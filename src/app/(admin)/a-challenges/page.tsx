@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn, getDifficultyConfig, getCategoryLabel } from "@/lib/utils";
-import type { Challenge } from "@/types";
+import type { Challenge, Difficulty } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import slugify from "slugify";
 import { Plus, Search, Pencil, Trash2, Eye, EyeOff, Save, X, Loader2, Swords, Sparkles } from "lucide-react";
 
 const emptyForm = {
-  title: "", description: "", category: "math", difficulty: "easy" as const,
+  title: "", description: "", category: "math", difficulty: "easy" as Difficulty,
   languages: "python,javascript", coin_reward: 5, xp_reward: 15,
   time_limit_ms: 2000, starter_python: "def solve():\n    # Kodingizni yozing\n    pass",
   starter_js: "function solve() {\n    // Kodingizni yozing\n}",
