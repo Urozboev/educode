@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   ArrowLeft, ArrowRight, BookOpen, Video, FileText, ClipboardList,
-  Code2, CheckCircle2, Clock, Coins, Confetti
+  Code2, CheckCircle2, Clock, Coins
 } from "lucide-react";
 import { cn, formatDuration } from "@/lib/utils";
 
