@@ -96,16 +96,19 @@ export default function AdminUsersPage() {
 
   async function assignAllStudents() {
     if (!selectedTeacher) return;
-    const students = users.filter(u => u.role === "student" && !u.is_blocked);
-    for (const s of students) {
+    const allStudents = users.filter(u => u.role === "student" && !u.is_blocked);
+    let added = 0;
+    for (const s of allStudents) {
       if (!teacherStudents.includes(s.id)) {
-        await supabase.from("teacher_students").insert({
-          teacher_id: selectedTeacher, student_id: s.id,
-        }).onConflict("teacher_id,student_id" as any);
+        const { error } = await supabase.from("teacher_students").upsert(
+          { teacher_id: selectedTeacher, student_id: s.id },
+          { onConflict: "teacher_id,student_id" }
+        );
+        if (!error) added++;
       }
     }
-    setTeacherStudents(students.map(s => s.id));
-    toast.success(`${students.length} ta talaba biriktirildi`);
+    setTeacherStudents(allStudents.map(s => s.id));
+    toast.success(`${added} ta talaba biriktirildi`);
   }
 
   const teachers = users.filter(u => u.role === "teacher");
