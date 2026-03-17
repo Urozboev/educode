@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -8,6 +8,14 @@ import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md"><div className="glass-card p-10 h-96 animate-pulse" /></div>}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/dashboard";
