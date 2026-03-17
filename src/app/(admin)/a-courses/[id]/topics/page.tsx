@@ -157,7 +157,7 @@ export default function AdminTopicsPage() {
   async function saveQuiz() {
     if (!expandedTopic || !quizForm.question.trim()) { toast.error("Savolni kiriting"); return; }
     let options;
-    try { options = JSON.parse(quizForm.options); } catch { toast.error("Options JSON noto'g'ri"); return; }
+    try { options = JSON.parse(quizForm.options); } catch (_e) { toast.error("Options JSON noto'g'ri"); return; }
 
     await supabase.from("quizzes").insert({
       topic_id: expandedTopic, question: quizForm.question, question_type: "single",
@@ -180,7 +180,7 @@ export default function AdminTopicsPage() {
   async function saveTask() {
     if (!expandedTopic || !taskForm.title.trim()) { toast.error("Nomini kiriting"); return; }
     let testCases;
-    try { testCases = JSON.parse(taskForm.test_cases); } catch { toast.error("Test cases JSON noto'g'ri"); return; }
+    try { testCases = JSON.parse(taskForm.test_cases); } catch (_e) { toast.error("Test cases JSON noto'g'ri"); return; }
 
     await supabase.from("topic_tasks").insert({
       topic_id: expandedTopic, title: taskForm.title, description: taskForm.description,

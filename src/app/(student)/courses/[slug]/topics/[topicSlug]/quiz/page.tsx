@@ -113,7 +113,7 @@ export default function QuizPage() {
       });
       const data = await res.json();
       setAiFeedback(data.feedback);
-    } catch { toast.error("AI xatolik"); }
+    } catch (_e) { toast.error("AI xatolik"); }
     setAiLoading(false);
   }
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { cn, getDifficultyConfig } from "@/lib/utils";
-import type { Course, CourseDifficulty } from "@/types";
+import type { Course } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import slugify from "slugify";
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 const emptyForm = {
-  title: "", description: "", category: "programming", difficulty: "beginner" as CourseDifficulty,
+  title: "", description: "", category: "programming", difficulty: "beginner" as const,
   is_free: true, price_coins: 0, coin_reward: 50, estimated_hours: 10, tags: "",
 };
 
