@@ -10,7 +10,7 @@ import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, BookOpen, Swords, Gamepad2,
   BarChart3, Trophy, Store, User, LogOut, ChevronLeft,
-  Menu, X, Moon, Sun, Flame, Coins, ChevronDown
+  Menu, X, Moon, Sun, Flame, Coins, ChevronDown, MessageCircle
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,6 +20,7 @@ const studentLinks = [
   { href: "/courses", label: "Kurslar", icon: BookOpen },
   { href: "/challenges", label: "Topshiriqlar", icon: Swords },
   { href: "/games", label: "O'yinlar", icon: Gamepad2 },
+  { href: "/chat", label: "AI Yordamchi", icon: MessageCircle },
   { href: "/my-results", label: "Natijalarim", icon: BarChart3 },
   { href: "/leaderboard", label: "Reyting", icon: Trophy },
   { href: "/store", label: "Do'kon", icon: Store },

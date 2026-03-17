@@ -9,9 +9,18 @@ export const metadata: Metadata = {
     default: "EduCode — Dasturlashni o'ynab o'rgan",
     template: "%s | EduCode",
   },
-  description:
-    "Raqamli intellektual ta'lim platformasi. Dasturlash tillarini interaktiv kurslar, AI yordamchi va gamifikatsiya orqali o'rganing.",
-  keywords: ["dasturlash", "programming", "o'rganish", "python", "javascript", "kurs"],
+  description: "Raqamli intellektual ta'lim platformasi. Dasturlash tillarini interaktiv kurslar, AI yordamchi va gamifikatsiya orqali o'rganing. Python, JavaScript va boshqa tillar.",
+  keywords: ["dasturlash", "programming", "o'rganish", "python", "javascript", "kurs", "educode", "ta'lim", "IT", "kompyuter savodxonligi", "prompt engineering"],
+  authors: [{ name: "EduCode" }],
+  openGraph: {
+    title: "EduCode — Dasturlashni o'ynab o'rgan",
+    description: "Interaktiv kurslar, AI feedback, gamifikatsiya — barchasi bitta platformada",
+    siteName: "EduCode",
+    locale: "uz_UZ",
+    type: "website",
+  },
+  robots: { index: true, follow: true },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://malla.uz"),
 };
 
 export default function RootLayout({
