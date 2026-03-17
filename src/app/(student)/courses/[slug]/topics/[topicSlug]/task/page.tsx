@@ -67,7 +67,7 @@ export default function TaskPage() {
       });
       const data = await res.json();
       setAiFeedback(data.feedback);
-    } catch { toast.error("AI xatolik"); }
+    } catch (_e) { toast.error("AI xatolik"); }
     setAiLoading(false);
   }
 

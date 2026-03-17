@@ -65,7 +65,7 @@ export default function AdminSettingsPage() {
   async function saveQuestion() {
     if (!qForm.question.trim()) { toast.error("Savolni kiriting"); return; }
     let options;
-    try { options = JSON.parse(qForm.options); } catch { toast.error("Options JSON noto'g'ri"); return; }
+    try { options = JSON.parse(qForm.options); } catch (_e) { toast.error("Options JSON noto'g'ri"); return; }
 
     const { error } = await supabase.from("placement_tests").insert({
       question: qForm.question, category: qForm.category, difficulty: qForm.difficulty,

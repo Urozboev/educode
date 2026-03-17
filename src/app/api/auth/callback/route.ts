@@ -1,6 +1,8 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -15,8 +17,12 @@ export async function GET(request: NextRequest) {
       {
         cookies: {
           get(name: string) { return cookieStore.get(name)?.value; },
-          set(name: string, value: string, options: CookieOptions) { cookieStore.set({ name, value, ...options }); },
-          remove(name: string, options: CookieOptions) { cookieStore.set({ name, value: '', ...options }); },
+          set(name: string, value: string, options: Record<string, unknown>) {
+            try { cookieStore.set({ name, value, ...options } as any); } catch (_e) { /* noop */ }
+          },
+          remove(name: string, options: Record<string, unknown>) {
+            try { cookieStore.set({ name, value: '', ...options } as any); } catch (_e) { /* noop */ }
+          },
         },
       }
     );
@@ -24,7 +30,6 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // Yangi foydalanuvchi bo'lsa — placement test ga yo'naltirish
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: placement } = await supabase
@@ -34,11 +39,9 @@ export async function GET(request: NextRequest) {
           .maybeSingle();
 
         if (!placement) {
-          // Hali placement test topshirmagan — test sahifasiga
           return NextResponse.redirect(`${origin}/placement-test`);
         }
       }
-
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

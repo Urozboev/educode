@@ -50,7 +50,7 @@ export default function ChallengeDetailPage() {
       });
       const data = await res.json();
       setAiFeedback(data.feedback);
-    } catch { toast.error("AI feedback xatolik"); }
+    } catch (_e) { toast.error("AI feedback xatolik"); }
     setAiLoading(false);
   }
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { completeTopic, checkAndCompleteCourse } from "@/lib/course-completion";
+import { completeTopic } from "@/lib/course-completion";
 import type { Topic, Course, TopicProgress } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";

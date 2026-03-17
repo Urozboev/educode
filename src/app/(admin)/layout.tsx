@@ -10,7 +10,7 @@ import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, BookOpen, Swords, Users, Award,
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
-  ChevronLeft, Menu, X
+  ChevronLeft, Menu, X, ShoppingBag, MessageSquare
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,8 +20,10 @@ const adminLinks = [
   { href: "/a-courses", label: "Kurslar", icon: BookOpen },
   { href: "/a-challenges", label: "Topshiriqlar", icon: Swords },
   { href: "/a-users", label: "Foydalanuvchilar", icon: Users },
+  { href: "/a-store", label: "Do'kon", icon: ShoppingBag },
   { href: "/a-achievements", label: "Yutuqlar", icon: Award },
   { href: "/a-certificates", label: "Sertifikatlar", icon: GraduationCap },
+  { href: "/a-testimonials", label: "Izohlar", icon: MessageSquare },
   { href: "/a-analytics", label: "Tahlillar", icon: BarChart3 },
   { href: "/a-settings", label: "Sozlamalar", icon: Settings },
   { href: "/a-export", label: "Eksport", icon: Download },

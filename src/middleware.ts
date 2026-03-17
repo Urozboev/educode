@@ -82,10 +82,8 @@ export async function middleware(request: NextRequest) {
 
       role = profile?.role || 'student';
 
-    const roleValue = role ?? "student";
-
       // Cookie ga saqlash
-      response.cookies.set('user-role', roleValue, {
+      response.cookies.set('user-role', role, {
         httpOnly: true,
         sameSite: 'lax' as const,
         maxAge: 3600,

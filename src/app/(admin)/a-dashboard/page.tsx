@@ -45,7 +45,7 @@ export default function AdminDashboardPage() {
 
       const { data: rs } = await supabase.from("submissions").select("id, status, language, task_type, created_at, user_id").order("created_at", { ascending: false }).limit(8);
       if (rs) {
-        const userIds = Array.from(new Set(rs.map(s => s.user_id)));
+        const userIds = [...new Set(rs.map(s => s.user_id))];
         const { data: profiles } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
         const nameMap = Object.fromEntries((profiles || []).map(p => [p.id, p.full_name]));
         setRecentSubs(rs.map(s => ({ ...s, user_name: nameMap[s.user_id] || "Noma'lum" })));
