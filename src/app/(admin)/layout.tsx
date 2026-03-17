@@ -10,7 +10,7 @@ import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, BookOpen, Swords, Users, Award,
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
-  ChevronLeft, Menu, X, ShoppingBag, MessageSquare
+  ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +25,7 @@ const adminLinks = [
   { href: "/a-certificates", label: "Sertifikatlar", icon: GraduationCap },
   { href: "/a-testimonials", label: "Izohlar", icon: MessageSquare },
   { href: "/a-analytics", label: "Tahlillar", icon: BarChart3 },
+  { href: "/a-about", label: "Platforma haqida", icon: Info },
   { href: "/a-settings", label: "Sozlamalar", icon: Settings },
   { href: "/a-export", label: "Eksport", icon: Download },
 ];

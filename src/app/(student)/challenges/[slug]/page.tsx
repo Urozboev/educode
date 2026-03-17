@@ -136,7 +136,15 @@ export default function ChallengeDetailPage() {
             testCases={allTestCases}
             taskId={challenge.id}
             taskType="challenge"
-            onSubmit={() => toast.success("Yuborildi!")}
+            onSubmit={async () => {
+              // Submissions ro'yxatini yangilash
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) {
+                const { data: subs } = await supabase.from("submissions").select("*")
+                  .eq("user_id", user.id).eq("task_id", challenge.id).order("created_at", { ascending: false }).limit(10);
+                if (subs) setSubmissions(subs as Submission[]);
+              }
+            }}
             onAIFeedback={handleAIFeedback}
             height="500px"
           />
