@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 import type { Certificate } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Printer, Share2, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Printer, Loader2 } from "lucide-react";
 
 export default function CertificatePage() {
   const { id } = useParams<{ id: string }>();
