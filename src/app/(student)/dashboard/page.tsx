@@ -5,12 +5,12 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getOrCreateProfile } from "@/lib/profile";
 import { cn, formatNumber, getLevelLabel, getLevelColor, calculateXpLevel } from "@/lib/utils";
-import type { Profile, Enrollment, Course, LeaderboardEntry } from "@/types";
+import type { Profile, Enrollment, Course } from "@/types";
 import { motion } from "framer-motion";
 import {
-  BookOpen, Code2, Trophy, Flame, Target, TrendingUp,
-  ChevronRight, Clock, Zap, Brain, Star, Coins, Play,
-  CheckCircle2, ArrowUpRight, GraduationCap
+  BookOpen, Code2, Trophy, Flame, Target,
+  ChevronRight, Zap, Brain, Star, Coins, Play,
+  CheckCircle2, 
 } from "lucide-react";
 
 const fadeUp = {

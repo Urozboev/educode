@@ -80,7 +80,7 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${redirect}`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=${redirect}`,
       },
     });
     if (error) { setErrorMsg("Google xatolik: " + error.message); setGoogleLoading(false); }
