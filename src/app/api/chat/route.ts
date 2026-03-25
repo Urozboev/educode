@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     // System prompt birinchi user message sifatida
     contents.push({ role: 'user', parts: [{ text: SYSTEM_PROMPT }] });
-    contents.push({ role: 'model', parts: [{ text: 'Tushundim. Faqat IT sohalari bo'yicha yordam beraman.' }] });
+    contents.push({ role: 'model', parts: [{ text: "Tushundim. Faqat IT sohalari bo'yicha yordam beraman." }] });
 
     // Oxirgi 6 ta xabarni qo'shish (token tejash)
     const recentHistory = (history || []).slice(-6);
