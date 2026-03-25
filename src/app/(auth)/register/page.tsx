@@ -38,7 +38,7 @@ export default function RegisterPage() {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/placement-test`,
+        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/placement-test`,
       },
     });
 
@@ -66,7 +66,7 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/placement-test`,
+        redirectTo: `${window.location.origin}/api/auth/callback?next=/placement-test`,
       },
     });
     if (error) setErrorMsg("Google bilan kirishda xatolik yuz berdi");

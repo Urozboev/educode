@@ -62,7 +62,14 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    font-size: 16.5px;
+    line-height: 1.65;
   }
+
+  /* Matn o'lchamini kattalashtirish */
+  .text-sm { font-size: 0.9rem !important; }
+  .text-xs { font-size: 0.8rem !important; }
+  .text-\[10px\] { font-size: 11px !important; }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;

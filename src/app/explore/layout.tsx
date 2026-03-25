@@ -12,6 +12,7 @@ import { useTheme } from "next-themes";
 const navLinks = [
   { href: "/explore/courses", label: "Kurslar" },
   { href: "/explore/challenges", label: "Topshiriqlar" },
+  { href: "/playground", label: "Playground" },
   { href: "/explore/games", label: "O'yinlar" },
   { href: "/explore/about", label: "Platforma haqida" },
 ];

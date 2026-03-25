@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
   // ============================================
   // OMMAVIY SAHIFALAR — hech narsa qilinmaydi
   // ============================================
-  const publicPaths = ['/', '/login', '/register', '/forgot-password', '/verify-email'];
+  const publicPaths = ['/', '/login', '/register', '/forgot-password', '/verify-email', '/playground'];
   const isPublicPrefix = pathname.startsWith('/explore');
   if (publicPaths.includes(pathname) || isPublicPrefix) {
     return NextResponse.next();
@@ -81,10 +81,9 @@ export async function middleware(request: NextRequest) {
         .single();
 
       role = profile?.role || 'student';
-      const cookieRole = role ?? 'student';
 
       // Cookie ga saqlash
-      response.cookies.set('user-role', cookieRole, {
+      response.cookies.set('user-role', role, {
         httpOnly: true,
         sameSite: 'lax' as const,
         maxAge: 3600,

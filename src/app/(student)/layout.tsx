@@ -14,11 +14,13 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
+import AutoLogout from "@/components/AutoLogout";
 
 const studentLinks = [
   { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
   { href: "/courses", label: "Kurslar", icon: BookOpen },
   { href: "/challenges", label: "Topshiriqlar", icon: Swords },
+  { href: "/playground", label: "Playground", icon: Code2 },
   { href: "/games", label: "O'yinlar", icon: Gamepad2 },
   { href: "/chat", label: "AI Yordamchi", icon: MessageCircle },
   { href: "/my-results", label: "Natijalarim", icon: BarChart3 },
@@ -312,6 +314,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         collapsed ? "lg:pl-[72px]" : "lg:pl-64"
       )}>
         <div className="p-6 lg:p-8">
+          <AutoLogout />
           {children}
         </div>
       </main>

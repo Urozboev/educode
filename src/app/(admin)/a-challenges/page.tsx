@@ -51,7 +51,6 @@ const emptyForm: FormType = {
   hidden_test_cases:
     '[{"input":"100 200","expected_output":"300","is_hidden":true}]',
 };
-
 export default function AdminChallengesPage() {
   const supabase = createClient();
   const [challenges, setChallenges] = useState<Challenge[]>([]);

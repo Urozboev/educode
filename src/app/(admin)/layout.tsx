@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
+import AutoLogout from "@/components/AutoLogout";
 
 const adminLinks = [
   { href: "/a-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
@@ -131,7 +132,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </AnimatePresence>
 
       <main className={cn("min-h-screen transition-all duration-300 pt-14 lg:pt-0", collapsed ? "lg:pl-[72px]" : "lg:pl-64")}>
-        <div className="p-4 md:p-6 lg:p-8">{children}</div>
+        <div className="p-4 md:p-6 lg:p-8"><AutoLogout />{children}</div>
       </main>
     </div>
   );
