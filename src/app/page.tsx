@@ -18,6 +18,288 @@ import { LanguageLogo } from "@/components/icons/LanguageLogo";
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
+/**
+ * Kreativ "spreadsheet" uslubidagi hero mosaic — har bir katak kod/rasm/statistika.
+ * Googlesheet.uz hero'dan ilhomlanib, EduCode uchun moslandi.
+ * Bitta CSS grid ichida 6 ustun × 6 qator — markazda 2×2 "big" cell.
+ */
+type MosaicCell =
+  | { kind: "empty"; tone?: "plain" | "purple" | "blue" | "green" | "yellow" | "pink" }
+  | { kind: "lang"; lang: "python" | "javascript" | "typescript" | "react" | "c++" | "java" | "csharp" | "html" }
+  | { kind: "snippet"; text: string; color?: string }
+  | { kind: "stat"; value: string; label: string; color: string }
+  | { kind: "icon"; Icon: any; color: string; badge?: string }
+  | { kind: "progress"; value: number; color: string; label: string }
+  | { kind: "check"; label: string };
+
+const TONE_BG: Record<string, string> = {
+  plain: "bg-surface/40",
+  purple: "bg-neon-purple/[0.08] border-neon-purple/15",
+  blue: "bg-neon-blue/[0.08] border-neon-blue/15",
+  green: "bg-neon-green/[0.08] border-neon-green/15",
+  yellow: "bg-neon-yellow/[0.08] border-neon-yellow/15",
+  pink: "bg-neon-pink/[0.08] border-neon-pink/15",
+};
+
+function MosaicCellView({ c, delay }: { c: MosaicCell; delay: number }) {
+  const base =
+    "relative aspect-square rounded-xl border border-border/50 bg-card/40 flex items-center justify-center overflow-hidden transition-all hover:scale-[1.04] hover:border-border hover:shadow-lg hover:shadow-black/5 hover:z-10";
+
+  const inner = (() => {
+    switch (c.kind) {
+      case "empty":
+        return <div className={`w-full h-full ${TONE_BG[c.tone || "plain"]}`} />;
+      case "lang":
+        return <LanguageLogo lang={c.lang as any} size={28} />;
+      case "snippet":
+        return (
+          <code
+            className="text-[10px] md:text-[11px] font-mono font-semibold truncate px-1.5"
+            style={{ color: c.color || "currentColor" }}
+          >
+            {c.text}
+          </code>
+        );
+      case "stat":
+        return (
+          <div className="text-center leading-none">
+            <div
+              className="font-display font-extrabold text-lg tracking-tight"
+              style={{ color: c.color }}
+            >
+              {c.value}
+            </div>
+            <div className="text-[9px] font-medium text-muted-foreground mt-0.5">{c.label}</div>
+          </div>
+        );
+      case "icon":
+        return (
+          <div className="flex flex-col items-center">
+            <c.Icon className="w-5 h-5" style={{ color: c.color }} />
+            {c.badge && (
+              <span className="text-[8px] font-bold mt-1" style={{ color: c.color }}>
+                {c.badge}
+              </span>
+            )}
+          </div>
+        );
+      case "progress":
+        return (
+          <div className="w-full px-2">
+            <div className="text-[9px] font-mono font-semibold mb-1" style={{ color: c.color }}>
+              {c.label}
+            </div>
+            <div className="h-1.5 rounded-full bg-surface overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                style={{ backgroundColor: c.color }}
+                initial={{ width: 0 }}
+                animate={{ width: `${c.value}%` }}
+                transition={{ duration: 1.2, delay: delay + 0.3 }}
+              />
+            </div>
+            <div className="text-[9px] text-muted-foreground mt-1 text-right">{c.value}%</div>
+          </div>
+        );
+      case "check":
+        return (
+          <div className="flex flex-col items-center">
+            <CheckCircle2 className="w-4 h-4 text-neon-green" />
+            <span className="text-[9px] font-semibold text-neon-green mt-0.5">{c.label}</span>
+          </div>
+        );
+      default:
+        return null;
+    }
+  })();
+
+  return (
+    <motion.div
+      className={base}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {inner}
+    </motion.div>
+  );
+}
+
+function HeroMosaic() {
+  // 6×6 grid + "big" 2×2 cell at rows 2–3, cols 2–3 (center-ish)
+  // Big cell col-start/row-start explicit; qolgan kataklar flow bilan joylanadi.
+  // Har bir katak uchun flow tartibini bilish uchun explicit (col,row) berib ketamiz,
+  // lekin sodda shaklda faqat 6×6 dan big cell joylarini (2,2),(3,2),(2,3),(3,3) chiqarib tashlaymiz.
+
+  const bigSlots = new Set(["2-2", "3-2", "2-3", "3-3"]); // 1-indexed grid-column/row
+
+  // 6×6 = 36 joy bor; big 4 tani oladi → bizga 32 cell kerak.
+  const cells: MosaicCell[] = [
+    // Row 1 (6)
+    { kind: "lang", lang: "python" },
+    { kind: "snippet", text: "print()", color: "#00D2FF" },
+    { kind: "empty", tone: "purple" },
+    { kind: "icon", Icon: Sparkles, color: "#FFD600", badge: "AI" },
+    { kind: "lang", lang: "javascript" },
+    { kind: "stat", value: "7", label: "til", color: "#6C5CE7" },
+    // Row 2 — big at cols 2,3 → normal cells at cols 1,4,5,6 (4 cells)
+    { kind: "empty", tone: "green" },
+    { kind: "icon", Icon: Trophy, color: "#FFD600" },
+    { kind: "lang", lang: "typescript" },
+    { kind: "snippet", text: "if x > 0:", color: "#FF6B9D" },
+    // Row 3 — big continues → 4 cells at cols 1,4,5,6
+    { kind: "stat", value: "+50", label: "XP", color: "#FFD600" },
+    { kind: "lang", lang: "react" },
+    { kind: "empty", tone: "blue" },
+    { kind: "snippet", text: "for i in..", color: "#00E676" },
+    // Row 4 (6)
+    { kind: "check", label: "4/4" },
+    { kind: "progress", value: 72, color: "#6C5CE7", label: "Py" },
+    { kind: "empty", tone: "yellow" },
+    { kind: "lang", lang: "c++" },
+    { kind: "icon", Icon: Brain, color: "#00D2FF" },
+    { kind: "snippet", text: "return 0", color: "#FF5252" },
+    // Row 5 (6)
+    { kind: "lang", lang: "java" },
+    { kind: "empty", tone: "pink" },
+    { kind: "stat", value: "100+", label: "kurs", color: "#00E676" },
+    { kind: "snippet", text: "while..", color: "#00D2FF" },
+    { kind: "empty", tone: "plain" },
+    { kind: "icon", Icon: Gamepad2, color: "#FF6B9D" },
+    // Row 6 (6)
+    { kind: "icon", Icon: CheckCircle2, color: "#00E676" },
+    { kind: "snippet", text: "=> ok", color: "#00E676" },
+    { kind: "lang", lang: "csharp" },
+    { kind: "empty", tone: "purple" },
+    { kind: "progress", value: 45, color: "#00D2FF", label: "JS" },
+    { kind: "lang", lang: "html" },
+  ];
+
+  // Explicit placement: (col, row) 1-indexed, skipping bigSlots for rows 2-3
+  const placements: { col: number; row: number; cell: MosaicCell }[] = [];
+  let i = 0;
+  for (let row = 1; row <= 6; row++) {
+    for (let col = 1; col <= 6; col++) {
+      if (bigSlots.has(`${col}-${row}`)) continue;
+      if (i < cells.length) {
+        placements.push({ col, row, cell: cells[i] });
+        i++;
+      }
+    }
+  }
+
+  return (
+    <div className="relative">
+      {/* Soft gradient behind the grid */}
+      <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,rgba(108,92,231,0.14)_0%,transparent_70%)] -z-10" />
+
+      {/* Column labels — like spreadsheet A B C D */}
+      <div className="grid grid-cols-[18px_repeat(6,1fr)] gap-1.5 mb-1.5">
+        <div />
+        {["A", "B", "C", "D", "E", "F"].map((l) => (
+          <div
+            key={l}
+            className="text-center text-[10px] font-mono font-semibold text-muted-foreground/40"
+          >
+            {l}
+          </div>
+        ))}
+      </div>
+
+      {/* Row numbers + single grid */}
+      <div className="grid grid-cols-[18px_repeat(6,1fr)] gap-1.5">
+        {/* Row numbers column */}
+        <div className="grid grid-rows-6 gap-1.5">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <div
+              key={n}
+              className="flex items-center justify-end pr-1 text-[10px] font-mono font-semibold text-muted-foreground/40"
+            >
+              {n}
+            </div>
+          ))}
+        </div>
+
+        {/* Actual 6×6 grid cells with explicit placement */}
+        <div
+          className="col-span-6 grid grid-cols-6 grid-rows-6 gap-1.5"
+          style={{ gridAutoFlow: "dense" }}
+        >
+          {/* Big 2×2 cell */}
+          <motion.div
+            style={{
+              gridColumn: "2 / span 2",
+              gridRow: "2 / span 2",
+              boxShadow: "0 0 0 1px rgba(108,92,231,0.2) inset, 0 10px 40px -10px rgba(108,92,231,0.35)",
+            }}
+            className="rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-3 flex flex-col gap-2 relative overflow-hidden hover:scale-[1.02] transition-all"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="flex items-center gap-1.5">
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-neon-red/60" />
+                <div className="w-1.5 h-1.5 rounded-full bg-neon-yellow/60" />
+                <div className="w-1.5 h-1.5 rounded-full bg-neon-green/60" />
+              </div>
+              <span className="text-[9px] font-mono text-muted-foreground ml-auto">main.py</span>
+            </div>
+            <div className="flex-1 flex flex-col justify-center text-[10px] md:text-[11px] leading-tight font-mono">
+              <div>
+                <span className="text-neon-purple">def</span>{" "}
+                <span className="text-neon-blue">salom</span>
+                (ism):
+              </div>
+              <div className="pl-3">
+                <span className="text-neon-purple">return</span>{" "}
+                <span className="text-neon-green">f&quot;Hi, {"{"}ism{"}"}&quot;</span>
+              </div>
+              <div className="mt-1 text-muted-foreground/50"># AI tahlil</div>
+            </div>
+            <div className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded self-start bg-neon-green/15 text-neon-green">
+              <CheckCircle2 className="w-2.5 h-2.5" /> bajarildi
+            </div>
+          </motion.div>
+
+          {/* All other cells */}
+          {placements.map((p, idx) => (
+            <div
+              key={`${p.col}-${p.row}`}
+              style={{ gridColumn: p.col, gridRow: p.row }}
+            >
+              <MosaicCellView c={p.cell} delay={0.05 + idx * 0.02} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Floating chips over the grid */}
+      <motion.div
+        className="absolute -top-5 left-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-yellow/95 backdrop-blur text-[#1a1a00] text-[11px] font-extrabold shadow-xl shadow-neon-yellow/40 rotate-[-4deg]"
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      >
+        <Trophy className="w-3.5 h-3.5" /> +50 XP
+      </motion.div>
+      <motion.div
+        className="absolute -bottom-4 -right-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-blue/95 backdrop-blur text-white text-[11px] font-extrabold shadow-xl shadow-neon-blue/40 rotate-[3deg]"
+        animate={{ y: [0, 4, 0] }}
+        transition={{ duration: 3.5, repeat: Infinity }}
+      >
+        <Brain className="w-3.5 h-3.5" /> AI Tahlil
+      </motion.div>
+      <motion.div
+        className="absolute top-[48%] -left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-green/95 backdrop-blur text-[#001a00] text-[11px] font-extrabold shadow-xl shadow-neon-green/40 rotate-[-6deg]"
+        animate={{ y: [0, -3, 0] }}
+        transition={{ duration: 2.8, repeat: Infinity }}
+      >
+        <CheckCircle2 className="w-3.5 h-3.5" /> 4/4
+      </motion.div>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const supabase = createClient();
   const { theme, setTheme } = useTheme();
@@ -192,78 +474,246 @@ export default function LandingPage() {
               </motion.div>
             </motion.div>
 
-            {/* Right — Illustration */}
-            <motion.div className="hidden md:block" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}>
-              <div className="relative">
-                {/* Code editor illustration */}
-                <div className="rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm shadow-2xl shadow-black/10 overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-surface/50">
-                    <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-neon-red/50" /><div className="w-3 h-3 rounded-full bg-neon-yellow/50" /><div className="w-3 h-3 rounded-full bg-neon-green/50" /></div>
-                    <span className="text-xs font-mono text-muted-foreground ml-2">main.py</span>
-                    <div className="ml-auto flex items-center gap-1.5"><span className="text-[10px] px-2 py-0.5 rounded-full bg-neon-green/10 text-neon-green">Python ✓</span></div>
-                  </div>
-                  <div className="p-5 font-mono text-sm leading-7">
-                    <div><span className="text-neon-purple">def</span> <span className="text-neon-blue">salom</span>(ism):</div>
-                    <div className="pl-6"><span className="text-neon-purple">return</span> <span className="text-neon-green">f&quot;Salom, {'{'}ism{'}'}!&quot;</span></div>
-                    <div className="mt-2"><span className="text-muted-foreground"># AI yordamchi tahlil qiladi</span></div>
-                    <div>natija = salom(<span className="text-neon-yellow">&quot;Talaba&quot;</span>)</div>
-                    <div><span className="text-neon-blue">print</span>(natija)</div>
-                  </div>
-                  <div className="px-5 py-3 border-t border-border/50 bg-neon-green/5">
-                    <div className="flex items-center gap-2 text-sm text-neon-green"><CheckCircle2 className="w-4 h-4" /> <span className="font-mono">Salom, Talaba!</span></div>
-                  </div>
-                </div>
-
-                {/* Floating badges */}
-                <motion.div className="absolute -top-3 -right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neon-yellow/10 border border-neon-yellow/20 text-neon-yellow text-xs font-bold shadow-lg"
-                  animate={{ y: [0, -6, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                  <Trophy className="w-3.5 h-3.5" /> +50 XP
-                </motion.div>
-                <motion.div className="absolute -bottom-3 -left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-xs font-bold shadow-lg"
-                  animate={{ y: [0, 6, 0] }} transition={{ duration: 3.5, repeat: Infinity }}>
-                  <Brain className="w-3.5 h-3.5" /> AI Tahlil
-                </motion.div>
-                <motion.div className="absolute top-1/2 -right-6 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neon-green/10 border border-neon-green/20 text-neon-green text-xs font-bold shadow-lg"
-                  animate={{ y: [0, -4, 0] }} transition={{ duration: 2.8, repeat: Infinity }}>
-                  <CheckCircle2 className="w-3.5 h-3.5" /> 4/4 test
-                </motion.div>
-              </div>
+            {/* Right — Creative spreadsheet-style mosaic */}
+            <motion.div
+              className="hidden md:block"
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <HeroMosaic />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ========== FEATURES ========== */}
+      {/* ========== FEATURES — BENTO GRID ========== */}
       <section className="py-20 px-5 border-t border-border/30">
         <div className="max-w-6xl mx-auto">
-          <motion.div className="max-w-2xl mb-14" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            <motion.p variants={fadeUp()} className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Imkoniyatlar</motion.p>
-            <motion.h2 variants={fadeUp(0.05)} className="font-display font-bold text-3xl md:text-4xl tracking-tight mb-4">
+          <motion.div
+            className="max-w-2xl mb-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={stagger}
+          >
+            <motion.p
+              variants={fadeUp()}
+              className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3"
+            >
+              Imkoniyatlar
+            </motion.p>
+            <motion.h2
+              variants={fadeUp(0.05)}
+              className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-4"
+            >
               Nima uchun <span className="gradient-text">EduCode</span>?
             </motion.h2>
-            <motion.p variants={fadeUp(0.1)} className="text-muted-foreground text-lg">
-              Platformamiz zamonaviy ta'lim yondashuvlarini birlashtirib, o'rganishni samarali va qiziqarli qiladi.
+            <motion.p variants={fadeUp(0.1)} className="text-[15px] md:text-base text-muted-foreground">
+              Har bir blok — aniq bir imkoniyat. Yig&apos;ilganda u butun boshli o&apos;qitish tizimini beradi.
             </motion.p>
           </motion.div>
 
-          <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            {[
-              { icon: Code2, title: "Interaktiv kod muharriri", desc: "Monaco Editor (VS Code asosi) bilan brauzerda kod yozing. Python va JavaScript to'liq qo'llab-quvvatlanadi.", color: "#6C5CE7" },
-              { icon: Brain, title: "Sun'iy intellekt yordamchi", desc: "Claude AI kodingizni tahlil qiladi. Gemini chatbot IT savollariga javob beradi. 24/7 tezkor feedback.", color: "#00D2FF" },
-              { icon: Trophy, title: "Gamifikatsiya tizimi", desc: "Coin va XP yig'ing, reytingda o'rningizni oshiring, do'kondan sovg'alar oling.", color: "#FFD600" },
-              { icon: Gamepad2, title: "6 ta interaktiv o'yin", desc: "Code Puzzle, Bug Fix, Maze Runner, Code Bird — o'ynab o'rganing.", color: "#00E676" },
-              { icon: GraduationCap, title: "Sertifikatlash", desc: "Kursni tugatib professional sertifikat oling. PNG va chop etish.", color: "#FF6B9D" },
-              { icon: Terminal, title: "Playground", desc: "Python, C++, Java, C#, JavaScript, HTML — 7 ta tilda kod yozing.", color: "#FF5252" },
-            ].map((f, i) => (
-              <motion.div key={f.title} variants={fadeUp(i * 0.05)} className="group p-6 rounded-2xl border border-border/50 bg-card/30 hover:bg-card/60 hover:border-border hover:shadow-lg hover:shadow-black/[0.03] transition-all duration-300">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: `${f.color}10`, border: `1px solid ${f.color}20` }}>
-                  <f.icon className="w-5 h-5" style={{ color: f.color }} />
+          {/* Bento grid: 6 ustun, turli o'lchamli bloklar */}
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 auto-rows-[140px] md:auto-rows-[160px]">
+            {/* 1. AI Tahlil — KATTA (col-span 3, row-span 2) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="col-span-2 md:col-span-3 md:row-span-2 relative p-6 md:p-7 rounded-3xl border border-border/60 bg-gradient-to-br from-neon-blue/[0.07] via-card/40 to-transparent overflow-hidden group hover:border-neon-blue/30 transition-all"
+            >
+              <div className="absolute -top-20 -right-20 w-60 h-60 bg-neon-blue/10 rounded-full blur-3xl" />
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="w-12 h-12 rounded-xl bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center">
+                  <Brain className="w-6 h-6 text-neon-blue" />
                 </div>
-                <h3 className="font-display font-bold text-lg mb-2 group-hover:text-foreground transition-colors">{f.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+                <div>
+                  <h3 className="font-display font-extrabold text-2xl md:text-[28px] tracking-tight mb-2">
+                    AI kod tahlili
+                  </h3>
+                  <p className="text-[15px] text-muted-foreground leading-relaxed max-w-md">
+                    Claude AI kodingizni satr-satr tekshirib, xatolaringizni, yaxshilanish joylarini va
+                    tushunchalarni o&apos;zbek tilida tushuntiradi. Gemini 24/7 savollarga javob beradi.
+                  </p>
+                  {/* Demo snippet */}
+                  <div className="mt-4 rounded-xl border border-border/60 bg-background/60 p-3 font-mono text-[12px] leading-relaxed max-w-sm">
+                    <div className="text-neon-purple">
+                      def <span className="text-neon-blue">kvadrat</span>(x): <span className="text-muted-foreground">return</span> x*x
+                    </div>
+                    <div className="mt-1.5 pt-1.5 border-t border-border/40 text-neon-blue flex items-start gap-1.5">
+                      <Sparkles className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                      <span className="text-[11px]">Toza funksiya. Type hint qo&apos;shishingiz mumkin.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* 2. Playground — med (col-span 3) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.08 }}
+              className="col-span-2 md:col-span-3 p-6 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all group"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-11 h-11 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center">
+                  <Terminal className="w-5 h-5 text-neon-purple" />
+                </div>
+                <div className="flex -space-x-2">
+                  {(["python", "javascript", "c++", "java", "csharp"] as const).map((lg, i) => (
+                    <div
+                      key={lg}
+                      className="w-8 h-8 rounded-lg border-2 border-card bg-surface flex items-center justify-center"
+                      style={{ zIndex: 10 - i }}
+                    >
+                      <LanguageLogo lang={lg} size={18} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <h3 className="font-display font-extrabold text-xl tracking-tight mb-1.5">Playground</h3>
+              <p className="text-[14px] text-muted-foreground leading-snug">
+                7 ta tilda kod yozing — Judge0 + Piston orqali real bajarish, stdin qo&apos;llab-quvvatlash.
+              </p>
+            </motion.div>
+
+            {/* 3. Monaco (col-span 2, row-span 1) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.12 }}
+              className="col-span-1 md:col-span-2 p-5 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all"
+            >
+              <div className="w-10 h-10 rounded-lg bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mb-3">
+                <Code2 className="w-5 h-5 text-neon-purple" />
+              </div>
+              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">VS Code muharrir</h3>
+              <p className="text-[12px] text-muted-foreground leading-snug">Monaco engine — syntax, IntelliSense.</p>
+            </motion.div>
+
+            {/* 4. Gamification (col-span 1) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.16 }}
+              className="col-span-1 p-5 rounded-3xl border border-border/60 bg-gradient-to-br from-neon-yellow/[0.08] to-transparent hover:border-neon-yellow/30 transition-all relative overflow-hidden"
+            >
+              <div className="absolute top-3 right-3 text-[32px] font-display font-extrabold leading-none text-neon-yellow/15">
+                XP
+              </div>
+              <div className="w-10 h-10 rounded-lg bg-neon-yellow/10 border border-neon-yellow/20 flex items-center justify-center mb-3">
+                <Trophy className="w-5 h-5 text-neon-yellow" />
+              </div>
+              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">Coin &amp; XP</h3>
+              <p className="text-[12px] text-muted-foreground leading-snug">Reyting, sovg&apos;alar.</p>
+            </motion.div>
+
+            {/* 5. Games (col-span 2) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="col-span-2 md:col-span-2 p-5 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-lg bg-neon-green/10 border border-neon-green/20 flex items-center justify-center flex-shrink-0">
+                  <Gamepad2 className="w-5 h-5 text-neon-green" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-display font-bold text-[15px] tracking-tight truncate">
+                    6 ta interaktiv o&apos;yin
+                  </h3>
+                  <p className="text-[12px] text-muted-foreground leading-snug truncate">
+                    Puzzle, BugFix, Maze, Bird…
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3 flex gap-1 flex-wrap">
+                {["Puzzle", "Bug", "Maze", "Bird", "Typing", "Battle"].map((t) => (
+                  <span
+                    key={t}
+                    className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-surface/60 border border-border/50 text-muted-foreground"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* 6. Certificate (col-span 2) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.24 }}
+              className="col-span-2 md:col-span-2 p-5 rounded-3xl border border-border/60 bg-gradient-to-br from-neon-pink/[0.06] to-transparent hover:border-neon-pink/30 transition-all relative overflow-hidden"
+            >
+              <div className="absolute -bottom-6 -right-4 rotate-[-8deg] opacity-40">
+                <div className="px-3 py-2 rounded-lg border-2 border-neon-pink/40 bg-card">
+                  <div className="text-[8px] font-mono text-muted-foreground">CERTIFICATE</div>
+                  <div className="text-[10px] font-bold text-neon-pink">EduCode</div>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="w-10 h-10 rounded-lg bg-neon-pink/10 border border-neon-pink/20 flex items-center justify-center mb-3">
+                  <GraduationCap className="w-5 h-5 text-neon-pink" />
+                </div>
+                <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">Sertifikat</h3>
+                <p className="text-[12px] text-muted-foreground leading-snug max-w-[200px]">
+                  Kursni tugating va PNG sertifikatni oling.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* 7. Multi-language tag row (col-span 6) */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.28 }}
+              className="col-span-2 md:col-span-6 p-5 md:p-6 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all flex items-center gap-4 md:gap-6 flex-wrap"
+            >
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-neon-red/10 border border-neon-red/20 flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-neon-red" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-[15px] tracking-tight">7 ta dasturlash tili</h3>
+                  <p className="text-[12px] text-muted-foreground leading-tight">
+                    Bir platformada — bir interfeysda
+                  </p>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-wrap gap-2 md:justify-end">
+                {(
+                  [
+                    { k: "python", label: "Python" },
+                    { k: "javascript", label: "JavaScript" },
+                    { k: "typescript", label: "TypeScript" },
+                    { k: "c++", label: "C++" },
+                    { k: "java", label: "Java" },
+                    { k: "csharp", label: "C#" },
+                    { k: "html", label: "HTML/CSS" },
+                  ] as const
+                ).map((l) => (
+                  <div
+                    key={l.k}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface/80 border border-border/60 text-[12px] font-semibold"
+                  >
+                    <LanguageLogo lang={l.k as any} size={14} />
+                    {l.label}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
