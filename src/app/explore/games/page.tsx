@@ -5,13 +5,67 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
-import { Puzzle, Bug, Keyboard, Swords, Lock, ArrowRight, Gamepad2 } from "lucide-react";
+import {
+  Puzzle,
+  Bug,
+  Keyboard,
+  Swords,
+  Lock,
+  ArrowRight,
+  Gamepad2,
+  Map,
+  Bird,
+} from "lucide-react";
 
 const games = [
-  { id: "puzzle", title: "Code Puzzle", desc: "Kod qatorlarini to'g'ri tartibga qo'ying. Mantiqiy fikrlashni rivojlantiradi.", icon: Puzzle, color: "#6C5CE7", difficulty: "Oson" },
-  { id: "bugfix", title: "Bug Fix Challenge", desc: "Xatoli kodni toping va tuzating. Real loyihalardagi muammolarni tushunishga yordam beradi.", icon: Bug, color: "#FF5252", difficulty: "O'rta" },
-  { id: "typing", title: "Code Typing Race", desc: "Kod yozish tezligingizni sinab ko'ring. Tezkor yozish — tezkor dasturlash.", icon: Keyboard, color: "#00D2FF", difficulty: "Oson" },
-  { id: "battle", title: "Code Battle", desc: "Boshqa talabalar bilan real-time musobaqa. Kim tezroq yechadi?", icon: Swords, color: "#00E676", difficulty: "Qiyin" },
+  {
+    id: "puzzle",
+    title: "Code Puzzle",
+    desc: "Kod qatorlarini to'g'ri tartibga qo'ying. Mantiqiy fikrlash va algoritm tuzilishini mashq qilasiz.",
+    icon: Puzzle,
+    color: "#6C5CE7",
+    difficulty: "Oson",
+  },
+  {
+    id: "bugfix",
+    title: "Bug Fix Challenge",
+    desc: "Kodning qayeri xato ekanligini toping va tuzating. Debug qilish ko'nikmalaringizni rivojlantirasiz.",
+    icon: Bug,
+    color: "#FF5252",
+    difficulty: "O'rta",
+  },
+  {
+    id: "typing",
+    title: "Code Typing Race",
+    desc: "Kod yozish tezligingizni sinab ko'ring. WPM va aniqlikni o'lchovchi real-time musobaqa.",
+    icon: Keyboard,
+    color: "#00D2FF",
+    difficulty: "Oson",
+  },
+  {
+    id: "battle",
+    title: "Code Battle",
+    desc: "30 soniyada ko'proq masalani yeching. Streak bilan ko'p ochko to'plang.",
+    icon: Swords,
+    color: "#00E676",
+    difficulty: "Qiyin",
+  },
+  {
+    id: "maze",
+    title: "Maze Runner",
+    desc: "Robotni buyruqlar ketma-ketligi bilan labirintdan olib chiqing. Sikllar va shartlarni o'rganing.",
+    icon: Map,
+    color: "#FFD600",
+    difficulty: "O'rta",
+  },
+  {
+    id: "bird",
+    title: "Code Bird",
+    desc: "Qushni yulduzlarga yo'naltiring. 8 yo'nalishli harakat va to'siqlarni oldini olish.",
+    icon: Bird,
+    color: "#FF6B9D",
+    difficulty: "Qiyin",
+  },
 ];
 
 export default function ExploreGames() {
@@ -21,7 +75,9 @@ export default function ExploreGames() {
 
   useEffect(() => {
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
     })();
   }, []);
@@ -31,56 +87,91 @@ export default function ExploreGames() {
   }
 
   return (
-    <div className="space-y-8">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-4xl mb-2">O'yinlar</h1>
-        <p className="text-muted-foreground text-lg">Dasturlashni o'yin orqali osonroq o'rganing</p>
+    <div className="space-y-10">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl"
+      >
+        <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight mb-3">
+          Interaktiv o'yinlar
+        </h1>
+        <p className="text-lg text-muted-foreground leading-relaxed">
+          Dasturlashni o'yin orqali osonroq va qiziqarliroq o'rganing. 6 xil format —
+          algoritm, debug, tezlik va mantiq uchun.
+        </p>
       </motion.div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      {/* Games grid */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {games.map((game, i) => (
-          <motion.button key={game.id} onClick={handleClick}
-            className="glass-card-hover p-8 text-left group w-full" initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-            <div className="flex items-start gap-5">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110"
-                style={{ backgroundColor: `${game.color}15`, border: `1px solid ${game.color}30` }}>
-                <game.icon className="w-8 h-8" style={{ color: game.color }} />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-display font-bold text-xl group-hover:text-neon-purple transition-colors">{game.title}</h3>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-muted-foreground">{game.difficulty}</span>
-                </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">{game.desc}</p>
-              </div>
+          <motion.button
+            key={game.id}
+            onClick={handleClick}
+            className="group w-full text-left p-6 rounded-2xl border border-border/50 bg-card/40 hover:bg-card hover:border-border hover:shadow-xl hover:shadow-black/[0.04] transition-all duration-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-transform group-hover:scale-105"
+              style={{
+                backgroundColor: `${game.color}14`,
+                border: `1px solid ${game.color}33`,
+              }}
+            >
+              <game.icon className="w-7 h-7" style={{ color: game.color }} />
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-display font-bold text-xl group-hover:text-neon-purple transition-colors">
+                {game.title}
+              </h3>
+            </div>
+            <p className="text-[15px] text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+              {game.desc}
+            </p>
+            <div className="flex items-center justify-between pt-4 border-t border-border/40">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-surface text-muted-foreground border border-border/60">
+                {game.difficulty}
+              </span>
+              <ArrowRight className="w-5 h-5 text-muted-foreground/60 group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
             </div>
           </motion.button>
         ))}
       </div>
 
-      {/* Animated gaming SVG */}
-      <motion.div className="flex justify-center py-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-        <svg width="300" height="180" viewBox="0 0 300 180" className="opacity-30">
-          <rect x="40" y="30" width="220" height="130" rx="16" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
-          <circle cx="100" cy="95" r="25" fill="none" stroke="#6C5CE7" strokeWidth="1.5" opacity="0.5">
-            <animate attributeName="r" values="25;28;25" dur="2s" repeatCount="indefinite" />
-          </circle>
-          <line x1="100" y1="80" x2="100" y2="110" stroke="#6C5CE7" strokeWidth="2" opacity="0.5" />
-          <line x1="85" y1="95" x2="115" y2="95" stroke="#6C5CE7" strokeWidth="2" opacity="0.5" />
-          <circle cx="190" cy="85" r="8" fill="#FF5252" opacity="0.5"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="1.5s" repeatCount="indefinite" /></circle>
-          <circle cx="210" cy="95" r="8" fill="#00E676" opacity="0.5"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="1.5s" repeatCount="indefinite" begin="0.3s" /></circle>
-          <circle cx="190" cy="105" r="8" fill="#00D2FF" opacity="0.5"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.5s" repeatCount="indefinite" begin="0.6s" /></circle>
-          <circle cx="170" cy="95" r="8" fill="#FFD600" opacity="0.5"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="1.5s" repeatCount="indefinite" begin="0.9s" /></circle>
-        </svg>
-      </motion.div>
-
-      {!isLoggedIn && (
-        <motion.div className="glass-card p-8 text-center" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-          <Gamepad2 className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-muted-foreground mb-4">O'yinlardan foydalanish uchun ro'yxatdan o'ting</p>
-          <Link href="/register" className="btn-primary text-sm py-2.5 px-6">Bepul boshlash</Link>
-        </motion.div>
+      {/* CTA */}
+      {!isLoggedIn ? (
+        <div className="p-8 md:p-10 rounded-3xl border border-border/50 bg-surface/30 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mx-auto mb-4">
+            <Gamepad2 className="w-6 h-6 text-neon-purple" />
+          </div>
+          <h3 className="font-display font-bold text-xl mb-2">
+            O'yinlarda ishtirok etish uchun ro'yxatdan o'ting
+          </h3>
+          <p className="text-muted-foreground text-base mb-5 max-w-md mx-auto">
+            Har bir o'yinda coin va XP yig'ing. Reytingda yuqori o'ringa chiqing.
+          </p>
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-display font-semibold text-sm hover:opacity-90 transition-all"
+          >
+            Bepul boshlash <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      ) : (
+        <div className="p-8 md:p-10 rounded-3xl border border-border/50 bg-surface/30 text-center">
+          <p className="text-muted-foreground text-base mb-4">
+            O'yin vaqtida XP va coin yig'ib, reytingda yuqoriga ko'tariling.
+          </p>
+          <Link
+            href="/games"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-display font-semibold text-sm hover:opacity-90 transition-all"
+          >
+            O'yinlarga kirish <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       )}
     </div>
   );

@@ -39,31 +39,31 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center"><Code2 className="w-4 h-4 text-white" /></div>
-            <span className="font-display font-bold text-lg">Edu<span className="gradient-text">Code</span></span>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20"><Code2 className="w-5 h-5 text-white" /></div>
+            <span className="font-display font-bold text-xl tracking-tight">Edu<span className="gradient-text">Code</span></span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-5">
+          <div className="hidden md:flex items-center gap-1">
             {navLinks.map(l => (
-              <Link key={l.href} href={l.href} className={`text-sm transition-colors ${pathname === l.href ? "text-neon-purple font-medium" : "text-muted-foreground hover:text-foreground"}`}>{l.label}</Link>
+              <Link key={l.href} href={l.href} className={`px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${pathname === l.href ? "text-neon-purple bg-neon-purple/8" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>{l.label}</Link>
             ))}
           </div>
 
           <div className="flex items-center gap-2">
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title="Mavzu o'zgartirish">
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors" title="Mavzu o'zgartirish">
+              {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
             </button>
 
             {user ? (
-              <Link href={dashboardUrl} className="btn-primary text-xs py-1.5 px-4">Dashboard</Link>
+              <Link href={dashboardUrl} className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Dashboard</Link>
             ) : (
               <div className="hidden md:flex items-center gap-2">
-                <Link href="/login" className="btn-ghost text-xs py-1.5 px-4">Kirish</Link>
-                <Link href="/register" className="btn-primary text-xs py-1.5 px-4">Boshlash</Link>
+                <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kirish</Link>
+                <Link href="/register" className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
               </div>
             )}
 
@@ -93,7 +93,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
           )}
         </AnimatePresence>
       </nav>
-      <main className="pt-20 pb-16 px-4 md:px-6"><div className="max-w-7xl mx-auto overflow-x-hidden">{children}</div></main>
+      <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6"><div className="max-w-6xl mx-auto overflow-x-hidden">{children}</div></main>
     </div>
   );
 }
