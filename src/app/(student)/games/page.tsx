@@ -1,53 +1,173 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, Reorder } from "framer-motion";
+import { motion, Reorder } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Puzzle, Bug, Keyboard, Swords, ArrowLeft, CheckCircle2, XCircle, RotateCcw, Trophy, Clock, Zap, MapPin, Feather, GripVertical, Trash2 } from "lucide-react";
+import {
+  Puzzle,
+  Bug,
+  Keyboard,
+  Swords,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Trophy,
+  Clock,
+  Zap,
+  Map,
+  Bird,
+  GripVertical,
+  Trash2,
+  Play,
+  Lightbulb,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft as ALeft,
+  ArrowRight as ARight,
+  Sparkles,
+  AlertTriangle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 type GameType = null | "puzzle" | "bugfix" | "typing" | "battle" | "maze" | "bird";
 
 const gameCards = [
-  { type: "puzzle" as const, title: "Code Puzzle", desc: "Kod qatorlarini drag-and-drop bilan to'g'ri tartibga qo'ying", icon: Puzzle, color: "#6C5CE7", diff: "Oson", emoji: "🧩" },
-  { type: "bugfix" as const, title: "Bug Fix", desc: "Xatoli kodni toping va tuzating", icon: Bug, color: "#FF5252", diff: "O'rta", emoji: "🐛" },
-  { type: "typing" as const, title: "Type Racer", desc: "Kod yozish tezligini sinab ko'ring", icon: Keyboard, color: "#00D2FF", diff: "Oson", emoji: "⌨️" },
-  { type: "battle" as const, title: "Code Battle", desc: "30 soniya — tezkor javob!", icon: Swords, color: "#00E676", diff: "Qiyin", emoji: "⚔️" },
-  { type: "maze" as const, title: "Maze Runner", desc: "Buyruq bloklari bilan labirintdan o'ting", icon: MapPin, color: "#FFD600", diff: "O'rta", emoji: "🏃" },
-  { type: "bird" as const, title: "Code Bird", desc: "Bloklarni joylashtirib qushni boshqaring", icon: Feather, color: "#FF6B9D", diff: "O'rta", emoji: "🐦" },
+  {
+    type: "puzzle" as const,
+    title: "Code Puzzle",
+    desc: "Kod qatorlarini drag-and-drop bilan to'g'ri tartibga qo'ying.",
+    Icon: Puzzle,
+    color: "#6C5CE7",
+    diff: "Oson",
+  },
+  {
+    type: "bugfix" as const,
+    title: "Bug Fix",
+    desc: "Xatoli kodni toping va tuzating.",
+    Icon: Bug,
+    color: "#FF5252",
+    diff: "O'rta",
+  },
+  {
+    type: "typing" as const,
+    title: "Type Racer",
+    desc: "Kod yozish tezligi va aniqligini sinang.",
+    Icon: Keyboard,
+    color: "#00D2FF",
+    diff: "Oson",
+  },
+  {
+    type: "battle" as const,
+    title: "Code Battle",
+    desc: "30 soniya — tezkor javob va streak bonusi.",
+    Icon: Swords,
+    color: "#00E676",
+    diff: "Qiyin",
+  },
+  {
+    type: "maze" as const,
+    title: "Maze Runner",
+    desc: "Buyruq bloklari bilan labirintdan o'ting.",
+    Icon: Map,
+    color: "#FFD600",
+    diff: "O'rta",
+  },
+  {
+    type: "bird" as const,
+    title: "Code Bird",
+    desc: "Bloklarni joylashtirib qushni boshqaring.",
+    Icon: Bird,
+    color: "#FF6B9D",
+    diff: "O'rta",
+  },
 ];
 
-function shuffle<T>(a: T[]): T[] { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
+function shuffle<T>(a: T[]): T[] {
+  const b = [...a];
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
 
 export default function GamesPage() {
   const [game, setGame] = useState<GameType>(null);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">O'yinlar</h1>
-        <p className="text-muted-foreground">Dasturlashni o'ynab o'rganing — 6 ta interaktiv o'yin</p>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-semibold tracking-widest uppercase mb-4">
+          <Sparkles className="w-3.5 h-3.5" />
+          Interaktiv o'yinlar
+        </div>
+        <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight mb-3">
+          O'yin bilan o'rganing
+        </h1>
+        <p className="text-[15px] md:text-base text-muted-foreground max-w-2xl">
+          Dasturlash ko'nikmalarini mustahkamlovchi 6 ta interaktiv o'yin. Tartib, mantiq, tezlik va
+          algoritmik fikrlashni rivojlantiring.
+        </p>
       </motion.div>
+
       {!game ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {gameCards.map((g, i) => (
-            <motion.button key={g.type} onClick={() => setGame(g.type)} className="glass-card-hover p-6 text-left group w-full"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
-              <div className="flex items-start gap-4">
-                <div className="text-4xl">{g.emoji}</div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-display font-bold text-lg group-hover:text-neon-purple transition-colors">{g.title}</h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-surface text-muted-foreground">{g.diff}</span>
+          {gameCards.map((g, i) => {
+            const Icon = g.Icon;
+            return (
+              <motion.button
+                key={g.type}
+                onClick={() => setGame(g.type)}
+                className="group relative text-left p-6 rounded-3xl border border-border/50 bg-card/40 hover:bg-card/80 hover:border-border transition-all overflow-hidden"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <div
+                  className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-opacity"
+                  style={{ backgroundColor: g.color }}
+                />
+                <div className="relative">
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border"
+                    style={{
+                      backgroundColor: `${g.color}14`,
+                      borderColor: `${g.color}33`,
+                      color: g.color,
+                    }}
+                  >
+                    <Icon className="w-7 h-7" strokeWidth={2} />
                   </div>
-                  <p className="text-muted-foreground">{g.desc}</p>
+
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-display font-bold text-lg tracking-tight group-hover:text-neon-purple transition-colors">
+                      {g.title}
+                    </h3>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full border border-border bg-surface/60 text-muted-foreground font-medium">
+                      {g.diff}
+                    </span>
+                  </div>
+                  <p className="text-[15px] text-muted-foreground leading-relaxed">{g.desc}</p>
+
+                  <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-foreground/70 group-hover:text-neon-purple transition-colors">
+                    O'ynash
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  </div>
                 </div>
-              </div>
-            </motion.button>
-          ))}
+              </motion.button>
+            );
+          })}
         </div>
       ) : (
         <div>
-          <button onClick={() => setGame(null)} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-5"><ArrowLeft className="w-4 h-4" /> O'yinlarga qaytish</button>
+          <button
+            onClick={() => setGame(null)}
+            className="inline-flex items-center gap-2 text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-6"
+          >
+            <ArrowLeft className="w-4 h-4" /> O'yinlarga qaytish
+          </button>
           {game === "puzzle" && <PuzzleGame />}
           {game === "bugfix" && <BugFixGame />}
           {game === "typing" && <TypingGame />}
@@ -60,7 +180,30 @@ export default function GamesPage() {
   );
 }
 
-// ===== 1. CODE PUZZLE — Drag & Drop =====
+// ===== Shared =====
+function GameHeader({
+  Icon,
+  title,
+  meta,
+}: {
+  Icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  meta?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <div className="w-11 h-11 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-neon-purple">
+          <Icon className="w-5 h-5" />
+        </div>
+        <h2 className="font-display font-extrabold text-2xl md:text-3xl tracking-tight">{title}</h2>
+      </div>
+      {meta && <div className="text-sm text-muted-foreground">{meta}</div>}
+    </div>
+  );
+}
+
+// ===== 1. CODE PUZZLE =====
 const puzzles = [
   { title: "Fibonacci", lines: ["def fibonacci(n):", "    if n <= 1:", "        return n", "    return fibonacci(n-1) + fibonacci(n-2)"] },
   { title: "Eng katta element", lines: ["def max_el(arr):", "    m = arr[0]", "    for x in arr:", "        if x > m:", "            m = x", "    return m"] },
@@ -81,40 +224,112 @@ function PuzzleGame() {
   const pz = puzzles[idx];
   const isCorrect = lines.every((l, i) => l === pz.lines[i]);
 
-  function next() { const n = (idx + 1) % puzzles.length; setIdx(n); setLines(shuffle([...puzzles[n].lines])); setChecked(false); }
+  function next() {
+    const n = (idx + 1) % puzzles.length;
+    setIdx(n);
+    setLines(shuffle([...puzzles[n].lines]));
+    setChecked(false);
+  }
 
   return (
-    <div className="max-w-2xl space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display font-bold text-xl">🧩 {pz.title}</h2>
-        <span className="text-muted-foreground">Skor: {score} · {idx + 1}/{puzzles.length}</span>
-      </div>
-      <p className="text-muted-foreground">Qatorlarni suring yoki tugmalar bilan to'g'ri tartibga qo'ying:</p>
+    <div className="max-w-2xl space-y-5">
+      <GameHeader
+        Icon={Puzzle}
+        title={pz.title}
+        meta={
+          <span>
+            Skor: <strong className="text-foreground">{score}</strong> · {idx + 1}/{puzzles.length}
+          </span>
+        }
+      />
+      <p className="text-[15px] text-muted-foreground">
+        Qatorlarni surib to'g'ri tartibga qo'ying, so'ng tekshiring.
+      </p>
 
-      <Reorder.Group axis="y" values={lines} onReorder={checked ? () => {} : setLines} className="space-y-2">
+      <Reorder.Group
+        axis="y"
+        values={lines}
+        onReorder={checked ? () => {} : setLines}
+        className="space-y-2"
+      >
         {lines.map((line, i) => (
-          <Reorder.Item key={line} value={line} className={cn(
-            "flex items-center gap-3 p-3 rounded-xl font-mono cursor-grab active:cursor-grabbing select-none transition-all border",
-            checked && line === pz.lines[i] ? "bg-neon-green/10 border-neon-green/30" :
-            checked ? "bg-neon-red/10 border-neon-red/30" :
-            "bg-surface/80 border-border/50 hover:border-neon-purple/30 hover:bg-surface"
-          )}>
+          <Reorder.Item
+            key={line}
+            value={line}
+            className={cn(
+              "flex items-center gap-3 p-3 rounded-xl font-mono cursor-grab active:cursor-grabbing select-none transition-all border",
+              checked && line === pz.lines[i]
+                ? "bg-neon-green/10 border-neon-green/30"
+                : checked
+                ? "bg-neon-red/10 border-neon-red/30"
+                : "bg-surface/60 border-border/60 hover:border-neon-purple/40 hover:bg-surface"
+            )}
+          >
             <GripVertical className="w-4 h-4 text-muted-foreground/40 flex-shrink-0" />
-            <span className="text-muted-foreground/40 w-5 text-right text-xs flex-shrink-0">{i + 1}</span>
-            <code className="flex-1 whitespace-pre">{line}</code>
-            {checked && (line === pz.lines[i] ? <CheckCircle2 className="w-4 h-4 text-neon-green flex-shrink-0" /> : <XCircle className="w-4 h-4 text-neon-red flex-shrink-0" />)}
+            <span className="text-muted-foreground/40 w-5 text-right text-xs flex-shrink-0">
+              {i + 1}
+            </span>
+            <code className="flex-1 whitespace-pre text-sm">{line}</code>
+            {checked &&
+              (line === pz.lines[i] ? (
+                <CheckCircle2 className="w-4 h-4 text-neon-green flex-shrink-0" />
+              ) : (
+                <XCircle className="w-4 h-4 text-neon-red flex-shrink-0" />
+              ))}
           </Reorder.Item>
         ))}
       </Reorder.Group>
 
-      <div className="flex gap-3">
-        <button onClick={() => { setChecked(true); if (isCorrect) setScore(s => s + 1); }} disabled={checked} className="btn-primary py-2.5 px-5 disabled:opacity-50">Tekshirish</button>
-        <button onClick={() => { setLines(shuffle([...pz.lines])); setChecked(false); }} className="btn-ghost py-2.5 px-5"><RotateCcw className="w-4 h-4 inline mr-1" /> Aralashtirish</button>
-        {checked && <button onClick={next} className="btn-neon py-2.5 px-5">Keyingi →</button>}
+      <div className="flex gap-3 flex-wrap">
+        <button
+          onClick={() => {
+            setChecked(true);
+            if (isCorrect) setScore((s) => s + 1);
+          }}
+          disabled={checked}
+          className="py-2.5 px-5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50"
+        >
+          Tekshirish
+        </button>
+        <button
+          onClick={() => {
+            setLines(shuffle([...pz.lines]));
+            setChecked(false);
+          }}
+          className="py-2.5 px-5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition inline-flex items-center gap-2"
+        >
+          <RotateCcw className="w-4 h-4" /> Aralashtirish
+        </button>
+        {checked && (
+          <button
+            onClick={next}
+            className="py-2.5 px-5 rounded-xl bg-neon-purple text-white font-semibold text-sm hover:opacity-90 transition inline-flex items-center gap-2"
+          >
+            Keyingi <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
-      {checked && <div className={cn("glass-card p-4 text-center", isCorrect ? "border-neon-green/20" : "border-neon-red/20")}>
-        {isCorrect ? <p className="text-neon-green font-semibold text-lg">To'g'ri! 🎉</p> : <p className="text-neon-red font-semibold">Noto'g'ri. Qayta urinib ko'ring!</p>}
-      </div>}
+
+      {checked && (
+        <div
+          className={cn(
+            "p-4 rounded-2xl border text-center",
+            isCorrect
+              ? "border-neon-green/30 bg-neon-green/5"
+              : "border-neon-red/30 bg-neon-red/5"
+          )}
+        >
+          {isCorrect ? (
+            <p className="inline-flex items-center gap-2 text-neon-green font-semibold text-lg">
+              <CheckCircle2 className="w-5 h-5" /> To'g'ri tartib!
+            </p>
+          ) : (
+            <p className="inline-flex items-center gap-2 text-neon-red font-semibold">
+              <XCircle className="w-5 h-5" /> Noto'g'ri. Qayta urinib ko'ring.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -143,26 +358,52 @@ function BugFixGame() {
   const bug = bugs[idx];
 
   function check() {
-    const isOk = answer.trim().replace(/\s+/g, ' ') === bug.fixed.trim().replace(/\s+/g, ' ');
-    if (isOk) setScore(s => s + 1);
-    setChecked(true); setShowAnswer(true);
+    const isOk = answer.trim().replace(/\s+/g, " ") === bug.fixed.trim().replace(/\s+/g, " ");
+    if (isOk) setScore((s) => s + 1);
+    setChecked(true);
+    setShowAnswer(true);
   }
-  function next() { setIdx((idx + 1) % bugs.length); setAnswer(""); setShowHint(false); setShowAnswer(false); setChecked(false); }
+  function next() {
+    setIdx((idx + 1) % bugs.length);
+    setAnswer("");
+    setShowHint(false);
+    setShowAnswer(false);
+    setChecked(false);
+  }
 
   return (
-    <div className="max-w-2xl space-y-4">
-      <div className="flex items-center justify-between"><h2 className="font-display font-bold text-xl">🐛 {bug.title}</h2>
-        <span className="text-muted-foreground">Skor: {score} · {idx + 1}/{bugs.length}</span></div>
-      <p className="text-muted-foreground">Xato qatorni topib, to'g'ri variantini yozing:</p>
+    <div className="max-w-2xl space-y-5">
+      <GameHeader
+        Icon={Bug}
+        title={bug.title}
+        meta={
+          <span>
+            Skor: <strong className="text-foreground">{score}</strong> · {idx + 1}/{bugs.length}
+          </span>
+        }
+      />
+      <p className="text-[15px] text-muted-foreground">
+        Xato qatorni topib, to'g'ri variantini yozing.
+      </p>
 
-      <div className="glass-card overflow-hidden">
-        <div className="px-4 py-2 bg-surface border-b border-border/50 flex items-center gap-2 text-xs">
-          <div className="flex gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-neon-red/60" /><div className="w-2.5 h-2.5 rounded-full bg-neon-yellow/60" /><div className="w-2.5 h-2.5 rounded-full bg-neon-green/60" /></div>
+      <div className="rounded-2xl border border-border/60 bg-card/40 overflow-hidden">
+        <div className="px-4 py-2 bg-surface/60 border-b border-border/50 flex items-center gap-2 text-xs">
+          <div className="flex gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-neon-red/60" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neon-yellow/60" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neon-green/60" />
+          </div>
           <span className="text-muted-foreground font-mono ml-2">buggy.py</span>
         </div>
-        <div className="p-4 font-mono">
+        <div className="p-4 font-mono text-sm">
           {bug.code.split("\n").map((line, i) => (
-            <div key={i} className={cn("flex gap-3 px-2 py-1.5 rounded-lg transition-all", i === bug.bugLine && "bg-neon-red/10 border-l-3 border-neon-red")}>
+            <div
+              key={i}
+              className={cn(
+                "flex gap-3 px-2 py-1.5 rounded-lg transition-all",
+                i === bug.bugLine && "bg-neon-red/10 border-l-2 border-neon-red"
+              )}
+            >
               <span className="text-muted-foreground/40 w-5 text-right text-xs">{i + 1}</span>
               <span className={i === bug.bugLine ? "text-neon-red font-medium" : ""}>{line}</span>
             </div>
@@ -170,17 +411,55 @@ function BugFixGame() {
         </div>
       </div>
 
-      <div><label className="font-medium mb-2 block">Tuzatilgan kod:</label>
-        <input value={answer} onChange={e => setAnswer(e.target.value)} className="input-field font-mono" placeholder="To'g'ri variantni yozing..." disabled={checked} /></div>
-
-      <div className="flex gap-3 flex-wrap">
-        <button onClick={() => setShowHint(!showHint)} className="btn-ghost py-2.5 px-4">💡 Maslahat</button>
-        {!checked && <button onClick={check} disabled={!answer.trim()} className="btn-primary py-2.5 px-5 disabled:opacity-50">Tekshirish</button>}
-        <button onClick={next} className="btn-neon py-2.5 px-5">Keyingi →</button>
+      <div>
+        <label className="text-sm font-semibold mb-2 block">Tuzatilgan kod:</label>
+        <input
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          className="w-full bg-surface/60 border border-border rounded-xl px-4 py-3 text-[15px] font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition"
+          placeholder="To'g'ri variantni yozing..."
+          disabled={checked}
+        />
       </div>
 
-      {showHint && <div className="glass-card p-4 bg-neon-yellow/5 border-neon-yellow/10"><p className="text-neon-yellow">💡 {bug.hint}</p></div>}
-      {showAnswer && <div className="glass-card p-4 bg-neon-green/5 border-neon-green/10"><p className="font-semibold text-neon-green mb-2">✅ To'g'ri javob:</p><pre className="font-mono text-muted-foreground whitespace-pre">{bug.fixed}</pre></div>}
+      <div className="flex gap-3 flex-wrap">
+        <button
+          onClick={() => setShowHint(!showHint)}
+          className="py-2.5 px-4 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition inline-flex items-center gap-2"
+        >
+          <Lightbulb className="w-4 h-4 text-neon-yellow" /> Maslahat
+        </button>
+        {!checked && (
+          <button
+            onClick={check}
+            disabled={!answer.trim()}
+            className="py-2.5 px-5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50"
+          >
+            Tekshirish
+          </button>
+        )}
+        <button
+          onClick={next}
+          className="py-2.5 px-5 rounded-xl bg-neon-purple text-white font-semibold text-sm hover:opacity-90 transition inline-flex items-center gap-2"
+        >
+          Keyingi <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {showHint && (
+        <div className="p-4 rounded-2xl bg-neon-yellow/5 border border-neon-yellow/20 flex items-start gap-3">
+          <Lightbulb className="w-5 h-5 text-neon-yellow flex-shrink-0 mt-0.5" />
+          <p className="text-[15px] text-neon-yellow">{bug.hint}</p>
+        </div>
+      )}
+      {showAnswer && (
+        <div className="p-4 rounded-2xl bg-neon-green/5 border border-neon-green/20">
+          <p className="inline-flex items-center gap-2 font-semibold text-neon-green mb-2">
+            <CheckCircle2 className="w-4 h-4" /> To'g'ri javob
+          </p>
+          <pre className="font-mono text-sm text-muted-foreground whitespace-pre">{bug.fixed}</pre>
+        </div>
+      )}
     </div>
   );
 }
@@ -208,34 +487,123 @@ function TypingGame() {
   const target = codeSnippets[sIdx];
 
   function handleChange(val: string) {
-    if (!started) { setStarted(true); setStartTime(Date.now()); }
+    if (!started) {
+      setStarted(true);
+      setStartTime(Date.now());
+    }
     setInput(val);
-    let err = 0; for (let i = 0; i < val.length; i++) if (val[i] !== target[i]) err++;
+    let err = 0;
+    for (let i = 0; i < val.length; i++) if (val[i] !== target[i]) err++;
     setAccuracy(val.length > 0 ? Math.round(((val.length - err) / val.length) * 100) : 100);
-    if (val === target) { setWpm(Math.round(target.split(/\s+/).length / ((Date.now() - startTime) / 60000))); setFinished(true); }
+    if (val === target) {
+      setWpm(Math.round(target.split(/\s+/).length / ((Date.now() - startTime) / 60000)));
+      setFinished(true);
+    }
   }
 
-  useEffect(() => { if (!started || finished) return; const t = setInterval(() => setElapsed(Math.round((Date.now() - startTime) / 1000)), 100); return () => clearInterval(t); }, [started, finished, startTime]);
+  useEffect(() => {
+    if (!started || finished) return;
+    const t = setInterval(() => setElapsed(Math.round((Date.now() - startTime) / 1000)), 100);
+    return () => clearInterval(t);
+  }, [started, finished, startTime]);
 
-  function restart() { setInput(""); setStarted(false); setFinished(false); setAccuracy(100); setElapsed(0); ref.current?.focus(); }
+  function restart() {
+    setInput("");
+    setStarted(false);
+    setFinished(false);
+    setAccuracy(100);
+    setElapsed(0);
+    ref.current?.focus();
+  }
 
   return (
-    <div className="max-w-2xl space-y-4">
-      <div className="flex items-center justify-between"><h2 className="font-display font-bold text-xl">⌨️ Type Racer</h2>
-        <div className="flex gap-4 text-muted-foreground">{started && !finished && <span className="text-neon-yellow"><Clock className="w-4 h-4 inline mr-1" />{elapsed}s</span>}<span>Aniqlik: {accuracy}%</span></div></div>
-      <div className="glass-card p-5 font-mono leading-relaxed">{target.split("").map((ch, i) => {
-        let c = "text-muted-foreground/30"; if (i < input.length) c = input[i] === ch ? "text-neon-green" : "text-neon-red bg-neon-red/10"; else if (i === input.length) c = "text-foreground bg-neon-purple/20 rounded";
-        return <span key={i} className={cn("transition-colors", c)}>{ch === "\n" ? "↵\n" : ch}</span>;
-      })}</div>
-      <textarea ref={ref} value={input} onChange={e => handleChange(e.target.value)} disabled={finished} className="input-field font-mono min-h-[100px] resize-none" placeholder="Bu yerda yozing..." autoFocus spellCheck={false} />
-      {finished && <motion.div className="glass-card p-6 text-center" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-        <Trophy className="w-12 h-12 text-neon-yellow mx-auto mb-3" /><h3 className="font-bold text-xl mb-3">Tugatildi! 🎉</h3>
-        <div className="flex items-center justify-center gap-8 text-lg"><div><span className="font-bold text-neon-blue">{wpm}</span> <span className="text-muted-foreground text-sm">WPM</span></div>
-          <div><span className="font-bold text-neon-green">{accuracy}%</span> <span className="text-muted-foreground text-sm">aniqlik</span></div>
-          <div><span className="font-bold text-neon-yellow">{elapsed}s</span> <span className="text-muted-foreground text-sm">vaqt</span></div></div>
-      </motion.div>}
-      <div className="flex gap-3"><button onClick={restart} className="btn-ghost py-2.5 px-5"><RotateCcw className="w-4 h-4 inline mr-1" /> Qayta</button>
-        <button onClick={() => { setSIdx((sIdx + 1) % codeSnippets.length); restart(); }} className="btn-neon py-2.5 px-5">Keyingi →</button></div>
+    <div className="max-w-2xl space-y-5">
+      <GameHeader
+        Icon={Keyboard}
+        title="Type Racer"
+        meta={
+          <div className="flex gap-4 text-muted-foreground">
+            {started && !finished && (
+              <span className="inline-flex items-center gap-1 text-neon-yellow">
+                <Clock className="w-4 h-4" /> {elapsed}s
+              </span>
+            )}
+            <span>
+              Aniqlik: <strong className="text-foreground">{accuracy}%</strong>
+            </span>
+          </div>
+        }
+      />
+
+      <div className="rounded-2xl border border-border/60 bg-card/40 p-5 font-mono leading-relaxed text-[15px]">
+        {target.split("").map((ch, i) => {
+          let c = "text-muted-foreground/30";
+          if (i < input.length)
+            c = input[i] === ch ? "text-neon-green" : "text-neon-red bg-neon-red/10";
+          else if (i === input.length) c = "text-foreground bg-neon-purple/20 rounded";
+          return (
+            <span key={i} className={cn("transition-colors", c)}>
+              {ch === "\n" ? "↵\n" : ch}
+            </span>
+          );
+        })}
+      </div>
+
+      <textarea
+        ref={ref}
+        value={input}
+        onChange={(e) => handleChange(e.target.value)}
+        disabled={finished}
+        className="w-full bg-surface/60 border border-border rounded-xl px-4 py-3 text-[15px] font-mono min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition"
+        placeholder="Bu yerda yozing..."
+        autoFocus
+        spellCheck={false}
+      />
+
+      {finished && (
+        <motion.div
+          className="rounded-2xl border border-border/60 bg-card/40 p-6 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-neon-yellow/10 border border-neon-yellow/20 flex items-center justify-center mx-auto mb-3">
+            <Trophy className="w-7 h-7 text-neon-yellow" />
+          </div>
+          <h3 className="font-display font-bold text-xl mb-4">Tugatildi</h3>
+          <div className="flex items-center justify-center gap-8 text-lg">
+            <div>
+              <span className="font-bold text-neon-blue text-2xl">{wpm}</span>
+              <span className="text-muted-foreground text-sm ml-1">WPM</span>
+            </div>
+            <div>
+              <span className="font-bold text-neon-green text-2xl">{accuracy}%</span>
+              <span className="text-muted-foreground text-sm ml-1">aniqlik</span>
+            </div>
+            <div>
+              <span className="font-bold text-neon-yellow text-2xl">{elapsed}s</span>
+              <span className="text-muted-foreground text-sm ml-1">vaqt</span>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <div className="flex gap-3">
+        <button
+          onClick={restart}
+          className="py-2.5 px-5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition inline-flex items-center gap-2"
+        >
+          <RotateCcw className="w-4 h-4" /> Qayta
+        </button>
+        <button
+          onClick={() => {
+            setSIdx((sIdx + 1) % codeSnippets.length);
+            restart();
+          }}
+          className="py-2.5 px-5 rounded-xl bg-neon-purple text-white font-semibold text-sm hover:opacity-90 transition inline-flex items-center gap-2"
+        >
+          Keyingi <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -264,36 +632,175 @@ function BattleGame() {
   const [streak, setStreak] = useState(0);
   const prob = battleProblems[pIdx];
 
-  useEffect(() => { if (!started || result) return; if (timeLeft <= 0) { setResult("lose"); setStreak(0); return; } const t = setInterval(() => setTimeLeft(v => v - 1), 1000); return () => clearInterval(t); }, [started, timeLeft, result]);
+  useEffect(() => {
+    if (!started || result) return;
+    if (timeLeft <= 0) {
+      setResult("lose");
+      setStreak(0);
+      return;
+    }
+    const t = setInterval(() => setTimeLeft((v) => v - 1), 1000);
+    return () => clearInterval(t);
+  }, [started, timeLeft, result]);
 
-  function start() { setStarted(true); setTimeLeft(30); setResult(null); setAnswer(""); }
-  function submit() { if (answer.trim() === prob.expected) { setScore(s => s + 1); setStreak(s => s + 1); setResult("win"); } else { setStreak(0); setResult("lose"); } }
-  function next() { setPIdx((pIdx + 1) % battleProblems.length); start(); }
+  function start() {
+    setStarted(true);
+    setTimeLeft(30);
+    setResult(null);
+    setAnswer("");
+  }
+  function submit() {
+    if (answer.trim() === prob.expected) {
+      setScore((s) => s + 1);
+      setStreak((s) => s + 1);
+      setResult("win");
+    } else {
+      setStreak(0);
+      setResult("lose");
+    }
+  }
+  function next() {
+    setPIdx((pIdx + 1) % battleProblems.length);
+    start();
+  }
 
   return (
-    <div className="max-w-2xl space-y-4">
-      <div className="flex items-center justify-between"><h2 className="font-display font-bold text-xl">⚔️ Code Battle</h2>
-        <div className="flex gap-4"><span className="text-neon-yellow font-bold">Skor: {score}</span>{streak > 1 && <span className="text-neon-red"><Zap className="w-4 h-4 inline" /> {streak}x</span>}</div></div>
+    <div className="max-w-2xl space-y-5">
+      <GameHeader
+        Icon={Swords}
+        title="Code Battle"
+        meta={
+          <div className="flex gap-4">
+            <span className="text-neon-yellow font-bold">Skor: {score}</span>
+            {streak > 1 && (
+              <span className="inline-flex items-center gap-1 text-neon-red">
+                <Zap className="w-4 h-4" /> {streak}x
+              </span>
+            )}
+          </div>
+        }
+      />
+
       {!started && !result ? (
-        <div className="glass-card p-10 text-center"><div className="text-6xl mb-4">⚔️</div><h3 className="font-bold text-xl mb-4">30 soniya. Tezkor javob.</h3><button onClick={start} className="btn-primary py-3 px-10 text-lg">Boshlash!</button></div>
-      ) : (<>
-        <div className="flex items-center gap-3"><div className="flex-1 h-4 bg-surface rounded-full overflow-hidden"><div className={cn("h-full rounded-full transition-all", timeLeft > 10 ? "bg-neon-green" : timeLeft > 5 ? "bg-neon-yellow" : "bg-neon-red animate-pulse")} style={{ width: `${(timeLeft / 30) * 100}%` }} /></div>
-          <span className={cn("font-mono font-bold text-xl w-10", timeLeft <= 5 && "text-neon-red")}>{timeLeft}s</span></div>
-        <div className="glass-card p-6"><h3 className="font-bold text-lg mb-2">{prob.title}</h3><p className="text-muted-foreground mb-3">{prob.desc}</p>
-          <div className="flex gap-4 font-mono bg-surface rounded-xl px-4 py-3 mb-3"><span>Kirish: <strong>{prob.input}</strong></span><span>Kutilgan: <strong className="text-neon-green">{prob.expected}</strong></span></div>
-          <p className="text-neon-yellow text-xs">💡 {prob.hint}</p></div>
-        {!result && <div className="flex gap-3"><input value={answer} onChange={e => setAnswer(e.target.value)} onKeyDown={e => e.key === "Enter" && submit()} className="input-field flex-1 font-mono text-lg" placeholder="Javob..." autoFocus />
-          <button onClick={submit} className="btn-primary py-3 px-8 text-lg">✓</button></div>}
-        {result && <motion.div className={cn("glass-card p-6 text-center", result === "win" ? "border-neon-green/20" : "border-neon-red/20")} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-          {result === "win" ? <><div className="text-5xl mb-2">🎉</div><p className="font-bold text-neon-green text-xl">To'g'ri!</p></> : <><div className="text-5xl mb-2">😔</div><p className="font-bold text-neon-red text-xl">{timeLeft <= 0 ? "Vaqt tugadi!" : "Noto'g'ri!"}</p><p className="text-muted-foreground mt-1">Javob: <strong className="text-neon-green">{prob.expected}</strong></p></>}
-          <button onClick={next} className="btn-primary py-2.5 px-8 mt-4">Keyingi →</button>
-        </motion.div>}
-      </>)}
+        <div className="rounded-3xl border border-border/60 bg-card/40 p-10 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-4">
+            <Swords className="w-8 h-8 text-neon-green" />
+          </div>
+          <h3 className="font-display font-bold text-2xl mb-2">30 soniya. Tezkor javob.</h3>
+          <p className="text-muted-foreground mb-6">
+            Har bir to'g'ri javob streakni oshiradi. Tezkor fikrlang!
+          </p>
+          <button
+            onClick={start}
+            className="py-3 px-10 rounded-xl bg-foreground text-background font-display font-bold text-base hover:opacity-90 transition"
+          >
+            Boshlash
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-3 bg-surface rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all",
+                  timeLeft > 10
+                    ? "bg-neon-green"
+                    : timeLeft > 5
+                    ? "bg-neon-yellow"
+                    : "bg-neon-red animate-pulse"
+                )}
+                style={{ width: `${(timeLeft / 30) * 100}%` }}
+              />
+            </div>
+            <span
+              className={cn(
+                "font-mono font-bold text-lg w-10 text-right",
+                timeLeft <= 5 && "text-neon-red"
+              )}
+            >
+              {timeLeft}s
+            </span>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-card/40 p-6">
+            <h3 className="font-display font-bold text-lg mb-2">{prob.title}</h3>
+            <p className="text-[15px] text-muted-foreground mb-4">{prob.desc}</p>
+            <div className="flex gap-4 font-mono bg-surface/60 rounded-xl px-4 py-3 mb-3 text-sm">
+              <span>
+                Kirish: <strong>{prob.input}</strong>
+              </span>
+              <span>
+                Kutilgan: <strong className="text-neon-green">{prob.expected}</strong>
+              </span>
+            </div>
+            <p className="inline-flex items-center gap-2 text-xs text-neon-yellow">
+              <Lightbulb className="w-3.5 h-3.5" /> {prob.hint}
+            </p>
+          </div>
+          {!result && (
+            <div className="flex gap-3">
+              <input
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit()}
+                className="flex-1 bg-surface/60 border border-border rounded-xl px-4 py-3 text-[15px] font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition"
+                placeholder="Javob..."
+                autoFocus
+              />
+              <button
+                onClick={submit}
+                className="py-3 px-8 rounded-xl bg-foreground text-background font-display font-bold text-base hover:opacity-90 transition inline-flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+          {result && (
+            <motion.div
+              className={cn(
+                "rounded-2xl border p-6 text-center",
+                result === "win"
+                  ? "border-neon-green/30 bg-neon-green/5"
+                  : "border-neon-red/30 bg-neon-red/5"
+              )}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              {result === "win" ? (
+                <>
+                  <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-3">
+                    <CheckCircle2 className="w-7 h-7 text-neon-green" />
+                  </div>
+                  <p className="font-display font-bold text-neon-green text-xl">To'g'ri!</p>
+                </>
+              ) : (
+                <>
+                  <div className="w-14 h-14 rounded-2xl bg-neon-red/10 border border-neon-red/20 flex items-center justify-center mx-auto mb-3">
+                    <XCircle className="w-7 h-7 text-neon-red" />
+                  </div>
+                  <p className="font-display font-bold text-neon-red text-xl">
+                    {timeLeft <= 0 ? "Vaqt tugadi!" : "Noto'g'ri!"}
+                  </p>
+                  <p className="text-muted-foreground mt-1">
+                    Javob: <strong className="text-neon-green">{prob.expected}</strong>
+                  </p>
+                </>
+              )}
+              <button
+                onClick={next}
+                className="py-2.5 px-8 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition mt-4 inline-flex items-center gap-2"
+              >
+                Keyingi <ArrowRight className="w-4 h-4" />
+              </button>
+            </motion.div>
+          )}
+        </>
+      )}
     </div>
   );
 }
 
-// ===== 5. MAZE — Buyruq bloklari bilan =====
+// ===== 5. MAZE — SVG robot =====
 const mazes = [
   { level: 1, grid: [[0,0,0,0,0],[0,1,1,1,0],[0,0,0,1,0],[0,1,0,0,0],[0,0,0,1,0]], start: [0,0] as [number,number], end: [4,2] as [number,number], desc: "Robotni maqsadga olib boring" },
   { level: 2, grid: [[0,0,1,0,0],[1,0,1,0,1],[0,0,0,0,0],[0,1,1,0,1],[0,0,0,0,0]], start: [0,0] as [number,number], end: [4,4] as [number,number], desc: "Murakkab labirint" },
@@ -301,11 +808,38 @@ const mazes = [
 ];
 
 const DIR_BLOCKS = [
-  { id: "up", label: "⬆ Yuqori", dx: -1, dy: 0, color: "#6C5CE7" },
-  { id: "down", label: "⬇ Pastga", dx: 1, dy: 0, color: "#00E676" },
-  { id: "left", label: "⬅ Chapga", dx: 0, dy: -1, color: "#00D2FF" },
-  { id: "right", label: "➡ O'ngga", dx: 0, dy: 1, color: "#FFD600" },
+  { id: "up", label: "Yuqori", Icon: ArrowUp, dx: -1, dy: 0, color: "#6C5CE7" },
+  { id: "down", label: "Pastga", Icon: ArrowDown, dx: 1, dy: 0, color: "#00E676" },
+  { id: "left", label: "Chapga", Icon: ALeft, dx: 0, dy: -1, color: "#00D2FF" },
+  { id: "right", label: "O'ngga", Icon: ARight, dx: 0, dy: 1, color: "#FFD600" },
 ];
+
+function RobotSprite({ x, y, size = 28 }: { x: number; y: number; size?: number }) {
+  const s = size;
+  return (
+    <g transform={`translate(${x - s / 2}, ${y - s / 2})`}>
+      {/* Body */}
+      <rect x={s * 0.15} y={s * 0.3} width={s * 0.7} height={s * 0.55} rx={s * 0.12} fill="#6C5CE7" />
+      <rect x={s * 0.15} y={s * 0.3} width={s * 0.7} height={s * 0.55} rx={s * 0.12} fill="url(#robotGrad)" opacity="0.4" />
+      {/* Head antenna */}
+      <line x1={s / 2} y1={s * 0.15} x2={s / 2} y2={s * 0.3} stroke="#FFD600" strokeWidth="1.5" />
+      <circle cx={s / 2} cy={s * 0.13} r={s * 0.07} fill="#FFD600" />
+      {/* Eyes */}
+      <circle cx={s * 0.37} cy={s * 0.5} r={s * 0.08} fill="#00D2FF" />
+      <circle cx={s * 0.63} cy={s * 0.5} r={s * 0.08} fill="#00D2FF" />
+      <circle cx={s * 0.37} cy={s * 0.5} r={s * 0.04} fill="#fff" />
+      <circle cx={s * 0.63} cy={s * 0.5} r={s * 0.04} fill="#fff" />
+      {/* Mouth */}
+      <rect x={s * 0.38} y={s * 0.68} width={s * 0.24} height={s * 0.05} rx={s * 0.02} fill="#00E676" />
+      <defs>
+        <linearGradient id="robotGrad" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity="0.3" />
+          <stop offset="1" stopColor="#000" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+    </g>
+  );
+}
 
 function MazeGame() {
   const [level, setLevel] = useState(0);
@@ -317,113 +851,341 @@ function MazeGame() {
   const maze = mazes[level];
   const CS = 52;
 
-  function addCmd(id: string) { if (!won && !animating) setCommands([...commands, id]); }
-  function removeCmd(i: number) { if (!won && !animating) setCommands(commands.filter((_, j) => j !== i)); }
-
-  function reset() { setPos([...maze.start]); setPath([[...maze.start]]); setWon(false); setCommands([]); setAnimating(false); }
+  function addCmd(id: string) {
+    if (!won && !animating) setCommands([...commands, id]);
+  }
+  function removeCmd(i: number) {
+    if (!won && !animating) setCommands(commands.filter((_, j) => j !== i));
+  }
+  function reset() {
+    setPos([...maze.start]);
+    setPath([[...maze.start]]);
+    setWon(false);
+    setCommands([]);
+    setAnimating(false);
+  }
 
   async function run() {
     if (commands.length === 0) return;
     setAnimating(true);
     let [r, c] = [...maze.start];
     const trail: [number, number][] = [[r, c]];
-    setPos([r, c]); setPath([[r, c]]);
+    setPos([r, c]);
+    setPath([[r, c]]);
 
     for (const cmdId of commands) {
-      const dir = DIR_BLOCKS.find(d => d.id === cmdId);
+      const dir = DIR_BLOCKS.find((d) => d.id === cmdId);
       if (!dir) continue;
-      const nr = r + dir.dx, nc = c + dir.dy;
-      if (nr < 0 || nr >= maze.grid.length || nc < 0 || nc >= maze.grid[0].length || maze.grid[nr][nc] === 1) break;
-      r = nr; c = nc;
+      const nr = r + dir.dx,
+        nc = c + dir.dy;
+      if (
+        nr < 0 ||
+        nr >= maze.grid.length ||
+        nc < 0 ||
+        nc >= maze.grid[0].length ||
+        maze.grid[nr][nc] === 1
+      )
+        break;
+      r = nr;
+      c = nc;
       trail.push([r, c]);
-      setPos([r, c]); setPath([...trail]);
-      await new Promise(res => setTimeout(res, 300));
+      setPos([r, c]);
+      setPath([...trail]);
+      await new Promise((res) => setTimeout(res, 300));
     }
 
-    if (r === maze.end[0] && c === maze.end[1]) { setWon(true); toast.success("Labirint yechildi! 🎉"); }
+    if (r === maze.end[0] && c === maze.end[1]) {
+      setWon(true);
+      toast.success("Labirint yechildi!");
+    }
     setAnimating(false);
   }
 
-  function nextLevel() { const n = (level + 1) % mazes.length; setLevel(n); setPos([...mazes[n].start]); setPath([[...mazes[n].start]]); setWon(false); setCommands([]); }
+  function nextLevel() {
+    const n = (level + 1) % mazes.length;
+    setLevel(n);
+    setPos([...mazes[n].start]);
+    setPath([[...mazes[n].start]]);
+    setWon(false);
+    setCommands([]);
+  }
 
   return (
-    <div className="max-w-3xl space-y-4">
-      <div className="flex items-center justify-between"><h2 className="font-display font-bold text-xl">🏃 Maze Runner — Bosqich {level + 1}</h2></div>
-      <p className="text-muted-foreground">{maze.desc}. Buyruq bloklarini joylashtirib robotni 🟡 maqsadga olib boring.</p>
+    <div className="max-w-3xl space-y-5">
+      <GameHeader
+        Icon={Map}
+        title={`Maze Runner — ${level + 1}-bosqich`}
+        meta={<span>{maze.desc}</span>}
+      />
+      <p className="text-[15px] text-muted-foreground">
+        Buyruq bloklarini joylashtirib robotni sariq maqsadga yetkazing.
+      </p>
 
-      <div className="grid lg:grid-cols-[1fr,auto] gap-4">
-        {/* Labirint */}
-        <div className="glass-card p-4 flex justify-center">
+      <div className="grid lg:grid-cols-[1fr,240px] gap-5">
+        {/* Maze */}
+        <div className="rounded-2xl border border-border/60 bg-card/40 p-4 flex justify-center">
           <svg width={maze.grid[0].length * CS + 4} height={maze.grid.length * CS + 4} className="block">
-            {maze.grid.map((row, r) => row.map((cell, c) => (
-              <rect key={`${r}-${c}`} x={c * CS + 2} y={r * CS + 2} width={CS - 2} height={CS - 2}
-                fill={cell === 1 ? "hsl(var(--surface))" : "transparent"} stroke="hsl(var(--border))" strokeWidth="0.5" rx="6" />
-            )))}
-            {path.map(([r, c], i) => i > 0 && (
-              <line key={i} x1={(path[i-1][1] + 0.5) * CS + 2} y1={(path[i-1][0] + 0.5) * CS + 2}
-                x2={(c + 0.5) * CS + 2} y2={(r + 0.5) * CS + 2} stroke="#6C5CE7" strokeWidth="3" opacity="0.4" />
-            ))}
-            <circle cx={(maze.start[1] + 0.5) * CS + 2} cy={(maze.start[0] + 0.5) * CS + 2} r="10" fill="#00E676" />
-            <circle cx={(maze.end[1] + 0.5) * CS + 2} cy={(maze.end[0] + 0.5) * CS + 2} r="10" fill="#FFD600" />
-            <text x={(pos[1] + 0.5) * CS + 2} y={(pos[0] + 0.5) * CS + 8} textAnchor="middle" fontSize="22">🤖</text>
+            {maze.grid.map((row, r) =>
+              row.map((cell, c) => (
+                <rect
+                  key={`${r}-${c}`}
+                  x={c * CS + 2}
+                  y={r * CS + 2}
+                  width={CS - 2}
+                  height={CS - 2}
+                  fill={cell === 1 ? "hsl(var(--surface))" : "transparent"}
+                  stroke="hsl(var(--border))"
+                  strokeWidth="0.5"
+                  rx="6"
+                />
+              ))
+            )}
+            {path.map(
+              ([r, c], i) =>
+                i > 0 && (
+                  <line
+                    key={i}
+                    x1={(path[i - 1][1] + 0.5) * CS + 2}
+                    y1={(path[i - 1][0] + 0.5) * CS + 2}
+                    x2={(c + 0.5) * CS + 2}
+                    y2={(r + 0.5) * CS + 2}
+                    stroke="#6C5CE7"
+                    strokeWidth="3"
+                    opacity="0.4"
+                  />
+                )
+            )}
+            {/* Start */}
+            <circle
+              cx={(maze.start[1] + 0.5) * CS + 2}
+              cy={(maze.start[0] + 0.5) * CS + 2}
+              r="9"
+              fill="#00E676"
+              opacity="0.3"
+            />
+            <circle
+              cx={(maze.start[1] + 0.5) * CS + 2}
+              cy={(maze.start[0] + 0.5) * CS + 2}
+              r="5"
+              fill="#00E676"
+            />
+            {/* Target */}
+            <g>
+              <circle
+                cx={(maze.end[1] + 0.5) * CS + 2}
+                cy={(maze.end[0] + 0.5) * CS + 2}
+                r="14"
+                fill="#FFD600"
+                opacity="0.15"
+              >
+                <animate attributeName="r" values="12;18;12" dur="1.8s" repeatCount="indefinite" />
+              </circle>
+              <circle
+                cx={(maze.end[1] + 0.5) * CS + 2}
+                cy={(maze.end[0] + 0.5) * CS + 2}
+                r="8"
+                fill="#FFD600"
+              />
+              <circle
+                cx={(maze.end[1] + 0.5) * CS + 2}
+                cy={(maze.end[0] + 0.5) * CS + 2}
+                r="3"
+                fill="#fff"
+              />
+            </g>
+            {/* Robot */}
+            <RobotSprite
+              x={(pos[1] + 0.5) * CS + 2}
+              y={(pos[0] + 0.5) * CS + 2}
+              size={36}
+            />
           </svg>
         </div>
 
-        {/* Buyruq bloklari */}
-        <div className="space-y-3 min-w-[200px]">
-          <p className="font-semibold text-xs text-muted-foreground">Buyruqlar:</p>
+        {/* Controls */}
+        <div className="space-y-3">
+          <p className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">
+            Buyruqlar
+          </p>
           <div className="grid grid-cols-2 gap-2">
-            {DIR_BLOCKS.map(d => (
-              <button key={d.id} onClick={() => addCmd(d.id)} disabled={won || animating}
-                className="py-2.5 px-3 rounded-xl font-semibold text-white text-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                style={{ backgroundColor: d.color }}>{d.label}</button>
-            ))}
+            {DIR_BLOCKS.map((d) => {
+              const Icon = d.Icon;
+              return (
+                <button
+                  key={d.id}
+                  onClick={() => addCmd(d.id)}
+                  disabled={won || animating}
+                  className="py-2.5 px-3 rounded-xl font-semibold text-white text-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+                  style={{ backgroundColor: d.color }}
+                >
+                  <Icon className="w-4 h-4" /> {d.label}
+                </button>
+              );
+            })}
           </div>
 
-          <p className="font-semibold text-xs text-muted-foreground mt-3">Ketma-ketlik ({commands.length}):</p>
+          <p className="font-semibold text-xs uppercase tracking-widest text-muted-foreground mt-4">
+            Ketma-ketlik ({commands.length})
+          </p>
           <div className="space-y-1 max-h-48 overflow-y-auto">
-            {commands.length === 0 ? <p className="text-xs text-muted-foreground italic">Buyruq qo'shing...</p> :
+            {commands.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Buyruq qo'shing...</p>
+            ) : (
               commands.map((cmdId, i) => {
-                const d = DIR_BLOCKS.find(b => b.id === cmdId);
-                return <div key={i} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface/50 border border-border/50">
-                  <span className="text-xs font-mono text-muted-foreground/50 w-4">{i+1}</span>
-                  <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: d?.color }} />
-                  <span className="text-xs font-medium flex-1">{d?.label}</span>
-                  <button onClick={() => removeCmd(i)} className="p-0.5 hover:text-neon-red"><Trash2 className="w-3 h-3" /></button>
-                </div>;
-              })}
+                const d = DIR_BLOCKS.find((b) => b.id === cmdId);
+                const Icon = d?.Icon;
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface/60 border border-border/50"
+                  >
+                    <span className="text-xs font-mono text-muted-foreground/50 w-4">{i + 1}</span>
+                    {Icon && <Icon className="w-3.5 h-3.5" style={{ color: d?.color }} />}
+                    <span className="text-xs font-medium flex-1">{d?.label}</span>
+                    <button
+                      onClick={() => removeCmd(i)}
+                      className="p-0.5 text-muted-foreground hover:text-neon-red"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
 
           <div className="flex gap-2">
-            <button onClick={run} disabled={won || animating || commands.length === 0} className="btn-primary py-2 px-4 flex-1 disabled:opacity-50">{animating ? "..." : "▶ Ishga tushirish"}</button>
-            <button onClick={reset} className="btn-ghost py-2 px-3"><RotateCcw className="w-4 h-4" /></button>
+            <button
+              onClick={run}
+              disabled={won || animating || commands.length === 0}
+              className="flex-1 py-2 px-4 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            >
+              <Play className="w-4 h-4" /> {animating ? "..." : "Ishga tushirish"}
+            </button>
+            <button
+              onClick={reset}
+              className="p-2 rounded-xl border border-border bg-surface/60 hover:bg-surface transition"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
 
-      {won && <motion.div className="glass-card p-5 text-center bg-neon-green/5 border-neon-green/10" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-        <div className="text-4xl mb-2">🎉</div><p className="font-bold text-neon-green text-lg">Bosqich o'tdi!</p>
-        <button onClick={nextLevel} className="btn-primary py-2.5 px-8 mt-3">Keyingi bosqich →</button>
-      </motion.div>}
+      {won && (
+        <motion.div
+          className="rounded-2xl border border-neon-green/30 bg-neon-green/5 p-5 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-3">
+            <Trophy className="w-7 h-7 text-neon-green" />
+          </div>
+          <p className="font-display font-bold text-neon-green text-lg">Bosqich o'tdi!</p>
+          <button
+            onClick={nextLevel}
+            className="py-2.5 px-8 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition mt-3 inline-flex items-center gap-2"
+          >
+            Keyingi bosqich <ArrowRight className="w-4 h-4" />
+          </button>
+        </motion.div>
+      )}
     </div>
   );
 }
 
-// ===== 6. CODE BIRD — Buyruq bloklari bilan =====
+// ===== 6. CODE BIRD — SVG bird =====
 const birdLevels = [
-  { level: 1, targets: [[200, 150]] as number[][], obstacles: [] as number[][], desc: "Qushni ⭐ yulduzga olib boring (2 ta o'ngga)" },
+  { level: 1, targets: [[200, 150]] as number[][], obstacles: [] as number[][], desc: "Qushni yulduzga olib boring (2 ta o'ngga)" },
   { level: 2, targets: [[320, 150]] as number[][], obstacles: [[200, 60, 20, 130]] as number[][], desc: "To'siqdan aylanib yulduzga yeting" },
   { level: 3, targets: [[160, 60], [320, 240]] as number[][], obstacles: [[120, 100, 160, 16], [240, 180, 16, 100]] as number[][], desc: "2 ta yulduzni yig'ing" },
 ];
 
 const BIRD_MOVES = [
-  { id: "right", label: "➡ O'ngga", dx: 80, dy: 0, color: "#FFD600" },
-  { id: "left", label: "⬅ Chapga", dx: -80, dy: 0, color: "#00D2FF" },
-  { id: "up", label: "⬆ Yuqori", dx: 0, dy: -80, color: "#6C5CE7" },
-  { id: "down", label: "⬇ Pastga", dx: 0, dy: 80, color: "#00E676" },
-  { id: "diag_ru", label: "↗ Diagonal", dx: 80, dy: -80, color: "#FF6B9D" },
-  { id: "diag_rd", label: "↘ Diagonal", dx: 80, dy: 80, color: "#FF5252" },
+  { id: "right", label: "O'ngga", Icon: ARight, dx: 80, dy: 0, color: "#FFD600" },
+  { id: "left", label: "Chapga", Icon: ALeft, dx: -80, dy: 0, color: "#00D2FF" },
+  { id: "up", label: "Yuqori", Icon: ArrowUp, dx: 0, dy: -80, color: "#6C5CE7" },
+  { id: "down", label: "Pastga", Icon: ArrowDown, dx: 0, dy: 80, color: "#00E676" },
+  { id: "diag_ru", label: "O'ng-yuqori", Icon: ARight, dx: 80, dy: -80, color: "#FF6B9D" },
+  { id: "diag_rd", label: "O'ng-past", Icon: ARight, dx: 80, dy: 80, color: "#FF5252" },
 ];
+
+function BirdSprite({ x, y, crashed }: { x: number; y: number; crashed: boolean }) {
+  if (crashed) {
+    return (
+      <g transform={`translate(${x}, ${y})`}>
+        <circle r="16" fill="#FF5252" opacity="0.2" />
+        <g stroke="#FF5252" strokeWidth="2.5" strokeLinecap="round">
+          <line x1="-10" y1="-10" x2="10" y2="10" />
+          <line x1="10" y1="-10" x2="-10" y2="10" />
+          <line x1="-14" y1="0" x2="-18" y2="0" />
+          <line x1="14" y1="0" x2="18" y2="0" />
+          <line x1="0" y1="-14" x2="0" y2="-18" />
+          <line x1="0" y1="14" x2="0" y2="18" />
+        </g>
+      </g>
+    );
+  }
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      {/* Body */}
+      <ellipse cx="0" cy="0" rx="12" ry="10" fill="#FFD600" />
+      <ellipse cx="-1" cy="-2" rx="10" ry="7" fill="#FF6B9D" opacity="0.7" />
+      {/* Wing */}
+      <path d="M -3 -2 Q -10 -8 -12 0 Q -8 3 -3 1 Z" fill="#6C5CE7">
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          from="-15 -5 0"
+          to="15 -5 0"
+          dur="0.4s"
+          repeatCount="indefinite"
+          values="-15 -5 0; 15 -5 0; -15 -5 0"
+        />
+      </path>
+      {/* Eye */}
+      <circle cx="5" cy="-3" r="2.5" fill="#fff" />
+      <circle cx="5.5" cy="-3" r="1.3" fill="#0D0D2B" />
+      {/* Beak */}
+      <polygon points="12,0 18,-1 12,2" fill="#FF5252" />
+    </g>
+  );
+}
+
+function StarSprite({ x, y, collected }: { x: number; y: number; collected: boolean }) {
+  if (collected) {
+    return (
+      <g transform={`translate(${x}, ${y})`} opacity="0.35">
+        <circle r="14" fill="#00E676" opacity="0.2" />
+        <path
+          d="M -6 0 L -2 4 L 7 -5"
+          stroke="#00E676"
+          strokeWidth="3"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    );
+  }
+  const pts = Array.from({ length: 5 })
+    .map((_, i) => {
+      const a = (Math.PI / 2) + (i * 2 * Math.PI) / 5;
+      const b = a + Math.PI / 5;
+      const rOut = 11,
+        rIn = 5;
+      return `${Math.cos(a) * rOut},${-Math.sin(a) * rOut} ${Math.cos(b) * rIn},${-Math.sin(b) * rIn}`;
+    })
+    .join(" ");
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <circle r="18" fill="#FFD600" opacity="0.1">
+        <animate attributeName="r" values="16;22;16" dur="2s" repeatCount="indefinite" />
+      </circle>
+      <polygon points={pts} fill="#FFD600" stroke="#FFB800" strokeWidth="1" />
+    </g>
+  );
+}
 
 function BirdGame() {
   const [level, setLevel] = useState(0);
@@ -436,17 +1198,26 @@ function BirdGame() {
   const [collected, setCollected] = useState<Set<number>>(new Set());
   const lv = birdLevels[level];
 
-  function addCmd(id: string) { if (!won && !animating) setCommands([...commands, id]); }
-  function removeCmd(i: number) { if (!won && !animating) setCommands(commands.filter((_, j) => j !== i)); }
-
-  function reset() { setBirdPos([40, 150]); setTrail([[40, 150]]); setWon(false); setCrashed(false); setCommands([]); setAnimating(false); setCollected(new Set()); }
+  function addCmd(id: string) {
+    if (!won && !animating) setCommands([...commands, id]);
+  }
+  function removeCmd(i: number) {
+    if (!won && !animating) setCommands(commands.filter((_, j) => j !== i));
+  }
+  function reset() {
+    setBirdPos([40, 150]);
+    setTrail([[40, 150]]);
+    setWon(false);
+    setCrashed(false);
+    setCommands([]);
+    setAnimating(false);
+    setCollected(new Set());
+  }
 
   function hitsObstacle(px: number, py: number): boolean {
     for (const [ox, oy, ow, oh] of lv.obstacles) {
-      // Kengaytirilgan to'siq chegarasi (qush radiusi 12px)
       if (px >= ox - 12 && px <= ox + ow + 12 && py >= oy - 12 && py <= oy + oh + 12) return true;
     }
-    // Ekrandan chiqish
     if (px < 10 || px > 390 || py < 10 || py > 290) return true;
     return false;
   }
@@ -455,122 +1226,241 @@ function BirdGame() {
     for (let i = 0; i < lv.targets.length; i++) {
       const [tx, ty] = lv.targets[i];
       const dist = Math.sqrt((px - tx) ** 2 + (py - ty) ** 2);
-      if (dist < 35) return i; // 35px radius — kengaytirilgan
+      if (dist < 35) return i;
     }
     return -1;
   }
 
   async function run() {
     if (commands.length === 0) return;
-    setAnimating(true); setCrashed(false); setCollected(new Set());
-    let x = 40, y = 150;
+    setAnimating(true);
+    setCrashed(false);
+    setCollected(new Set());
+    let x = 40,
+      y = 150;
     const tr: [number, number][] = [[x, y]];
     const hits = new Set<number>();
-    setBirdPos([x, y]); setTrail([[x, y]]);
+    setBirdPos([x, y]);
+    setTrail([[x, y]]);
 
     for (const cmdId of commands) {
-      const mv = BIRD_MOVES.find(m => m.id === cmdId);
+      const mv = BIRD_MOVES.find((m) => m.id === cmdId);
       if (!mv) continue;
-
-      const nx = x + mv.dx, ny = y + mv.dy;
-
+      const nx = x + mv.dx,
+        ny = y + mv.dy;
       if (hitsObstacle(nx, ny)) {
-        setBirdPos([nx, ny]); setCrashed(true);
-        await new Promise(r => setTimeout(r, 300));
+        setBirdPos([nx, ny]);
+        setCrashed(true);
+        await new Promise((r) => setTimeout(r, 300));
         break;
       }
-
-      x = nx; y = ny;
+      x = nx;
+      y = ny;
       tr.push([x, y]);
-      setBirdPos([x, y]); setTrail([...tr]);
-
+      setBirdPos([x, y]);
+      setTrail([...tr]);
       const ti = hitsTarget(x, y);
-      if (ti >= 0) { hits.add(ti); setCollected(new Set(hits)); }
-
-      await new Promise(r => setTimeout(r, 350));
+      if (ti >= 0) {
+        hits.add(ti);
+        setCollected(new Set(hits));
+      }
+      await new Promise((r) => setTimeout(r, 350));
     }
 
-    if (hits.size === lv.targets.length) { setWon(true); toast.success("Bosqich o'tdi! 🐦🎉"); }
+    if (hits.size === lv.targets.length) {
+      setWon(true);
+      toast.success("Bosqich o'tdi!");
+    }
     setAnimating(false);
   }
 
-  function nextLevel() { const n = (level + 1) % birdLevels.length; setLevel(n); reset(); }
+  function nextLevel() {
+    const n = (level + 1) % birdLevels.length;
+    setLevel(n);
+    reset();
+  }
 
   return (
-    <div className="max-w-3xl space-y-4">
-      <div className="flex items-center justify-between"><h2 className="font-display font-bold text-xl">🐦 Code Bird — Bosqich {level + 1}/{birdLevels.length}</h2></div>
-      <p className="text-muted-foreground">{lv.desc}</p>
+    <div className="max-w-3xl space-y-5">
+      <GameHeader
+        Icon={Bird}
+        title={`Code Bird — ${level + 1}/${birdLevels.length}`}
+        meta={<span>{lv.desc}</span>}
+      />
 
-      <div className="grid lg:grid-cols-[1fr,220px] gap-4">
-        <div className="glass-card p-4 flex justify-center">
-          <svg width="400" height="300" className="block rounded-xl" style={{ background: "linear-gradient(180deg, rgba(26,26,62,0.5) 0%, rgba(13,13,43,0.5) 100%)" }}>
-            {/* Grid */}
-            {Array.from({ length: 5 }).map((_, i) => <line key={`vg${i}`} x1={(i + 1) * 80} y1="0" x2={(i + 1) * 80} y2="300" stroke="rgba(255,255,255,0.03)" />)}
-            {Array.from({ length: 3 }).map((_, i) => <line key={`hg${i}`} x1="0" y1={(i + 1) * 80} x2="400" y2={(i + 1) * 80} stroke="rgba(255,255,255,0.03)" />)}
+      <div className="grid lg:grid-cols-[1fr,240px] gap-5">
+        <div className="rounded-2xl border border-border/60 bg-card/40 p-4 flex justify-center">
+          <svg
+            width="400"
+            height="300"
+            className="block rounded-xl"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(108,92,231,0.08) 0%, rgba(0,210,255,0.04) 100%)",
+            }}
+          >
+            {Array.from({ length: 5 }).map((_, i) => (
+              <line
+                key={`vg${i}`}
+                x1={(i + 1) * 80}
+                y1="0"
+                x2={(i + 1) * 80}
+                y2="300"
+                stroke="rgba(255,255,255,0.04)"
+              />
+            ))}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <line
+                key={`hg${i}`}
+                x1="0"
+                y1={(i + 1) * 80}
+                x2="400"
+                y2={(i + 1) * 80}
+                stroke="rgba(255,255,255,0.04)"
+              />
+            ))}
 
-            {/* To'siqlar */}
-            {lv.obstacles.map(([x, y, w, h], i) => <rect key={i} x={x} y={y} width={w} height={h} fill="#FF5252" opacity="0.3" rx="4" stroke="#FF5252" strokeWidth="1.5" />)}
-
-            {/* Yulduzlar */}
-            {lv.targets.map(([x, y], i) => (
+            {lv.obstacles.map(([x, y, w, h], i) => (
               <g key={i}>
-                {!collected.has(i) && <>
-                  <circle cx={x} cy={y} r="20" fill="#FFD600" opacity="0.1"><animate attributeName="r" values="20;24;20" dur="2s" repeatCount="indefinite" /></circle>
-                  <circle cx={x} cy={y} r="6" fill="#FFD600" opacity="0.3" />
-                  <text x={x} y={y + 7} textAnchor="middle" fontSize="20">⭐</text>
-                </>}
-                {collected.has(i) && <text x={x} y={y + 7} textAnchor="middle" fontSize="20" opacity="0.3">✅</text>}
+                <rect x={x} y={y} width={w} height={h} fill="#FF5252" opacity="0.25" rx="4" />
+                <rect
+                  x={x}
+                  y={y}
+                  width={w}
+                  height={h}
+                  fill="none"
+                  stroke="#FF5252"
+                  strokeWidth="1.5"
+                  strokeDasharray="4 3"
+                  rx="4"
+                />
               </g>
             ))}
 
-            {/* Trail */}
-            {trail.map((pt, i) => i > 0 && <line key={i} x1={trail[i - 1][0]} y1={trail[i - 1][1]} x2={pt[0]} y2={pt[1]} stroke="#6C5CE7" strokeWidth="2.5" opacity="0.5" strokeDasharray="6" />)}
+            {lv.targets.map(([x, y], i) => (
+              <StarSprite key={i} x={x} y={y} collected={collected.has(i)} />
+            ))}
 
-            {/* Qush */}
-            <text x={birdPos[0]} y={birdPos[1] + 8} textAnchor="middle" fontSize="28">{crashed ? "💥" : "🐦"}</text>
+            {trail.map(
+              (pt, i) =>
+                i > 0 && (
+                  <line
+                    key={i}
+                    x1={trail[i - 1][0]}
+                    y1={trail[i - 1][1]}
+                    x2={pt[0]}
+                    y2={pt[1]}
+                    stroke="#6C5CE7"
+                    strokeWidth="2.5"
+                    opacity="0.5"
+                    strokeDasharray="6 3"
+                  />
+                )
+            )}
 
             {/* Start marker */}
-            <circle cx={40} cy={150} r="8" fill="#00E676" opacity="0.3" /><text x={40} y={155} textAnchor="middle" fontSize="10" fill="#00E676">S</text>
+            <circle cx={40} cy={150} r="10" fill="#00E676" opacity="0.25" />
+            <circle cx={40} cy={150} r="5" fill="#00E676" />
+
+            <BirdSprite x={birdPos[0]} y={birdPos[1]} crashed={crashed} />
           </svg>
         </div>
 
-        {/* Buyruqlar */}
         <div className="space-y-3">
-          <p className="font-semibold text-xs text-muted-foreground">Buyruqlar:</p>
+          <p className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">
+            Buyruqlar
+          </p>
           <div className="grid grid-cols-2 gap-1.5">
-            {BIRD_MOVES.map(m => (
-              <button key={m.id} onClick={() => addCmd(m.id)} disabled={won || animating}
-                className="py-2 px-2 rounded-lg font-bold text-white text-xs transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                style={{ backgroundColor: m.color }}>{m.label}</button>
-            ))}
+            {BIRD_MOVES.map((m) => {
+              const Icon = m.Icon;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => addCmd(m.id)}
+                  disabled={won || animating}
+                  className="py-2 px-2 rounded-lg font-semibold text-white text-xs transition-all hover:scale-105 active:scale-95 disabled:opacity-50 inline-flex items-center justify-center gap-1"
+                  style={{ backgroundColor: m.color }}
+                >
+                  <Icon className="w-3.5 h-3.5" /> {m.label}
+                </button>
+              );
+            })}
           </div>
 
-          <p className="font-semibold text-xs text-muted-foreground">Ketma-ketlik ({commands.length}):</p>
-          <div className="space-y-1 max-h-36 overflow-y-auto scrollbar-hide">
-            {commands.length === 0 ? <p className="text-xs text-muted-foreground italic">Buyruq qo'shing...</p> :
+          <p className="font-semibold text-xs uppercase tracking-widest text-muted-foreground mt-4">
+            Ketma-ketlik ({commands.length})
+          </p>
+          <div className="space-y-1 max-h-36 overflow-y-auto">
+            {commands.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Buyruq qo'shing...</p>
+            ) : (
               commands.map((cmdId, i) => {
-                const m = BIRD_MOVES.find(b => b.id === cmdId);
-                return <div key={i} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface/50 border border-border/50">
-                  <span className="text-xs font-mono text-muted-foreground/50 w-4">{i + 1}</span>
-                  <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: m?.color }} />
-                  <span className="text-xs flex-1">{m?.label}</span>
-                  <button onClick={() => removeCmd(i)} className="p-0.5 hover:text-neon-red"><Trash2 className="w-3 h-3" /></button>
-                </div>;
-              })}
+                const m = BIRD_MOVES.find((b) => b.id === cmdId);
+                const Icon = m?.Icon;
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-surface/60 border border-border/50"
+                  >
+                    <span className="text-xs font-mono text-muted-foreground/50 w-4">{i + 1}</span>
+                    {Icon && <Icon className="w-3.5 h-3.5" style={{ color: m?.color }} />}
+                    <span className="text-xs flex-1">{m?.label}</span>
+                    <button
+                      onClick={() => removeCmd(i)}
+                      className="p-0.5 text-muted-foreground hover:text-neon-red"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
 
           <div className="flex gap-2">
-            <button onClick={run} disabled={won || animating || commands.length === 0} className="btn-primary py-2 px-3 flex-1 text-sm disabled:opacity-50">{animating ? "..." : "▶ Boshlash"}</button>
-            <button onClick={reset} className="btn-ghost py-2 px-3"><RotateCcw className="w-4 h-4" /></button>
+            <button
+              onClick={run}
+              disabled={won || animating || commands.length === 0}
+              className="flex-1 py-2 px-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            >
+              <Play className="w-4 h-4" /> {animating ? "..." : "Boshlash"}
+            </button>
+            <button
+              onClick={reset}
+              className="p-2 rounded-xl border border-border bg-surface/60 hover:bg-surface transition"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
 
-      {won && <motion.div className="glass-card p-5 text-center bg-neon-green/5" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-        <div className="text-4xl mb-2">🎉</div><p className="font-bold text-neon-green">Bosqich o'tdi!</p>
-        <button onClick={nextLevel} className="btn-primary py-2.5 px-8 mt-3">Keyingi bosqich →</button>
-      </motion.div>}
-      {crashed && !won && <div className="glass-card p-4 text-center text-neon-red"><div className="text-3xl mb-1">💥</div><p className="font-bold">To'siqqa urildi yoki chegaradan chiqdi! Qayta urinib ko'ring.</p></div>}
+      {won && (
+        <motion.div
+          className="rounded-2xl border border-neon-green/30 bg-neon-green/5 p-5 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-3">
+            <Trophy className="w-7 h-7 text-neon-green" />
+          </div>
+          <p className="font-display font-bold text-neon-green text-lg">Bosqich o'tdi!</p>
+          <button
+            onClick={nextLevel}
+            className="py-2.5 px-8 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition mt-3 inline-flex items-center gap-2"
+          >
+            Keyingi bosqich <ArrowRight className="w-4 h-4" />
+          </button>
+        </motion.div>
+      )}
+      {crashed && !won && (
+        <div className="rounded-2xl border border-neon-red/30 bg-neon-red/5 p-4 text-center">
+          <div className="inline-flex items-center gap-2 text-neon-red font-semibold">
+            <AlertTriangle className="w-5 h-5" /> To'siqqa urildi yoki chegaradan chiqdi
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">Qayta urinib ko'ring.</p>
+        </div>
+      )}
     </div>
   );
 }

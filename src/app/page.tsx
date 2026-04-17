@@ -10,8 +10,10 @@ import {
   Code2, Brain, Trophy, Gamepad2, Users, ChevronRight, ChevronLeft,
   BookOpen, Terminal, Shield, Globe, ArrowRight, ArrowUpRight,
   LayoutDashboard, LogOut, Menu, X, Star, Quote, Moon, Sun,
-  Sparkles, Play, CheckCircle2, GraduationCap, MessageCircle
+  Sparkles, Play, CheckCircle2, GraduationCap, MessageCircle,
+  Cpu, Layers, Binary, Zap, Monitor
 } from "lucide-react";
+import { LanguageLogo } from "@/components/icons/LanguageLogo";
 
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -54,7 +56,16 @@ export default function LandingPage() {
   useEffect(() => { if (testimonials.length <= 1) return; const t = setInterval(() => setTIdx(i => (i + 1) % testimonials.length), 6000); return () => clearInterval(t); }, [testimonials.length]);
 
   const dUrl = user?.role === "admin" ? "/a-dashboard" : user?.role === "teacher" ? "/t-dashboard" : "/dashboard";
-  const catIcon: Record<string, string> = { python: "🐍", programming: "💻", frontend: "⚛️", computer_literacy: "🖥️", prompt_engineering: "🤖", algorithms: "🧠" };
+  const categoryIcon = (cat: string, size = 22) => {
+    const key = (cat || "").toLowerCase();
+    if (key === "python") return <LanguageLogo lang="python" size={size} />;
+    if (key === "frontend") return <LanguageLogo lang="react" size={size} />;
+    if (key === "programming") return <Code2 className="text-neon-purple" style={{ width: size, height: size }} />;
+    if (key === "computer_literacy") return <Monitor className="text-neon-blue" style={{ width: size, height: size }} />;
+    if (key === "prompt_engineering") return <Brain className="text-neon-pink" style={{ width: size, height: size }} />;
+    if (key === "algorithms") return <Binary className="text-neon-green" style={{ width: size, height: size }} />;
+    return <BookOpen className="text-muted-foreground" style={{ width: size, height: size }} />;
+  };
   const navLinks = [
     { href: "/explore/courses", label: "Kurslar" },
     { href: "/explore/challenges", label: "Topshiriqlar" },
@@ -204,17 +215,17 @@ export default function LandingPage() {
                 </div>
 
                 {/* Floating badges */}
-                <motion.div className="absolute -top-3 -right-3 px-3 py-1.5 rounded-xl bg-neon-yellow/10 border border-neon-yellow/20 text-neon-yellow text-xs font-bold shadow-lg"
+                <motion.div className="absolute -top-3 -right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neon-yellow/10 border border-neon-yellow/20 text-neon-yellow text-xs font-bold shadow-lg"
                   animate={{ y: [0, -6, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                  🏆 +50 XP
+                  <Trophy className="w-3.5 h-3.5" /> +50 XP
                 </motion.div>
-                <motion.div className="absolute -bottom-3 -left-3 px-3 py-1.5 rounded-xl bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-xs font-bold shadow-lg"
+                <motion.div className="absolute -bottom-3 -left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-xs font-bold shadow-lg"
                   animate={{ y: [0, 6, 0] }} transition={{ duration: 3.5, repeat: Infinity }}>
-                  🤖 AI Tahlil
+                  <Brain className="w-3.5 h-3.5" /> AI Tahlil
                 </motion.div>
-                <motion.div className="absolute top-1/2 -right-6 px-3 py-1.5 rounded-xl bg-neon-green/10 border border-neon-green/20 text-neon-green text-xs font-bold shadow-lg"
+                <motion.div className="absolute top-1/2 -right-6 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neon-green/10 border border-neon-green/20 text-neon-green text-xs font-bold shadow-lg"
                   animate={{ y: [0, -4, 0] }} transition={{ duration: 2.8, repeat: Infinity }}>
-                  ✅ 4/4 test
+                  <CheckCircle2 className="w-3.5 h-3.5" /> 4/4 test
                 </motion.div>
               </div>
             </motion.div>
@@ -275,7 +286,7 @@ export default function LandingPage() {
                 <motion.div key={c.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp(i * 0.05)}>
                   <Link href={user ? `/courses/${c.slug}` : "/login"} className="block group p-5 rounded-2xl border border-border/50 bg-card/50 hover:bg-card hover:border-border hover:shadow-lg hover:shadow-black/[0.03] transition-all duration-300">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center text-xl border border-border/50">{catIcon[c.category] || "📚"}</div>
+                      <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center border border-border/50">{categoryIcon(c.category, 22)}</div>
                       <div className="min-w-0 flex-1">
                         <h3 className="font-display font-bold truncate group-hover:text-neon-purple transition-colors">{c.title}</h3>
                         <div className="flex items-center gap-2 mt-0.5">
