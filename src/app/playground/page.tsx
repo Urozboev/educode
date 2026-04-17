@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Editor from "@monaco-editor/react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { createClient } from "@/lib/supabase/client";
 import {
   Play,
   Loader2,
@@ -19,6 +20,10 @@ import {
   ChevronDown,
   Cpu,
   Clock,
+  LayoutDashboard,
+  LogOut,
+  AlertCircle,
+  Keyboard,
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 
@@ -30,6 +35,8 @@ type Lang = {
   starter: string;
   /** false — brauzerda bajariladi (HTML preview), true — backend API orqali */
   api?: boolean;
+  /** Kod tarkibida stdin talab qilinishini aniqlovchi pattern */
+  stdinPattern?: RegExp;
 };
 
 const languages: Lang[] = [
@@ -39,12 +46,12 @@ const languages: Lang[] = [
     monaco: "python",
     version: "3.10",
     api: true,
+    stdinPattern: /(^|\W)input\s*\(/,
     starter: `# Python Playground
-print("Salom, Dunyo!")
-
-# input() dan foydalanish:
-ism = input("Ismingiz: ")
-print(f"Xush kelibsiz, {ism}!")`,
+# Agar kodda input() bo'lsa — qiymatlarni pastdagi "Kirish" oynasiga yozing
+name = input("Ismingiz: ")
+age = input("Yoshingiz: ")
+print(f"Xush kelibsiz, {name}! Siz {age} yoshdasiz.")`,
   },
   {
     id: "javascript",
@@ -52,7 +59,8 @@ print(f"Xush kelibsiz, {ism}!")`,
     monaco: "javascript",
     version: "Node 12",
     api: true,
-    starter: `// JavaScript Playground
+    stdinPattern: /readline|process\.stdin/,
+    starter: `// JavaScript (Node) Playground
 console.log("Salom, Dunyo!");
 
 const arr = [1, 2, 3, 4, 5];
@@ -77,13 +85,13 @@ console.log(greet("TypeScript"));`,
     monaco: "cpp",
     version: "GCC 9.2",
     api: true,
+    stdinPattern: /std::cin|cin\s*>>/,
     starter: `#include <iostream>
 using namespace std;
 
 int main() {
-    cout << "Salom, Dunyo!" << endl;
-
-    int a = 10, b = 20;
+    int a, b;
+    cin >> a >> b;
     cout << "Yig'indi: " << a + b << endl;
     return 0;
 }`,
@@ -94,14 +102,14 @@ int main() {
     monaco: "java",
     version: "OpenJDK 13",
     api: true,
-    starter: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("Salom, Dunyo!");
+    stdinPattern: /Scanner|BufferedReader/,
+    starter: `import java.util.Scanner;
 
-        int[] arr = {1, 2, 3, 4, 5};
-        int sum = 0;
-        for (int n : arr) sum += n;
-        System.out.println("Yig'indi: " + sum);
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String name = sc.nextLine();
+        System.out.println("Salom, " + name + "!");
     }
 }`,
   },
@@ -111,16 +119,13 @@ int main() {
     monaco: "csharp",
     version: "Mono 6.12",
     api: true,
+    stdinPattern: /Console\.ReadLine/,
     starter: `using System;
 
 class Program {
     static void Main() {
-        Console.WriteLine("Salom, Dunyo!");
-
-        int[] arr = {1, 2, 3, 4, 5};
-        int sum = 0;
-        foreach (int n in arr) sum += n;
-        Console.WriteLine($"Yig'indi: {sum}");
+        string name = Console.ReadLine();
+        Console.WriteLine($"Salom, {name}!");
     }
 }`,
   },
@@ -168,6 +173,7 @@ class Program {
 
 export default function PlaygroundPage() {
   const { theme, setTheme } = useTheme();
+  const supabase = createClient();
   const [mounted, setMounted] = useState(false);
   const [lang, setLang] = useState<Lang>(languages[0]);
   const [code, setCode] = useState(languages[0].starter);
@@ -178,16 +184,54 @@ export default function PlaygroundPage() {
   const [showHtml, setShowHtml] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [meta, setMeta] = useState<{ provider?: string; time?: string; memory?: number; warning?: string }>({});
+  const [stdinFocused, setStdinFocused] = useState(false);
+  const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Foydalanuvchi holatini olish
+  useEffect(() => {
+    (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url, role")
+          .eq("id", session.user.id)
+          .single();
+        if (p) setUser({ name: p.full_name, avatar: p.avatar_url, role: p.role });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Kod tarkibida input() bor-yo'qligini aniqlash
+  const needsStdin = useMemo(() => {
+    if (!lang.stdinPattern) return false;
+    return lang.stdinPattern.test(code);
+  }, [code, lang.stdinPattern]);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    document.cookie = "user-role=; path=/; max-age=0";
+    setUser(null);
+    setUserMenuOpen(false);
+  }
+
+  const dashboardUrl =
+    user?.role === "admin" ? "/a-dashboard" : user?.role === "teacher" ? "/t-dashboard" : "/dashboard";
+
   function switchLang(l: Lang) {
     setLang(l);
     setCode(l.starter);
     setOutput("");
+    setStdin("");
     setShowHtml(false);
     setLangOpen(false);
     setMeta({});
@@ -324,12 +368,52 @@ export default function PlaygroundPage() {
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           )}
-          <Link
-            href="/register"
-            className="hidden sm:inline-flex px-4 py-1.5 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 transition-all"
-          >
-            Ro'yxatdan o'tish
-          </Link>
+
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-surface hover:bg-surface-hover border border-border/60 transition-all"
+              >
+                <div className="w-7 h-7 rounded-full bg-hero-gradient flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
+                  {user.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    getInitials(user.name)
+                  )}
+                </div>
+                <span className="text-sm font-medium hidden sm:block">{user.name.split(" ")[0]}</span>
+              </button>
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute right-0 top-11 w-52 bg-card p-1.5 rounded-xl shadow-2xl z-50 border border-border/60">
+                    <Link
+                      href={dashboardUrl}
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm hover:bg-accent transition-colors"
+                    >
+                      <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> Dashboard
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-neon-red hover:bg-neon-red/8 w-full transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" /> Chiqish
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/register"
+              className="hidden sm:inline-flex px-4 py-1.5 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 transition-all"
+            >
+              Ro'yxatdan o'tish
+            </Link>
+          )}
         </div>
       </header>
 
@@ -382,6 +466,7 @@ export default function PlaygroundPage() {
                 onClick={() => {
                   setCode(lang.starter);
                   setOutput("");
+                  setStdin("");
                   setShowHtml(false);
                   setMeta({});
                 }}
@@ -420,23 +505,69 @@ export default function PlaygroundPage() {
           {/* Bottom bar: stdin + run */}
           <div className="border-t border-border/30 flex-shrink-0">
             {lang.id !== "html" && (
-              <div className="px-4 py-2 border-b border-border/20">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-                  <Terminal className="w-3 h-3" /> Kirish (stdin)
+              <div
+                className={cn(
+                  "px-4 py-3 border-b border-border/20 transition-colors",
+                  stdinFocused && "bg-neon-purple/[0.03]",
+                  needsStdin && !stdin.trim() && "bg-neon-yellow/[0.04]"
+                )}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={cn(
+                        "w-6 h-6 rounded-md flex items-center justify-center border",
+                        needsStdin && !stdin.trim()
+                          ? "bg-neon-yellow/10 border-neon-yellow/30 text-neon-yellow"
+                          : "bg-surface border-border/60 text-muted-foreground"
+                      )}
+                    >
+                      <Keyboard className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <div className="text-[13px] font-semibold leading-tight">
+                        Kirish qiymatlari (stdin)
+                      </div>
+                      <div className="text-[11px] text-muted-foreground leading-tight">
+                        {needsStdin
+                          ? "Kodingiz foydalanuvchi kiritishini kutmoqda — qiymatlarni yozib, keyin Ishga tushirish bosing"
+                          : "Agar kodingiz input() chaqirsa, qiymatlarni bu yerga yozing"}
+                      </div>
+                    </div>
+                  </div>
+                  {needsStdin && !stdin.trim() && (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-neon-yellow font-semibold px-2 py-0.5 rounded-full bg-neon-yellow/10 border border-neon-yellow/20">
+                      <AlertCircle className="w-3 h-3" /> kerak
+                    </span>
+                  )}
                 </div>
                 <textarea
                   value={stdin}
                   onChange={(e) => setStdin(e.target.value)}
-                  className="w-full bg-transparent border border-border/40 rounded-lg px-3 py-2 text-sm font-mono resize-none h-12 focus:outline-none focus:ring-1 focus:ring-neon-purple/50 focus:border-neon-purple/30"
-                  placeholder="Qiymatlarni kiriting (har bir qator alohida)..."
+                  onFocus={() => setStdinFocused(true)}
+                  onBlur={() => setStdinFocused(false)}
+                  className={cn(
+                    "w-full bg-surface/40 border rounded-lg px-3 py-2 text-sm font-mono resize-y min-h-[56px] max-h-40 placeholder:text-muted-foreground/50 focus:outline-none transition-colors",
+                    needsStdin && !stdin.trim()
+                      ? "border-neon-yellow/30 focus:ring-2 focus:ring-neon-yellow/30 focus:border-neon-yellow/50"
+                      : "border-border/50 focus:ring-2 focus:ring-neon-purple/30 focus:border-neon-purple/40"
+                  )}
+                  placeholder={
+                    lang.id === "python"
+                      ? "Ali\n20"
+                      : lang.id === "c++" || lang.id === "csharp" || lang.id === "java"
+                      ? "5 10"
+                      : "Har bir qator — yangi input() uchun qiymat"
+                  }
+                  spellCheck={false}
                 />
               </div>
             )}
-            <div className="px-4 py-2.5 flex items-center gap-2">
+            <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
               <button
                 onClick={handleRun}
                 disabled={running}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-neon-green text-white font-semibold text-sm hover:bg-neon-green/90 disabled:opacity-50 transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-neon-green text-white font-semibold text-sm hover:bg-neon-green/90 disabled:opacity-50 transition-all shadow-lg shadow-neon-green/20"
               >
                 {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
                 {running ? "Bajarilmoqda..." : "Ishga tushirish"}
@@ -445,7 +576,7 @@ export default function PlaygroundPage() {
                 Ctrl + Enter
               </kbd>
               <span className="text-xs text-muted-foreground ml-auto hidden sm:block">
-                {lang.id === "html" ? "Natija o'ngda" : "Judge0 API orqali bajariladi"}
+                {lang.id === "html" ? "Natija o'ngda" : "Judge0 + Piston (fallback)"}
               </span>
             </div>
           </div>
