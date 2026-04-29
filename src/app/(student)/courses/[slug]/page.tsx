@@ -42,7 +42,11 @@ export default function CourseDetailPage() {
 
     const { data: courseData } = await supabase
       .from("courses").select("*").eq("slug", slug).eq("is_published", true).single();
-    if (!courseData) { router.push("/courses"); return; }
+    if (!courseData) {
+      // Login qilmagan foydalanuvchi uchun /explore'ga, login qilganga /courses'ga qaytaramiz
+      router.push(user ? "/courses" : "/explore/courses");
+      return;
+    }
     setCourse(courseData as Course);
 
     const { data: topicsData } = await supabase
@@ -162,12 +166,31 @@ export default function CourseDetailPage() {
                     </Link>
                   </>
                 )
-              ) : (
+              ) : userId ? (
                 <button onClick={handleEnroll} disabled={enrolling}
                   className="w-full py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                   {enrolling ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                   {course.is_free ? "Bepul boshlash" : `${course.price_coins} coin bilan ochish`}
                 </button>
+              ) : (
+                <>
+                  <Link
+                    href={`/register?redirect=/courses/${slug}`}
+                    className="w-full py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Bepul ro'yxatdan o'tish
+                  </Link>
+                  <Link
+                    href={`/login?redirect=/courses/${slug}`}
+                    className="w-full py-2.5 rounded-xl border border-border/60 text-sm font-medium hover:bg-surface/50 transition-all flex items-center justify-center"
+                  >
+                    Hisobim bor
+                  </Link>
+                  <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
+                    Ro'yxatdan o'tish bepul · 100 coin sovg'a
+                  </p>
+                </>
               )}
             </div>
           </div>
@@ -184,21 +207,42 @@ export default function CourseDetailPage() {
           {topics.map((topic, i) => {
             const progress = getTopicProgress(topic.id);
             const isCompleted = progress?.is_completed;
-            const isLocked = !enrollment && !course.is_free;
+            // Login qilmagan foydalanuvchi yoki coin'li kursga yozilmagan foydalanuvchi → lock
+            const isLockedForGuest = !userId;
+            const isLockedForCoin = !!userId && !enrollment && !course.is_free;
+            const isLocked = isLockedForGuest || isLockedForCoin;
 
             return (
               <motion.div key={topic.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.04 * i }}>
                 {isLocked ? (
-                  <div className="p-4 md:p-5 rounded-2xl border border-border/40 bg-card/30 flex items-center gap-4 opacity-60 cursor-not-allowed">
-                    <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center text-muted-foreground flex-shrink-0">
-                      <Lock className="w-5 h-5" />
+                  isLockedForGuest ? (
+                    <Link
+                      href={`/register?redirect=/courses/${slug}`}
+                      className="p-4 md:p-5 rounded-2xl border border-border/40 bg-card/30 flex items-center gap-4 hover:bg-card/50 transition-colors group"
+                    >
+                      <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center text-muted-foreground flex-shrink-0 group-hover:text-neon-purple transition-colors">
+                        <Lock className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-semibold text-[15px] truncate">{topic.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {formatDuration(topic.estimated_minutes)} · ro'yxatdan o'ting va boshlang
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground/60 group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
+                    </Link>
+                  ) : (
+                    <div className="p-4 md:p-5 rounded-2xl border border-border/40 bg-card/30 flex items-center gap-4 opacity-60 cursor-not-allowed">
+                      <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center text-muted-foreground flex-shrink-0">
+                        <Lock className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-semibold text-[15px] truncate">{topic.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{formatDuration(topic.estimated_minutes)}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-display font-semibold text-[15px] truncate">{topic.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{formatDuration(topic.estimated_minutes)}</p>
-                    </div>
-                  </div>
+                  )
                 ) : (
                   <Link href={`/courses/${slug}/topics/${topic.slug}`}
                     className="group p-4 md:p-5 rounded-2xl border border-border/50 bg-card/40 hover:bg-card hover:border-border hover:shadow-lg hover:shadow-black/[0.04] transition-all flex items-center gap-4 block">
