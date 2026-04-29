@@ -9,7 +9,14 @@ export async function middleware(request: NextRequest) {
   // ============================================
   const publicPaths = ['/', '/login', '/register', '/forgot-password', '/verify-email', '/playground'];
   const isPublicPrefix = pathname.startsWith('/explore');
-  if (publicPaths.includes(pathname) || isPublicPrefix) {
+
+  // Public preview sahifalari (login talab qilmaydi):
+  // /courses/[slug] va /challenges/[slug] — kurs/topshiriq haqida ma'lumot
+  // Lekin /courses/[slug]/topics/... va boshqa chuqur path'lar AUTH talab qiladi
+  const isCoursePreview = /^\/courses\/[^\/]+$/.test(pathname);
+  const isChallengePreview = /^\/challenges\/[^\/]+$/.test(pathname);
+
+  if (publicPaths.includes(pathname) || isPublicPrefix || isCoursePreview || isChallengePreview) {
     return NextResponse.next();
   }
 

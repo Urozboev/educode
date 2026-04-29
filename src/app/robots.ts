@@ -10,7 +10,12 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/"],
+        allow: [
+          "/",
+          "/explore/",
+          "/courses/",          // /courses/[slug] — public preview
+          "/challenges/",       // /challenges/[slug] — public preview
+        ],
         disallow: [
           "/api/",
           "/dashboard",
@@ -21,9 +26,9 @@ export default function robots(): MetadataRoute.Robots {
           "/certificate/",
           "/chat",
           "/games",
-          "/challenges/",       // login talab qiladigan instance'lar (slug bilan) — ehtiyotkorlik
-          "/courses/",          // login talab qiladigan content (slug bilan)
-          "/t-",                // teacher panellari (t-dashboard, t-students, ...)
+          "/courses/*/topics/", // mavzu darslari auth talab qiladi
+          "/t-",                // teacher panellari
+          "/a-",                // admin panellari
           "/login",
           "/register",
           "/forgot-password",
@@ -31,11 +36,6 @@ export default function robots(): MetadataRoute.Robots {
           "/playground",
           "/placement-test",
         ],
-      },
-      {
-        userAgent: "Googlebot",
-        allow: ["/", "/explore/", "/explore/courses", "/explore/challenges", "/explore/games", "/explore/about"],
-        disallow: ["/api/", "/dashboard", "/profile", "/t-"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

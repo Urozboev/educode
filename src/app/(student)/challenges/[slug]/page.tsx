@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import type { Challenge, Submission, SubmissionTestResult, SupportedLanguage } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, Loader2, Coins, Users, Clock } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Coins, Users, Clock, Lock } from "lucide-react";
 import { cn, getDifficultyConfig, getCategoryLabel, formatRelativeDate } from "@/lib/utils";
 
 const CodeEditor = dynamic(() => import("@/components/editor/CodeEditor"), { ssr: false });
@@ -22,15 +22,22 @@ export default function ChallengeDetailPage() {
   const [aiFeedback, setAiFeedback] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { data: ch } = await supabase.from("challenges").select("*").eq("slug", slug).single();
+      const { data: ch } = await supabase
+        .from("challenges")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .maybeSingle();
       if (ch) {
         setChallenge(ch as Challenge);
         if (ch.languages?.[0]) setLang(ch.languages[0] as SupportedLanguage);
       }
       const { data: { user } } = await supabase.auth.getUser();
+      if (user) setUserId(user.id);
       if (user && ch) {
         const { data: subs } = await supabase.from("submissions").select("*")
           .eq("user_id", user.id).eq("task_id", ch.id).order("created_at", { ascending: false }).limit(10);
@@ -60,7 +67,10 @@ export default function ChallengeDetailPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/challenges" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        href={userId ? "/challenges" : "/explore/challenges"}
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="w-4 h-4" /> Topshiriqlar
       </Link>
 
@@ -119,35 +129,77 @@ export default function ChallengeDetailPage() {
           )}
         </div>
 
-        {/* Right: Editor */}
+        {/* Right: Editor (auth bor bo'lsa) yoki CTA panel (login qilmaganlar uchun) */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <div className="mb-3 flex gap-2">
-            {challenge.languages.map(l => (
-              <button key={l} onClick={() => setLang(l as SupportedLanguage)}
-                className={cn("px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-                  lang === l ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-surface text-muted-foreground")}>
-                {l}
-              </button>
-            ))}
-          </div>
-          <CodeEditor
-            language={lang}
-            starterCode={challenge.starter_code?.[lang] || ""}
-            testCases={allTestCases}
-            taskId={challenge.id}
-            taskType="challenge"
-            onSubmit={async () => {
-              // Submissions ro'yxatini yangilash
-              const { data: { user } } = await supabase.auth.getUser();
-              if (user) {
-                const { data: subs } = await supabase.from("submissions").select("*")
-                  .eq("user_id", user.id).eq("task_id", challenge.id).order("created_at", { ascending: false }).limit(10);
-                if (subs) setSubmissions(subs as Submission[]);
-              }
-            }}
-            onAIFeedback={handleAIFeedback}
-            height="500px"
-          />
+          {userId ? (
+            <>
+              <div className="mb-3 flex gap-2">
+                {challenge.languages.map(l => (
+                  <button key={l} onClick={() => setLang(l as SupportedLanguage)}
+                    className={cn("px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                      lang === l ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-surface text-muted-foreground")}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+              <CodeEditor
+                language={lang}
+                starterCode={challenge.starter_code?.[lang] || ""}
+                testCases={allTestCases}
+                taskId={challenge.id}
+                taskType="challenge"
+                onSubmit={async () => {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (user) {
+                    const { data: subs } = await supabase.from("submissions").select("*")
+                      .eq("user_id", user.id).eq("task_id", challenge.id).order("created_at", { ascending: false }).limit(10);
+                    if (subs) setSubmissions(subs as Submission[]);
+                  }
+                }}
+                onAIFeedback={handleAIFeedback}
+                height="500px"
+              />
+            </>
+          ) : (
+            <div className="glass-card p-8 flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-2xl bg-neon-purple/10 flex items-center justify-center mb-4">
+                <Lock className="w-7 h-7 text-neon-purple" />
+              </div>
+              <h3 className="font-display font-bold text-lg mb-2">Topshiriqni yechish uchun ro'yxatdan o'ting</h3>
+              <p className="text-sm text-muted-foreground mb-5 max-w-sm">
+                Bepul hisob yarating, kod yozing va avtomatik testlar orqali yechimni tekshirib ko'ring.
+                AI Sokratik mentor sizga yo'l-yo'riq beradi.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 w-full max-w-xs">
+                <Link
+                  href={`/register?redirect=/challenges/${slug}`}
+                  className="flex-1 py-3 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Bepul boshlash
+                </Link>
+                <Link
+                  href={`/login?redirect=/challenges/${slug}`}
+                  className="flex-1 py-3 rounded-xl border border-border/60 text-sm font-medium hover:bg-surface/50 transition-all flex items-center justify-center"
+                >
+                  Kirish
+                </Link>
+              </div>
+              <p className="text-[11px] text-muted-foreground/70 mt-4">
+                Ro'yxatdan o'tish 30 sekund · 100 coin sovg'a
+              </p>
+              <div className="mt-6 pt-6 border-t border-border/40 w-full max-w-sm">
+                <p className="text-xs font-semibold text-muted-foreground mb-2 text-left">Tillar:</p>
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {challenge.languages.map(l => (
+                    <span key={l} className="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-surface border border-border">
+                      {l}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

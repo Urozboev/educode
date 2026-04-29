@@ -41,10 +41,19 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   const supabase = createClient();
 
+  // Public preview yo'llari (login qilinmagan foydalanuvchi ham ko'ra oladi)
+  const isPublicPreview =
+    /^\/courses\/[^\/]+$/.test(pathname) || /^\/challenges\/[^\/]+$/.test(pathname);
+
   const loadProfile = useCallback(async () => {
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
+        // Public preview sahifasida login majburiy emas
+        if (isPublicPreview) {
+          setLoading(false);
+          return;
+        }
         router.push("/login");
         return;
       }
@@ -58,7 +67,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       console.error("Profil yuklash xatolik:", err);
     }
     setLoading(false);
-  }, [supabase, router]);
+  }, [supabase, router, isPublicPreview]);
 
   useEffect(() => {
     loadProfile();
@@ -203,6 +212,46 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       </div>
     </div>
   );
+
+  // Public preview: login qilmagan foydalanuvchi /courses/[slug] yoki /challenges/[slug] da bo'lsa,
+  // student sidebar o'rniga oddiy katalog navbar ko'rsatamiz.
+  if (!loading && !profile && isPublicPreview) {
+    return (
+      <div className="min-h-screen bg-background overflow-x-hidden">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20">
+                <Code2 className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-display font-bold text-xl tracking-tight">
+                Edu<span className="gradient-text">Code</span>
+              </span>
+            </Link>
+            <div className="hidden md:flex items-center gap-1">
+              <Link href="/explore/courses" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kurslar</Link>
+              <Link href="/explore/challenges" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Topshiriqlar</Link>
+              <Link href="/explore/about" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Platforma haqida</Link>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors"
+                title="Mavzu o'zgartirish"
+              >
+                {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+              </button>
+              <Link href="/login" className="hidden md:block px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kirish</Link>
+              <Link href="/register" className="px-4 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+            </div>
+          </div>
+        </nav>
+        <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6">
+          <div className="max-w-6xl mx-auto overflow-x-hidden">{children}</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
