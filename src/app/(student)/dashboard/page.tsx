@@ -12,6 +12,7 @@ import {
   ChevronRight, Clock, Zap, Brain, Star, Coins, Play,
   CheckCircle2, ArrowUpRight, GraduationCap
 } from "lucide-react";
+import CognitiveHealthCard from "@/components/ai/CognitiveHealthCard";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -182,6 +183,9 @@ export default function DashboardPage() {
           </div>
         </motion.div>
       )}
+
+      {/* Cognitive Health */}
+      <CognitiveHealthCard />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

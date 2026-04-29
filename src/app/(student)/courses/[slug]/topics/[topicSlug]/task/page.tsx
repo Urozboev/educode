@@ -9,8 +9,11 @@ import dynamic from "next/dynamic";
 import type { TopicTask, SubmissionTestResult } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, Loader2, Lightbulb, ChevronDown } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 import { cn, getDifficultyConfig } from "@/lib/utils";
+import { AILabel, AIDisclaimer } from "@/components/ai/AILabel";
+import HintTier from "@/components/ai/HintTier";
+import PlanFirstFlow from "@/components/ai/PlanFirstFlow";
 
 const CodeEditor = dynamic(() => import("@/components/editor/CodeEditor"), { ssr: false });
 
@@ -20,9 +23,10 @@ export default function TaskPage() {
   const [tasks, setTasks] = useState<TopicTask[]>([]);
   const [currentTask, setCurrentTask] = useState<TopicTask | null>(null);
   const [aiFeedback, setAiFeedback] = useState("");
+  const [aiFeedbackMeta, setAiFeedbackMeta] = useState<{ model?: string; prompt_template?: string; generated_at?: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const [showHints, setShowHints] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [codeUnlocked, setCodeUnlocked] = useState(false);
   const [topicId, setTopicId] = useState("");
   const [courseId, setCourseId] = useState("");
   const [userId, setUserId] = useState("");
@@ -67,6 +71,11 @@ export default function TaskPage() {
       });
       const data = await res.json();
       setAiFeedback(data.feedback);
+      setAiFeedbackMeta({
+        model: data.meta?.model,
+        prompt_template: data.meta?.prompt_template,
+        generated_at: new Date().toISOString(),
+      });
     } catch (_e) { toast.error("AI xatolik"); }
     setAiLoading(false);
   }
@@ -91,7 +100,7 @@ export default function TaskPage() {
         {tasks.length > 1 && (
           <div className="flex gap-2">
             {tasks.map((t, i) => (
-              <button key={t.id} onClick={() => { setCurrentTask(t); setAiFeedback(""); }}
+              <button key={t.id} onClick={() => { setCurrentTask(t); setAiFeedback(""); setAiFeedbackMeta(null); setCodeUnlocked(t.difficulty === 'easy'); }}
                 className={cn("w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center transition-all",
                   currentTask.id === t.id ? "bg-neon-purple text-white" : "bg-surface text-muted-foreground hover:bg-surface-hover")}>
                 {i + 1}
@@ -100,6 +109,18 @@ export default function TaskPage() {
           </div>
         )}
       </div>
+
+      {/* Plan-First flow (medium/hard uchun majburiy, easy uchun yashirin) */}
+      {currentTask.difficulty !== 'easy' && (
+        <PlanFirstFlow
+          key={currentTask.id}
+          taskId={currentTask.id}
+          taskType="topic_task"
+          taskDescription={currentTask.description}
+          difficulty={currentTask.difficulty as any}
+          onCodeUnlocked={() => setCodeUnlocked(true)}
+        />
+      )}
 
       {/* ===== ROW 1: Description | Editor (yonma-yon) ===== */}
       <div className="grid lg:grid-cols-[1fr,1.2fr] gap-4">
@@ -125,36 +146,42 @@ export default function TaskPage() {
             ))}
           </div>
 
-          {/* Hints */}
+          {/* Tiered Hints */}
           {currentTask.hints && currentTask.hints.length > 0 && (
             <div className="border-t border-border/50 pt-3 mt-3">
-              <button onClick={() => setShowHints(!showHints)} className="flex items-center gap-2 text-sm text-neon-yellow hover:underline">
-                <Lightbulb className="w-4 h-4" /> Maslahatlar ({currentTask.hints.length})
-                <ChevronDown className={cn("w-4 h-4 transition-transform", showHints && "rotate-180")} />
-              </button>
-              {showHints && (
-                <div className="mt-2 space-y-2">
-                  {currentTask.hints.map((h: any, i: number) => (
-                    <p key={i} className="text-xs text-muted-foreground bg-neon-yellow/5 border border-neon-yellow/10 rounded-lg px-3 py-2">💡 {h.text}</p>
-                  ))}
-                </div>
-              )}
+              <HintTier
+                taskId={currentTask.id}
+                taskType="topic_task"
+                hints={currentTask.hints as any}
+              />
             </div>
           )}
         </motion.div>
 
         {/* Right: Code Editor */}
         <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-          <CodeEditor
-            language={currentTask.language as any}
-            starterCode={currentTask.starter_code}
-            testCases={currentTask.test_cases}
-            taskId={currentTask.id}
-            taskType="topic_task"
-            onSubmit={handleSubmit}
-            onAIFeedback={handleAIFeedback}
-            height="460px"
-          />
+          {currentTask.difficulty !== 'easy' && !codeUnlocked ? (
+            <div className="glass-card flex flex-col items-center justify-center text-center p-8 h-[460px]">
+              <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center mb-3">
+                <Sparkles className="w-6 h-6 text-neon-purple" />
+              </div>
+              <h3 className="font-semibold mb-1">Avval rejani tuzing</h3>
+              <p className="text-xs text-muted-foreground max-w-xs">
+                Murakkab topshiriqlarda kod yozish bosqichi Plan-First yondashuvi tugagandan keyin ochiladi.
+              </p>
+            </div>
+          ) : (
+            <CodeEditor
+              language={currentTask.language as any}
+              starterCode={currentTask.starter_code}
+              testCases={currentTask.test_cases}
+              taskId={currentTask.id}
+              taskType="topic_task"
+              onSubmit={handleSubmit}
+              onAIFeedback={handleAIFeedback}
+              height="460px"
+            />
+          )}
         </motion.div>
       </div>
 
@@ -168,7 +195,19 @@ export default function TaskPage() {
           {aiLoading ? (
             <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Tahlil qilinmoqda...</div>
           ) : (
-            <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{aiFeedback}</div>
+            <div className="space-y-3">
+              <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{aiFeedback}</div>
+              {aiFeedbackMeta && (
+                <div className="flex flex-col gap-1 pt-2 border-t border-border/50">
+                  <AILabel
+                    model={aiFeedbackMeta.model}
+                    promptTemplate={aiFeedbackMeta.prompt_template}
+                    generatedAt={aiFeedbackMeta.generated_at}
+                  />
+                  <AIDisclaimer />
+                </div>
+              )}
+            </div>
           )}
         </motion.div>
       )}

@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { SOCRATIC_CHAT_PROMPT, PROMPT_VERSIONS } from '@/lib/ai-prompts';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { checkAIQuota, logAIInteraction } from '@/lib/ai/usage';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const SYSTEM_PROMPT = `Sen EduCode platformasining AI yordamchisisisan. Faqat quyidagi sohalar bo'yicha javob ber:
-- Dasturlash (Python, JavaScript, HTML/CSS, algoritimlar, ma'lumot tuzilmalari)
-- Kompyuter savodxonligi (operatsion tizimlar, internet, xavfsizlik, ofis dasturlari)
-- Prompt Engineering (sun'iy intellekt bilan ishlash, prompt yozish usullari)
-
-QOIDALAR:
-1. Faqat yuqoridagi sohalar bo'yicha javob ber. Boshqa sohalarga "Bu soha bo'yicha yordam bera olmayman" de.
-2. O'zbek tilida javob ber (agar savol o'zbekcha bo'lsa).
-3. Kod misollarini \`\`\` ichida ber.
-4. Qisqa va aniq javob ber — 200 so'zdan oshmasin (agar batafsil so'ralmasa).
-5. Xushmuomala va rag'batlantiruvchi bo'l.`;
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -30,14 +21,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ reply: 'Savolingizni yozing.' });
     }
 
-    // Gemini API formatida tarix tayyorlash (max 6 ta xabar — token tejash)
+    const supabase = createServerSupabaseClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Quota tekshiruv (foydalanuvchi tizimga kirgan bo'lsa)
+    let quota = null as Awaited<ReturnType<typeof checkAIQuota>> | null;
+    if (user) {
+      quota = await checkAIQuota(supabase, user.id);
+      if (!quota.allowed) {
+        return NextResponse.json({
+          reply: quota.message,
+          quota,
+          blocked: true,
+        }, { status: 429 });
+      }
+    }
+
     const contents: any[] = [];
+    contents.push({ role: 'user', parts: [{ text: SOCRATIC_CHAT_PROMPT }] });
+    contents.push({ role: 'model', parts: [{ text: "Tushundim. Sokratik usulda yo'l-yo'riq beraman." }] });
 
-    // System prompt birinchi user message sifatida
-    contents.push({ role: 'user', parts: [{ text: SYSTEM_PROMPT }] });
-    contents.push({ role: 'model', parts: [{ text: "Tushundim. Faqat IT sohalari bo'yicha yordam beraman." }] });
-
-    // Oxirgi 6 ta xabarni qo'shish (token tejash)
     const recentHistory = (history || []).slice(-6);
     for (const msg of recentHistory) {
       contents.push({
@@ -46,7 +49,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Yangi xabar
     contents.push({ role: 'user', parts: [{ text: message }] });
 
     const response = await fetch(
@@ -56,11 +58,7 @@ export async function POST(request: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
-          generationConfig: {
-            maxOutputTokens: 1024,
-            temperature: 0.7,
-            topP: 0.9,
-          },
+          generationConfig: { maxOutputTokens: 1024, temperature: 0.7, topP: 0.9 },
           safetySettings: [
             { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
             { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
@@ -79,7 +77,31 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Javob olinmadi.';
 
-    return NextResponse.json({ reply });
+    // Log + counter
+    let cooldownTriggered = false;
+    if (user) {
+      const r = await logAIInteraction(supabase, {
+        user_id: user.id,
+        interaction_type: 'chat',
+        task_type: 'free_chat',
+        model_used: model,
+        prompt_template: PROMPT_VERSIONS.socraticChat,
+        user_query: message,
+        ai_response: reply,
+      });
+      cooldownTriggered = r.cooldownTriggered;
+    }
+
+    return NextResponse.json({
+      reply,
+      meta: {
+        model,
+        prompt_template: PROMPT_VERSIONS.socraticChat,
+        ai_generated: true,
+      },
+      quota: quota ? { ...quota, used: quota.used + 1, remaining: Math.max(0, quota.remaining - 1) } : null,
+      cooldownTriggered,
+    });
   } catch (error: any) {
     console.error('Chat error:', error);
     return NextResponse.json({ reply: `⚠️ Xatolik: ${error.message}` });
@@ -91,6 +113,7 @@ export async function GET() {
     status: 'ok',
     route: '/api/chat',
     model: process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-2.0-flash',
+    prompt_template: PROMPT_VERSIONS.socraticChat,
     hasKey: !!process.env.GEMINI_API_KEY,
   });
 }

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { SupportedLanguage, TestCase, SubmissionTestResult } from "@/types";
 import { Play, RotateCcw, CheckCircle2, XCircle, Clock, Loader2, Sparkles, Copy, Check, Send, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import AIDeclarationModal, { type AIDeclarationData } from "@/components/ai/AIDeclarationModal";
 
 interface CodeEditorProps {
   language: SupportedLanguage;
@@ -33,9 +34,36 @@ export default function CodeEditor({
   const [activeTab, setActiveTab] = useState<"output" | "tests">("output");
   const [pyodideReady, setPyodideReady] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showDeclaration, setShowDeclaration] = useState(false);
+  const [aiUsedToday, setAiUsedToday] = useState(0);
+  const [pasteDetected, setPasteDetected] = useState(false);
+  const [pendingResults, setPendingResults] = useState<SubmissionTestResult[] | null>(null);
   const pyodideRef = useRef<any>(null);
 
   useEffect(() => { if (language === "python") loadPyodide(); }, [language]);
+
+  // 30 sekundlik avtomatik kod snapshot (faqat task/challenge ichida)
+  useEffect(() => {
+    if (!taskId) return;
+    const interval = setInterval(async () => {
+      if (!code || code === starterCode) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        await supabase.from('code_snapshots').insert({
+          user_id: user.id,
+          task_id: taskId,
+          task_type: taskType || 'topic_task',
+          language,
+          code_content: code,
+          code_length: code.length,
+          paste_detected: false,
+          trigger_type: 'auto',
+        });
+      } catch (_e) { /* */ }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [taskId, code, starterCode, taskType, language, supabase]);
 
   async function loadPyodide() {
     try {
@@ -153,12 +181,12 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
     setIsRunning(false);
   }
 
-  // ===== YUBORISH — DB GA SAQLASH + COIN/XP =====
-  async function handleSubmit() {
-    if (isSubmitting) return;
+  // ===== YUBORISH — testlarni ishga tushirib, AI Declaration modal'ni ko'rsatadi =====
+  async function requestSubmit() {
+    if (isSubmitting || !taskId) return;
     setIsSubmitting(true);
 
-    // 1. Avval testlarni ishga tushirish
+    // Avval testlar
     let results = testResults;
     if (testCases.length > 0) {
       setActiveTab("tests");
@@ -177,6 +205,27 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
       setTestResults(results);
     }
 
+    // Bugungi AI usage hint uchun
+    try {
+      const r = await fetch("/api/ai/stats");
+      if (r.ok) {
+        const j = await r.json();
+        setAiUsedToday(j.daily?.used ?? 0);
+      }
+    } catch (_e) { /* */ }
+
+    setPendingResults(results);
+    setShowDeclaration(true);
+    setIsSubmitting(false);
+  }
+
+  // ===== HAQIQIY YUBORISH — DB GA SAQLASH + DECLARATION + COIN/XP =====
+  async function handleSubmit(declaration?: AIDeclarationData) {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    const results = pendingResults ?? testResults;
+
     const passed = results.filter(r => r.passed).length;
     const total = results.length;
     const allPassed = total > 0 && passed === total;
@@ -187,11 +236,38 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
     if (!user) { toast.error("Tizimga kiring"); setIsSubmitting(false); return; }
 
     // 3. Submission saqlash
-    const { error: subErr } = await supabase.from('submissions').insert({
+    const { data: subData, error: subErr } = await supabase.from('submissions').insert({
       user_id: user.id, task_id: taskId, task_type: taskType || 'topic_task',
       code, language, status, passed_tests: passed, total_tests: total, test_results: results,
-    });
+    }).select('id').single();
     if (subErr) { toast.error(`Saqlash xatolik: ${subErr.message}`); setIsSubmitting(false); return; }
+
+    // 3.5. AI Declaration (agar berilgan bo'lsa)
+    if (declaration) {
+      await supabase.from('ai_declarations').insert({
+        user_id: user.id,
+        submission_id: subData?.id,
+        task_id: taskId,
+        task_type: taskType || 'topic_task',
+        used_ai: declaration.used_ai,
+        ai_used_for: declaration.ai_used_for,
+        ai_used_for_other: declaration.ai_used_for_other || null,
+        could_solve_alone: declaration.could_solve_alone,
+        honesty_pledge: declaration.honesty_pledge,
+      });
+    }
+
+    // 3.6. Final code snapshot
+    await supabase.from('code_snapshots').insert({
+      user_id: user.id,
+      task_id: taskId,
+      task_type: taskType || 'topic_task',
+      language,
+      code_content: code,
+      code_length: code.length,
+      paste_detected: pasteDetected,
+      trigger_type: 'submit',
+    });
 
     // 4. Challenge uchun coin/XP berish (TO'G'RIDAN-TO'G'RI)
     if (allPassed && taskType === 'challenge' && taskId) {
@@ -272,7 +348,37 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
       )}
 
       {/* Editor */}
-      <div style={{ height }}><Editor height={height} language={language === "python" ? "python" : "javascript"} value={code} onChange={val => setCode(val || "")} theme="vs-dark"
+      <div style={{ height }}><Editor
+        height={height}
+        language={language === "python" ? "python" : "javascript"}
+        value={code}
+        onChange={val => setCode(val || "")}
+        onMount={(editor) => {
+          editor.onDidPaste(async (e: any) => {
+            const pastedRange = e.range;
+            const pastedText = editor.getModel()?.getValueInRange(pastedRange) || "";
+            if (pastedText.length >= 40) {
+              setPasteDetected(true);
+              try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user && taskId) {
+                  await supabase.from('code_snapshots').insert({
+                    user_id: user.id,
+                    task_id: taskId,
+                    task_type: taskType || 'topic_task',
+                    language,
+                    code_content: editor.getValue(),
+                    code_length: editor.getValue().length,
+                    paste_detected: true,
+                    paste_size: pastedText.length,
+                    trigger_type: 'paste',
+                  });
+                }
+              } catch (_e) { /* */ }
+            }
+          });
+        }}
+        theme="vs-dark"
         options={{ minimap: { enabled: false }, fontSize: 14, fontFamily: "'JetBrains Mono', monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, readOnly, padding: { top: 12, bottom: 12 }, renderLineHighlight: "line", cursorBlinking: "smooth" }} /></div>
 
       {/* Actions */}
@@ -288,7 +394,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
           </button>
         )}
         {taskId && (
-          <button onClick={handleSubmit} disabled={isRunning || isSubmitting}
+          <button onClick={requestSubmit} disabled={isRunning || isSubmitting}
             className="btn-neon py-2 px-4 flex items-center gap-1.5 text-sm disabled:opacity-50">
             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             {isSubmitting ? "Yuborilmoqda..." : "Yuborish"}
@@ -344,6 +450,18 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
           )}
         </div>
       </div>
+
+      <AIDeclarationModal
+        open={showDeclaration}
+        onClose={() => { setShowDeclaration(false); setIsSubmitting(false); }}
+        submitting={isSubmitting}
+        hint={{ aiUsedToday, pasteDetected }}
+        onConfirm={async (decl) => {
+          await handleSubmit(decl);
+          setShowDeclaration(false);
+          setPendingResults(null);
+        }}
+      />
     </div>
   );
 }

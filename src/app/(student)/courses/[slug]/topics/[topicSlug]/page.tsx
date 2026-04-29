@@ -20,6 +20,7 @@ import {
   Coins,
 } from "lucide-react";
 import { cn, formatDuration } from "@/lib/utils";
+import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
 
 export default function TopicPage() {
   const { slug, topicSlug } = useParams<{ slug: string; topicSlug: string }>();
@@ -32,6 +33,8 @@ export default function TopicPage() {
   const [progress, setProgress] = useState<TopicProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
+  const [showReflection, setShowReflection] = useState(false);
+  const [reflectionDone, setReflectionDone] = useState(false);
 
   useEffect(() => {
     loadTopic();
@@ -90,8 +93,27 @@ export default function TopicPage() {
       prog = newProg;
     }
     if (prog) setProgress(prog as TopicProgress);
+
+    // Refleksiya yozilganmi?
+    if (currentTopic) {
+      const { count: reflCount } = await supabase
+        .from("reflection_journals")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("topic_id", currentTopic.id);
+      if ((reflCount ?? 0) > 0) setReflectionDone(true);
+    }
+
     setLoading(false);
   }
+
+  // Mavzu tugatilganda refleksiya modal'ni avtomatik ochish
+  useEffect(() => {
+    if (progress?.is_completed && !reflectionDone && !showReflection) {
+      const t = setTimeout(() => setShowReflection(true), 1200);
+      return () => clearTimeout(t);
+    }
+  }, [progress?.is_completed, reflectionDone, showReflection]);
 
   async function markContentRead() {
     if (!progress || progress.content_read || !topic || !course) return;
@@ -310,6 +332,25 @@ export default function TopicPage() {
           </Link>
         )}
       </div>
+
+      {/* Refleksiya — tugatilgan mavzu uchun yoki istalgan paytda yozish mumkin */}
+      {progress?.is_completed && !reflectionDone && (
+        <button
+          onClick={() => setShowReflection(true)}
+          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neon-green/10 border border-neon-green/30 text-neon-green text-sm hover:bg-neon-green/20 transition"
+        >
+          📓 Refleksiya yozish (3 daqiqa)
+        </button>
+      )}
+
+      <ReflectionJournalModal
+        open={showReflection}
+        onClose={() => setShowReflection(false)}
+        topicId={topic?.id}
+        courseId={course?.id}
+        topicTitle={topic?.title}
+        onSaved={() => setReflectionDone(true)}
+      />
     </div>
   );
 }

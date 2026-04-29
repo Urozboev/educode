@@ -3,11 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Send, Loader2, Bot, User, Trash2, Sparkles } from "lucide-react";
+import { Send, Loader2, Bot, User, Trash2, Sparkles, Brain, Clock } from "lucide-react";
+import { AILabel, AIDisclaimer } from "@/components/ai/AILabel";
+import { toast } from "sonner";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  meta?: { model?: string; prompt_template?: string; generated_at?: string };
 }
 
 const suggestions = [
@@ -17,13 +20,36 @@ const suggestions = [
   "Algoritm murakkabligini qanday hisoblash mumkin?",
 ];
 
+interface QuotaInfo {
+  used: number;
+  limit: number;
+  remaining: number;
+  cooldownUntil?: string | null;
+  blocked?: boolean;
+  message?: string;
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [quota, setQuota] = useState<QuotaInfo | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
+  useEffect(() => {
+    fetch("/api/ai/stats").then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.daily) {
+        setQuota({
+          used: d.daily.used,
+          limit: d.daily.limit,
+          remaining: d.daily.remaining,
+          cooldownUntil: d.daily.cooldownUntil,
+        });
+      }
+    }).catch(() => {});
+  }, []);
 
   async function handleSend(text?: string) {
     const msg = (text || input).trim();
@@ -44,7 +70,50 @@ export default function ChatPage() {
         }),
       });
       const data = await res.json();
-      setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
+
+      if (res.status === 429 || data.blocked) {
+        setMessages(prev => [
+          ...prev,
+          { role: "assistant", content: data.reply || data.message || "AI yordami chegarasiga yetdingiz." },
+        ]);
+        if (data.quota) {
+          setQuota({
+            used: data.quota.used,
+            limit: data.quota.limit,
+            remaining: data.quota.remaining,
+            cooldownUntil: data.quota.cooldownUntil,
+            blocked: true,
+          });
+        }
+        setLoading(false);
+        return;
+      }
+
+      setMessages(prev => [
+        ...prev,
+        {
+          role: "assistant",
+          content: data.reply,
+          meta: {
+            model: data.meta?.model,
+            prompt_template: data.meta?.prompt_template,
+            generated_at: new Date().toISOString(),
+          },
+        },
+      ]);
+
+      if (data.quota) {
+        setQuota({
+          used: data.quota.used,
+          limit: data.quota.limit,
+          remaining: data.quota.remaining,
+          cooldownUntil: data.quota.cooldownUntil,
+        });
+        if (data.quota.warning) toast.warning(data.quota.warning);
+      }
+      if (data.cooldownTriggered) {
+        toast.warning("Bir oz dam oling — 30 daqiqalik cooldown ishga tushdi.");
+      }
     } catch (_e) {
       setMessages(prev => [...prev, { role: "assistant", content: "⚠️ Xatolik yuz berdi. Qayta urinib ko'ring." }]);
     }
@@ -67,19 +136,52 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] max-w-3xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div>
           <h1 className="font-display font-bold text-2xl flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-neon-blue" /> AI Yordamchi
+            <Sparkles className="w-6 h-6 text-neon-blue" /> AI Mentor
           </h1>
-          <p className="text-xs text-muted-foreground">Dasturlash, kompyuter savodxonligi va prompt engineering bo'yicha</p>
+          <p className="text-xs text-muted-foreground">
+            Sokratik usulda yo'l-yo'riq beradi · tayyor yechim bermaydi
+          </p>
         </div>
-        {messages.length > 0 && (
-          <button onClick={() => setMessages([])} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1">
-            <Trash2 className="w-3.5 h-3.5" /> Tozalash
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {quota && (
+            <div
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border",
+                quota.cooldownUntil
+                  ? "bg-neon-red/10 border-neon-red/20 text-neon-red"
+                  : quota.remaining <= 2
+                  ? "bg-neon-yellow/10 border-neon-yellow/20 text-neon-yellow"
+                  : "bg-surface border-border text-muted-foreground",
+              )}
+              title="Bugungi AI savollari"
+            >
+              {quota.cooldownUntil ? <Clock className="w-3.5 h-3.5" /> : <Brain className="w-3.5 h-3.5" />}
+              <span>{quota.used}/{quota.limit}</span>
+            </div>
+          )}
+          {messages.length > 0 && (
+            <button onClick={() => setMessages([])} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1">
+              <Trash2 className="w-3.5 h-3.5" /> Tozalash
+            </button>
+          )}
+        </div>
       </div>
+
+      {quota?.cooldownUntil && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-neon-red/5 border border-neon-red/20 text-xs text-neon-red flex items-center gap-2">
+          <Clock className="w-4 h-4 flex-shrink-0" />
+          <span>
+            Cooldown faol — AI yordami{" "}
+            <span className="font-semibold">
+              {new Date(quota.cooldownUntil).toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" })}
+            </span>{" "}
+            dan keyin ochiladi. Shu vaqt ichida mustaqil urinib ko'ring.
+          </span>
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-4 pb-4 scrollbar-hide">
@@ -87,7 +189,12 @@ export default function ChatPage() {
           <div className="text-center py-12">
             <Bot className="w-16 h-16 text-neon-blue/20 mx-auto mb-4" />
             <h2 className="font-semibold text-lg mb-2">Savol bering!</h2>
-            <p className="text-sm text-muted-foreground mb-6">IT sohalari bo'yicha har qanday savolingizga javob beraman</p>
+            <p className="text-sm text-muted-foreground mb-2">
+              Dasturlash, IT va prompt engineering bo'yicha yo'l-yo'riq olasiz.
+            </p>
+            <p className="text-xs text-neon-yellow/80 mb-6">
+              ⚠️ Men topshiriqning to'liq yechimini yozib bermayman — Sokratik savollar bilan o'zingiz yechishingizga yordam beraman.
+            </p>
             <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
               {suggestions.map(s => (
                 <button key={s} onClick={() => handleSend(s)}
@@ -107,11 +214,24 @@ export default function ChatPage() {
                 <Bot className="w-4 h-4 text-neon-blue" />
               </div>
             )}
-            <div className={cn("max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
-              msg.role === "user"
-                ? "bg-neon-purple text-white rounded-br-md"
-                : "bg-surface border border-border rounded-bl-md")}>
-              {msg.role === "assistant" ? formatContent(msg.content) : msg.content}
+            <div className={cn("max-w-[85%] flex flex-col gap-2",
+              msg.role === "user" ? "items-end" : "items-start")}>
+              <div className={cn("rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                msg.role === "user"
+                  ? "bg-neon-purple text-white rounded-br-md"
+                  : "bg-surface border border-border rounded-bl-md")}>
+                {msg.role === "assistant" ? formatContent(msg.content) : msg.content}
+              </div>
+              {msg.role === "assistant" && (
+                <div className="flex flex-col gap-1 w-full">
+                  <AILabel
+                    model={msg.meta?.model}
+                    promptTemplate={msg.meta?.prompt_template}
+                    generatedAt={msg.meta?.generated_at}
+                  />
+                  <AIDisclaimer />
+                </div>
+              )}
             </div>
             {msg.role === "user" && (
               <div className="w-8 h-8 rounded-lg bg-neon-purple/10 flex items-center justify-center flex-shrink-0">
