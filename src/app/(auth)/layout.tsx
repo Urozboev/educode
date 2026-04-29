@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Code2 } from "lucide-react";
+
+export const metadata: Metadata = {
+  // Auth sahifalari Google'da chiqishi shart emas
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
