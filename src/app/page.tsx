@@ -14,6 +14,7 @@ import {
   Cpu, Layers, Binary, Zap, Monitor
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
+import { OrganizationJsonLd, WebsiteJsonLd, FaqJsonLd } from "@/components/seo/JsonLd";
 
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -360,6 +361,37 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      <OrganizationJsonLd />
+      <WebsiteJsonLd />
+      <FaqJsonLd
+        items={[
+          {
+            question: "EduCode platformasi nima?",
+            answer:
+              "EduCode (malla.uz) — interaktiv dasturlash kurslari, AI Sokratik mentor va gamifikatsiya bilan o'zbek tilidagi onlayn ta'lim platformasi. Python, JavaScript, HTML/CSS, algoritmlar va prompt engineering bo'yicha kurslar mavjud.",
+          },
+          {
+            question: "EduCode bepulmi?",
+            answer:
+              "Ha, EduCode'ning asosiy kurslari va topshiriqlari bepul. Ba'zi premium kurslar coin yoki to'g'ridan-to'g'ri sotib olish orqali ochiladi.",
+          },
+          {
+            question: "AI mentor qanday ishlaydi?",
+            answer:
+              "AI mentor Sokratik usulda ishlaydi: tayyor kod yechimini bermaydi, savollar orqali talabani mustaqil yechishga yo'naltiradi. Bu yondashuv Code.org 2024 va UNESCO 2024 tavsiyalariga muvofiq.",
+          },
+          {
+            question: "Qaysi dasturlash tillarini o'rganish mumkin?",
+            answer:
+              "Hozircha Python, JavaScript, HTML/CSS, algoritmlar va ma'lumot tuzilmalari bo'yicha kurslar mavjud. Yaqin orada C++ va boshqa tillar qo'shiladi.",
+          },
+          {
+            question: "Sertifikat olish mumkinmi?",
+            answer:
+              "Ha, kursni 100% tugatgan talabalarga avtomatik raqamli sertifikat beriladi. Sertifikat profilingizda saqlanadi va PDF sifatida yuklab olish mumkin.",
+          },
+        ]}
+      />
 
       {/* ========== NAVBAR ========== */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-2xl border-b border-border/40">
