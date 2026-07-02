@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn, formatDuration } from "@/lib/utils";
 import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
+import ProtectedVideoPlayer from "@/components/video/ProtectedVideoPlayer";
 
 export default function TopicPage() {
   const { slug, topicSlug } = useParams<{ slug: string; topicSlug: string }>();
@@ -46,8 +47,7 @@ export default function TopicPage() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
-    setUserId(user.id);
+    if (user) setUserId(user.id);
 
     const { data: courseData } = await supabase
       .from("courses")
@@ -55,11 +55,13 @@ export default function TopicPage() {
       .eq("slug", slug)
       .single();
     if (!courseData) {
-      router.push("/courses");
+      router.push(user ? "/courses" : "/explore/courses");
       return;
     }
     setCourse(courseData as Course);
 
+    // topics RLS: free preview / bepul kurs / enrollment bo'lsagina qator keladi.
+    // Guest foydalanuvchi faqat is_free_preview darslarni oladi.
     const { data: topicsData } = await supabase
       .from("topics")
       .select("*")
@@ -69,33 +71,35 @@ export default function TopicPage() {
 
     const currentTopic = topicsData?.find((t) => t.slug === topicSlug);
     if (!currentTopic) {
+      // RLS qatorni bermadi — dars yopiq yoki mavjud emas → kurs sahifasiga
       router.push(`/courses/${slug}`);
       return;
     }
     setTopic(currentTopic as Topic);
 
-    let { data: prog } = await supabase
-      .from("topic_progress")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("topic_id", currentTopic.id)
-      .single();
-    if (!prog) {
-      const { data: newProg } = await supabase
+    // Progress faqat login qilgan foydalanuvchi uchun
+    if (user) {
+      let { data: prog } = await supabase
         .from("topic_progress")
-        .insert({
-          user_id: user.id,
-          topic_id: currentTopic.id,
-          course_id: courseData.id,
-        })
-        .select()
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("topic_id", currentTopic.id)
         .single();
-      prog = newProg;
-    }
-    if (prog) setProgress(prog as TopicProgress);
+      if (!prog) {
+        const { data: newProg } = await supabase
+          .from("topic_progress")
+          .insert({
+            user_id: user.id,
+            topic_id: currentTopic.id,
+            course_id: courseData.id,
+          })
+          .select()
+          .single();
+        prog = newProg;
+      }
+      if (prog) setProgress(prog as TopicProgress);
 
-    // Refleksiya yozilganmi?
-    if (currentTopic) {
+      // Refleksiya yozilganmi?
       const { count: reflCount } = await supabase
         .from("reflection_journals")
         .select("id", { count: "exact", head: true })
@@ -227,8 +231,8 @@ export default function TopicPage() {
         </Link>
       </motion.div>
 
-      {/* Video */}
-      {topic.video_url && (
+      {/* Video — himoyalangan player (signed URL, watermark, nodownload) */}
+      {(topic.video_url || topic.video_id) && (
         <motion.div
           className="rounded-3xl border border-border/60 bg-card/40 overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
@@ -239,7 +243,7 @@ export default function TopicPage() {
             <span className="inline-flex items-center gap-2 text-sm font-semibold">
               <Video className="w-4 h-4 text-neon-blue" /> Video dars
             </span>
-            {!progress?.video_watched && (
+            {userId && !progress?.video_watched && (
               <button
                 onClick={markVideoWatched}
                 className="text-xs font-medium text-neon-blue hover:underline"
@@ -248,17 +252,38 @@ export default function TopicPage() {
               </button>
             )}
           </div>
-          <div className="aspect-video bg-black">
-            <iframe
-              src={
-                topic.video_url.includes("watch?v=")
-                  ? topic.video_url.replace("watch?v=", "embed/")
-                  : topic.video_url
-              }
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+          <ProtectedVideoPlayer
+            topicId={topic.id}
+            redirectPath={`/courses/${slug}/topics/${topicSlug}`}
+          />
+        </motion.div>
+      )}
+
+      {/* Guest (free preview) uchun register CTA */}
+      {!userId && (
+        <motion.div
+          className="rounded-3xl border border-neon-purple/30 bg-neon-purple/5 p-6 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <p className="font-display font-bold text-lg mb-1">Bu — bepul namunaviy dars</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Kursning barcha darslari, testlari va amaliy topshiriqlariga kirish uchun ro'yxatdan o'ting.
+          </p>
+          <div className="flex gap-2 justify-center">
+            <Link
+              href={`/register?redirect=/courses/${slug}`}
+              className="px-6 py-2.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition"
+            >
+              Bepul ro'yxatdan o'tish
+            </Link>
+            <Link
+              href={`/login?redirect=/courses/${slug}`}
+              className="px-6 py-2.5 rounded-xl border border-border/60 text-sm font-medium hover:bg-surface/50 transition"
+            >
+              Kirish
+            </Link>
           </div>
         </motion.div>
       )}

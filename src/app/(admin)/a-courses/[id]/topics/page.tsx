@@ -4,27 +4,42 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import type { Course, Topic, Quiz, TopicTask } from "@/types";
+import type { Course, Topic, Quiz, TopicTask, CourseSection, VideoProvider } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import slugify from "slugify";
 import {
   ArrowLeft, Plus, Pencil, Trash2, Save, X, Loader2, Video, FileText,
-  ChevronUp, ChevronDown, ClipboardList, Code2, Sparkles, Brain, ChevronRight
+  ChevronUp, ChevronDown, ClipboardList, Code2, Sparkles, Brain, ChevronRight,
+  FolderPlus, Eye
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const EMPTY_TOPIC_FORM = {
+  title: "", content_html: "", video_url: "", presentation_url: "",
+  coin_reward: 10, xp_reward: 25, estimated_minutes: 30,
+  section_id: "", is_free_preview: false,
+  video_provider: "youtube" as VideoProvider, video_id: "",
+};
 
 export default function AdminTopicsPage() {
   const { id: courseId } = useParams<{ id: string }>();
   const supabase = createClient();
   const [course, setCourse] = useState<Course | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [sections, setSections] = useState<CourseSection[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Section form
+  const [showSectionForm, setShowSectionForm] = useState(false);
+  const [editSectionId, setEditSectionId] = useState<string | null>(null);
+  const [sectionForm, setSectionForm] = useState({ title: "", description: "" });
+  const [savingSection, setSavingSection] = useState(false);
 
   // Topic form
   const [showTopicForm, setShowTopicForm] = useState(false);
   const [editTopicId, setEditTopicId] = useState<string | null>(null);
-  const [topicForm, setTopicForm] = useState({ title: "", content_html: "", video_url: "", presentation_url: "", coin_reward: 10, xp_reward: 25, estimated_minutes: 30 });
+  const [topicForm, setTopicForm] = useState({ ...EMPTY_TOPIC_FORM });
   const [savingTopic, setSavingTopic] = useState(false);
   const [aiGenerating, setAiGenerating] = useState<string | null>(null);
 
@@ -44,11 +59,68 @@ export default function AdminTopicsPage() {
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {
-    const { data: c } = await supabase.from("courses").select("*").eq("id", courseId).single();
+    const [{ data: c }, { data: t }, { data: s }] = await Promise.all([
+      supabase.from("courses").select("*").eq("id", courseId).single(),
+      supabase.from("topics").select("*").eq("course_id", courseId).order("order_index"),
+      supabase.from("course_sections").select("*").eq("course_id", courseId).order("order_index"),
+    ]);
     if (c) setCourse(c as Course);
-    const { data: t } = await supabase.from("topics").select("*").eq("course_id", courseId).order("order_index");
     if (t) setTopics(t as Topic[]);
+    if (s) setSections(s as CourseSection[]);
     setLoading(false);
+  }
+
+  // ==================== SECTION CRUD ====================
+  function openNewSection() {
+    setSectionForm({ title: "", description: "" });
+    setEditSectionId(null);
+    setShowSectionForm(true);
+  }
+
+  function openEditSection(s: CourseSection) {
+    setSectionForm({ title: s.title, description: s.description || "" });
+    setEditSectionId(s.id);
+    setShowSectionForm(true);
+  }
+
+  async function saveSection() {
+    if (!sectionForm.title.trim()) { toast.error("Bo'lim nomini kiriting"); return; }
+    setSavingSection(true);
+    if (editSectionId) {
+      const { error } = await supabase.from("course_sections")
+        .update({ title: sectionForm.title, description: sectionForm.description || null })
+        .eq("id", editSectionId);
+      if (error) { toast.error(error.message); setSavingSection(false); return; }
+      toast.success("Bo'lim yangilandi");
+    } else {
+      const { error } = await supabase.from("course_sections").insert({
+        course_id: courseId,
+        title: sectionForm.title,
+        description: sectionForm.description || null,
+        order_index: sections.length,
+      });
+      if (error) { toast.error(error.message); setSavingSection(false); return; }
+      toast.success("Bo'lim qo'shildi");
+    }
+    setShowSectionForm(false);
+    setSavingSection(false);
+    loadData();
+  }
+
+  async function deleteSection(s: CourseSection) {
+    const topicCount = topics.filter(t => t.section_id === s.id).length;
+    if (!confirm(`"${s.title}" bo'limini o'chirish?${topicCount > 0 ? ` Ichidagi ${topicCount} ta dars bo'limsiz qoladi (o'chirilmaydi).` : ""}`)) return;
+    await supabase.from("course_sections").delete().eq("id", s.id);
+    toast.success("Bo'lim o'chirildi");
+    loadData();
+  }
+
+  async function moveSectionOrder(idx: number, dir: -1 | 1) {
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= sections.length) return;
+    await supabase.from("course_sections").update({ order_index: newIdx }).eq("id", sections[idx].id);
+    await supabase.from("course_sections").update({ order_index: idx }).eq("id", sections[newIdx].id);
+    loadData();
   }
 
   async function loadTopicDetails(topicId: string) {
@@ -65,13 +137,19 @@ export default function AdminTopicsPage() {
   }
 
   // ==================== TOPIC CRUD ====================
-  function openNewTopic() {
-    setTopicForm({ title: "", content_html: "", video_url: "", presentation_url: "", coin_reward: 10, xp_reward: 25, estimated_minutes: 30 });
+  function openNewTopic(sectionId?: string) {
+    setTopicForm({ ...EMPTY_TOPIC_FORM, section_id: sectionId || "" });
     setEditTopicId(null); setShowTopicForm(true);
   }
 
   function openEditTopic(t: Topic) {
-    setTopicForm({ title: t.title, content_html: t.content_html || "", video_url: t.video_url || "", presentation_url: t.presentation_url || "", coin_reward: t.coin_reward, xp_reward: t.xp_reward, estimated_minutes: t.estimated_minutes });
+    setTopicForm({
+      title: t.title, content_html: t.content_html || "", video_url: t.video_url || "",
+      presentation_url: t.presentation_url || "", coin_reward: t.coin_reward,
+      xp_reward: t.xp_reward, estimated_minutes: t.estimated_minutes,
+      section_id: t.section_id || "", is_free_preview: t.is_free_preview || false,
+      video_provider: (t.video_provider || "youtube") as VideoProvider, video_id: t.video_id || "",
+    });
     setEditTopicId(t.id); setShowTopicForm(true);
   }
 
@@ -79,7 +157,13 @@ export default function AdminTopicsPage() {
     if (!topicForm.title.trim()) { toast.error("Mavzu nomini kiriting"); return; }
     setSavingTopic(true);
     const slug = slugify(topicForm.title, { lower: true, strict: true });
-    const payload = { ...topicForm, slug, course_id: courseId, video_url: topicForm.video_url || null, presentation_url: topicForm.presentation_url || null };
+    const payload = {
+      ...topicForm, slug, course_id: courseId,
+      video_url: topicForm.video_url || null,
+      presentation_url: topicForm.presentation_url || null,
+      section_id: topicForm.section_id || null,
+      video_id: topicForm.video_id || null,
+    };
 
     if (editTopicId) {
       const { error } = await supabase.from("topics").update(payload).eq("id", editTopicId);
@@ -210,12 +294,71 @@ export default function AdminTopicsPage() {
             <ArrowLeft className="w-4 h-4" /> Kurslar
           </Link>
           <h1 className="font-display font-bold text-2xl">{course?.title || "..."} — Mavzular</h1>
-          <p className="text-sm text-muted-foreground">{topics.length} ta mavzu</p>
+          <p className="text-sm text-muted-foreground">{sections.length} ta bo'lim · {topics.length} ta mavzu</p>
         </div>
-        <button onClick={openNewTopic} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
-          <Plus className="w-4 h-4" /> Yangi mavzu
-        </button>
+        <div className="flex gap-2">
+          <button onClick={openNewSection} className="btn-ghost py-2.5 px-4 flex items-center gap-2 text-sm border border-border">
+            <FolderPlus className="w-4 h-4" /> Yangi bo'lim
+          </button>
+          <button onClick={() => openNewTopic()} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
+            <Plus className="w-4 h-4" /> Yangi mavzu
+          </button>
+        </div>
       </div>
+
+      {/* ===== SECTION FORM ===== */}
+      <AnimatePresence>
+        {showSectionForm && (
+          <motion.div className="glass-card p-6" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-semibold">{editSectionId ? "Bo'limni tahrirlash" : "Yangi bo'lim"}</h2>
+              <button onClick={() => setShowSectionForm(false)} className="p-1.5 hover:bg-accent rounded-lg"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Bo'lim nomi *</label>
+                <input value={sectionForm.title} onChange={e => setSectionForm({ ...sectionForm, title: e.target.value })} className="input-field" placeholder="Kompyuter bilan tanishuv" />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Tavsif (ixtiyoriy)</label>
+                <input value={sectionForm.description} onChange={e => setSectionForm({ ...sectionForm, description: e.target.value })} className="input-field" placeholder="Bo'lim haqida qisqa..." />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-4">
+              <button onClick={() => setShowSectionForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={saveSection} disabled={savingSection} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
+                {savingSection ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {editSectionId ? "Saqlash" : "Qo'shish"}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ===== SECTIONS LIST ===== */}
+      {sections.length > 0 && (
+        <div className="glass-card p-4">
+          <h3 className="font-semibold text-sm mb-3 text-muted-foreground">Bo'limlar tartibi</h3>
+          <div className="space-y-1.5">
+            {sections.map((s, i) => (
+              <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-surface/50">
+                <div className="flex flex-col gap-0.5">
+                  <button onClick={() => moveSectionOrder(i, -1)} disabled={i === 0} className="p-0.5 hover:bg-accent rounded disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => moveSectionOrder(i, 1)} disabled={i === sections.length - 1} className="p-0.5 hover:bg-accent rounded disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
+                </div>
+                <div className="w-7 h-7 rounded-lg bg-neon-blue/10 flex items-center justify-center text-neon-blue font-bold text-xs flex-shrink-0">{i + 1}</div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{s.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{topics.filter(t => t.section_id === s.id).length} ta dars</p>
+                </div>
+                <button onClick={() => openNewTopic(s.id)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-neon-green" title="Bo'limga dars qo'shish"><Plus className="w-4 h-4" /></button>
+                <button onClick={() => openEditSection(s)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
+                <button onClick={() => deleteSection(s)} className="p-1.5 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ===== TOPIC FORM ===== */}
       <AnimatePresence>
@@ -242,9 +385,67 @@ export default function AdminTopicsPage() {
                 <textarea value={topicForm.content_html} onChange={e => setTopicForm({ ...topicForm, content_html: e.target.value })}
                   className="input-field min-h-[250px] font-mono text-sm" placeholder="<h2>Sarlavha</h2><p>Matn...</p>" />
               </div>
+              {/* Bo'lim va free preview */}
               <div className="grid md:grid-cols-2 gap-4">
-                <div><label className="text-sm font-medium mb-1 block">Video URL</label>
-                  <input value={topicForm.video_url} onChange={e => setTopicForm({ ...topicForm, video_url: e.target.value })} className="input-field" placeholder="https://youtube.com/watch?v=..." /></div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Bo'lim</label>
+                  <select value={topicForm.section_id} onChange={e => setTopicForm({ ...topicForm, section_id: e.target.value })} className="input-field">
+                    <option value="">— Bo'limsiz —</option>
+                    {sections.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-end pb-1">
+                  <label className={cn(
+                    "flex items-center gap-2.5 px-4 py-2.5 rounded-xl border cursor-pointer transition-all w-full",
+                    topicForm.is_free_preview ? "bg-neon-blue/10 border-neon-blue/40" : "bg-surface border-border hover:bg-surface-hover",
+                  )}>
+                    <input type="checkbox" checked={topicForm.is_free_preview}
+                      onChange={e => setTopicForm({ ...topicForm, is_free_preview: e.target.checked })}
+                      className="accent-neon-blue" />
+                    <Eye className="w-4 h-4 text-neon-blue" />
+                    <span className="text-sm">Bepul ko'rish (namunaviy dars)</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Video sozlamalari */}
+              <div className="p-4 rounded-xl bg-surface/40 border border-border/50 space-y-3">
+                <p className="text-sm font-medium flex items-center gap-2"><Video className="w-4 h-4 text-neon-blue" /> Video sozlamalari</p>
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block text-muted-foreground">Provider</label>
+                    <select value={topicForm.video_provider} onChange={e => setTopicForm({ ...topicForm, video_provider: e.target.value as VideoProvider })} className="input-field text-sm">
+                      <option value="bunny">Bunny Stream (himoyalangan — tavsiya)</option>
+                      <option value="youtube">YouTube (himoyasiz — bepul kontent)</option>
+                      <option value="cloudflare">Cloudflare Stream</option>
+                      <option value="vimeo">Vimeo</option>
+                      <option value="direct">To'g'ridan-to'g'ri URL (eski)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block text-muted-foreground">
+                      {topicForm.video_provider === "bunny" ? "Bunny Video GUID" :
+                       topicForm.video_provider === "cloudflare" ? "Cloudflare Video ID" :
+                       topicForm.video_provider === "vimeo" ? "Vimeo Video ID" : "Video ID (ixtiyoriy)"}
+                    </label>
+                    <input value={topicForm.video_id} onChange={e => setTopicForm({ ...topicForm, video_id: e.target.value })}
+                      className="input-field text-sm font-mono" placeholder={topicForm.video_provider === "bunny" ? "e3f5a-...-9b2c" : ""} />
+                  </div>
+                </div>
+                {(topicForm.video_provider === "youtube" || topicForm.video_provider === "direct") && (
+                  <div>
+                    <label className="text-xs font-medium mb-1 block text-muted-foreground">Video URL (eski usul)</label>
+                    <input value={topicForm.video_url} onChange={e => setTopicForm({ ...topicForm, video_url: e.target.value })} className="input-field text-sm" placeholder="https://youtube.com/watch?v=..." />
+                  </div>
+                )}
+                {topicForm.video_provider === "bunny" && (
+                  <p className="text-[11px] text-muted-foreground">
+                    💡 Videoni Bunny Stream dashboard'ga yuklang, GUID'ni shu yerga qo'ying. Token himoyasi avtomatik ishlaydi.
+                  </p>
+                )}
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
                 <div><label className="text-sm font-medium mb-1 block">Taqdimot URL</label>
                   <input value={topicForm.presentation_url} onChange={e => setTopicForm({ ...topicForm, presentation_url: e.target.value })} className="input-field" /></div>
               </div>
@@ -274,7 +475,7 @@ export default function AdminTopicsPage() {
         topics.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <p className="mb-4">Hali mavzu qo'shilmagan</p>
-            <button onClick={openNewTopic} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi mavzuni qo'shish</button>
+            <button onClick={() => openNewTopic()} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi mavzuni qo'shish</button>
           </div>
         ) : topics.map((t, i) => (
           <div key={t.id}>
@@ -285,9 +486,19 @@ export default function AdminTopicsPage() {
               </div>
               <div className="w-8 h-8 rounded-lg bg-neon-purple/10 flex items-center justify-center text-neon-purple font-bold text-sm flex-shrink-0">{i + 1}</div>
               <button onClick={() => toggleExpand(t.id)} className="flex-1 min-w-0 text-left">
-                <p className="font-medium text-sm truncate">{t.title}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm truncate">{t.title}</p>
+                  {t.is_free_preview && (
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-neon-blue/10 text-neon-blue border border-neon-blue/20 flex-shrink-0">
+                      <Eye className="w-2.5 h-2.5" /> Bepul
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-0.5">
-                  {t.video_url && <span className="flex items-center gap-0.5"><Video className="w-3 h-3" /> Video</span>}
+                  {t.section_id && (
+                    <span className="text-neon-blue/80">{sections.find(s => s.id === t.section_id)?.title || "?"}</span>
+                  )}
+                  {(t.video_url || t.video_id) && <span className="flex items-center gap-0.5"><Video className="w-3 h-3" /> {t.video_provider === "bunny" ? "Bunny" : "Video"}</span>}
                   {t.content_html && <span className="flex items-center gap-0.5"><FileText className="w-3 h-3" /> Matn</span>}
                   <span>+{t.coin_reward} coin</span>
                 </div>

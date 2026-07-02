@@ -43,7 +43,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   // Public preview yo'llari (login qilinmagan foydalanuvchi ham ko'ra oladi)
   const isPublicPreview =
-    /^\/courses\/[^\/]+$/.test(pathname) || /^\/challenges\/[^\/]+$/.test(pathname);
+    /^\/courses\/[^\/]+$/.test(pathname) ||
+    /^\/courses\/[^\/]+\/topics\/[^\/]+$/.test(pathname) ||
+    /^\/challenges\/[^\/]+$/.test(pathname);
 
   const loadProfile = useCallback(async () => {
     try {
