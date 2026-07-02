@@ -5,13 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { cn, getDifficultyConfig, formatDuration, getLevelLabel } from "@/lib/utils";
-import type { Course, Topic, Enrollment, TopicProgress } from "@/types";
-import { motion } from "framer-motion";
+import type { Course, TopicTocEntry, CourseSection, Enrollment, TopicProgress } from "@/types";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
-  BookOpen, Clock, Users, Coins, ChevronRight, Lock, Play,
+  BookOpen, Clock, Users, Coins, ChevronRight, ChevronDown, Lock, Play,
   CheckCircle2, Circle, FileText, Video, ClipboardList, Code2,
-  ArrowLeft, Star, Loader2, Sparkles, GraduationCap, Download
+  ArrowLeft, Star, Loader2, Sparkles, GraduationCap, Download, Eye
 } from "lucide-react";
 
 export default function CourseDetailPage() {
@@ -20,7 +20,9 @@ export default function CourseDetailPage() {
   const supabase = createClient();
 
   const [course, setCourse] = useState<Course | null>(null);
-  const [topics, setTopics] = useState<Topic[]>([]);
+  const [topics, setTopics] = useState<TopicTocEntry[]>([]);
+  const [sections, setSections] = useState<CourseSection[]>([]);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [topicProgress, setTopicProgress] = useState<TopicProgress[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,9 +51,20 @@ export default function CourseDetailPage() {
     }
     setCourse(courseData as Course);
 
-    const { data: topicsData } = await supabase
-      .from("topics").select("*").eq("course_id", courseData.id).eq("is_published", true).order("order_index");
-    if (topicsData) setTopics(topicsData as Topic[]);
+    // Mundarija public view'dan (kontent ustunlari yo'q — RLS'siz o'qiladi)
+    // va bo'limlar parallel yuklanadi
+    const [{ data: topicsData }, { data: sectionsData }] = await Promise.all([
+      supabase.from("topics_toc").select("*").eq("course_id", courseData.id).order("order_index"),
+      supabase.from("course_sections").select("*").eq("course_id", courseData.id).eq("is_published", true).order("order_index"),
+    ]);
+    if (topicsData) setTopics(topicsData as TopicTocEntry[]);
+    if (sectionsData) {
+      setSections(sectionsData as CourseSection[]);
+      // Birinchi bo'lim ochiq holda boshlanadi
+      if (sectionsData.length > 0) {
+        setOpenSections({ [sectionsData[0].id]: true });
+      }
+    }
 
     if (user) {
       const { data: enrollData } = await supabase
@@ -63,6 +76,10 @@ export default function CourseDetailPage() {
       if (progressData) setTopicProgress(progressData as TopicProgress[]);
     }
     setLoading(false);
+  }
+
+  function toggleSection(id: string) {
+    setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
   }
 
   async function handleEnroll() {
@@ -200,83 +217,158 @@ export default function CourseDetailPage() {
       {/* Topics List */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
         <div className="flex items-end justify-between mb-5">
-          <h2 className="font-display font-bold text-2xl tracking-tight">Mavzular</h2>
-          <span className="text-sm text-muted-foreground">{topics.length} ta</span>
+          <h2 className="font-display font-bold text-2xl tracking-tight">Kurs mundarijasi</h2>
+          <span className="text-sm text-muted-foreground">
+            {sections.length > 0 && `${sections.length} bo'lim · `}{topics.length} dars
+          </span>
         </div>
-        <div className="space-y-2.5">
-          {topics.map((topic, i) => {
-            const progress = getTopicProgress(topic.id);
-            const isCompleted = progress?.is_completed;
-            // Login qilmagan foydalanuvchi yoki coin'li kursga yozilmagan foydalanuvchi → lock
-            const isLockedForGuest = !userId;
-            const isLockedForCoin = !!userId && !enrollment && !course.is_free;
-            const isLocked = isLockedForGuest || isLockedForCoin;
 
-            return (
-              <motion.div key={topic.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.04 * i }}>
-                {isLocked ? (
-                  isLockedForGuest ? (
-                    <Link
-                      href={`/register?redirect=/courses/${slug}`}
-                      className="p-4 md:p-5 rounded-2xl border border-border/40 bg-card/30 flex items-center gap-4 hover:bg-card/50 transition-colors group"
-                    >
-                      <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center text-muted-foreground flex-shrink-0 group-hover:text-neon-purple transition-colors">
-                        <Lock className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-display font-semibold text-[15px] truncate">{topic.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {formatDuration(topic.estimated_minutes)} · ro'yxatdan o'ting va boshlang
-                        </p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground/60 group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
-                    </Link>
-                  ) : (
-                    <div className="p-4 md:p-5 rounded-2xl border border-border/40 bg-card/30 flex items-center gap-4 opacity-60 cursor-not-allowed">
-                      <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center text-muted-foreground flex-shrink-0">
-                        <Lock className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-display font-semibold text-[15px] truncate">{topic.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{formatDuration(topic.estimated_minutes)}</p>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  <Link href={`/courses/${slug}/topics/${topic.slug}`}
-                    className="group p-4 md:p-5 rounded-2xl border border-border/50 bg-card/40 hover:bg-card hover:border-border hover:shadow-lg hover:shadow-black/[0.04] transition-all flex items-center gap-4 block">
-                    <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center text-[15px] font-bold border flex-shrink-0",
-                      isCompleted ? "bg-neon-green/10 text-neon-green border-neon-green/20" : "bg-neon-purple/10 text-neon-purple border-neon-purple/20")}>
-                      {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <span>{String(i + 1).padStart(2, "0")}</span>}
+        {sections.length > 0 ? (
+          /* ======== BO'LIMLAR ACCORDION ======== */
+          <div className="space-y-3">
+            {sections.map((section, sIdx) => {
+              const sectionTopics = topics.filter(t => t.section_id === section.id);
+              const isOpen = !!openSections[section.id];
+              const completedCount = sectionTopics.filter(t => getTopicProgress(t.id)?.is_completed).length;
+              const totalMinutes = section.estimated_minutes ||
+                sectionTopics.reduce((s, t) => s + (t.estimated_minutes || 0), 0);
+
+              return (
+                <div key={section.id} className="rounded-2xl border border-border/50 bg-card/40 overflow-hidden">
+                  <button
+                    onClick={() => toggleSection(section.id)}
+                    className="w-full flex items-center gap-4 p-4 md:p-5 text-left hover:bg-card/70 transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      {sIdx + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-display font-semibold text-[15px] group-hover:text-neon-purple transition-colors line-clamp-1">{topic.title}</p>
-                      <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{formatDuration(topic.estimated_minutes)}</span>
-                        {topic.video_url && <span className="flex items-center gap-1"><Video className="w-3.5 h-3.5" />Video</span>}
-                        <span className="flex items-center gap-1 text-neon-yellow font-medium"><Coins className="w-3.5 h-3.5" />+{topic.coin_reward}</span>
+                      <p className="font-display font-bold text-[15px] md:text-base">{section.title}</p>
+                      <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-muted-foreground">
+                        <span>{sectionTopics.length} dars</span>
+                        {totalMinutes > 0 && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(totalMinutes)}</span>}
+                        {userId && enrollment && completedCount > 0 && (
+                          <span className="text-neon-green">{completedCount}/{sectionTopics.length} tugatildi</span>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      {progress && !isCompleted && (
-                        <div className="flex gap-1">
-                          {progress.content_read && <div className="w-2 h-2 rounded-full bg-neon-green" title="O'qildi" />}
-                          {progress.quiz_passed && <div className="w-2 h-2 rounded-full bg-neon-blue" title="Test o'tdi" />}
-                          {progress.tasks_completed && <div className="w-2 h-2 rounded-full bg-neon-purple" title="Topshiriq bajarildi" />}
+                    <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform flex-shrink-0", isOpen && "rotate-180")} />
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-3 pb-3 space-y-1.5 border-t border-border/40 pt-3">
+                          {sectionTopics.map((topic, i) => renderTopicRow(topic, i))}
+                          {sectionTopics.length === 0 && (
+                            <p className="text-xs text-muted-foreground px-3 py-2">Darslar tez orada qo'shiladi</p>
+                          )}
                         </div>
-                      )}
-                      <ChevronRight className="w-5 h-5 text-muted-foreground/60 group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </Link>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+
+            {/* Bo'limga biriktirilmagan darslar */}
+            {topics.filter(t => !t.section_id).length > 0 && (
+              <div className="rounded-2xl border border-border/50 bg-card/40 p-3 space-y-1.5">
+                {topics.filter(t => !t.section_id).map((topic, i) => renderTopicRow(topic, i))}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* ======== ODDIY RO'YXAT (bo'limsiz kurslar) ======== */
+          <div className="space-y-2.5">
+            {topics.map((topic, i) => renderTopicRow(topic, i))}
+          </div>
+        )}
       </motion.div>
     </div>
   );
+
+  /* ======== BITTA DARS QATORI ======== */
+  function renderTopicRow(topic: TopicTocEntry, i: number) {
+    const progress = getTopicProgress(topic.id);
+    const isCompleted = progress?.is_completed;
+    const hasAccess = !!enrollment || course!.is_free;
+    // Free preview darslar HAMMAGA ochiq (login'siz ham)
+    const isPreviewOpen = topic.is_free_preview;
+    const isLocked = !isPreviewOpen && (!userId || (!!userId && !hasAccess));
+    const lockedForGuest = isLocked && !userId;
+
+    if (isLocked) {
+      return (
+        <Link
+          key={topic.id}
+          href={lockedForGuest ? `/register?redirect=/courses/${slug}` : "#enroll"}
+          onClick={lockedForGuest ? undefined : (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); toast.info("Avval kursga yoziling"); }}
+          className="p-3.5 md:p-4 rounded-xl border border-border/40 bg-card/30 flex items-center gap-3.5 hover:bg-card/50 transition-colors group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center text-muted-foreground flex-shrink-0 group-hover:text-neon-purple transition-colors">
+            <Lock className="w-4.5 h-4.5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-display font-semibold text-[14px] truncate">{topic.title}</p>
+            <div className="flex items-center gap-2.5 mt-0.5 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(topic.estimated_minutes)}</span>
+              {topic.has_video && <span className="flex items-center gap-1"><Video className="w-3 h-3" />Video</span>}
+            </div>
+          </div>
+          <ChevronRight className="w-4.5 h-4.5 text-muted-foreground/50 group-hover:text-neon-purple transition-colors flex-shrink-0" />
+        </Link>
+      );
+    }
+
+    return (
+      <Link
+        key={topic.id}
+        href={`/courses/${slug}/topics/${topic.slug}`}
+        className="group p-3.5 md:p-4 rounded-xl border border-border/50 bg-card/40 hover:bg-card hover:border-border transition-all flex items-center gap-3.5"
+      >
+        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold border flex-shrink-0",
+          isCompleted ? "bg-neon-green/10 text-neon-green border-neon-green/20"
+            : isPreviewOpen && !enrollment ? "bg-neon-blue/10 text-neon-blue border-neon-blue/20"
+            : "bg-neon-purple/10 text-neon-purple border-neon-purple/20")}>
+          {isCompleted ? <CheckCircle2 className="w-4.5 h-4.5" />
+            : isPreviewOpen && !enrollment ? <Play className="w-4 h-4" />
+            : <span>{String(i + 1).padStart(2, "0")}</span>}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="font-display font-semibold text-[14px] group-hover:text-neon-purple transition-colors line-clamp-1">{topic.title}</p>
+            {isPreviewOpen && !enrollment && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neon-blue/10 text-neon-blue border border-neon-blue/20 flex-shrink-0">
+                <Eye className="w-3 h-3" /> Bepul ko'rish
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5 mt-0.5 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(topic.estimated_minutes)}</span>
+            {topic.has_video && <span className="flex items-center gap-1"><Video className="w-3 h-3" />Video</span>}
+            <span className="flex items-center gap-1 text-neon-yellow font-medium"><Coins className="w-3 h-3" />+{topic.coin_reward}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5 flex-shrink-0">
+          {progress && !isCompleted && (
+            <div className="flex gap-1">
+              {progress.content_read && <div className="w-2 h-2 rounded-full bg-neon-green" title="O'qildi" />}
+              {progress.quiz_passed && <div className="w-2 h-2 rounded-full bg-neon-blue" title="Test o'tdi" />}
+              {progress.tasks_completed && <div className="w-2 h-2 rounded-full bg-neon-purple" title="Topshiriq bajarildi" />}
+            </div>
+          )}
+          <ChevronRight className="w-4.5 h-4.5 text-muted-foreground/60 group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
+        </div>
+      </Link>
+    );
+  }
 }
 
 // Sertifikat havola komponenti

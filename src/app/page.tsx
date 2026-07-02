@@ -316,23 +316,25 @@ export default function LandingPage() {
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
+    // Statistika, kurslar va testimonial'lar — bitta cache'langan endpoint
+    // (avval 6 ta alohida Supabase roundtrip edi)
+    fetch("/api/public/home")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d) return;
+        if (d.stats) setStats(d.stats);
+        if (d.courses) setCourses(d.courses);
+        if (d.testimonials) setTestimonials(d.testimonials);
+      })
+      .catch(() => {});
+
+    // Auth holati alohida (sessiyaga bog'liq — cache qilinmaydi)
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const { data: p } = await supabase.from("profiles").select("full_name, avatar_url, role").eq("id", session.user.id).single();
         if (p) setUser({ name: p.full_name, avatar: p.avatar_url, role: p.role });
       }
-      const [u, c, ch, s] = await Promise.all([
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase.from("courses").select("*", { count: "exact", head: true }).eq("is_published", true),
-        supabase.from("challenges").select("*", { count: "exact", head: true }).eq("is_published", true),
-        supabase.from("submissions").select("*", { count: "exact", head: true }),
-      ]);
-      setStats({ users: u.count || 0, courses: c.count || 0, challenges: ch.count || 0, submissions: s.count || 0 });
-      const { data: co } = await supabase.from("courses").select("id,title,slug,description,category,total_topics,total_enrolled,is_free,price_coins,difficulty").eq("is_published", true).order("order_index").limit(6);
-      if (co) setCourses(co);
-      const { data: t } = await supabase.from("testimonials").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(10);
-      if (t) setTestimonials(t);
     })();
   }, []);
 
