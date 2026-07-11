@@ -57,8 +57,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
-        body: ["DM Sans", "sans-serif"],
+        display: ["Space Grotesk", "sans-serif"],
+        body: ["Manrope", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       borderRadius: {

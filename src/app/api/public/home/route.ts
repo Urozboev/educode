@@ -25,7 +25,7 @@ export async function GET() {
       supabase.from('submissions').select('*', { count: 'exact', head: true }),
       supabase
         .from('courses')
-        .select('id,title,slug,description,category,total_topics,total_enrolled,is_free,price_coins,difficulty')
+        .select('id,title,slug,description,category,total_topics,total_enrolled,is_free,price_coins,difficulty,thumbnail_url')
         .eq('is_published', true)
         .order('order_index')
         .limit(6),

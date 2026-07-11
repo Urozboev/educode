@@ -943,24 +943,47 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {courses.map((c, i) => (
                 <motion.div key={c.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp(i * 0.05)}>
-                  <Link href={user ? `/courses/${c.slug}` : "/login"} className="block group p-5 rounded-2xl border border-border/50 bg-card/50 hover:bg-card hover:border-border hover:shadow-lg hover:shadow-black/[0.03] transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-11 h-11 rounded-xl bg-surface flex items-center justify-center border border-border/50">{categoryIcon(c.category, 22)}</div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-display font-bold truncate group-hover:text-neon-purple transition-colors">{c.title}</h3>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-xs text-muted-foreground">{c.total_topics} mavzu</span>
-                          <span className="text-xs text-muted-foreground">·</span>
-                          <span className="text-xs text-muted-foreground">{c.total_enrolled} talaba</span>
+                  <Link
+                    href={user ? `/courses/${c.slug}` : `/courses/${c.slug}`}
+                    className="relative block group rounded-3xl border border-border/50 bg-card/50 overflow-hidden hover:border-neon-purple/40 hover:shadow-2xl hover:shadow-neon-purple/10 hover:-translate-y-1.5 transition-all duration-300"
+                  >
+                    {/* Cover — rasm yoki gradient */}
+                    <div className="relative h-36 overflow-hidden bg-gradient-to-br from-neon-purple/20 via-card/50 to-neon-blue/10">
+                      {c.thumbnail_url ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={c.thumbnail_url}
+                            alt={c.title}
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                        </>
+                      ) : (
+                        <div className="absolute bottom-3 left-5 opacity-90 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left">
+                          {categoryIcon(c.category, 52)}
                         </div>
+                      )}
+                      {/* Shine sweep */}
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
+                      {/* Narx badge */}
+                      <div className="absolute top-3 right-3.5">
+                        {c.is_free
+                          ? <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-neon-green/90 text-background shadow-lg shadow-neon-green/30">BEPUL</span>
+                          : <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-neon-yellow/90 text-[#1a1a00] shadow-lg shadow-neon-yellow/30">{c.price_coins} coin</span>}
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{c.description}</p>
-                    <div className="flex items-center justify-between">
-                      {c.is_free
-                        ? <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-neon-green/8 text-neon-green border border-neon-green/15">Bepul</span>
-                        : <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-neon-yellow/8 text-neon-yellow border border-neon-yellow/15">{c.price_coins} coin</span>}
-                      <ArrowUpRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-neon-purple group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+
+                    <div className="p-5">
+                      <h3 className="font-display font-bold text-lg leading-snug mb-1.5 group-hover:text-neon-purple transition-colors line-clamp-1">{c.title}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{c.description}</p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{c.total_topics} mavzu · {c.total_enrolled} talaba</span>
+                        <span className="inline-flex items-center gap-1 font-semibold text-neon-purple opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all">
+                          Boshlash <ArrowUpRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 </motion.div>

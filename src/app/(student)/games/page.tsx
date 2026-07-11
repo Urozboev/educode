@@ -1186,10 +1186,13 @@ function MazeGame() {
 }
 
 // ===== 6. CODE BIRD — SVG bird =====
+// MUHIM: qush 80px qadam bilan yuradi (start 40,150) — yulduzlar faqat
+// yetib boriladigan grid nuqtalarida bo'lishi shart:
+// x ∈ {40,120,200,280,360}, y ∈ {70,150,230}
 const birdLevels = [
   { level: 1, targets: [[200, 150]] as number[][], obstacles: [] as number[][], desc: "Qushni yulduzga olib boring (2 ta o'ngga)" },
-  { level: 2, targets: [[320, 150]] as number[][], obstacles: [[200, 60, 20, 130]] as number[][], desc: "To'siqdan aylanib yulduzga yeting" },
-  { level: 3, targets: [[160, 60], [320, 240]] as number[][], obstacles: [[120, 100, 160, 16], [240, 180, 16, 100]] as number[][], desc: "2 ta yulduzni yig'ing" },
+  { level: 2, targets: [[360, 150]] as number[][], obstacles: [[200, 60, 20, 130]] as number[][], desc: "To'siqdan aylanib yulduzga yeting" },
+  { level: 3, targets: [[200, 70], [360, 230]] as number[][], obstacles: [[120, 100, 160, 16], [240, 180, 16, 100]] as number[][], desc: "2 ta yulduzni yig'ing" },
 ];
 
 const BIRD_MOVES = [

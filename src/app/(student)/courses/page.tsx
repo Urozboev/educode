@@ -204,31 +204,65 @@ export default function CoursesPage() {
               >
                 <Link
                   href={`/courses/${course.slug}`}
-                  className="group relative flex flex-col h-full rounded-3xl border border-border/50 bg-card/40 overflow-hidden hover:border-border hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1 transition-all duration-300 block"
+                  className="group relative flex flex-col h-full rounded-3xl border border-border/50 bg-card/40 overflow-hidden hover:border-transparent hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 block"
+                  style={{ ["--accent" as any]: style.accent }}
                 >
-                  {/* Cover band */}
-                  <div className={cn("relative h-28 bg-gradient-to-br flex items-end px-5 pb-3 overflow-hidden", style.gradient)}>
-                    {/* Pattern dots */}
-                    <div
-                      className="absolute inset-0 opacity-[0.15]"
-                      style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "16px 16px" }}
-                    />
+                  {/* Hover gradient halqa (border glow) */}
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20"
+                    style={{ boxShadow: `inset 0 0 0 1.5px ${style.accent}66, 0 20px 50px -16px ${style.accent}40` }}
+                  />
+
+                  {/* Cover — rasm bo'lsa rasm, bo'lmasa gradient+emoji */}
+                  <div className={cn("relative h-40 overflow-hidden", !course.thumbnail_url && `bg-gradient-to-br ${style.gradient}`)}>
+                    {course.thumbnail_url ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={course.thumbnail_url}
+                          alt={course.title}
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        {/* Pastdan qoraytiruvchi gradient — matn o'qilishi uchun */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      </>
+                    ) : (
+                      <>
+                        {/* Pattern dots */}
+                        <div
+                          className="absolute inset-0 opacity-[0.15]"
+                          style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "16px 16px" }}
+                        />
+                        <div className="absolute bottom-3 left-5 text-6xl drop-shadow-lg group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left">
+                          {style.emoji}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Shine sweep — hover'da yorug'lik o'tadi */}
+                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
+
+                    {/* Kategoriya chip */}
+                    <div className="absolute top-3.5 left-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/45 text-white border border-white/15 backdrop-blur-md">
+                      {style.emoji} {categories.find(c => c.value === course.category)?.label || course.category}
+                    </div>
+
+                    {/* Narx badge */}
                     <div className="absolute top-3.5 right-4 flex gap-1.5">
                       {course.is_free ? (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-green/15 text-neon-green border border-neon-green/25 backdrop-blur-sm">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-green/90 text-background backdrop-blur-sm shadow-lg shadow-neon-green/30">
                           BEPUL
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/15 text-neon-yellow border border-neon-yellow/25 backdrop-blur-sm">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/90 text-[#1a1a00] backdrop-blur-sm shadow-lg shadow-neon-yellow/30">
                           <Coins className="w-3 h-3" />{course.price_coins}
                         </span>
                       )}
                     </div>
-                    <div className="relative text-5xl drop-shadow-lg group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left">
-                      {style.emoji}
-                    </div>
+
                     {enrollment?.is_completed && (
-                      <div className="absolute bottom-3 right-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-green text-background">
+                      <div className="absolute bottom-3 right-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-green text-background shadow-lg">
                         <CheckCircle2 className="w-3 h-3" /> TUGATILDI
                       </div>
                     )}
