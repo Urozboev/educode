@@ -20,6 +20,8 @@ import {
   X,
   Save,
   Coins,
+  ImagePlus,
+  Upload,
 } from "lucide-react";
 
 type CourseFormType = {
@@ -32,6 +34,7 @@ type CourseFormType = {
   coin_reward: number;
   estimated_hours: number;
   tags: string;
+  thumbnail_url: string;
 };
 
 const emptyForm: CourseFormType = {
@@ -44,6 +47,7 @@ const emptyForm: CourseFormType = {
   coin_reward: 50,
   estimated_hours: 10,
   tags: "",
+  thumbnail_url: "",
 };
 
 export default function AdminCoursesPage() {
@@ -55,6 +59,38 @@ export default function AdminCoursesPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  /** Rasm faylini Supabase Storage'ga yuklab, public URL ni formaga yozadi */
+  async function handleThumbnailUpload(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Faqat rasm fayli yuklang (JPG, PNG, WebP)");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Rasm 2MB dan kichik bo'lishi kerak");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${Date.now()}-${slugify(form.title || "kurs", { lower: true, strict: true })}.${ext}`;
+      const { error } = await supabase.storage
+        .from("course-thumbnails")
+        .upload(path, file, { cacheControl: "31536000", upsert: false });
+      if (error) {
+        toast.error(`Yuklash xatolik: ${error.message}`);
+        setUploading(false);
+        return;
+      }
+      const { data } = supabase.storage.from("course-thumbnails").getPublicUrl(path);
+      setForm(f => ({ ...f, thumbnail_url: data.publicUrl }));
+      toast.success("Rasm yuklandi");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+    setUploading(false);
+  }
 
   useEffect(() => {
     loadCourses();
@@ -86,6 +122,7 @@ export default function AdminCoursesPage() {
       coin_reward: c.coin_reward,
       estimated_hours: c.estimated_hours || 10,
       tags: c.tags?.join(", ") || "",
+      thumbnail_url: c.thumbnail_url || "",
     });
     setEditId(c.id);
     setShowForm(true);
@@ -108,6 +145,7 @@ export default function AdminCoursesPage() {
       price_coins: form.is_free ? 0 : form.price_coins,
       coin_reward: form.coin_reward,
       estimated_hours: form.estimated_hours,
+      thumbnail_url: form.thumbnail_url || null,
       tags: form.tags
         ? form.tags
             .split(",")
@@ -354,6 +392,66 @@ export default function AdminCoursesPage() {
                 className="input-field"
                 placeholder="python, boshlang'ich"
               />
+            </div>
+
+            {/* Kurs rasmi (cover) */}
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-1 block">
+                Kurs rasmi (cover) — kartada ko'rinadi, tavsiya: 800×500
+              </label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                {/* Preview */}
+                <div className="relative w-full sm:w-64 h-36 rounded-[10px] border border-border/60 bg-surface/40 overflow-hidden flex items-center justify-center flex-shrink-0">
+                  {form.thumbnail_url ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={form.thumbnail_url} alt="Kurs rasmi" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => setForm({ ...form, thumbnail_url: "" })}
+                        className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white hover:bg-neon-red/80 transition-colors"
+                        title="Rasmni olib tashlash"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      <ImagePlus className="w-8 h-8 mx-auto mb-1 opacity-40" />
+                      <p className="text-[11px]">Rasm yo'q</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload + URL */}
+                <div className="flex-1 space-y-2 w-full">
+                  <label className={cn(
+                    "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition-all text-sm font-medium",
+                    uploading
+                      ? "border-neon-blue/40 bg-neon-blue/5 text-neon-blue"
+                      : "border-border hover:border-neon-purple/40 hover:bg-neon-purple/5 text-muted-foreground hover:text-foreground",
+                  )}>
+                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {uploading ? "Yuklanmoqda..." : "Kompyuterdan rasm tanlash (max 2MB)"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleThumbnailUpload(f);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  <input
+                    value={form.thumbnail_url}
+                    onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })}
+                    className="input-field text-xs font-mono"
+                    placeholder="yoki tashqi rasm URL kiriting: https://..."
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-6">
