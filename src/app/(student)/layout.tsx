@@ -43,6 +43,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   // Public preview yo'llari (login qilinmagan foydalanuvchi ham ko'ra oladi)
   const isPublicPreview =
+    pathname === "/playground" ||
     /^\/courses\/[^\/]+$/.test(pathname) ||
     /^\/courses\/[^\/]+\/topics\/[^\/]+$/.test(pathname) ||
     /^\/challenges\/[^\/]+$/.test(pathname);
@@ -233,6 +234,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             <div className="hidden md:flex items-center gap-1">
               <Link href="/explore/courses" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kurslar</Link>
               <Link href="/explore/challenges" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Topshiriqlar</Link>
+              <Link href="/playground" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Playground</Link>
               <Link href="/explore/about" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Platforma haqida</Link>
             </div>
             <div className="flex items-center gap-2">
