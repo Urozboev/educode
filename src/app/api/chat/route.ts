@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-2.0-flash';
+  const model = process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-flash-latest';
 
   if (!apiKey) {
     return NextResponse.json({ reply: '⚠️ GEMINI_API_KEY sozlanmagan. .env.local faylini tekshiring.' });
@@ -112,7 +112,7 @@ export async function GET() {
   return NextResponse.json({
     status: 'ok',
     route: '/api/chat',
-    model: process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-2.0-flash',
+    model: process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-flash-latest',
     prompt_template: PROMPT_VERSIONS.socraticChat,
     hasKey: !!process.env.GEMINI_API_KEY,
   });
