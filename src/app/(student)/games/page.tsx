@@ -558,7 +558,31 @@ function TypingGame() {
         }
       />
 
-      <div className="rounded-2xl border border-border/60 bg-card/40 p-5 font-mono leading-relaxed text-[15px]">
+      {/* 2.5D poyga trassasi — progress mashina bilan */}
+      <div
+        className="relative rounded-2xl border border-border/60 overflow-hidden px-4 py-3"
+        style={{ background: "linear-gradient(180deg, #0d0a1a 0%, #16122a 100%)" }}
+      >
+        <div
+          className="absolute inset-0 opacity-25 pointer-events-none"
+          style={{
+            backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 26px, rgba(255,255,255,0.25) 26px, rgba(255,255,255,0.25) 40px)",
+            maskImage: "linear-gradient(180deg, transparent 42%, black 50%, transparent 58%)",
+            WebkitMaskImage: "linear-gradient(180deg, transparent 42%, black 50%, transparent 58%)",
+          }}
+        />
+        <div className="relative h-9">
+          <div
+            className="absolute top-1/2 -translate-y-1/2 text-2xl transition-all duration-200 drop-shadow-[0_4px_8px_rgba(0,210,255,0.5)]"
+            style={{ left: `calc(${Math.min(100, (input.length / Math.max(1, target.length)) * 100)}% - 14px)`, transform: "translateY(-50%) scaleX(-1)" }}
+          >
+            🏎️
+          </div>
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 text-lg">🏁</div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border/60 bg-card/40 p-5 font-mono leading-relaxed text-[15px] shadow-[inset_0_2px_12px_rgba(0,0,0,0.25)]">
         {target.split("").map((ch, i) => {
           let c = "text-muted-foreground/30";
           if (i < input.length)
@@ -945,23 +969,67 @@ function MazeGame() {
       </p>
 
       <div className="grid lg:grid-cols-[1fr,240px] gap-5">
-        {/* Maze */}
-        <div className="rounded-2xl border border-border/60 bg-card/40 p-4 flex justify-center">
-          <svg width={maze.grid[0].length * CS + 4} height={maze.grid.length * CS + 4} className="block">
+        {/* Maze — 2.5D perspektiv maydon */}
+        <div
+          className="rounded-2xl border border-border/60 p-6 flex justify-center overflow-hidden relative"
+          style={{
+            background: "radial-gradient(ellipse at 50% 0%, rgba(108,92,231,0.12), rgba(10,10,20,0.9) 70%)",
+            perspective: "900px",
+          }}
+        >
+          {/* Neon "pol" chiziqlari */}
+          <div
+            className="absolute inset-0 opacity-20 pointer-events-none"
+            style={{
+              backgroundImage: "linear-gradient(rgba(108,92,231,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(108,92,231,0.4) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+              transform: "perspective(400px) rotateX(60deg) translateY(30%) scale(2)",
+              transformOrigin: "center bottom",
+            }}
+          />
+          <svg
+            width={maze.grid[0].length * CS + 4}
+            height={maze.grid.length * CS + 4}
+            className="block relative"
+            style={{
+              transform: "rotateX(24deg)",
+              transformStyle: "preserve-3d",
+              filter: "drop-shadow(0 24px 32px rgba(0,0,0,0.5))",
+            }}
+          >
+            <defs>
+              <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#2a2440" />
+                <stop offset="100%" stopColor="#171226" />
+              </linearGradient>
+            </defs>
             {maze.grid.map((row, r) =>
-              row.map((cell, c) => (
-                <rect
-                  key={`${r}-${c}`}
-                  x={c * CS + 2}
-                  y={r * CS + 2}
-                  width={CS - 2}
-                  height={CS - 2}
-                  fill={cell === 1 ? "hsl(var(--surface))" : "transparent"}
-                  stroke="hsl(var(--border))"
-                  strokeWidth="0.5"
-                  rx="6"
-                />
-              ))
+              row.map((cell, c) =>
+                cell === 1 ? (
+                  <g key={`${r}-${c}`}>
+                    {/* Devor "balandligi" (ekstruziya) */}
+                    <rect
+                      x={c * CS + 2} y={r * CS + 6}
+                      width={CS - 2} height={CS - 2}
+                      fill="#0d0a18" rx="6"
+                    />
+                    <rect
+                      x={c * CS + 2} y={r * CS - 1}
+                      width={CS - 2} height={CS - 2}
+                      fill="url(#wallGrad)" stroke="rgba(108,92,231,0.35)" strokeWidth="1" rx="6"
+                    />
+                  </g>
+                ) : (
+                  <rect
+                    key={`${r}-${c}`}
+                    x={c * CS + 2} y={r * CS + 2}
+                    width={CS - 2} height={CS - 2}
+                    fill="rgba(255,255,255,0.02)"
+                    stroke="rgba(108,92,231,0.12)"
+                    strokeWidth="0.5" rx="6"
+                  />
+                )
+              )
             )}
             {path.map(
               ([r, c], i) =>
@@ -1312,16 +1380,33 @@ function BirdGame() {
       />
 
       <div className="grid lg:grid-cols-[1fr,240px] gap-5">
-        <div className="rounded-2xl border border-border/60 bg-card/40 p-4 flex justify-center">
+        <div
+          className="rounded-2xl border border-border/60 p-4 flex justify-center relative overflow-hidden"
+          style={{ background: "radial-gradient(ellipse at 50% 100%, rgba(0,210,255,0.1), rgba(8,8,18,0.95) 65%)" }}
+        >
           <svg
             width="400"
             height="300"
             className="block rounded-xl"
             style={{
-              background:
-                "linear-gradient(180deg, rgba(108,92,231,0.08) 0%, rgba(0,210,255,0.04) 100%)",
+              background: "linear-gradient(180deg, #0b0920 0%, #141033 55%, #1a1445 100%)",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.45), inset 0 0 60px rgba(108,92,231,0.15)",
             }}
           >
+            {/* Yulduzlar (parallax qatlam) */}
+            {Array.from({ length: 26 }).map((_, i) => {
+              const sx = ((i * 71) % 397) + 2;
+              const sy = ((i * 47) % 280) + 6;
+              const sr = 0.6 + (i % 3) * 0.5;
+              return (
+                <circle key={`st${i}`} cx={sx} cy={sy} r={sr} fill="#fff" opacity={0.25 + (i % 4) * 0.12}>
+                  <animate attributeName="opacity" values={`${0.15 + (i % 4) * 0.1};${0.5 + (i % 3) * 0.15};${0.15 + (i % 4) * 0.1}`} dur={`${2 + (i % 4)}s`} repeatCount="indefinite" />
+                </circle>
+              );
+            })}
+            {/* Uzoq tog' silueti */}
+            <path d="M0,300 L0,255 L60,215 L120,250 L190,200 L260,245 L330,210 L400,250 L400,300 Z" fill="rgba(108,92,231,0.18)" />
+            <path d="M0,300 L0,275 L80,245 L160,272 L250,235 L330,268 L400,242 L400,300 Z" fill="rgba(0,210,255,0.1)" />
             {Array.from({ length: 5 }).map((_, i) => (
               <line
                 key={`vg${i}`}
