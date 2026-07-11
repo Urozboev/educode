@@ -83,7 +83,12 @@ export default function CodeEditor({
   }
 
   // ===== PYTHON ISHGA TUSHIRISH =====
-  // globals orqali string uzatish — indent muammosi BO'LMAYDI
+  // globals orqali string uzatish — indent muammosi BO'LMAYDI.
+  // Harness CPython semantikasiga maksimal yaqin:
+  //  - __name__ == "__main__" ISHLAYDI (funksiyali/main()li kod ham qabul qilinadi)
+  //  - input() qiymatning faqat \n belgisini olib tashlaydi (ichki bo'shliqlar saqlanadi)
+  //  - stdin tugaganda EOFError (CPython kabi) — tushunarli xato
+  //  - exit()/SystemExit chiqishni buzmaydi
   async function runPython(src: string, stdin: string = ""): Promise<{ stdout: string; stderr: string; time_ms: number }> {
     if (!pyodideRef.current) throw new Error("Pyodide tayyor emas");
     const t0 = performance.now();
@@ -91,21 +96,34 @@ export default function CodeEditor({
       pyodideRef.current.globals.set('__user_code__', src);
       pyodideRef.current.globals.set('__user_stdin__', stdin);
       pyodideRef.current.runPython(`
-import sys
+import sys, builtins
 from io import StringIO
 
-sys.stdin = StringIO(__user_stdin__)
-__capture__ = StringIO()
-sys.stdout = __capture__
+_stdin_buf = StringIO(__user_stdin__)
+_stdout_buf = StringIO()
+
+def _test_input(prompt=""):
+    line = _stdin_buf.readline()
+    if not line:
+        raise EOFError("EOF when reading a line (kirish qiymatlari tugadi)")
+    return line.rstrip("\\r\\n")
+
+# Har bajarishda TOZA global muhit — testlar orasida holat sizmaydi
+_g = {"__builtins__": builtins, "__name__": "__main__", "input": _test_input}
+
+_old_out, _old_in = sys.stdout, sys.stdin
+sys.stdout, sys.stdin = _stdout_buf, _stdin_buf
 __run_err__ = ""
-
 try:
-    exec(__user_code__, {"__builtins__": __builtins__, "input": lambda p="": sys.stdin.readline().strip()})
-except Exception as __e__:
-    __run_err__ = type(__e__).__name__ + ": " + str(__e__)
+    exec(compile(__user_code__, "main.py", "exec"), _g)
+except SystemExit:
+    pass
+except BaseException as _e:
+    __run_err__ = type(_e).__name__ + ": " + str(_e)
+finally:
+    sys.stdout, sys.stdin = _old_out, _old_in
 
-sys.stdout = sys.__stdout__
-__run_stdout__ = __capture__.getvalue()
+__run_stdout__ = _stdout_buf.getvalue()
 `);
       const stdout = pyodideRef.current.globals.get('__run_stdout__') || '';
       const stderr = pyodideRef.current.globals.get('__run_err__') || '';
@@ -133,10 +151,14 @@ __run_stdout__ = __capture__.getvalue()
       };
       window.addEventListener("message", handler);
       const lines = JSON.stringify(stdin.split("\n"));
+      // MUHIM: user kodidan keyin \n — kod "// izoh" bilan tugasa ham
+      // postMessage comment ichiga tushib qolmaydi
       iframe.srcdoc = `<script>
 var _o=[];var _olog=console.log;console.log=function(){_o.push([].slice.call(arguments).map(String).join(' '))};
-var _l=${lines},_i=0;function prompt(){return _l[_i++]||''}var readline=prompt;var input=prompt;
-try{${src};parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:''}},'*')}
+var _l=${lines},_i=0;function prompt(){return _l[_i++]!==undefined?_l[_i-1]:''}var readline=prompt;var input=prompt;
+try{
+${src}
+;parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:''}},'*')}
 catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.message}},'*')}
 <\/script>`;
     });
@@ -144,6 +166,32 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
 
   async function runCode(src: string, stdin: string = "") {
     return language === "python" ? runPython(src, stdin) : runJS(src, stdin);
+  }
+
+  // ===== TESTLARNI BAJARISH (yagona manba — solishtirish bir joyda) =====
+  function normalizeOutput(s: string): string {
+    return s.replace(/\r\n/g, "\n").replace(/[ \t]+$/gm, "").trim();
+  }
+
+  async function executeTests(src: string): Promise<SubmissionTestResult[]> {
+    const results: SubmissionTestResult[] = [];
+    for (const tc of testCases) {
+      try {
+        const r = await runCode(src, tc.input);
+        const actual = normalizeOutput(r.stdout);
+        const expected = normalizeOutput(tc.expected_output);
+        results.push({
+          input: tc.input,
+          expected: tc.expected_output.trim(),
+          actual: r.stderr ? `Xatolik: ${r.stderr}` : r.stdout.trim(),
+          passed: !r.stderr && actual === expected,
+          time_ms: r.time_ms,
+        });
+      } catch (err: any) {
+        results.push({ input: tc.input, expected: tc.expected_output.trim(), actual: `Xatolik: ${err.message}`, passed: false, time_ms: 0 });
+      }
+    }
+    return results;
   }
 
   // ===== ODDIY ISHGA TUSHIRISH (testlarsiz) =====
@@ -163,17 +211,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
   async function handleRunTests() {
     if (testCases.length === 0) { toast.info("Test mavjud emas"); return; }
     setIsRunning(true); setTestResults([]); setActiveTab("tests");
-    const results: SubmissionTestResult[] = [];
-    for (const tc of testCases) {
-      try {
-        const r = await runCode(code, tc.input);
-        const actual = r.stdout.trim().replace(/\r\n/g, '\n').replace(/\s+$/gm, '');
-        const expected = tc.expected_output.trim().replace(/\r\n/g, '\n').replace(/\s+$/gm, '');
-        results.push({ input: tc.input, expected: tc.expected_output.trim(), actual: r.stderr ? `Xatolik: ${r.stderr}` : r.stdout.trim(), passed: !r.stderr && actual === expected, time_ms: r.time_ms });
-      } catch (err: any) {
-        results.push({ input: tc.input, expected: tc.expected_output.trim(), actual: `Xatolik: ${err.message}`, passed: false, time_ms: 0 });
-      }
-    }
+    const results = await executeTests(code);
     setTestResults(results);
     const passed = results.filter(r => r.passed).length;
     if (passed === results.length) setOutput(`✅ Barcha ${results.length} ta test o'tdi!`);
@@ -190,18 +228,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
     let results = testResults;
     if (testCases.length > 0) {
       setActiveTab("tests");
-      const newResults: SubmissionTestResult[] = [];
-      for (const tc of testCases) {
-        try {
-          const r = await runCode(code, tc.input);
-          const actual = r.stdout.trim().replace(/\r\n/g, '\n').replace(/\s+$/gm, '');
-          const expected = tc.expected_output.trim().replace(/\r\n/g, '\n').replace(/\s+$/gm, '');
-          newResults.push({ input: tc.input, expected: tc.expected_output.trim(), actual: r.stderr ? `Xatolik: ${r.stderr}` : r.stdout.trim(), passed: !r.stderr && actual === expected, time_ms: r.time_ms });
-        } catch (err: any) {
-          newResults.push({ input: tc.input, expected: tc.expected_output.trim(), actual: `Xatolik: ${err.message}`, passed: false, time_ms: 0 });
-        }
-      }
-      results = newResults;
+      results = await executeTests(code);
       setTestResults(results);
     }
 
