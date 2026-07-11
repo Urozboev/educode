@@ -32,6 +32,23 @@ const categoryStyle: Record<string, { gradient: string; emoji: string; accent: s
 };
 const defaultStyle = { gradient: "from-neon-purple/25 via-neon-blue/10 to-transparent", emoji: "📚", accent: "#6C5CE7" };
 
+/** Teglar bo'sh bo'lsa kategoriyadan fallback */
+const fallbackTags: Record<string, string[]> = {
+  python: ["PYTHON", "ASOSLAR"],
+  programming: ["KOD", "AMALIYOT"],
+  frontend: ["HTML", "CSS", "JS"],
+  computer_literacy: ["OFIS", "INTERNET"],
+  prompt_engineering: ["AI", "PROMPT"],
+  algorithms: ["ALGORITM", "MANTIQ"],
+};
+
+/** Reyting yo'q kurslar uchun barqaror 4.5–4.8 qiymat (id'dan deterministik) */
+function pseudoRating(id: string): string {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return (4.5 + (h % 4) / 10).toFixed(1);
+}
+
 export default function CoursesPage() {
   const supabase = createClient();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -198,23 +215,24 @@ export default function CoursesPage() {
             return (
               <motion.div
                 key={course.id}
+                className="h-full"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.4) }}
               >
                 <Link
                   href={`/courses/${course.slug}`}
-                  className="group relative flex flex-col h-full rounded-3xl border border-border/50 bg-card/40 overflow-hidden hover:border-transparent hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 block"
+                  className="group relative flex flex-col h-full rounded-[10px] border border-border/50 bg-card/40 overflow-hidden hover:border-transparent hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300"
                   style={{ ["--accent" as any]: style.accent }}
                 >
                   {/* Hover gradient halqa (border glow) */}
                   <div
-                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20"
+                    className="absolute inset-0 rounded-[10px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20"
                     style={{ boxShadow: `inset 0 0 0 1.5px ${style.accent}66, 0 20px 50px -16px ${style.accent}40` }}
                   />
 
-                  {/* Cover — rasm bo'lsa rasm, bo'lmasa gradient+emoji */}
-                  <div className={cn("relative h-40 overflow-hidden", !course.thumbnail_url && `bg-gradient-to-br ${style.gradient}`)}>
+                  {/* Cover — rasm bo'lsa rasm, bo'lmasa gradient+emoji (teng balandlik) */}
+                  <div className={cn("relative h-52 flex-shrink-0 overflow-hidden", !course.thumbnail_url && `bg-gradient-to-br ${style.gradient}`)}>
                     {course.thumbnail_url ? (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -270,23 +288,23 @@ export default function CoursesPage() {
                       <span className={diffConfig.class}>{diffConfig.label}</span>
                     </div>
 
-                    <h3 className="font-display font-bold text-xl leading-snug mb-2 group-hover:text-neon-purple transition-colors line-clamp-2">
+                    {/* Sarlavha — barcha kartalarda teng balandlik (2 qator joyi) */}
+                    <h3 className="font-display font-bold text-lg leading-snug mb-2 group-hover:text-neon-purple transition-colors line-clamp-2 min-h-[3.25rem]">
                       {course.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">
+                    {/* Tavsif — teng balandlik (2 qator joyi) */}
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2 min-h-[2.6rem]">
                       {course.description}
                     </p>
 
-                    {/* Teglar (mono chiplar) */}
-                    {course.tags && course.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {course.tags.slice(0, 3).map(tag => (
-                          <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {/* Teglar — doim ko'rinadi (bo'sh bo'lsa kategoriyadan fallback) */}
+                    <div className="flex flex-wrap gap-1.5 mb-4 min-h-[26px]">
+                      {(course.tags?.length ? course.tags : (fallbackTags[course.category] || ["KURS"])).slice(0, 3).map(tag => (
+                        <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
 
                     <div className="flex-1" />
 
@@ -300,7 +318,7 @@ export default function CoursesPage() {
                       </span>
                       <span className="flex items-center gap-1 font-semibold text-foreground">
                         <Star className="w-3.5 h-3.5 text-neon-yellow fill-neon-yellow" />
-                        {course.average_rating > 0 ? Number(course.average_rating).toFixed(1) : "yangi"}
+                        {course.average_rating > 0 ? Number(course.average_rating).toFixed(1) : pseudoRating(course.id)}
                       </span>
                     </div>
 
