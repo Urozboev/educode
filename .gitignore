@@ -32,3 +32,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code worktrees
+/.claude/
+
+# Katta video/arxiv fayllar (Bunny Stream'ga yuklanadi, git'da saqlanmaydi)
+/public/video-courses/
+*.rar
+*.mp4
+*.mov
+*.mkv

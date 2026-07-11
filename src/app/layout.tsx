@@ -79,7 +79,7 @@ export const metadata: Metadata = {
   },
   verification: {
     // Google Search Console / Yandex Webmaster verification kalitini qo'ying:
-    // google: "...",
+    google: "kJzWawsmQa4bEhrzKsRUODklqzr7ccSalSM5kgNalis",
     // yandex: "...",
   },
 };
