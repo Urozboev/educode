@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const next = searchParams.get('next') || '/dashboard';
+  const roleParam = searchParams.get('role'); // OAuth parent uchun
 
   if (code) {
     const cookieStore = cookies();
@@ -32,6 +33,25 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        // OAuth orqali parent ro'yxatdan o'tgan bo'lsa, rolni to'g'rilash
+        // (trigger Google metadata'da role topmaydi — default 'student' bo'ladi)
+        if (roleParam === 'parent' && profile?.role === 'student') {
+          await supabase.from('profiles').update({ role: 'parent' }).eq('id', user.id);
+          return NextResponse.redirect(`${origin}/p-dashboard`);
+        }
+
+        // Ota-ona placement test topshirmaydi
+        if (profile?.role === 'parent') {
+          return NextResponse.redirect(`${origin}/p-dashboard`);
+        }
+
+        // Talaba — placement test tekshiruvi
         const { data: placement } = await supabase
           .from('placement_results')
           .select('id')

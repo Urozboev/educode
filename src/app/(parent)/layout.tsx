@@ -8,31 +8,18 @@ import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
 import {
-  Code2, LayoutDashboard, BookOpen, Swords, Users, Award,
-  GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
-  ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins
+  Code2, LayoutDashboard, Users, Coins, LogOut, Moon, Sun, ChevronLeft, Menu,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
-import AutoLogout from "@/components/AutoLogout";
 
-const adminLinks = [
-  { href: "/a-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
-  { href: "/a-courses", label: "Kurslar", icon: BookOpen },
-  { href: "/a-challenges", label: "Topshiriqlar", icon: Swords },
-  { href: "/a-users", label: "Foydalanuvchilar", icon: Users },
-  { href: "/a-store", label: "Do'kon", icon: ShoppingBag },
-  { href: "/a-payments", label: "Coin so'rovlari", icon: Coins },
-  { href: "/a-achievements", label: "Yutuqlar", icon: Award },
-  { href: "/a-certificates", label: "Sertifikatlar", icon: GraduationCap },
-  { href: "/a-testimonials", label: "Izohlar", icon: MessageSquare },
-  { href: "/a-analytics", label: "Tahlillar", icon: BarChart3 },
-  { href: "/a-about", label: "Platforma haqida", icon: Info },
-  { href: "/a-settings", label: "Sozlamalar", icon: Settings },
-  { href: "/a-export", label: "Eksport", icon: Download },
+const parentLinks = [
+  { href: "/p-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
+  { href: "/p-children", label: "Farzandlarim", icon: Users },
+  { href: "/p-coins", label: "Coinlar", icon: Coins },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function ParentLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -44,8 +31,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) { const p = await getOrCreateProfile(supabase, user.id); if (p) setProfile(p as Profile); }
+      if (!user) { router.push("/login"); return; }
+      const p = await getOrCreateProfile(supabase, user.id);
+      if (p) setProfile(p as Profile);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleLogout() {
@@ -57,31 +47,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const Sidebar = () => (
     <div className="flex flex-col h-full">
       <div className={cn("flex items-center px-5 h-16 border-b border-border/50", collapsed && "justify-center px-3")}>
-        <Link href="/a-dashboard" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-neon-red to-neon-yellow flex items-center justify-center">
-            <Code2 className="w-5 h-5 text-white" />
-          </div>
-          {!collapsed && <span className="font-display font-bold text-lg">Admin</span>}
+        <Link href="/p-dashboard" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
+          <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center"><Code2 className="w-5 h-5 text-white" /></div>
+          {!collapsed && <span className="font-display font-bold text-lg">Edu<span className="gradient-text">Code</span></span>}
         </Link>
       </div>
       {profile && !collapsed && (
         <div className="p-4 border-b border-border/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-neon-red/20 flex items-center justify-center text-neon-red font-bold text-sm">
-              {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full rounded-full object-cover" /> : getInitials(profile.full_name)}
+            <div className="w-10 h-10 rounded-full bg-neon-blue/20 flex items-center justify-center text-neon-blue font-bold text-sm">
+              {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full rounded-full object-cover" alt="" /> : getInitials(profile.full_name)}
             </div>
-            <div><p className="font-semibold text-sm truncate">{profile.full_name}</p><p className="text-xs text-neon-red font-medium">Administrator</p></div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm truncate">{profile.full_name}</p>
+              <p className="text-xs text-neon-blue font-medium">Ota-ona</p>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neon-yellow/10 border border-neon-yellow/20">
+            <Coins className="w-4 h-4 text-neon-yellow" />
+            <span className="text-sm font-bold">{profile.coins}</span>
+            <span className="text-[11px] text-muted-foreground">coin</span>
           </div>
         </div>
       )}
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {adminLinks.map(link => {
+      <nav className="flex-1 p-3 space-y-1">
+        {parentLinks.map(link => {
           const active = pathname.startsWith(link.href);
           return (
             <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
               className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                 collapsed && "justify-center px-3",
-                active ? "bg-neon-red/10 text-neon-red" : "text-muted-foreground hover:bg-accent hover:text-foreground")}>
+                active ? "bg-neon-blue/10 text-neon-blue" : "text-muted-foreground hover:bg-accent hover:text-foreground")}>
               <link.icon className="w-5 h-5" />{!collapsed && <span>{link.label}</span>}
             </Link>
           );
@@ -102,7 +98,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar */}
       <aside className={cn("fixed left-0 top-0 h-full bg-card/80 backdrop-blur-xl border-r border-border/50 z-40 transition-all duration-300 hidden lg:block",
         collapsed ? "w-[72px]" : "w-64")}>
         <Sidebar />
@@ -111,15 +106,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <ChevronLeft className={cn("w-3.5 h-3.5 transition-transform", collapsed && "rotate-180")} />
         </button>
       </aside>
-
-      {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-card/80 backdrop-blur-xl border-b border-border/50 z-30 flex items-center justify-between px-4">
         <button onClick={() => setMobileOpen(true)} className="p-2 hover:bg-accent rounded-xl"><Menu className="w-5 h-5" /></button>
-        <span className="font-display font-bold text-sm">Admin Panel</span>
+        <span className="font-display font-bold text-sm">Ota-ona paneli</span>
         <div className="w-9" />
       </header>
-
-      {/* Mobile Sidebar */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -131,9 +122,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </>
         )}
       </AnimatePresence>
-
       <main className={cn("min-h-screen transition-all duration-300 pt-14 lg:pt-0", collapsed ? "lg:pl-[72px]" : "lg:pl-64")}>
-        <div className="p-4 md:p-6 lg:p-8"><AutoLogout />{children}</div>
+        <div className="p-4 md:p-6 lg:p-8">{children}</div>
       </main>
     </div>
   );

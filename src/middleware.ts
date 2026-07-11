@@ -74,12 +74,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // ============================================
-  // ADMIN/TEACHER tekshirish
+  // ROL TEKSHIRISH (admin / teacher / parent)
   // ============================================
   const isAdminPath = pathname.startsWith('/a-');
   const isTeacherPath = pathname.startsWith('/t-');
+  const isParentPath = pathname.startsWith('/p-');
 
-  if (isAdminPath || isTeacherPath) {
+  if (isAdminPath || isTeacherPath || isParentPath) {
     // Cookie dan rolni o'qish
     let role = request.cookies.get('user-role')?.value;
 
@@ -107,6 +108,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
     if (isTeacherPath && role !== 'teacher' && role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+    if (isParentPath && role !== 'parent' && role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }

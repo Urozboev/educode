@@ -14,11 +14,16 @@ import {
   AlertCircle,
   CheckCircle2,
   ArrowRight,
+  GraduationCap,
+  Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
+type Role = "student" | "parent";
+
 export default function RegisterPage() {
   const router = useRouter();
+  const [role, setRole] = useState<Role>("student");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +33,9 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
 
   const supabase = createClient();
+
+  // Rolga qarab ro'yxatdan keyingi yo'nalish
+  const nextPath = role === "parent" ? "/p-dashboard" : "/placement-test";
 
   const passwordChecks = [
     { label: "Kamida 8 ta belgi", valid: password.length >= 8 },
@@ -47,8 +55,8 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/placement-test`,
+        data: { full_name: fullName, role },
+        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${nextPath}`,
       },
     });
 
@@ -63,7 +71,7 @@ export default function RegisterPage() {
     }
 
     if (data?.session) {
-      router.push("/placement-test");
+      router.push(nextPath);
       return;
     }
 
@@ -75,7 +83,8 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=/placement-test`,
+        // Rol OAuth'da metadata orqali o'tmaydi — callback'da query bilan uzatamiz
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${nextPath}&role=${role}`,
       },
     });
     if (error) setErrorMsg("Google bilan kirishda xatolik yuz berdi");
@@ -118,13 +127,45 @@ export default function RegisterPage() {
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="p-8 md:p-10 rounded-3xl border border-border/60 bg-card/80 backdrop-blur-xl shadow-2xl shadow-black/5">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
             Hisob yarating
           </h1>
           <p className="text-muted-foreground text-base">
-            Bepul 100 coin va barcha kurslarga kirish huquqi.
+            {role === "parent"
+              ? "Farzandingiz o'quv jarayonini kuzating."
+              : "Bepul 100 coin va barcha kurslarga kirish huquqi."}
           </p>
+        </div>
+
+        {/* Rol tanlash */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <button
+            type="button"
+            onClick={() => setRole("student")}
+            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+              role === "student"
+                ? "border-neon-purple bg-neon-purple/10"
+                : "border-border bg-surface/40 hover:bg-surface/60"
+            }`}
+          >
+            <GraduationCap className={`w-6 h-6 ${role === "student" ? "text-neon-purple" : "text-muted-foreground"}`} />
+            <span className="text-sm font-semibold">Talaba</span>
+            <span className="text-[11px] text-muted-foreground text-center leading-tight">O'rganaman</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setRole("parent")}
+            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+              role === "parent"
+                ? "border-neon-blue bg-neon-blue/10"
+                : "border-border bg-surface/40 hover:bg-surface/60"
+            }`}
+          >
+            <Users className={`w-6 h-6 ${role === "parent" ? "text-neon-blue" : "text-muted-foreground"}`} />
+            <span className="text-sm font-semibold">Ota-ona</span>
+            <span className="text-[11px] text-muted-foreground text-center leading-tight">Kuzataman</span>
+          </button>
         </div>
 
         {errorMsg && (
