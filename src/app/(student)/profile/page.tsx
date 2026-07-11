@@ -8,6 +8,7 @@ import type { Profile, UserAchievement, Achievement } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { User, Mail, Edit3, Save, Loader2, Zap, Coins, Flame, Trophy, X, Star, Send, CheckCircle2, MessageSquare } from "lucide-react";
+import ParentControlSection from "@/components/parent/ParentControlSection";
 
 export default function ProfilePage() {
   const supabase = createClient();
@@ -140,6 +141,9 @@ export default function ProfilePage() {
           </div>
         </motion.div>
       )}
+
+      {/* OTA-ONA NAZORATI */}
+      <ParentControlSection />
 
       {/* IZOH YOZISH */}
       <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>

@@ -46,7 +46,33 @@ function LoginForm() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    document.cookie = "user-role=; path=/; max-age=0";
+
     if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      // Rolga qarab yo'naltirish
+      if (profile?.role === "parent") {
+        router.push("/p-dashboard");
+        router.refresh();
+        return;
+      }
+      if (profile?.role === "admin") {
+        router.push("/a-dashboard");
+        router.refresh();
+        return;
+      }
+      if (profile?.role === "teacher") {
+        router.push("/t-dashboard");
+        router.refresh();
+        return;
+      }
+
+      // Talaba — placement test tekshiruvi
       const { data: placement } = await supabase
         .from("placement_results")
         .select("id")
@@ -58,7 +84,6 @@ function LoginForm() {
         return;
       }
     }
-    document.cookie = "user-role=; path=/; max-age=0";
     router.push(redirect);
     router.refresh();
   }

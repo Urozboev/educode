@@ -55,22 +55,57 @@ export interface Course {
   updated_at: string;
 }
 
+export type VideoProvider = 'youtube' | 'bunny' | 'cloudflare' | 'vimeo' | 'direct';
+
+export interface CourseSection {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string | null;
+  order_index: number;
+  estimated_minutes: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Topic {
   id: string;
   course_id: string;
+  section_id: string | null;
   title: string;
   slug: string;
   content_html: string | null;
   video_url: string | null;
+  video_provider: VideoProvider | null;
+  video_id: string | null;
   video_duration_seconds: number | null;
   presentation_url: string | null;
   order_index: number;
   coin_reward: number;
   xp_reward: number;
   estimated_minutes: number;
+  is_free_preview: boolean;
   is_published: boolean;
   created_at: string;
   updated_at: string;
+}
+
+/** Public mundarija (topics_toc view) — kontent ustunlarisiz */
+export interface TopicTocEntry {
+  id: string;
+  course_id: string;
+  section_id: string | null;
+  title: string;
+  slug: string;
+  order_index: number;
+  estimated_minutes: number;
+  coin_reward: number;
+  xp_reward: number;
+  is_free_preview: boolean;
+  is_published: boolean;
+  video_duration_seconds: number | null;
+  has_video: boolean;
 }
 
 export interface Quiz {

@@ -11,12 +11,16 @@ export async function middleware(request: NextRequest) {
   const isPublicPrefix = pathname.startsWith('/explore');
 
   // Public preview sahifalari (login talab qilmaydi):
-  // /courses/[slug] va /challenges/[slug] — kurs/topshiriq haqida ma'lumot
-  // Lekin /courses/[slug]/topics/... va boshqa chuqur path'lar AUTH talab qiladi
+  // /courses/[slug] — kurs mundarijasi
+  // /courses/[slug]/topics/[topicSlug] — dars sahifasi (free preview darslar uchun;
+  //   pullik kontent RLS va video-token API bilan himoyalanadi)
+  // /challenges/[slug] — topshiriq tavsifi
+  // Quiz/task sub-sahifalari AUTH talab qiladi
   const isCoursePreview = /^\/courses\/[^\/]+$/.test(pathname);
+  const isTopicPreview = /^\/courses\/[^\/]+\/topics\/[^\/]+$/.test(pathname);
   const isChallengePreview = /^\/challenges\/[^\/]+$/.test(pathname);
 
-  if (publicPaths.includes(pathname) || isPublicPrefix || isCoursePreview || isChallengePreview) {
+  if (publicPaths.includes(pathname) || isPublicPrefix || isCoursePreview || isTopicPreview || isChallengePreview) {
     return NextResponse.next();
   }
 
@@ -70,12 +74,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // ============================================
-  // ADMIN/TEACHER tekshirish
+  // ROL TEKSHIRISH (admin / teacher / parent)
   // ============================================
   const isAdminPath = pathname.startsWith('/a-');
   const isTeacherPath = pathname.startsWith('/t-');
+  const isParentPath = pathname.startsWith('/p-');
 
-  if (isAdminPath || isTeacherPath) {
+  if (isAdminPath || isTeacherPath || isParentPath) {
     // Cookie dan rolni o'qish
     let role = request.cookies.get('user-role')?.value;
 
@@ -103,6 +108,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
     if (isTeacherPath && role !== 'teacher' && role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+    if (isParentPath && role !== 'parent' && role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }

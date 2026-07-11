@@ -29,6 +29,7 @@ export default function robots(): MetadataRoute.Robots {
           "/courses/*/topics/", // mavzu darslari auth talab qiladi
           "/t-",                // teacher panellari
           "/a-",                // admin panellari
+          "/p-",                // ota-ona panellari
           "/login",
           "/register",
           "/forgot-password",
