@@ -7,14 +7,30 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   Settings, Save, Loader2, Coins, Zap, RefreshCw, Plus, Trash2, X,
-  Brain, Sparkles, ChevronDown, ChevronUp, ClipboardList, Code2
+  Brain, Sparkles, ChevronDown, ChevronUp, ClipboardList, Code2, CreditCard, ShoppingCart
 } from "lucide-react";
+
+interface CoinPackage { coins: number; uzs: number; }
+interface CoinPriceSettings {
+  price_per_coin: number;
+  packages: CoinPackage[];
+  card_number: string;
+  card_owner: string;
+}
 
 export default function AdminSettingsPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"coins" | "placement">("coins");
+  const [activeTab, setActiveTab] = useState<"coins" | "pricing" | "placement">("coins");
+
+  // Coin narxi (ota-ona xaridi uchun)
+  const [pricing, setPricing] = useState<CoinPriceSettings>({
+    price_per_coin: 100,
+    packages: [{ coins: 100, uzs: 10000 }, { coins: 500, uzs: 45000 }, { coins: 1000, uzs: 80000 }],
+    card_number: "8600 0000 0000 0000",
+    card_owner: "EduCode Admin",
+  });
 
   // Coin/XP settings
   const [coinSettings, setCoinSettings] = useState({
@@ -43,6 +59,8 @@ export default function AdminSettingsPage() {
       if (coinData?.value) setCoinSettings(coinData.value as any);
       const { data: xpData } = await supabase.from("platform_settings").select("value").eq("key", "xp_settings").single();
       if (xpData?.value) setXpSettings(xpData.value as any);
+      const { data: priceData } = await supabase.from("platform_settings").select("value").eq("key", "coin_price_uzs").maybeSingle();
+      if (priceData?.value) setPricing(priceData.value as CoinPriceSettings);
       await loadPlacementQuestions();
       setLoading(false);
     })();
@@ -59,6 +77,30 @@ export default function AdminSettingsPage() {
     await supabase.from("platform_settings").upsert({ key: "xp_settings", value: xpSettings, updated_at: new Date().toISOString() });
     toast.success("Sozlamalar saqlandi");
     setSaving(false);
+  }
+
+  async function handleSavePricing() {
+    // Validatsiya
+    if (pricing.packages.some(p => p.coins <= 0 || p.uzs < 0)) {
+      toast.error("Paketlarda noto'g'ri qiymat bor");
+      return;
+    }
+    setSaving(true);
+    await supabase.from("platform_settings").upsert({
+      key: "coin_price_uzs", value: pricing, updated_at: new Date().toISOString(),
+    });
+    toast.success("Coin narxi saqlandi");
+    setSaving(false);
+  }
+
+  function updatePackage(idx: number, field: keyof CoinPackage, val: number) {
+    setPricing(p => ({ ...p, packages: p.packages.map((pk, i) => i === idx ? { ...pk, [field]: val } : pk) }));
+  }
+  function addPackage() {
+    setPricing(p => ({ ...p, packages: [...p.packages, { coins: 100, uzs: 10000 }] }));
+  }
+  function removePackage(idx: number) {
+    setPricing(p => ({ ...p, packages: p.packages.filter((_, i) => i !== idx) }));
   }
 
   // ===== PLACEMENT QUESTION CRUD =====
@@ -149,11 +191,75 @@ export default function AdminSettingsPage() {
           activeTab === "coins" ? "bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20" : "bg-surface text-muted-foreground")}>
           <Coins className="w-4 h-4 inline mr-1.5" /> Coin / XP
         </button>
+        <button onClick={() => setActiveTab("pricing")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all",
+          activeTab === "pricing" ? "bg-neon-green/10 text-neon-green border border-neon-green/20" : "bg-surface text-muted-foreground")}>
+          <ShoppingCart className="w-4 h-4 inline mr-1.5" /> Coin narxi
+        </button>
         <button onClick={() => setActiveTab("placement")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all",
           activeTab === "placement" ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-surface text-muted-foreground")}>
           <Brain className="w-4 h-4 inline mr-1.5" /> Daraja aniqlash testi
         </button>
       </div>
+
+      {/* ===== COIN NARXI TAB ===== */}
+      {activeTab === "pricing" && (
+        <div className="space-y-6">
+          <motion.div className="glass-card p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <h2 className="font-display font-semibold text-lg mb-1 flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-neon-green" /> To'lov kartasi
+            </h2>
+            <p className="text-xs text-muted-foreground mb-4">Ota-onalar coin sotib olganda shu karta ko'rsatiladi.</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Karta raqami</label>
+                <input value={pricing.card_number} onChange={e => setPricing({ ...pricing, card_number: e.target.value })}
+                  className="input-field font-mono" placeholder="8600 0000 0000 0000" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Karta egasi</label>
+                <input value={pricing.card_owner} onChange={e => setPricing({ ...pricing, card_owner: e.target.value })}
+                  className="input-field" placeholder="Ism Familiya" />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div className="glass-card p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-semibold text-lg flex items-center gap-2">
+                <Coins className="w-5 h-5 text-neon-yellow" /> Coin paketlari
+              </h2>
+              <button onClick={addPackage} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1 border border-border">
+                <Plus className="w-3.5 h-3.5" /> Paket qo'shish
+              </button>
+            </div>
+            <div className="space-y-3">
+              {pricing.packages.map((pk, idx) => (
+                <div key={idx} className="flex items-end gap-3 p-3 rounded-xl bg-surface/50">
+                  <div className="flex-1">
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Coin miqdori</label>
+                    <input type="number" value={pk.coins} onChange={e => updatePackage(idx, "coins", +e.target.value)} className="input-field" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Narxi (so'm)</label>
+                    <input type="number" value={pk.uzs} onChange={e => updatePackage(idx, "uzs", +e.target.value)} className="input-field" />
+                  </div>
+                  <div className="text-xs text-muted-foreground pb-3 whitespace-nowrap">
+                    ={pk.coins > 0 ? Math.round(pk.uzs / pk.coins) : 0} so'm/coin
+                  </div>
+                  <button onClick={() => removePackage(idx)} disabled={pricing.packages.length <= 1}
+                    className="p-2.5 rounded-lg hover:bg-neon-red/10 text-muted-foreground hover:text-neon-red disabled:opacity-30 mb-0.5">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <button onClick={handleSavePricing} disabled={saving} className="btn-primary py-3 px-8 flex items-center gap-2 disabled:opacity-50">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Narxlarni saqlash
+          </button>
+        </div>
+      )}
 
       {/* ===== COIN/XP TAB ===== */}
       {activeTab === "coins" && (
