@@ -11,7 +11,7 @@ import {
   BookOpen, Terminal, Shield, Globe, ArrowRight, ArrowUpRight,
   LayoutDashboard, LogOut, Menu, X, Star, Quote, Moon, Sun,
   Sparkles, Play, CheckCircle2, GraduationCap, MessageCircle,
-  Cpu, Layers, Binary, Zap, Monitor
+  Cpu, Layers, Binary, Zap, Monitor, Plus
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 import { OrganizationJsonLd, WebsiteJsonLd, FaqJsonLd } from "@/components/seo/JsonLd";
@@ -301,6 +301,145 @@ function HeroMosaic() {
   );
 }
 
+/* ============ Hero'da aylanuvchi so'z ============ */
+const ROTATING_WORDS = [
+  { text: "zamonaviy usulda", color: "gradient-text" },
+  { text: "AI mentor bilan", color: "text-neon-blue" },
+  { text: "o'ynab-o'ynab", color: "text-neon-green" },
+  { text: "amaliyot orqali", color: "text-neon-yellow" },
+];
+
+function RotatingWord() {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx(i => (i + 1) % ROTATING_WORDS.length), 2600);
+    return () => clearInterval(t);
+  }, []);
+  const w = ROTATING_WORDS[idx];
+  return (
+    <span className="relative inline-block min-w-[280px] md:min-w-[420px]">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={idx}
+          className={`inline-block ${w.color === "gradient-text" ? "gradient-text" : w.color}`}
+          initial={{ opacity: 0, y: 18, rotateX: 45 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          exit={{ opacity: 0, y: -18, rotateX: -45 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {w.text}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
+/* ============ Sanovchi raqam (count-up) ============ */
+function CountUp({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    if (!value) return;
+    const dur = 1200;
+    const t0 = performance.now();
+    let raf: number;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      // easeOutCubic
+      setDisplay(Math.round(value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{formatNumber(display)}</>;
+}
+
+/* ============ Til logolari marquee ============ */
+const MARQUEE_LANGS = ["python", "javascript", "typescript", "react", "html", "java", "c++", "csharp"];
+
+function LangMarquee() {
+  const row = [...MARQUEE_LANGS, ...MARQUEE_LANGS, ...MARQUEE_LANGS];
+  return (
+    <div className="relative overflow-hidden py-6 border-y border-border/30 bg-surface/20">
+      {/* Chekka fade */}
+      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      <motion.div
+        className="flex items-center gap-12 w-max"
+        animate={{ x: ["0%", "-33.333%"] }}
+        transition={{ repeat: Infinity, duration: 28, ease: "linear" }}
+      >
+        {row.map((l, i) => (
+          <div key={i} className="flex items-center gap-2.5 opacity-50 hover:opacity-100 transition-opacity">
+            <LanguageLogo lang={l as any} size={26} />
+            <span className="text-sm font-medium text-muted-foreground capitalize whitespace-nowrap">
+              {l === "csharp" ? "C#" : l === "c++" ? "C++" : l}
+            </span>
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ============ FAQ (JSON-LD savollariga mos ko'rinadigan qism) ============ */
+const FAQ_ITEMS = [
+  { q: "EduCode platformasi nima?", a: "EduCode (malla.uz) — interaktiv dasturlash kurslari, AI Sokratik mentor va gamifikatsiya bilan o'zbek tilidagi onlayn ta'lim platformasi. Python, JavaScript, HTML/CSS, algoritmlar va prompt engineering bo'yicha kurslar mavjud." },
+  { q: "EduCode bepulmi?", a: "Ha, asosiy kurslar va topshiriqlar bepul. Ba'zi premium kurslar coin yoki to'g'ridan-to'g'ri sotib olish orqali ochiladi. Ro'yxatdan o'tganda 100 coin sovg'a qilinadi." },
+  { q: "AI mentor qanday ishlaydi?", a: "AI mentor Sokratik usulda ishlaydi: tayyor kod yechimini bermaydi, savollar orqali sizni mustaqil yechishga yo'naltiradi. Bu chuqur o'rganish va mustaqil fikrlashni rivojlantiradi." },
+  { q: "Qaysi dasturlash tillarini o'rganish mumkin?", a: "Hozircha Python, JavaScript, HTML/CSS, algoritmlar va ma'lumot tuzilmalari bo'yicha kurslar mavjud. Playground'da esa 7 ta tilda kod yozib sinash mumkin." },
+  { q: "Sertifikat olish mumkinmi?", a: "Ha, kursni 100% tugatgan talabalarga avtomatik raqamli sertifikat beriladi. Uni profilingizdan PDF sifatida yuklab olishingiz mumkin." },
+];
+
+function FaqSection() {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section className="py-20 px-5 border-t border-border/30">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Savol-javob</p>
+          <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">Ko'p so'raladigan savollar</h2>
+        </div>
+        <div className="space-y-3">
+          {FAQ_ITEMS.map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              className={`rounded-2xl border transition-colors overflow-hidden ${open === i ? "border-neon-purple/30 bg-neon-purple/[0.04]" : "border-border/50 bg-card/30 hover:bg-card/50"}`}
+            >
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="w-full flex items-center justify-between gap-4 px-5 md:px-6 py-4.5 text-left py-4"
+              >
+                <span className="font-display font-semibold text-[15px] md:text-base">{item.q}</span>
+                <span className={`w-7 h-7 rounded-full border flex items-center justify-center flex-shrink-0 transition-all ${open === i ? "bg-neon-purple border-neon-purple text-white rotate-45" : "border-border text-muted-foreground"}`}>
+                  <Plus className="w-4 h-4" />
+                </span>
+              </button>
+              <AnimatePresence initial={false}>
+                {open === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="px-5 md:px-6 pb-5 text-sm md:text-[15px] text-muted-foreground leading-relaxed">{item.a}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPage() {
   const supabase = createClient();
   const { theme, setTheme } = useTheme();
@@ -478,7 +617,7 @@ export default function LandingPage() {
 
               <motion.h1 variants={fadeUp(0.05)} className="font-display font-extrabold text-4xl md:text-[3.5rem] leading-[1.1] tracking-tight mb-5">
                 Dasturlashni<br />
-                <span className="gradient-text">zamonaviy usulda</span> o'rganing
+                <RotatingWord /><br className="md:hidden" /> o'rganing
               </motion.h1>
 
               <motion.p variants={fadeUp(0.1)} className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg mb-8">
@@ -501,7 +640,9 @@ export default function LandingPage() {
                   { val: stats.submissions, label: "Yuborish" },
                 ].map(s => (
                   <div key={s.label}>
-                    <div className="font-display font-bold text-2xl md:text-3xl">{formatNumber(Number(s.val))}+</div>
+                    <div className="font-display font-bold text-2xl md:text-3xl">
+                      <CountUp value={Number(s.val)} />+
+                    </div>
                     <div className="text-sm text-muted-foreground">{s.label}</div>
                   </div>
                 ))}
@@ -521,8 +662,11 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ========== TIL LOGOLARI MARQUEE ========== */}
+      <LangMarquee />
+
       {/* ========== FEATURES — BENTO GRID ========== */}
-      <section className="py-20 px-5 border-t border-border/30">
+      <section className="py-20 px-5">
         <div className="max-w-6xl mx-auto">
           <motion.div
             className="max-w-2xl mb-12"
@@ -869,10 +1013,16 @@ export default function LandingPage() {
         </section>
       )}
 
+      {/* ========== FAQ ========== */}
+      <FaqSection />
+
       {/* ========== CTA ========== */}
       <section className="py-20 px-5 border-t border-border/30">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
+          <div className="relative rounded-[2rem] border border-neon-purple/20 bg-gradient-to-br from-neon-purple/[0.08] via-card/40 to-neon-blue/[0.06] p-8 md:p-12 overflow-hidden">
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-neon-purple/15 blur-[90px] pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-neon-blue/10 blur-[90px] pointer-events-none" />
+          <div className="relative grid md:grid-cols-2 gap-10 items-center">
             <div>
               <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Tayyor misiz?</p>
               <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight mb-4">Dasturlash sayohatingizni hoziroq boshlang</h2>
@@ -892,15 +1042,16 @@ export default function LandingPage() {
                 { icon: Brain, text: "AI kod tahlili", color: "#00D2FF" },
                 { icon: Trophy, text: "Coin va sovg'alar", color: "#FFD600" },
                 { icon: GraduationCap, text: "Professional sertifikat", color: "#00E676" },
-                { icon: Gamepad2, text: "6 ta interaktiv o'yin", color: "#FF6B9D" },
+                { icon: Gamepad2, text: "7 ta interaktiv o'yin (3D bilan)", color: "#FF6B9D" },
                 { icon: Globe, text: "To'liq o'zbek tilida", color: "#FF5252" },
               ].map(f => (
-                <div key={f.text} className="flex items-center gap-3 p-3.5 rounded-xl border border-border/40 bg-card/30">
+                <div key={f.text} className="flex items-center gap-3 p-3.5 rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm hover:border-border transition-colors">
                   <f.icon className="w-5 h-5 flex-shrink-0" style={{ color: f.color }} />
                   <span className="text-sm font-medium">{f.text}</span>
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </div>
       </section>
