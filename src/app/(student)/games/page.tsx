@@ -1,8 +1,22 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { motion, Reorder } from "framer-motion";
 import { cn } from "@/lib/utils";
+
+// Three.js og'ir — faqat o'yin ochilganda yuklanadi
+const QuizBattle3D = dynamic(() => import("@/components/games/QuizBattle3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[520px] rounded-3xl border border-border/50 bg-[#0a0a14] flex items-center justify-center">
+      <div className="text-center">
+        <div className="text-4xl mb-3 animate-bounce">⚔️</div>
+        <p className="text-white/60 text-sm">3D sahna yuklanmoqda...</p>
+      </div>
+    </div>
+  ),
+});
 import {
   Puzzle,
   Bug,
@@ -31,9 +45,17 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type GameType = null | "puzzle" | "bugfix" | "typing" | "battle" | "maze" | "bird";
+type GameType = null | "puzzle" | "bugfix" | "typing" | "battle" | "maze" | "bird" | "quiz3d";
 
 const gameCards = [
+  {
+    type: "quiz3d" as const,
+    title: "Quiz Battle 3D",
+    desc: "3D arenada 45 soniya — kublardan to'g'ri javobni tanlang, combo yig'ing!",
+    Icon: Swords,
+    color: "#B388FF",
+    diff: "3D · Yangi",
+  },
   {
     type: "puzzle" as const,
     title: "Code Puzzle",
@@ -107,8 +129,8 @@ export default function GamesPage() {
           O'yin bilan o'rganing
         </h1>
         <p className="text-[15px] md:text-base text-muted-foreground max-w-2xl">
-          Dasturlash ko'nikmalarini mustahkamlovchi 6 ta interaktiv o'yin. Tartib, mantiq, tezlik va
-          algoritmik fikrlashni rivojlantiring.
+          Dasturlash ko'nikmalarini mustahkamlovchi 7 ta interaktiv o'yin — jumladan 3D arena.
+          Tartib, mantiq, tezlik va algoritmik fikrlashni rivojlantiring.
         </p>
       </motion.div>
 
@@ -168,6 +190,7 @@ export default function GamesPage() {
           >
             <ArrowLeft className="w-4 h-4" /> O'yinlarga qaytish
           </button>
+          {game === "quiz3d" && <QuizBattle3D />}
           {game === "puzzle" && <PuzzleGame />}
           {game === "bugfix" && <BugFixGame />}
           {game === "typing" && <TypingGame />}
