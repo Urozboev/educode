@@ -21,6 +21,8 @@ type Lang = {
   stdinPattern?: RegExp;
   /** Interaktiv konsol (dastur ishlagach qiymat kiritish) qo'llab-quvvatlanadimi */
   interactive?: boolean;
+  /** stdin tugaganini bildiruvchi xato pattern (auto-detect uchun) */
+  eofPattern?: RegExp;
 };
 
 const languages: Lang[] = [
@@ -31,6 +33,7 @@ const languages: Lang[] = [
     version: "3.10",
     api: true,
     interactive: true,
+    eofPattern: /EOFError/,
     stdinPattern: /(^|\W)input\s*\(/,
     starter: `# Python Playground
 # input() chaqirilganda dastur to'xtab, konsolda qiymat so'raydi
@@ -70,6 +73,7 @@ console.log(greet("TypeScript"));`,
     monaco: "cpp",
     version: "GCC 9.2",
     api: true,
+    interactive: true,
     stdinPattern: /std::cin|cin\s*>>/,
     starter: `#include <iostream>
 using namespace std;
@@ -87,6 +91,8 @@ int main() {
     monaco: "java",
     version: "OpenJDK 13",
     api: true,
+    interactive: true,
+    eofPattern: /NoSuchElementException|InputMismatchException/,
     stdinPattern: /Scanner|BufferedReader/,
     starter: `import java.util.Scanner;
 
@@ -104,6 +110,8 @@ public class Main {
     monaco: "csharp",
     version: "Mono 6.12",
     api: true,
+    interactive: true,
+    eofPattern: /ArgumentNullException|NullReferenceException/,
     stdinPattern: /Console\.ReadLine/,
     starter: `using System;
 
@@ -234,14 +242,17 @@ export default function PlaygroundPage() {
   );
 
   /**
-   * Python interaktiv bajarish: buffer bilan ishga tushiriladi.
-   * EOFError chiqsa — dastur kiritish kutmoqda: konsolda inline input ochamiz.
-   * Foydalanuvchi qiymat kiritgach buffer'ga qo'shib QAYTA ishga tushiramiz
-   * (natija determinstik — oldingi chiqishlar aynan takrorlanadi).
+   * Interaktiv bajarish (barcha API tillar): buffer bilan ishga tushiriladi.
+   * stdin-tugadi xatosi (eofPattern: Python EOFError, Java NoSuchElement,
+   * C# ArgumentNull...) chiqsa — konsolda inline input ochiladi.
+   * Qiymat kiritilgach buffer'ga qo'shilib QAYTA bajariladi.
+   * C++ kabi EOF'ni xatosiz "yutib yuboradigan" tillarda esa terminal
+   * ostidagi doimiy kiritish qatori orqali qiymat qo'shib re-run qilinadi.
    */
-  const runPythonInteractive = useCallback(
+  const runInteractive = useCallback(
     async (buffer: string[]) => {
-      const data = await execOnServer(PY_ECHO_HARNESS + code, buffer.join("\n"));
+      const isPy = lang.id === "python";
+      const data = await execOnServer(isPy ? PY_ECHO_HARNESS + code : code, buffer.join("\n"));
 
       setMeta({ provider: data.provider, time: data.time, memory: data.memory, warning: data.warning });
 
@@ -254,8 +265,8 @@ export default function PlaygroundPage() {
       const out: string = data.stdout || "";
       const err: string = data.stderr || "";
 
-      if (err.includes("EOFError")) {
-        // Dastur input() kutmoqda — hozirgi chiqishni ko'rsatib, qiymat so'raymiz
+      if (lang.eofPattern && err && lang.eofPattern.test(err)) {
+        // Dastur kiritish kutmoqda — hozirgi chiqishni ko'rsatib, qiymat so'raymiz
         setOutput(out);
         setAwaitingInput(true);
         return;
@@ -263,14 +274,14 @@ export default function PlaygroundPage() {
 
       setAwaitingInput(false);
       if (err) {
-        setOutput(`${out}${out ? "\n" : ""}${fixPyLineNumbers(err)}`);
+        setOutput(`${out}${out ? "\n" : ""}${isPy ? fixPyLineNumbers(err) : err}`);
       } else if (data.status === "timeout") {
         setOutput(out + "\n⏱ Vaqt limiti tugadi (timeout)");
       } else {
         setOutput(out || "(natija bo'sh)");
       }
     },
-    [code, execOnServer],
+    [code, execOnServer, lang],
   );
 
   /** Oddiy (interaktiv bo'lmagan) bajarish */
@@ -305,7 +316,7 @@ export default function PlaygroundPage() {
         setShowHtml(true);
         setOutput("HTML natijasi o'ng panelda ko'rsatilgan");
       } else if (lang.interactive) {
-        await runPythonInteractive([]);
+        await runInteractive([]);
       } else {
         await runPlain();
       }
@@ -325,7 +336,7 @@ export default function PlaygroundPage() {
     inputsRef.current = [...inputsRef.current, value];
     setRunning(true);
     try {
-      await runPythonInteractive(inputsRef.current);
+      await runInteractive(inputsRef.current);
     } catch (e: any) {
       if (e?.name !== "AbortError") setOutput(`Xatolik: ${e.message}`);
     }
@@ -353,7 +364,8 @@ export default function PlaygroundPage() {
   }, [running, awaitingInput, code, lang, stdin]);
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-5.5rem)] lg:h-[calc(100dvh-4rem)] -mx-1">
+    // Layout padding'ini negativ margin bilan bekor qilib, butun ekranga yoyamiz
+    <div className="flex flex-col h-[calc(100dvh-3.5rem)] lg:h-[100dvh] -m-4 md:-m-6 lg:-m-8 p-3 md:p-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-3 pb-3 flex-shrink-0 flex-wrap">
         <div className="flex items-center gap-2.5">
@@ -576,8 +588,11 @@ export default function PlaygroundPage() {
                   {output || (running ? "" : '"Ishga tushirish" tugmasini bosing yoki Ctrl+Enter...')}
                 </pre>
 
-                {/* Inline input — dastur kiritish kutayotganda terminal ichida */}
-                {awaitingInput && (
+                {/* Inline input — dastur kiritish kutayotganda terminal ichida.
+                    C++ kabi EOF'ni xatosiz o'tkazadigan tillarda esa natijadan
+                    keyin ham qiymat qo'shish mumkin (kiritilgach qayta bajariladi) */}
+                {(awaitingInput ||
+                  (!running && !!output && lang.interactive && !lang.eofPattern && !!lang.stdinPattern?.test(code))) && (
                   <form
                     className="inline-flex items-center gap-1"
                     onSubmit={(e) => { e.preventDefault(); submitInline(); }}

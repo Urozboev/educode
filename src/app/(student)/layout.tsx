@@ -235,6 +235,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <Link href="/explore/courses" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kurslar</Link>
               <Link href="/explore/challenges" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Topshiriqlar</Link>
               <Link href="/playground" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Playground</Link>
+              <Link href="/explore/games" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">O'yinlar</Link>
               <Link href="/explore/about" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Platforma haqida</Link>
             </div>
             <div className="flex items-center gap-2">
