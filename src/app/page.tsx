@@ -42,9 +42,18 @@ const TONE_BG: Record<string, string> = {
   pink: "bg-neon-pink/[0.08] border-neon-pink/15",
 };
 
-function MosaicCellView({ c, delay }: { c: MosaicCell; delay: number }) {
+function MosaicCellView({ c, delay, idx, active }: { c: MosaicCell; delay: number; idx: number; active: boolean }) {
   const base =
-    "relative aspect-square rounded-xl border border-border/50 bg-card/40 flex items-center justify-center overflow-hidden transition-all hover:scale-[1.04] hover:border-border hover:shadow-lg hover:shadow-black/5 hover:z-10";
+    "relative aspect-square rounded-xl border flex items-center justify-center overflow-hidden transition-all duration-500 hover:scale-[1.06] hover:border-border hover:shadow-lg hover:shadow-black/5 hover:z-10 " +
+    (active
+      ? "border-neon-purple/50 bg-neon-purple/[0.08] shadow-[0_0_24px_rgba(108,92,231,0.25)] scale-[1.03] z-10"
+      : "border-border/50 bg-card/40");
+
+  // Har katak uchun deterministik "tasodifiy" suzish parametrlari
+  // (Math.random emas — hydration mos bo'lishi uchun index'dan)
+  const floatDur = 3.2 + ((idx * 37) % 17) / 10;      // 3.2s – 4.9s
+  const floatDelay = ((idx * 53) % 20) / 10;           // 0 – 2s
+  const floatAmp = 2.5 + ((idx * 29) % 3);             // 2.5 – 4.5px
 
   const inner = (() => {
     switch (c.kind) {
@@ -59,6 +68,7 @@ function MosaicCellView({ c, delay }: { c: MosaicCell; delay: number }) {
             style={{ color: c.color || "currentColor" }}
           >
             {c.text}
+            <span className="animate-pulse opacity-70">▍</span>
           </code>
         );
       case "stat":
@@ -121,7 +131,14 @@ function MosaicCellView({ c, delay }: { c: MosaicCell; delay: number }) {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] }}
     >
-      {inner}
+      {/* Doimiy yumshoq suzish — ichki qatlam (kirish animatsiyasiga xalaqit bermaydi) */}
+      <motion.div
+        className="w-full h-full flex items-center justify-center"
+        animate={{ y: [0, -floatAmp, 0] }}
+        transition={{ repeat: Infinity, duration: floatDur, delay: floatDelay, ease: "easeInOut" }}
+      >
+        {inner}
+      </motion.div>
     </motion.div>
   );
 }
@@ -188,6 +205,20 @@ function HeroMosaic() {
       }
     }
   }
+
+  // "Jonli faollik" — har 1.6s da tasodifiy katak yorishadi
+  // (xuddi jadvalda kimdir ishlayotgandek)
+  const [activeIdx, setActiveIdx] = useState(3);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setActiveIdx(prev => {
+        let next = Math.floor(Math.random() * 32);
+        if (next === prev) next = (next + 7) % 32;
+        return next;
+      });
+    }, 1600);
+    return () => clearInterval(t);
+  }, []);
 
   return (
     <div className="relative">
@@ -269,7 +300,7 @@ function HeroMosaic() {
               key={`${p.col}-${p.row}`}
               style={{ gridColumn: p.col, gridRow: p.row }}
             >
-              <MosaicCellView c={p.cell} delay={0.05 + idx * 0.02} />
+              <MosaicCellView c={p.cell} delay={0.05 + idx * 0.02} idx={idx} active={idx === activeIdx} />
             </div>
           ))}
         </div>
