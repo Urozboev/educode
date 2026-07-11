@@ -41,51 +41,52 @@ export default function DashboardPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Profil (agar yo'q bo'lsa avtomatik yaratiladi)
-    const profileData = await getOrCreateProfile(supabase, user.id);
+    // Barcha so'rovlar PARALLEL — 7 ta ketma-ket roundtrip o'rniga bitta to'lqin
+    const [
+      profileData,
+      { data: enrollData },
+      { data: completedData },
+      { data: certsData },
+      { count: completedCourses },
+      { count: solvedChallenges },
+      { count: passedQuizzes },
+    ] = await Promise.all([
+      getOrCreateProfile(supabase, user.id),
+      supabase
+        .from("enrollments")
+        .select("*, course:courses(*)")
+        .eq("user_id", user.id)
+        .eq("is_completed", false)
+        .order("last_accessed_at", { ascending: false })
+        .limit(4),
+      supabase
+        .from("enrollments")
+        .select("*, course:courses(*)")
+        .eq("user_id", user.id)
+        .eq("is_completed", true)
+        .order("completed_at", { ascending: false })
+        .limit(4),
+      supabase
+        .from("certificates")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("issued_at", { ascending: false })
+        .limit(4),
+      supabase
+        .from("enrollments").select("*", { count: "exact", head: true })
+        .eq("user_id", user.id).eq("is_completed", true),
+      supabase
+        .from("submissions").select("*", { count: "exact", head: true })
+        .eq("user_id", user.id).eq("task_type", "challenge").eq("status", "accepted"),
+      supabase
+        .from("quiz_results").select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+    ]);
+
     if (profileData) setProfile(profileData as Profile);
-
-    // Davom etayotgan kurslar
-    const { data: enrollData } = await supabase
-      .from("enrollments")
-      .select("*, course:courses(*)")
-      .eq("user_id", user.id)
-      .eq("is_completed", false)
-      .order("last_accessed_at", { ascending: false })
-      .limit(4);
     if (enrollData) setEnrollments(enrollData as any[]);
-
-    // Tugatilgan kurslar
-    const { data: completedData } = await supabase
-      .from("enrollments")
-      .select("*, course:courses(*)")
-      .eq("user_id", user.id)
-      .eq("is_completed", true)
-      .order("completed_at", { ascending: false })
-      .limit(4);
     if (completedData) setCompletedEnrollments(completedData as any[]);
-
-    // Sertifikatlar
-    const { data: certsData } = await supabase
-      .from("certificates")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("issued_at", { ascending: false })
-      .limit(4);
     if (certsData) setCertificates(certsData);
-
-    // Statistika
-    const { count: completedCourses } = await supabase
-      .from("enrollments").select("*", { count: "exact", head: true })
-      .eq("user_id", user.id).eq("is_completed", true);
-
-    const { count: solvedChallenges } = await supabase
-      .from("submissions").select("*", { count: "exact", head: true })
-      .eq("user_id", user.id).eq("task_type", "challenge").eq("status", "accepted");
-
-    const { count: passedQuizzes } = await supabase
-      .from("quiz_results").select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
 
     setStats({
       coursesCompleted: completedCourses || 0,
