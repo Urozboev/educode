@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -11,7 +11,7 @@ import slugify from "slugify";
 import {
   ArrowLeft, Plus, Pencil, Trash2, Save, X, Loader2, Video, FileText,
   ChevronUp, ChevronDown, ClipboardList, Code2, Sparkles, Brain, ChevronRight,
-  FolderPlus, Eye
+  FolderPlus, Eye, Wand2, Square
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +42,15 @@ export default function AdminTopicsPage() {
   const [topicForm, setTopicForm] = useState({ ...EMPTY_TOPIC_FORM });
   const [savingTopic, setSavingTopic] = useState(false);
   const [aiGenerating, setAiGenerating] = useState<string | null>(null);
+
+  // Batch (to'plu) AI generatsiya
+  const [batchOpen, setBatchOpen] = useState(false);
+  const [batchRunning, setBatchRunning] = useState(false);
+  const [batchDoQuiz, setBatchDoQuiz] = useState(true);
+  const [batchDoTask, setBatchDoTask] = useState(true);
+  const [batchScope, setBatchScope] = useState<string>("all"); // "all" yoki section_id
+  const [batchProgress, setBatchProgress] = useState({ done: 0, total: 0, label: "", ok: 0, fail: 0 });
+  const batchStop = useRef(false);
 
   // Expanded topic (shows quizzes and tasks)
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
@@ -237,6 +246,79 @@ export default function AdminTopicsPage() {
     setAiGenerating(null);
   }
 
+  // ==================== BATCH (TO'PLU) AI GENERATSIYA ====================
+  // Bitta mavzu uchun quiz/task generatsiya + DB ga saqlash (mavjud bo'lsa o'tkazib yuboradi)
+  async function genForTopic(topic: Topic, doQuiz: boolean, doTask: boolean): Promise<{ ok: boolean }> {
+    let ok = true;
+    try {
+      if (doQuiz) {
+        const { count } = await supabase.from("quizzes").select("id", { count: "exact", head: true }).eq("topic_id", topic.id);
+        if ((count ?? 0) === 0) {
+          const res = await fetch("/api/ai/generate", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "quiz", topic_title: topic.title, course_title: course?.title }),
+          });
+          const data = await res.json();
+          if (data.data) {
+            const quizzes = Array.isArray(data.data) ? data.data : [data.data];
+            const rows = quizzes.map((q: any, i: number) => ({
+              topic_id: topic.id, question: q.question,
+              question_type: q.question_type || "single",
+              options: q.options, explanation: q.explanation || "",
+              points: 1, order_index: i,
+            }));
+            if (rows.length) await supabase.from("quizzes").insert(rows);
+          } else ok = false;
+        }
+      }
+      if (doTask) {
+        const { count } = await supabase.from("topic_tasks").select("id", { count: "exact", head: true }).eq("topic_id", topic.id);
+        if ((count ?? 0) === 0) {
+          const res = await fetch("/api/ai/generate", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "task", topic_title: topic.title, course_title: course?.title }),
+          });
+          const data = await res.json();
+          if (data.data) {
+            const t = data.data;
+            await supabase.from("topic_tasks").insert({
+              topic_id: topic.id, title: t.title, description: t.description,
+              starter_code: t.starter_code || "", solution_code: t.solution_code || "",
+              language: t.language || "python", test_cases: t.test_cases || [],
+              hints: t.hints || [], difficulty: t.difficulty || "easy",
+              coin_reward: t.coin_reward || 5, xp_reward: t.xp_reward || 15, order_index: 0,
+            });
+          } else ok = false;
+        }
+      }
+    } catch { ok = false; }
+    return { ok };
+  }
+
+  async function runBatch() {
+    if (!batchDoQuiz && !batchDoTask) { toast.error("Kamida bittasini tanlang (test yoki topshiriq)"); return; }
+    const targets = batchScope === "all" ? topics : topics.filter(t => t.section_id === batchScope);
+    if (targets.length === 0) { toast.error("Mavzu topilmadi"); return; }
+
+    batchStop.current = false;
+    setBatchRunning(true);
+    setBatchProgress({ done: 0, total: targets.length, label: "", ok: 0, fail: 0 });
+
+    let ok = 0, fail = 0;
+    for (let i = 0; i < targets.length; i++) {
+      if (batchStop.current) { toast.info("To'xtatildi"); break; }
+      const t = targets[i];
+      setBatchProgress({ done: i, total: targets.length, label: t.title, ok, fail });
+      const r = await genForTopic(t, batchDoQuiz, batchDoTask);
+      if (r.ok) ok++; else fail++;
+      setBatchProgress({ done: i + 1, total: targets.length, label: t.title, ok, fail });
+    }
+
+    setBatchRunning(false);
+    toast.success(`Tugadi: ${ok} muvaffaqiyatli${fail ? `, ${fail} xato` : ""}`);
+    if (expandedTopic) loadTopicDetails(expandedTopic);
+  }
+
   // ==================== QUIZ CRUD ====================
   async function saveQuiz() {
     if (!expandedTopic || !quizForm.question.trim()) { toast.error("Savolni kiriting"); return; }
@@ -297,6 +379,9 @@ export default function AdminTopicsPage() {
           <p className="text-sm text-muted-foreground">{sections.length} ta bo'lim · {topics.length} ta mavzu</p>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => setBatchOpen(v => !v)} className="btn-ghost py-2.5 px-4 flex items-center gap-2 text-sm border border-neon-blue/30 text-neon-blue">
+            <Wand2 className="w-4 h-4" /> AI to'plu
+          </button>
           <button onClick={openNewSection} className="btn-ghost py-2.5 px-4 flex items-center gap-2 text-sm border border-border">
             <FolderPlus className="w-4 h-4" /> Yangi bo'lim
           </button>
@@ -305,6 +390,80 @@ export default function AdminTopicsPage() {
           </button>
         </div>
       </div>
+
+      {/* ===== BATCH AI GENERATSIYA ===== */}
+      <AnimatePresence>
+        {batchOpen && (
+          <motion.div className="glass-card p-6 border border-neon-blue/20" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-semibold flex items-center gap-2"><Wand2 className="w-5 h-5 text-neon-blue" /> AI bilan to'plu generatsiya</h2>
+              {!batchRunning && <button onClick={() => setBatchOpen(false)} className="p-1.5 hover:bg-accent rounded-lg"><X className="w-5 h-5" /></button>}
+            </div>
+
+            {batchRunning ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground truncate flex-1">
+                    <Loader2 className="w-4 h-4 animate-spin inline mr-2 text-neon-blue" />
+                    {batchProgress.label || "Boshlanmoqda..."}
+                  </span>
+                  <span className="font-mono font-semibold ml-3">{batchProgress.done}/{batchProgress.total}</span>
+                </div>
+                <div className="w-full h-2.5 bg-surface rounded-full overflow-hidden">
+                  <div className="h-full bg-neon-blue rounded-full transition-all" style={{ width: `${batchProgress.total ? (batchProgress.done / batchProgress.total) * 100 : 0}%` }} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-4 text-xs">
+                    <span className="text-neon-green">✓ {batchProgress.ok} muvaffaqiyatli</span>
+                    {batchProgress.fail > 0 && <span className="text-neon-red">✗ {batchProgress.fail} xato</span>}
+                  </div>
+                  <button onClick={() => { batchStop.current = true; }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neon-red/10 text-neon-red text-xs font-medium hover:bg-neon-red/20">
+                    <Square className="w-3.5 h-3.5" /> To'xtatish
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Har mavzu uchun AI test va topshiriq yaratadi. <strong>Allaqachon kontenti bor mavzular o'tkazib yuboriladi.</strong> Har mavzu ~5-10 soniya oladi.
+                </p>
+
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nima yaratilsin?</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 text-sm cursor-pointer">
+                        <input type="checkbox" checked={batchDoQuiz} onChange={e => setBatchDoQuiz(e.target.checked)} className="accent-neon-blue" />
+                        <ClipboardList className="w-4 h-4 text-neon-blue" /> Testlar (5 ta/mavzu)
+                      </label>
+                      <label className="flex items-center gap-2 text-sm cursor-pointer">
+                        <input type="checkbox" checked={batchDoTask} onChange={e => setBatchDoTask(e.target.checked)} className="accent-neon-purple" />
+                        <Code2 className="w-4 h-4 text-neon-purple" /> Topshiriqlar (1 ta/mavzu)
+                      </label>
+                    </div>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Qamrov</label>
+                    <select value={batchScope} onChange={e => setBatchScope(e.target.value)} className="input-field text-sm">
+                      <option value="all">Barcha mavzular ({topics.length} ta)</option>
+                      {sections.map(s => (
+                        <option key={s.id} value={s.id}>{s.title} ({topics.filter(t => t.section_id === s.id).length} ta)</option>
+                      ))}
+                    </select>
+                    <p className="text-[11px] text-muted-foreground mt-2">
+                      💡 Katta kurs uchun bo'lim-bo'lim generatsiya qilish tavsiya etiladi (API limit va byudjet uchun).
+                    </p>
+                  </div>
+                </div>
+
+                <button onClick={runBatch} className="btn-primary py-2.5 px-6 text-sm flex items-center gap-2">
+                  <Wand2 className="w-4 h-4" /> Generatsiyani boshlash
+                </button>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ===== SECTION FORM ===== */}
       <AnimatePresence>
