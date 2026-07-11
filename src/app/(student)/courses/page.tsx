@@ -3,28 +3,34 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { cn, getDifficultyConfig, getCategoryLabel } from "@/lib/utils";
+import { cn, getDifficultyConfig } from "@/lib/utils";
 import type { Course, Enrollment } from "@/types";
 import { motion } from "framer-motion";
 import {
-  BookOpen, Search, Filter, Clock, Users, Coins, Star,
-  ChevronRight, Lock, CheckCircle2, GraduationCap
+  BookOpen, Search, Clock, Users, Coins, Star,
+  ChevronRight, CheckCircle2, Play, Sparkles, Layers,
 } from "lucide-react";
 
 const categories = [
-  { value: "all", label: "Barchasi" },
-  { value: "python", label: "Python" },
-  { value: "programming", label: "Dasturlash" },
-  { value: "frontend", label: "Frontend" },
-  { value: "computer_literacy", label: "Kompyuter savodxonligi" },
-  { value: "prompt_engineering", label: "Prompt Engineering" },
-  { value: "algorithms", label: "Algoritmlar" },
+  { value: "all", label: "Barchasi", icon: "✨" },
+  { value: "python", label: "Python", icon: "🐍" },
+  { value: "programming", label: "Dasturlash", icon: "💻" },
+  { value: "frontend", label: "Frontend", icon: "⚛️" },
+  { value: "computer_literacy", label: "Kompyuter savodxonligi", icon: "🖥️" },
+  { value: "prompt_engineering", label: "Prompt Engineering", icon: "🤖" },
+  { value: "algorithms", label: "Algoritmlar", icon: "🧠" },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.4, delay: i * 0.06 } }),
+/** Kategoriya bo'yicha cover gradient + emoji */
+const categoryStyle: Record<string, { gradient: string; emoji: string; accent: string }> = {
+  python: { gradient: "from-[#3776AB]/30 via-[#FFD43B]/10 to-transparent", emoji: "🐍", accent: "#3776AB" },
+  programming: { gradient: "from-neon-purple/30 via-neon-blue/10 to-transparent", emoji: "💻", accent: "#6C5CE7" },
+  frontend: { gradient: "from-[#61DAFB]/25 via-neon-purple/10 to-transparent", emoji: "⚛️", accent: "#61DAFB" },
+  computer_literacy: { gradient: "from-neon-blue/25 via-neon-green/10 to-transparent", emoji: "🖥️", accent: "#00D2FF" },
+  prompt_engineering: { gradient: "from-neon-pink/25 via-neon-purple/10 to-transparent", emoji: "🤖", accent: "#FF6BCB" },
+  algorithms: { gradient: "from-neon-green/25 via-neon-blue/10 to-transparent", emoji: "🧠", accent: "#00E676" },
 };
+const defaultStyle = { gradient: "from-neon-purple/25 via-neon-blue/10 to-transparent", emoji: "📚", accent: "#6C5CE7" };
 
 export default function CoursesPage() {
   const supabase = createClient();
@@ -36,6 +42,7 @@ export default function CoursesPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadData() {
@@ -70,27 +77,77 @@ export default function CoursesPage() {
     return enrollments.find((e) => e.course_id === courseId);
   }
 
-  const categoryIcons: Record<string, string> = {
-    python: "🐍", programming: "💻", frontend: "⚛️",
-    computer_literacy: "🖥️", prompt_engineering: "🤖", algorithms: "🧠",
-  };
+  // Davom etayotgan kurslar (progress bor, tugallanmagan)
+  const continuing = enrollments
+    .filter(e => !e.is_completed && e.progress_percent > 0)
+    .map(e => ({ enrollment: e, course: courses.find(c => c.id === e.course_id) }))
+    .filter(x => x.course)
+    .slice(0, 3);
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Kurslar</h1>
-        <p className="text-muted-foreground">O'zingizga mos kursni tanlang va o'rganishni boshlang</p>
+      <motion.div
+        className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-neon-purple/[0.12] via-card/60 to-neon-blue/[0.08] p-7 md:p-9"
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-neon-purple/15 blur-[80px] pointer-events-none" />
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-semibold mb-3">
+            <Sparkles className="w-3.5 h-3.5" /> {courses.length} ta kurs mavjud
+          </div>
+          <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
+            Kurslar <span className="gradient-text">katalogi</span>
+          </h1>
+          <p className="text-muted-foreground max-w-lg">
+            O'zingizga mos kursni tanlang — interaktiv darslar, AI mentor va amaliy topshiriqlar bilan o'rganing.
+          </p>
+        </div>
       </motion.div>
+
+      {/* Davom etayotgan kurslar */}
+      {continuing.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <h2 className="font-display font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+            <Play className="w-4 h-4 text-neon-green" /> Davom ettirish
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {continuing.map(({ enrollment, course }) => (
+              <Link
+                key={enrollment.id}
+                href={`/courses/${course!.slug}`}
+                className="group relative overflow-hidden rounded-2xl border border-neon-green/20 bg-neon-green/[0.04] hover:bg-neon-green/[0.08] p-4 flex items-center gap-3.5 transition-all"
+              >
+                <div className="relative w-11 h-11 flex-shrink-0">
+                  <svg className="w-11 h-11 -rotate-90" viewBox="0 0 44 44">
+                    <circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" strokeWidth="4" className="text-border" />
+                    <circle
+                      cx="22" cy="22" r="19" fill="none" stroke="#00E676" strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray={`${(enrollment.progress_percent / 100) * 119.4} 119.4`}
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold font-mono">
+                    {enrollment.progress_percent}%
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-display font-semibold text-sm truncate group-hover:text-neon-green transition-colors">{course!.title}</p>
+                  <p className="text-[11px] text-muted-foreground">Qolgan joydan davom eting</p>
+                </div>
+                <ChevronRight className="w-4.5 h-4.5 text-muted-foreground group-hover:text-neon-green group-hover:translate-x-1 transition-all flex-shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Search & Filter */}
       <motion.div
-        className="flex flex-col md:flex-row gap-4"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        className="space-y-3"
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
       >
-        <div className="relative flex-1">
+        <div className="relative max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input
             type="text"
@@ -106,13 +163,13 @@ export default function CoursesPage() {
               key={cat.value}
               onClick={() => setCategory(cat.value)}
               className={cn(
-                "px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+                "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border",
                 category === cat.value
-                  ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20"
-                  : "bg-surface text-muted-foreground hover:bg-surface-hover border border-transparent"
+                  ? "bg-neon-purple/10 text-neon-purple border-neon-purple/30 shadow-lg shadow-neon-purple/10"
+                  : "bg-surface text-muted-foreground hover:bg-surface-hover border-transparent hover:border-border/60"
               )}
             >
-              {cat.label}
+              <span className="text-sm">{cat.icon}</span> {cat.label}
             </button>
           ))}
         </div>
@@ -120,9 +177,9 @@ export default function CoursesPage() {
 
       {/* Course Grid */}
       {loading ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="glass-card p-6 h-64 animate-pulse" />
+            <div key={i} className="glass-card h-72 animate-pulse" />
           ))}
         </div>
       ) : filteredCourses.length === 0 ? (
@@ -132,99 +189,113 @@ export default function CoursesPage() {
           <p className="text-muted-foreground">Qidiruv so'zini o'zgartiring yoki boshqa kategoriyani tanlang</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredCourses.map((course, i) => {
             const enrollment = getEnrollment(course.id);
-            const diffConfig = getDifficultyConfig(course.difficulty || 'beginner');
+            const diffConfig = getDifficultyConfig(course.difficulty || "beginner");
+            const style = categoryStyle[course.category] || defaultStyle;
 
             return (
               <motion.div
                 key={course.id}
-                custom={i}
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.4) }}
               >
                 <Link
                   href={`/courses/${course.slug}`}
-                  className="glass-card-hover p-6 flex flex-col h-full group block"
+                  className="group relative flex flex-col h-full rounded-3xl border border-border/50 bg-card/40 overflow-hidden hover:border-border hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1 transition-all duration-300 block"
                 >
-                  {/* Thumbnail / Icon */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-14 h-14 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-2xl flex-shrink-0">
-                      {categoryIcons[course.category] || "📚"}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-display font-bold text-lg truncate group-hover:text-neon-purple transition-colors">
-                        {course.title}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className={diffConfig.class}>{diffConfig.label}</span>
-                        {!course.is_free && (
-                          <span className="coin-badge text-[10px] py-0.5 px-2">
-                            <Coins className="w-3 h-3" />
-                            {course.price_coins}
-                          </span>
-                        )}
-                        {course.is_free && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neon-green/10 text-neon-green border border-neon-green/20">
-                            Bepul
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1 line-clamp-2">
-                    {course.description}
-                  </p>
-
-                  {/* Stats */}
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
-                    <span className="flex items-center gap-1">
-                      <BookOpen className="w-3.5 h-3.5" />
-                      {course.total_topics} mavzu
-                    </span>
-                    {course.estimated_hours && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        ~{course.estimated_hours} soat
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5" />
-                      {course.total_enrolled}
-                    </span>
-                  </div>
-
-                  {/* Progress or CTA */}
-                  {enrollment ? (
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-medium">
-                          {enrollment.is_completed ? (
-                            <span className="flex items-center gap-1 text-neon-green">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Tugatildi
-                            </span>
-                          ) : (
-                            "Davom etmoqda"
-                          )}
+                  {/* Cover band */}
+                  <div className={cn("relative h-28 bg-gradient-to-br flex items-end px-5 pb-3 overflow-hidden", style.gradient)}>
+                    {/* Pattern dots */}
+                    <div
+                      className="absolute inset-0 opacity-[0.15]"
+                      style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "16px 16px" }}
+                    />
+                    <div className="absolute top-3.5 right-4 flex gap-1.5">
+                      {course.is_free ? (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-green/15 text-neon-green border border-neon-green/25 backdrop-blur-sm">
+                          BEPUL
                         </span>
-                        <span className="text-xs text-muted-foreground font-mono">{enrollment.progress_percent}%</span>
-                      </div>
-                      <div className="w-full h-2 bg-border rounded-full overflow-hidden">
-                        <div className="h-full progress-gradient rounded-full" style={{ width: `${enrollment.progress_percent}%` }} />
-                      </div>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/15 text-neon-yellow border border-neon-yellow/25 backdrop-blur-sm">
+                          <Coins className="w-3 h-3" />{course.price_coins}
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-neon-purple group-hover:underline">
-                        {course.is_free ? "Boshlash" : "Ko'rish"}
+                    <div className="relative text-5xl drop-shadow-lg group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left">
+                      {style.emoji}
+                    </div>
+                    {enrollment?.is_completed && (
+                      <div className="absolute bottom-3 right-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-green text-background">
+                        <CheckCircle2 className="w-3 h-3" /> TUGATILDI
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Body */}
+                  <div className="flex flex-col flex-1 p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={diffConfig.class}>{diffConfig.label}</span>
+                      {course.average_rating > 0 && (
+                        <span className="inline-flex items-center gap-0.5 text-[11px] text-neon-yellow font-semibold">
+                          <Star className="w-3 h-3 fill-neon-yellow" /> {Number(course.average_rating).toFixed(1)}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-display font-bold text-lg leading-snug mb-2 group-hover:text-neon-purple transition-colors line-clamp-2">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1 line-clamp-2">
+                      {course.description}
+                    </p>
+
+                    {/* Stats */}
+                    <div className="flex items-center gap-3.5 text-[11px] text-muted-foreground mb-4">
+                      <span className="flex items-center gap-1">
+                        <Layers className="w-3.5 h-3.5" />{course.total_topics} dars
                       </span>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
+                      {course.estimated_hours && (
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />~{course.estimated_hours} soat
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5" />{course.total_enrolled}
+                      </span>
                     </div>
-                  )}
+
+                    {/* Progress yoki CTA */}
+                    {enrollment && !enrollment.is_completed ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xs font-medium text-neon-blue">Davom etmoqda</span>
+                          <span className="text-xs text-muted-foreground font-mono">{enrollment.progress_percent}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-border rounded-full overflow-hidden">
+                          <div className="h-full progress-gradient rounded-full transition-all" style={{ width: `${enrollment.progress_percent}%` }} />
+                        </div>
+                      </div>
+                    ) : enrollment?.is_completed ? (
+                      <div className="flex items-center justify-between text-neon-green text-sm font-medium">
+                        <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> 100% tugatildi</span>
+                        <ChevronRight className="w-4.5 h-4.5" />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold" style={{ color: style.accent }}>
+                          {course.is_free ? "Bepul boshlash" : "Batafsil ko'rish"}
+                        </span>
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center border transition-all group-hover:translate-x-1"
+                          style={{ borderColor: `${style.accent}40`, backgroundColor: `${style.accent}12` }}
+                        >
+                          <ChevronRight className="w-4 h-4" style={{ color: style.accent }} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </Link>
               </motion.div>
             );
