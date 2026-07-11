@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
 export const runtime = 'nodejs';
-// 5 daqiqa server cache — bosh sahifa statistikasi tez-tez o'zgarmaydi.
-// Bitta so'rov 6 ta alohida client-side roundtrip o'rnini bosadi.
-export const revalidate = 300;
+// 60s server cache — bitta so'rov 6 ta alohida client-side roundtrip
+// o'rnini bosadi. Admin kurs saqlaganda /api/revalidate orqali darhol
+// tozalanadi (pastga qarang).
+export const revalidate = 60;
 
 function anonClient() {
   return createServerClient(
@@ -47,11 +48,6 @@ export async function GET() {
         },
         courses: courseList.data || [],
         testimonials: testimonials.data || [],
-      },
-      {
-        headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
-        },
       },
     );
   } catch (error: any) {

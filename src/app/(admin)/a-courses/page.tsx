@@ -183,6 +183,8 @@ export default function AdminCoursesPage() {
     setShowForm(false);
     setSaving(false);
     loadCourses();
+    // Bosh sahifa/katalog cache'ini darhol tozalash
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
   }
 
   async function togglePublish(c: Course) {
@@ -192,6 +194,7 @@ export default function AdminCoursesPage() {
       .eq("id", c.id);
     toast.success(c.is_published ? "Kurs yashirildi" : "Kurs nashr qilindi");
     loadCourses();
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
   }
 
   async function handleDelete(c: Course) {
@@ -199,6 +202,7 @@ export default function AdminCoursesPage() {
     await supabase.from("courses").delete().eq("id", c.id);
     toast.success("Kurs o'chirildi");
     loadCourses();
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
   }
 
   const filtered = courses.filter((c) =>
