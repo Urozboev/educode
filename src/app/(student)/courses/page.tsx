@@ -243,11 +243,6 @@ export default function CoursesPage() {
                     {/* Shine sweep — hover'da yorug'lik o'tadi */}
                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
 
-                    {/* Kategoriya chip */}
-                    <div className="absolute top-3.5 left-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/45 text-white border border-white/15 backdrop-blur-md">
-                      {style.emoji} {categories.find(c => c.value === course.category)?.label || course.category}
-                    </div>
-
                     {/* Narx badge */}
                     <div className="absolute top-3.5 right-4 flex gap-1.5">
                       {course.is_free ? (
@@ -268,67 +263,81 @@ export default function CoursesPage() {
                     )}
                   </div>
 
-                  {/* Body */}
-                  <div className="flex flex-col flex-1 p-5">
-                    <div className="flex items-center gap-2 mb-2">
+                  {/* Body — toza, havodor uslub */}
+                  <div className="flex flex-col flex-1 p-5 md:p-6">
+                    {/* Daraja chipi */}
+                    <div className="mb-3">
                       <span className={diffConfig.class}>{diffConfig.label}</span>
-                      {course.average_rating > 0 && (
-                        <span className="inline-flex items-center gap-0.5 text-[11px] text-neon-yellow font-semibold">
-                          <Star className="w-3 h-3 fill-neon-yellow" /> {Number(course.average_rating).toFixed(1)}
-                        </span>
-                      )}
                     </div>
-                    <h3 className="font-display font-bold text-lg leading-snug mb-2 group-hover:text-neon-purple transition-colors line-clamp-2">
+
+                    <h3 className="font-display font-bold text-xl leading-snug mb-2 group-hover:text-neon-purple transition-colors line-clamp-2">
                       {course.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1 line-clamp-2">
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">
                       {course.description}
                     </p>
 
-                    {/* Stats */}
-                    <div className="flex items-center gap-3.5 text-[11px] text-muted-foreground mb-4">
-                      <span className="flex items-center gap-1">
+                    {/* Teglar (mono chiplar) */}
+                    {course.tags && course.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {course.tags.slice(0, 3).map(tag => (
+                          <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex-1" />
+
+                    {/* Statistika qatori */}
+                    <div className="flex items-center justify-between py-3 border-t border-border/50 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />{course.estimated_hours ? `${course.estimated_hours} soat` : "—"}
+                      </span>
+                      <span className="flex items-center gap-1.5">
                         <Layers className="w-3.5 h-3.5" />{course.total_topics} dars
                       </span>
-                      {course.estimated_hours && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />~{course.estimated_hours} soat
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" />{course.total_enrolled}
+                      <span className="flex items-center gap-1 font-semibold text-foreground">
+                        <Star className="w-3.5 h-3.5 text-neon-yellow fill-neon-yellow" />
+                        {course.average_rating > 0 ? Number(course.average_rating).toFixed(1) : "yangi"}
                       </span>
                     </div>
 
-                    {/* Progress yoki CTA */}
-                    {enrollment && !enrollment.is_completed ? (
-                      <div>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-xs font-medium text-neon-blue">Davom etmoqda</span>
-                          <span className="text-xs text-muted-foreground font-mono">{enrollment.progress_percent}%</span>
+                    {/* Pastki qator: narx / progress + Ko'rish */}
+                    <div className="pt-3 border-t border-border/50">
+                      {enrollment && !enrollment.is_completed ? (
+                        <div>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-xs font-semibold text-neon-blue">Davom etmoqda</span>
+                            <span className="text-xs text-muted-foreground font-mono">{enrollment.progress_percent}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-border rounded-full overflow-hidden">
+                            <div className="h-full progress-gradient rounded-full transition-all" style={{ width: `${enrollment.progress_percent}%` }} />
+                          </div>
                         </div>
-                        <div className="w-full h-2 bg-border rounded-full overflow-hidden">
-                          <div className="h-full progress-gradient rounded-full transition-all" style={{ width: `${enrollment.progress_percent}%` }} />
+                      ) : enrollment?.is_completed ? (
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-1.5 text-neon-green text-sm font-bold">
+                            <CheckCircle2 className="w-4 h-4" /> Tugatildi
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-green">
+                            Ko'rish <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </span>
                         </div>
-                      </div>
-                    ) : enrollment?.is_completed ? (
-                      <div className="flex items-center justify-between text-neon-green text-sm font-medium">
-                        <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> 100% tugatildi</span>
-                        <ChevronRight className="w-4.5 h-4.5" />
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold" style={{ color: style.accent }}>
-                          {course.is_free ? "Bepul boshlash" : "Batafsil ko'rish"}
-                        </span>
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center border transition-all group-hover:translate-x-1"
-                          style={{ borderColor: `${style.accent}40`, backgroundColor: `${style.accent}12` }}
-                        >
-                          <ChevronRight className="w-4 h-4" style={{ color: style.accent }} />
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <span className={cn("font-display font-bold text-base", course.is_free ? "text-neon-green" : "text-neon-yellow")}>
+                            {course.is_free ? "Bepul" : (
+                              <span className="inline-flex items-center gap-1"><Coins className="w-4 h-4" />{course.price_coins} coin</span>
+                            )}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 text-sm font-bold transition-all group-hover:gap-2.5" style={{ color: style.accent }}>
+                            <Play className="w-3.5 h-3.5" /> Ko'rish <ChevronRight className="w-4 h-4" />
+                          </span>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </Link>
               </motion.div>

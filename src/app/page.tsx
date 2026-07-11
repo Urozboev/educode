@@ -11,7 +11,7 @@ import {
   BookOpen, Terminal, Shield, Globe, ArrowRight, ArrowUpRight,
   LayoutDashboard, LogOut, Menu, X, Star, Quote, Moon, Sun,
   Sparkles, Play, CheckCircle2, GraduationCap, MessageCircle,
-  Cpu, Layers, Binary, Zap, Monitor, Plus
+  Cpu, Layers, Binary, Zap, Monitor, Plus, Clock
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 import { OrganizationJsonLd, WebsiteJsonLd, FaqJsonLd } from "@/components/seo/JsonLd";
@@ -975,13 +975,40 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <div className="p-5">
+                    <div className="p-5 md:p-6">
                       <h3 className="font-display font-bold text-lg leading-snug mb-1.5 group-hover:text-neon-purple transition-colors line-clamp-1">{c.title}</h3>
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{c.description}</p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{c.total_topics} mavzu · {c.total_enrolled} talaba</span>
-                        <span className="inline-flex items-center gap-1 font-semibold text-neon-purple opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all">
-                          Boshlash <ArrowUpRight className="w-3.5 h-3.5" />
+
+                      {/* Teglar */}
+                      {c.tags && c.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {c.tags.slice(0, 3).map((tag: string) => (
+                            <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Statistika qatori */}
+                      <div className="flex items-center justify-between py-3 border-t border-border/50 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5" />{c.estimated_hours ? `${c.estimated_hours} soat` : "—"}
+                        </span>
+                        <span>{c.total_topics} dars</span>
+                        <span className="flex items-center gap-1 font-semibold text-foreground">
+                          <Star className="w-3.5 h-3.5 text-neon-yellow fill-neon-yellow" />
+                          {c.average_rating > 0 ? Number(c.average_rating).toFixed(1) : "yangi"}
+                        </span>
+                      </div>
+
+                      {/* Pastki qator */}
+                      <div className="pt-3 border-t border-border/50 flex items-center justify-between">
+                        <span className={`font-display font-bold ${c.is_free ? "text-neon-green" : "text-neon-yellow"}`}>
+                          {c.is_free ? "Bepul" : `${c.price_coins} coin`}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple transition-all group-hover:gap-2.5">
+                          <Play className="w-3.5 h-3.5" /> Ko'rish <ArrowUpRight className="w-4 h-4" />
                         </span>
                       </div>
                     </div>
