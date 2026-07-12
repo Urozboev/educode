@@ -130,3 +130,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+// Diagnostika: Bunny sozlamalari to'g'ri kiritilganini tekshirish
+// Brauzerda oching: /api/video/token
+export async function GET() {
+  const libraryId = process.env.BUNNY_STREAM_LIBRARY_ID;
+  const tokenKey = process.env.BUNNY_STREAM_TOKEN_KEY;
+  return NextResponse.json({
+    route: '/api/video/token',
+    bunny: {
+      library_id: libraryId ? `OK (${libraryId})` : "YO'Q — BUNNY_STREAM_LIBRARY_ID .env.local da kiritilmagan",
+      token_key: tokenKey ? `OK (${tokenKey.slice(0, 6)}...)` : "YO'Q — BUNNY_STREAM_TOKEN_KEY .env.local da kiritilmagan",
+      ready: !!(libraryId && tokenKey),
+    },
+    eslatma: "Kalitlarni kiritgach dev serverni qayta ishga tushiring (Ctrl+C -> npm run dev)",
+  });
+}
