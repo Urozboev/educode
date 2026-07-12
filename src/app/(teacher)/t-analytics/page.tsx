@@ -4,13 +4,23 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatNumber, cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { BarChart3, Users, Target, TrendingUp, Brain, Activity } from "lucide-react";
+import { BarChart3, Users, Target, TrendingUp, Brain, Activity, ShieldAlert, BookOpen, ClipboardCheck } from "lucide-react";
+
+interface AiRow {
+  id: string; full_name: string;
+  dependency: number;      // AI bog'liqlik indeksi (0-100)
+  aiToday: number;
+  reflections: number;
+  pasteFlags: number;
+}
 
 export default function TeacherAnalyticsPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ students: 0, submissions: 0, accepted: 0, quizzes: 0, avgScore: 0 });
   const [topStudents, setTopStudents] = useState<any[]>([]);
+  const [aiRows, setAiRows] = useState<AiRow[]>([]);
+  const [aiAgg, setAiAgg] = useState({ avgDep: 0, reflTotal: 0, pasteTotal: 0 });
 
   useEffect(() => {
     (async () => {
@@ -32,12 +42,51 @@ export default function TeacherAnalyticsPage() {
 
         setStats({ students: ids.length, submissions: subs.count || 0, accepted: accepted.count || 0, quizzes: quizzes.count || 0, avgScore: avg });
 
-        const { data: top } = await supabase.from("profiles").select("id, full_name, xp, level").in("id", ids).order("xp", { ascending: false }).limit(5);
-        if (top) setTopStudents(top);
+        const { data: top } = await supabase.from("profiles").select("id, full_name, xp, level, ai_dependency_score").in("id", ids).order("xp", { ascending: false });
+        if (top) setTopStudents(top.slice(0, 5));
+
+        // ===== AI / Cognitive Safeguards tahlili (dissertatsiya ma'lumotlari) =====
+        const today = new Date().toISOString().slice(0, 10);
+        const [usageToday, refl, pastes] = await Promise.all([
+          supabase.from("ai_usage_daily").select("user_id, total_queries").in("user_id", ids).eq("date", today),
+          supabase.from("reflection_journals").select("user_id").in("user_id", ids),
+          supabase.from("code_snapshots").select("user_id").in("user_id", ids).eq("paste_detected", true),
+        ]);
+        const countBy = (arr: any[] | null, key = "user_id") => {
+          const m: Record<string, number> = {};
+          (arr || []).forEach(r => { m[r[key]] = (m[r[key]] || 0) + 1; });
+          return m;
+        };
+        const usageMap: Record<string, number> = {};
+        (usageToday.data || []).forEach((r: any) => { usageMap[r.user_id] = r.total_queries; });
+        const reflMap = countBy(refl.data);
+        const pasteMap = countBy(pastes.data);
+
+        const rows: AiRow[] = (top || []).map((s: any) => ({
+          id: s.id,
+          full_name: s.full_name,
+          dependency: Math.round(Number(s.ai_dependency_score) || 0),
+          aiToday: usageMap[s.id] || 0,
+          reflections: reflMap[s.id] || 0,
+          pasteFlags: pasteMap[s.id] || 0,
+        })).sort((a, b) => b.dependency - a.dependency);
+        setAiRows(rows);
+
+        const avgDep = rows.length ? Math.round(rows.reduce((s, r) => s + r.dependency, 0) / rows.length) : 0;
+        setAiAgg({
+          avgDep,
+          reflTotal: (refl.data || []).length,
+          pasteTotal: (pastes.data || []).length,
+        });
       }
       setLoading(false);
     })();
   }, []);
+
+  const depZone = (d: number) => d <= 30 ? { c: "text-neon-green", b: "bg-neon-green" }
+    : d <= 60 ? { c: "text-neon-yellow", b: "bg-neon-yellow" }
+    : d <= 80 ? { c: "text-orange-400", b: "bg-orange-500" }
+    : { c: "text-neon-red", b: "bg-neon-red" };
 
   const cards = [
     { label: "Talabalar", value: stats.students, icon: Users, color: "#6C5CE7" },
@@ -84,6 +133,87 @@ export default function TeacherAnalyticsPage() {
             </div>
             <p className="text-right text-xs text-muted-foreground mt-1">{Math.round((stats.accepted / stats.submissions) * 100)}%</p>
           </div>
+        )}
+      </motion.div>
+
+      {/* ===== AI FOYDALANISH TAHLILI (Cognitive Safeguards) ===== */}
+      <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Brain className="w-5 h-5 text-neon-purple" />
+          <h2 className="font-display font-semibold text-lg">AI foydalanish tahlili</h2>
+        </div>
+        <p className="text-xs text-muted-foreground mb-5">
+          Talabalarning AI mentordan foydalanishi, mustaqil tafakkur va akademik halollik ko'rsatkichlari.
+        </p>
+
+        {/* Agregat kartalar */}
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          <div className="p-4 rounded-xl bg-surface/50 text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1"><Activity className="w-4 h-4 text-neon-purple" /></div>
+            <div className={cn("font-display font-bold text-2xl", depZone(aiAgg.avgDep).c)}>{aiAgg.avgDep}%</div>
+            <div className="text-[11px] text-muted-foreground">o'rtacha AI bog'liqlik</div>
+          </div>
+          <div className="p-4 rounded-xl bg-surface/50 text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1"><BookOpen className="w-4 h-4 text-neon-green" /></div>
+            <div className="font-display font-bold text-2xl text-neon-green">{aiAgg.reflTotal}</div>
+            <div className="text-[11px] text-muted-foreground">refleksiya yozuvi</div>
+          </div>
+          <div className="p-4 rounded-xl bg-surface/50 text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1"><ShieldAlert className="w-4 h-4 text-neon-red" /></div>
+            <div className="font-display font-bold text-2xl text-neon-red">{aiAgg.pasteTotal}</div>
+            <div className="text-[11px] text-muted-foreground">paste ogohlantirishi</div>
+          </div>
+        </div>
+
+        {/* Talabalar jadvali */}
+        {aiRows.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[11px] text-muted-foreground uppercase tracking-wider border-b border-border/50">
+                  <th className="text-left font-medium py-2">Talaba</th>
+                  <th className="text-center font-medium py-2">AI bog'liqlik</th>
+                  <th className="text-center font-medium py-2">Bugun AI</th>
+                  <th className="text-center font-medium py-2">Refleksiya</th>
+                  <th className="text-center font-medium py-2">Paste</th>
+                </tr>
+              </thead>
+              <tbody>
+                {aiRows.map(r => {
+                  const z = depZone(r.dependency);
+                  return (
+                    <tr key={r.id} className="border-b border-border/30 last:border-0">
+                      <td className="py-2.5 font-medium">{r.full_name}</td>
+                      <td className="py-2.5">
+                        <div className="flex items-center gap-2 justify-center">
+                          <div className="w-16 h-1.5 bg-border rounded-full overflow-hidden">
+                            <div className={cn("h-full rounded-full", z.b)} style={{ width: `${Math.min(100, r.dependency)}%` }} />
+                          </div>
+                          <span className={cn("text-xs font-semibold tabular-nums", z.c)}>{r.dependency}%</span>
+                        </div>
+                      </td>
+                      <td className="py-2.5 text-center text-muted-foreground">{r.aiToday}</td>
+                      <td className="py-2.5 text-center">
+                        {r.reflections > 0
+                          ? <span className="inline-flex items-center gap-1 text-neon-green text-xs"><ClipboardCheck className="w-3.5 h-3.5" />{r.reflections}</span>
+                          : <span className="text-muted-foreground/40 text-xs">—</span>}
+                      </td>
+                      <td className="py-2.5 text-center">
+                        {r.pasteFlags > 0
+                          ? <span className="inline-flex items-center gap-1 text-neon-red text-xs font-semibold"><ShieldAlert className="w-3.5 h-3.5" />{r.pasteFlags}</span>
+                          : <span className="text-neon-green/60 text-xs">✓</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <p className="text-[11px] text-muted-foreground mt-3">
+              💡 AI bog'liqlik &le;30% — sog'lom, 61%+ — e'tibor talab qiladi. Paste ogohlantirishlari akademik halollik uchun.
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground text-center py-6">Ma'lumot yig'ilmoqda — talabalar darslarni boshlagach ko'rsatkichlar paydo bo'ladi.</p>
         )}
       </motion.div>
     </div>
