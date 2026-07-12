@@ -8,6 +8,8 @@ import type { Course, Topic, Quiz, TopicTask, CourseSection, VideoProvider } fro
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import slugify from "slugify";
+import dynamic from "next/dynamic";
+const RichTextEditor = dynamic(() => import("@/components/editor/RichTextEditor"), { ssr: false });
 import {
   ArrowLeft, Plus, Pencil, Trash2, Save, X, Loader2, Video, FileText,
   ChevronUp, ChevronDown, ClipboardList, Code2, Sparkles, Brain, ChevronRight,
@@ -551,16 +553,19 @@ export default function AdminTopicsPage() {
                 <input value={topicForm.title} onChange={e => setTopicForm({ ...topicForm, title: e.target.value })} className="input-field" placeholder="O'zgaruvchilar va ma'lumot turlari" />
               </div>
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-medium">Ma'ruza matni (HTML)</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-sm font-medium">Dars matni</label>
                   <button onClick={() => aiGenerate('lecture')} disabled={!topicForm.title || aiGenerating === 'lecture'}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 disabled:opacity-50 transition-all">
                     {aiGenerating === 'lecture' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                     AI bilan yaratish
                   </button>
                 </div>
-                <textarea value={topicForm.content_html} onChange={e => setTopicForm({ ...topicForm, content_html: e.target.value })}
-                  className="input-field min-h-[250px] font-mono text-sm" placeholder="<h2>Sarlavha</h2><p>Matn...</p>" />
+                <RichTextEditor
+                  value={topicForm.content_html}
+                  onChange={(html) => setTopicForm(f => ({ ...f, content_html: html }))}
+                  placeholder="Matnni yozing — qalin, kursiv, sarlavha, ro'yxat, havola va rasm qo'shishingiz mumkin..."
+                />
               </div>
               {/* Bo'lim va free preview */}
               <div className="grid md:grid-cols-2 gap-4">
