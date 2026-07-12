@@ -43,6 +43,24 @@ export default function AdminTopicsPage() {
   const [savingTopic, setSavingTopic] = useState(false);
   const [aiGenerating, setAiGenerating] = useState<string | null>(null);
 
+  // Bunny video ro'yxati (GUID tanlash uchun)
+  const [bunnyVideos, setBunnyVideos] = useState<{ guid: string; title: string; status: string; minutes: number }[]>([]);
+  const [bunnyLoading, setBunnyLoading] = useState(false);
+
+  async function loadBunnyVideos() {
+    setBunnyLoading(true);
+    try {
+      const res = await fetch("/api/admin/bunny-videos");
+      const data = await res.json();
+      if (data.error) { toast.error(data.error); setBunnyLoading(false); return; }
+      setBunnyVideos(data.videos || []);
+      if ((data.videos || []).length === 0) toast.info("Kutubxonada video topilmadi");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+    setBunnyLoading(false);
+  }
+
   // Batch (to'plu) AI generatsiya
   const [batchOpen, setBatchOpen] = useState(false);
   const [batchRunning, setBatchRunning] = useState(false);
@@ -587,10 +605,35 @@ export default function AdminTopicsPage() {
                        topicForm.video_provider === "cloudflare" ? "Cloudflare Video ID" :
                        topicForm.video_provider === "vimeo" ? "Vimeo Video ID" : "Video ID (ixtiyoriy)"}
                     </label>
-                    <input value={topicForm.video_id} onChange={e => setTopicForm({ ...topicForm, video_id: e.target.value })}
-                      className="input-field text-sm font-mono" placeholder={topicForm.video_provider === "bunny" ? "e3f5a-...-9b2c" : ""} />
+                    <div className="flex gap-2">
+                      <input value={topicForm.video_id} onChange={e => setTopicForm({ ...topicForm, video_id: e.target.value })}
+                        className="input-field text-sm font-mono flex-1" placeholder={topicForm.video_provider === "bunny" ? "e3f5a-...-9b2c" : ""} />
+                      {topicForm.video_provider === "bunny" && (
+                        <button type="button" onClick={loadBunnyVideos} disabled={bunnyLoading}
+                          className="px-3 py-2 rounded-xl text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 disabled:opacity-50 whitespace-nowrap">
+                          {bunnyLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin inline" /> : "Ro'yxatdan tanlash"}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Bunny video ro'yxati */}
+                {bunnyVideos.length > 0 && topicForm.video_provider === "bunny" && (
+                  <div className="max-h-48 overflow-y-auto space-y-1 border border-border/50 rounded-xl p-2 bg-surface/30">
+                    {bunnyVideos.map(v => (
+                      <button key={v.guid} type="button"
+                        onClick={() => { setTopicForm(f => ({ ...f, video_id: v.guid })); setBunnyVideos([]); }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-xs hover:bg-neon-blue/10 transition-colors">
+                        <Video className="w-3.5 h-3.5 text-neon-blue flex-shrink-0" />
+                        <span className="flex-1 truncate font-medium">{v.title}</span>
+                        <span className={cn("text-[10px]", v.status === "tayyor" ? "text-neon-green" : "text-neon-yellow")}>{v.status}</span>
+                        <span className="text-[10px] text-muted-foreground">{v.minutes} daq</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {(topicForm.video_provider === "youtube" || topicForm.video_provider === "direct") && (
                   <div>
                     <label className="text-xs font-medium mb-1 block text-muted-foreground">Video URL (eski usul)</label>
@@ -599,7 +642,7 @@ export default function AdminTopicsPage() {
                 )}
                 {topicForm.video_provider === "bunny" && (
                   <p className="text-[11px] text-muted-foreground">
-                    💡 Videoni Bunny Stream dashboard'ga yuklang, GUID'ni shu yerga qo'ying. Token himoyasi avtomatik ishlaydi.
+                    💡 Videoni Bunny Stream dashboard'ga yuklang, keyin "Ro'yxatdan tanlash" bosing yoki GUID'ni qo'lda kiriting.
                   </p>
                 )}
               </div>
