@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: [
           "/",
           "/explore/",
+          "/blog/",             // blog maqolalari
           "/courses/",          // /courses/[slug] — public preview
           "/challenges/",       // /challenges/[slug] — public preview
         ],

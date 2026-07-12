@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   // OMMAVIY SAHIFALAR — hech narsa qilinmaydi
   // ============================================
   const publicPaths = ['/', '/login', '/register', '/forgot-password', '/verify-email', '/playground'];
-  const isPublicPrefix = pathname.startsWith('/explore');
+  const isPublicPrefix = pathname.startsWith('/explore') || pathname.startsWith('/blog');
 
   // Public preview sahifalari (login talab qilmaydi):
   // /courses/[slug] — kurs mundarijasi

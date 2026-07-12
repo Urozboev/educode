@@ -57,6 +57,24 @@ export interface Course {
 
 export type VideoProvider = 'youtube' | 'bunny' | 'cloudflare' | 'vimeo' | 'direct';
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content_html: string | null;
+  cover_url: string | null;
+  tags: string[];
+  category: string;
+  author_name: string;
+  reading_minutes: number;
+  views: number;
+  is_published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CourseSection {
   id: string;
   course_id: string;

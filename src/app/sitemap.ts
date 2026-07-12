@@ -25,9 +25,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/explore/courses`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/explore/challenges`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/explore/games`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
   ];
 
   // 2) Dinamik mazmun
+  let blog: Item[] = [];
   let courses: Item[] = [];
   let challenges: Item[] = [];
   let topics: Item[] = [];
@@ -87,9 +89,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
     }
+
+    // Blog maqolalari
+    const { data: blogRows } = await supabase
+      .from("blog_posts")
+      .select("slug, updated_at")
+      .eq("is_published", true);
+    if (blogRows) {
+      blog = blogRows.map((b: any) => ({
+        url: `${SITE_URL}/blog/${b.slug}`,
+        lastModified: b.updated_at ? new Date(b.updated_at) : now,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }));
+    }
   } catch (e) {
     console.warn("[sitemap] Supabase fetch failed:", e);
   }
 
-  return [...staticRoutes, ...courses, ...challenges, ...topics];
+  return [...staticRoutes, ...courses, ...challenges, ...topics, ...blog];
 }

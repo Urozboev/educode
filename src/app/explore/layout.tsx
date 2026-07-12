@@ -14,6 +14,7 @@ const navLinks = [
   { href: "/explore/challenges", label: "Topshiriqlar" },
   { href: "/playground", label: "Playground" },
   { href: "/explore/games", label: "O'yinlar" },
+  { href: "/blog", label: "Blog" },
   { href: "/explore/about", label: "Platforma haqida" },
 ];
 

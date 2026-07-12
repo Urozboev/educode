@@ -11,6 +11,13 @@ const nextConfig = {
     serverActions: { bodySizeLimit: '10mb' },
     optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
   },
+  // Qisqa /blog URL — kontent /explore/blog dan (explore navbar bilan)
+  async rewrites() {
+    return [
+      { source: '/blog', destination: '/explore/blog' },
+      { source: '/blog/:slug', destination: '/explore/blog/:slug' },
+    ];
+  },
   // Sahifalar tezligi
   poweredByHeader: false,
   compress: true,
