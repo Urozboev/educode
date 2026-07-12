@@ -80,89 +80,103 @@ export default function CertificatePage() {
 
       {/* Certificate */}
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
-        <div ref={certRef} className="relative bg-white rounded-2xl overflow-hidden shadow-2xl" style={{ aspectRatio: "1.414/1" }}>
-          {/* Background pattern */}
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50" />
-            {/* Border decoration */}
-            <div className="absolute inset-4 border-2 border-gray-200 rounded-xl" />
-            <div className="absolute inset-5 border border-gray-100 rounded-lg" />
-            {/* Corner decorations */}
-            <svg className="absolute top-6 left-6 w-16 h-16 text-purple-200" viewBox="0 0 64 64"><path d="M0 0 L64 0 L64 8 L8 8 L8 64 L0 64 Z" fill="currentColor" /></svg>
-            <svg className="absolute top-6 right-6 w-16 h-16 text-blue-200" viewBox="0 0 64 64"><path d="M0 0 L64 0 L64 64 L56 64 L56 8 L0 8 Z" fill="currentColor" /></svg>
-            <svg className="absolute bottom-6 left-6 w-16 h-16 text-blue-200" viewBox="0 0 64 64"><path d="M0 0 L8 0 L8 56 L64 56 L64 64 L0 64 Z" fill="currentColor" /></svg>
-            <svg className="absolute bottom-6 right-6 w-16 h-16 text-purple-200" viewBox="0 0 64 64"><path d="M56 0 L64 0 L64 64 L0 64 L0 56 L56 56 Z" fill="currentColor" /></svg>
-          </div>
+        <div ref={certRef} className="relative overflow-hidden shadow-2xl" style={{ aspectRatio: "1.414/1", background: "#fffdf7", borderRadius: "8px" }}>
+          {/* Fon: nozik guilloche naqsh + burchak gradientlari */}
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 15% 15%, rgba(108,92,231,0.06), transparent 45%), radial-gradient(circle at 85% 85%, rgba(0,120,200,0.06), transparent 45%), #fffdf7" }} />
+          <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: "repeating-linear-gradient(45deg, #6C5CE7 0, #6C5CE7 1px, transparent 1px, transparent 11px)" }} />
 
-          {/* Content */}
-          <div className="relative flex flex-col items-center justify-center h-full px-12 py-10 text-center">
-            {/* Logo */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
-                </svg>
+          {/* Oltin ikki qavatli ramka */}
+          <div style={{ position: "absolute", inset: "18px", border: "2px solid #c9a227", borderRadius: "4px" }} />
+          <div style={{ position: "absolute", inset: "24px", border: "1px solid #e3c96b", borderRadius: "2px" }} />
+
+          {/* Burchak bezaklari (oltin) */}
+          {[
+            { t: "26px", l: "26px", r: "rotate(0deg)" },
+            { t: "26px", right: "26px", r: "rotate(90deg)" },
+            { bottom: "26px", l: "26px", r: "rotate(270deg)" },
+            { bottom: "26px", right: "26px", r: "rotate(180deg)" },
+          ].map((c, i) => (
+            <svg key={i} width="46" height="46" viewBox="0 0 46 46" style={{ position: "absolute", top: c.t as any, left: c.l as any, right: (c as any).right, bottom: (c as any).bottom, transform: c.r }}>
+              <path d="M2 2 L2 22 M2 2 L22 2 M2 2 Q22 6 24 24" stroke="#c9a227" strokeWidth="1.5" fill="none" />
+              <circle cx="2" cy="2" r="2.5" fill="#c9a227" />
+            </svg>
+          ))}
+
+          {/* Kontent */}
+          <div className="relative flex flex-col items-center h-full text-center" style={{ padding: "52px 64px 40px" }}>
+            {/* Brend */}
+            <div className="flex items-center gap-2" style={{ marginBottom: "18px" }}>
+              <div style={{ width: "34px", height: "34px", borderRadius: "9px", background: "linear-gradient(135deg,#6C5CE7,#00A8E8)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
               </div>
-              <span style={{ fontFamily: "Georgia, serif", fontSize: "18px", fontWeight: "bold", color: "#6C5CE7" }}>EduCode</span>
+              <span style={{ fontFamily: "Georgia, serif", fontSize: "17px", fontWeight: "bold", letterSpacing: "1px", color: "#1a1a2e" }}>EduCode</span>
             </div>
 
-            {/* Title */}
-            <h1 style={{ fontFamily: "Georgia, serif", fontSize: "36px", fontWeight: "bold", color: "#1a1a2e", marginBottom: "8px", letterSpacing: "3px" }}>
+            {/* Sarlavha */}
+            <h1 style={{ fontFamily: "Georgia, serif", fontSize: "40px", fontWeight: "bold", color: "#1a1a2e", letterSpacing: "8px", marginBottom: "4px" }}>
               SERTIFIKAT
             </h1>
-            <div style={{ width: "200px", height: "2px", background: "linear-gradient(90deg, transparent, #6C5CE7, transparent)", marginBottom: "24px" }} />
+            <p style={{ fontSize: "11px", color: "#c9a227", letterSpacing: "4px", fontWeight: 600, marginBottom: "20px" }}>MUVAFFAQIYATLI TUGATGANLIK</p>
 
-            {/* Description */}
-            <p style={{ fontSize: "14px", color: "#666", marginBottom: "12px" }}>Ushbu sertifikat</p>
+            <p style={{ fontSize: "13px", color: "#777", marginBottom: "10px" }}>Ushbu sertifikat</p>
 
-            {/* Name */}
-            <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "bold", color: "#6C5CE7", marginBottom: "12px", borderBottom: "2px solid #6C5CE7", paddingBottom: "8px", display: "inline-block" }}>
+            {/* Ism */}
+            <h2 style={{ fontFamily: "Georgia, serif", fontSize: "34px", fontWeight: "bold", color: "#6C5CE7", marginBottom: "6px", lineHeight: 1.1 }}>
               {cert.full_name}
             </h2>
+            <div style={{ width: "260px", height: "1.5px", background: "linear-gradient(90deg, transparent, #c9a227, transparent)", marginBottom: "16px" }} />
 
-            {/* Course info */}
-            <p style={{ fontSize: "14px", color: "#666", marginBottom: "6px" }}>tomonidan</p>
-            <h3 style={{ fontFamily: "Georgia, serif", fontSize: "22px", fontWeight: "600", color: "#1a1a2e", marginBottom: "24px" }}>
+            <p style={{ fontSize: "13px", color: "#777", marginBottom: "8px" }}>quyidagi kursni muvaffaqiyatli tamomlaganini tasdiqlaydi:</p>
+            <h3 style={{ fontFamily: "Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#1a1a2e", marginBottom: "14px", maxWidth: "80%" }}>
               &ldquo;{cert.course_title}&rdquo;
             </h3>
-            <p style={{ fontSize: "14px", color: "#666", marginBottom: "6px" }}>kursi muvaffaqiyatli tugatilganligini tasdiqlaydi</p>
 
-            {/* Score */}
-            {cert.score_percentage && (
-              <div style={{ background: "#f0f0ff", borderRadius: "12px", padding: "8px 24px", marginTop: "8px", marginBottom: "16px" }}>
-                <span style={{ fontSize: "14px", color: "#6C5CE7", fontWeight: "600" }}>
-                  O'rtacha ball: {cert.score_percentage}%
-                </span>
+            {cert.score_percentage != null && cert.score_percentage > 0 && (
+              <div style={{ background: "linear-gradient(135deg, #6C5CE710, #00A8E810)", border: "1px solid #6C5CE730", borderRadius: "999px", padding: "5px 20px", marginBottom: "auto" }}>
+                <span style={{ fontSize: "13px", color: "#6C5CE7", fontWeight: 700 }}>O&apos;rtacha ball: {cert.score_percentage}%</span>
               </div>
             )}
 
-            {/* Date and Number */}
-            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: "500px", marginTop: "auto", paddingTop: "24px" }}>
-              <div style={{ textAlign: "left" }}>
-                <p style={{ fontSize: "11px", color: "#999", marginBottom: "4px" }}>SANA</p>
-                <p style={{ fontSize: "14px", color: "#333", fontWeight: "500" }}>{formatDate(cert.completion_date)}</p>
+            {/* Pastki qator: sana | muhr | imzo */}
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", width: "100%", maxWidth: "560px", marginTop: "auto", paddingTop: "20px" }}>
+              {/* Sana */}
+              <div style={{ textAlign: "center", flex: 1 }}>
+                <p style={{ fontSize: "13px", color: "#333", fontWeight: 600, fontFamily: "Georgia, serif", borderBottom: "1px solid #999", paddingBottom: "3px", marginBottom: "4px" }}>{formatDate(cert.completion_date)}</p>
+                <p style={{ fontSize: "10px", color: "#999", letterSpacing: "1px" }}>SANA</p>
               </div>
-              <div style={{ textAlign: "center" }}>
-                {/* Medal */}
-                <svg width="48" height="48" viewBox="0 0 48 48">
-                  <circle cx="24" cy="20" r="16" fill="#FFD600" opacity="0.15" />
-                  <circle cx="24" cy="20" r="12" fill="#FFD600" opacity="0.25" />
-                  <circle cx="24" cy="20" r="8" fill="#FFD600" opacity="0.4" />
-                  <text x="24" y="24" textAnchor="middle" fill="#b8860b" fontSize="12" fontWeight="bold">★</text>
-                  <polygon points="20,32 24,36 28,32 26,44 24,40 22,44" fill="#6C5CE7" opacity="0.3" />
+
+              {/* Oltin muhr-medal */}
+              <div style={{ flex: "0 0 auto", margin: "0 24px" }}>
+                <svg width="76" height="76" viewBox="0 0 76 76">
+                  <circle cx="38" cy="34" r="26" fill="none" stroke="#c9a227" strokeWidth="1" strokeDasharray="2 3" />
+                  <circle cx="38" cy="34" r="22" fill="url(#gold)" />
+                  <circle cx="38" cy="34" r="22" fill="none" stroke="#a5811a" strokeWidth="1.5" />
+                  <circle cx="38" cy="34" r="16" fill="none" stroke="#fff5d6" strokeWidth="1" opacity="0.7" />
+                  <text x="38" y="41" textAnchor="middle" fill="#7a5c10" fontSize="20" fontWeight="bold">★</text>
+                  {/* Lenta */}
+                  <path d="M28 52 L28 72 L38 65 L48 72 L48 52 Z" fill="#6C5CE7" />
+                  <path d="M28 52 L28 60 L38 55 L48 60 L48 52 Z" fill="#5847c4" />
+                  <defs>
+                    <radialGradient id="gold" cx="0.4" cy="0.35">
+                      <stop offset="0%" stopColor="#ffe89a" />
+                      <stop offset="60%" stopColor="#e3c96b" />
+                      <stop offset="100%" stopColor="#c9a227" />
+                    </radialGradient>
+                  </defs>
                 </svg>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <p style={{ fontSize: "11px", color: "#999", marginBottom: "4px" }}>SERTIFIKAT RAQAMI</p>
-                <p style={{ fontSize: "12px", color: "#333", fontFamily: "monospace" }}>{cert.certificate_number}</p>
+
+              {/* Imzo */}
+              <div style={{ textAlign: "center", flex: 1 }}>
+                <p style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: "17px", color: "#1a1a2e", borderBottom: "1px solid #999", paddingBottom: "3px", marginBottom: "4px" }}>EduCode</p>
+                <p style={{ fontSize: "10px", color: "#999", letterSpacing: "1px" }}>PLATFORMA</p>
               </div>
             </div>
 
-            {/* Footer */}
-            <div style={{ width: "100%", borderTop: "1px solid #e0e0e0", paddingTop: "12px", marginTop: "16px" }}>
-              <p style={{ fontSize: "10px", color: "#aaa" }}>
-                EduCode Platform — Raqamli intellektual ta'lim platformasi · malla.uz
-              </p>
+            {/* Footer: raqam + verifikatsiya */}
+            <div style={{ width: "100%", borderTop: "1px solid #e8e2cf", paddingTop: "10px", marginTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <p style={{ fontSize: "10px", color: "#999", fontFamily: "monospace" }}>№ {cert.certificate_number}</p>
+              <p style={{ fontSize: "10px", color: "#aaa" }}>malla.uz — Raqamli intellektual ta&apos;lim platformasi</p>
             </div>
           </div>
         </div>
