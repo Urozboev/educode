@@ -317,10 +317,14 @@ export default function TopicPage() {
             className="prose prose-invert prose-purple max-w-none
               prose-headings:font-display prose-headings:tracking-tight
               prose-p:text-[16px] prose-p:text-muted-foreground prose-p:leading-relaxed
-              prose-a:text-neon-purple prose-strong:text-foreground
-              prose-code:text-neon-green prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+              prose-a:text-neon-purple prose-a:font-medium hover:prose-a:underline
+              prose-strong:text-foreground
+              prose-code:text-neon-green prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
               prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border prose-pre:overflow-x-auto
-              prose-li:text-muted-foreground"
+              prose-li:text-muted-foreground prose-li:marker:text-neon-purple/60
+              prose-img:rounded-2xl prose-img:border prose-img:border-border/60 prose-img:shadow-lg prose-img:mx-auto
+              prose-blockquote:border-l-neon-purple prose-blockquote:bg-neon-purple/[0.04] prose-blockquote:rounded-r-xl prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:text-muted-foreground
+              prose-hr:border-border/60"
             dangerouslySetInnerHTML={{ __html: topic.content_html }}
           />
         </motion.div>
