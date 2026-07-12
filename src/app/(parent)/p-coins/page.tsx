@@ -27,6 +27,7 @@ export default function ParentCoinsPage() {
   const [selectedPkg, setSelectedPkg] = useState<Pkg | null>(null);
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [payingProvider, setPayingProvider] = useState<"payme" | "click" | null>(null);
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -72,6 +73,28 @@ export default function ParentCoinsPage() {
     toast.success("So'rov yuborildi! Admin tasdiqlagach coinlar hisobingizga tushadi.");
     setSelectedPkg(null); setNote("");
     load();
+  }
+
+  async function payOnline(provider: "payme" | "click") {
+    if (!selectedPkg) return;
+    setPayingProvider(provider);
+    try {
+      const res = await fetch("/api/payments/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount_coins: selectedPkg.coins, amount_uzs: selectedPkg.uzs, provider }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; // provayder to'lov sahifasiga o'tish
+      } else {
+        toast.error(data.error || "To'lov tizimi sozlanmagan");
+        setPayingProvider(null);
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+      setPayingProvider(null);
+    }
   }
 
   const statusBadge = (s: string) => {
@@ -124,6 +147,30 @@ export default function ParentCoinsPage() {
         {selectedPkg && (
           <motion.div className="p-4 rounded-2xl bg-surface/50 border border-border space-y-4"
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
+
+            {/* Onlayn to'lov — Payme / Click */}
+            <div>
+              <p className="text-sm font-semibold mb-2 flex items-center gap-2"><CreditCard className="w-4 h-4 text-neon-green" /> Onlayn to'lov (darhol)</p>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button onClick={() => payOnline("payme")} disabled={payingProvider !== null}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#33b0b9]/40 bg-[#33b0b9]/10 hover:bg-[#33b0b9]/20 font-bold text-sm transition-all disabled:opacity-50" style={{ color: "#33b0b9" }}>
+                  {payingProvider === "payme" ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Payme
+                </button>
+                <button onClick={() => payOnline("click")} disabled={payingProvider !== null}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#00A0E3]/40 bg-[#00A0E3]/10 hover:bg-[#00A0E3]/20 font-bold text-sm transition-all disabled:opacity-50" style={{ color: "#00A0E3" }}>
+                  {payingProvider === "click" ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Click
+                </button>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-2">To'langach coinlar avtomatik hisobingizga tushadi.</p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-[11px] text-muted-foreground">yoki karta orqali (qo'lda)</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+
+            {/* Qo'lda — karta o'tkazma + admin tasdiq */}
             <div className="flex items-start gap-3 p-3 rounded-xl bg-neon-blue/5 border border-neon-blue/20">
               <CreditCard className="w-5 h-5 text-neon-blue flex-shrink-0 mt-0.5" />
               <div className="flex-1 text-sm">
