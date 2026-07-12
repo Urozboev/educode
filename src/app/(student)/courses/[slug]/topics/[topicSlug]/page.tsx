@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   Clock,
   Coins,
+  Lock,
 } from "lucide-react";
 import { cn, formatDuration } from "@/lib/utils";
 import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
@@ -36,6 +37,11 @@ export default function TopicPage() {
   const [userId, setUserId] = useState("");
   const [showReflection, setShowReflection] = useState(false);
   const [reflectionDone, setReflectionDone] = useState(false);
+  const [watchFrac, setWatchFrac] = useState(0); // video ko'rish ulushi (0–1)
+
+  // Video bor va yetarlicha ko'rilganmi (90%+)? — "Ko'rdim" tugmasi shunga bog'liq
+  const hasVideo = !!(topic?.video_url || topic?.video_id);
+  const videoWatched = !hasVideo || watchFrac >= 0.9 || !!progress?.video_watched;
 
   useEffect(() => {
     loadTopic();
@@ -110,6 +116,16 @@ export default function TopicPage() {
 
     setLoading(false);
   }
+
+  // Zaxira: agar video bor-u, 45 soniyada player.js'dan hech progress kelmasa
+  // (ehtimol brauzer/pleyer hodisalarni bermayapti), tugmani qulfdan chiqaramiz.
+  useEffect(() => {
+    if (!hasVideo || progress?.video_watched) return;
+    const t = setTimeout(() => {
+      setWatchFrac(prev => (prev < 0.05 ? 0.9 : prev));
+    }, 45000);
+    return () => clearTimeout(t);
+  }, [hasVideo, progress?.video_watched, topic?.id]);
 
   // Mavzu tugatilganda refleksiya modal'ni avtomatik ochish
   useEffect(() => {
@@ -194,15 +210,18 @@ export default function TopicPage() {
       >
         <button
           onClick={markContentRead}
-          disabled={progress?.content_read}
+          disabled={progress?.content_read || !videoWatched}
+          title={!videoWatched ? "Avval videoni oxirigacha ko'ring" : undefined}
           className={cn(
             "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border",
             progress?.content_read
               ? "bg-neon-green/10 text-neon-green border-neon-green/20"
+              : !videoWatched
+              ? "bg-surface/30 border-border/40 text-muted-foreground/50 cursor-not-allowed"
               : "bg-surface/60 hover:bg-surface border-border text-foreground"
           )}
         >
-          <CheckCircle2 className="w-4 h-4" />
+          {!videoWatched ? <Lock className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
           {progress?.content_read ? "O'qildi" : "O'qidim"}
         </button>
         <Link
@@ -243,19 +262,48 @@ export default function TopicPage() {
             <span className="inline-flex items-center gap-2 text-sm font-semibold">
               <Video className="w-4 h-4 text-neon-blue" /> Video dars
             </span>
-            {userId && !progress?.video_watched && (
-              <button
-                onClick={markVideoWatched}
-                className="text-xs font-medium text-neon-blue hover:underline"
-              >
-                Ko'rdim
-              </button>
+            {userId && (
+              progress?.video_watched ? (
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neon-green">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Ko'rildi
+                </span>
+              ) : (
+                <button
+                  onClick={markVideoWatched}
+                  disabled={watchFrac < 0.9}
+                  title={watchFrac < 0.9 ? "Videoni oxirigacha ko'ring" : undefined}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all",
+                    watchFrac < 0.9
+                      ? "text-muted-foreground/50 border-border/40 cursor-not-allowed"
+                      : "text-neon-green border-neon-green/30 bg-neon-green/10 hover:bg-neon-green/20"
+                  )}
+                >
+                  {watchFrac < 0.9 ? <Lock className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                  Ko'rdim
+                </button>
+              )
             )}
           </div>
           <ProtectedVideoPlayer
             topicId={topic.id}
             redirectPath={`/courses/${slug}/topics/${topicSlug}`}
+            onProgress={setWatchFrac}
           />
+          {/* Ko'rish progress'i */}
+          {userId && !progress?.video_watched && (
+            <div className="px-5 py-2.5 border-t border-border/50 flex items-center gap-3">
+              <div className="flex-1 h-1.5 bg-surface rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-neon-blue rounded-full transition-all duration-500"
+                  style={{ width: `${Math.round(watchFrac * 100)}%` }}
+                />
+              </div>
+              <span className="text-[11px] font-mono text-muted-foreground tabular-nums">
+                {Math.round(watchFrac * 100)}% ko'rildi
+              </span>
+            </div>
+          )}
         </motion.div>
       )}
 

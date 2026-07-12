@@ -10,6 +10,8 @@ interface Props {
   /** Free preview darslar uchun register CTA'da redirect qilinadigan sahifa */
   redirectPath?: string;
   className?: string;
+  /** Video ko'rish ulushi (0–1) o'zgarganda chaqiriladi — "Ko'rdim" tugmasini ochish uchun */
+  onProgress?: (fraction: number) => void;
 }
 
 interface TokenResponse {
@@ -28,13 +30,52 @@ interface TokenResponse {
  * - Foydalanuvchi email'i yarim shaffof watermark sifatida video ustida harakatlanadi
  *   (ekran yozib olishda kim tarqatganini aniqlash uchun)
  */
-export default function ProtectedVideoPlayer({ topicId, redirectPath, className }: Props) {
+export default function ProtectedVideoPlayer({ topicId, redirectPath, className, onProgress }: Props) {
   const supabase = createClient();
   const [data, setData] = useState<TokenResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [watermark, setWatermark] = useState<string | null>(null);
   const [wmPos, setWmPos] = useState({ top: 12, left: 65 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const maxFracRef = useRef(0);
+
+  // Bunny player.js hodisalarini tinglash — video ko'rish ulushini aniqlash
+  useEffect(() => {
+    if (!onProgress) return;
+    function onMsg(e: MessageEvent) {
+      // Faqat Bunny iframe'idan kelgan xabarlar
+      if (typeof e.data !== "string") return;
+      let msg: any;
+      try { msg = JSON.parse(e.data); } catch { return; }
+      if (msg?.context !== "player.js") return;
+
+      const iframe = iframeRef.current;
+      if (msg.event === "ready" && iframe?.contentWindow) {
+        // Hodisalarga obuna bo'lish
+        ["timeupdate", "ended"].forEach(ev => {
+          iframe.contentWindow!.postMessage(
+            JSON.stringify({ context: "player.js", method: "addEventListener", value: ev }),
+            "*",
+          );
+        });
+      } else if (msg.event === "timeupdate" && msg.value) {
+        const { seconds, duration } = msg.value;
+        if (duration > 0) {
+          const frac = Math.min(1, seconds / duration);
+          if (frac > maxFracRef.current + 0.01) {
+            maxFracRef.current = frac;
+            onProgress?.(frac);
+          }
+        }
+      } else if (msg.event === "ended") {
+        maxFracRef.current = 1;
+        onProgress?.(1);
+      }
+    }
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [onProgress, data?.embed_url]);
 
   async function fetchToken() {
     setLoading(true);
@@ -147,6 +188,7 @@ export default function ProtectedVideoPlayer({ topicId, redirectPath, className 
         />
       ) : (
         <iframe
+          ref={iframeRef}
           src={data.embed_url}
           className="w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
