@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 import type { Certificate } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Printer, Share2, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Printer, Loader2, Pencil, Check } from "lucide-react";
 
 export default function CertificatePage() {
   const { id } = useParams<{ id: string }>();
@@ -16,28 +16,68 @@ export default function CertificatePage() {
   const [cert, setCert] = useState<Certificate | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  // Sertifikatda ko'rinadigan ism — Gmail'dan kelgan ism boshqacha bo'lishi mumkin,
+  // shuning uchun foydalanuvchi tahrirlashi mumkin
+  const [name, setName] = useState("");
+  const [savingName, setSavingName] = useState(false);
   const certRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("certificates").select("*").eq("id", id).single();
-      if (data) setCert(data as Certificate);
+      if (data) {
+        setCert(data as Certificate);
+        setName((data as Certificate).full_name || "");
+      }
       setLoading(false);
     })();
   }, [id]);
 
+  // Ismni hisobga saqlash (keyingi tashrifda ham ko'rinishi uchun) — RLS ruxsat bermasa xatolikni yutamiz
+  async function saveName() {
+    const trimmed = name.trim();
+    if (!cert || !trimmed || trimmed === cert.full_name) return;
+    setSavingName(true);
+    const { error } = await supabase
+      .from("certificates")
+      .update({ full_name: trimmed })
+      .eq("id", cert.id);
+    if (!error) {
+      setCert({ ...cert, full_name: trimmed });
+      toast.success("Ism saqlandi");
+    } else {
+      // DB'ga yozib bo'lmasa ham, yuklab olinadigan PNG'da to'g'ri ism ko'rinadi
+      toast.message("Ism shu tashrif uchun qo'llanildi");
+    }
+    setSavingName(false);
+  }
+
   async function handleDownload() {
-    if (!certRef.current) return;
+    const node = certRef.current;
+    if (!node) return;
     setDownloading(true);
 
     try {
       // html2canvas dinamik import
       const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(certRef.current, {
+      // aspect-ratio orqali hisoblangan balandlik — klonda yo'qolmasligi uchun aniq px beramiz
+      const w = node.offsetWidth;
+      const h = node.offsetHeight;
+      const canvas = await html2canvas(node, {
         scale: 2,
-        backgroundColor: null,
+        backgroundColor: "#fffdf7",
         useCORS: true,
         logging: false,
+        width: w,
+        height: h,
+        windowWidth: w,
+        windowHeight: h,
+        onclone: (_doc, clone) => {
+          // Klonda aspect-ratio qo'llab-quvvatlanmaydi → aniq balandlik o'rnatamiz
+          clone.style.aspectRatio = "auto";
+          clone.style.width = `${w}px`;
+          clone.style.height = `${h}px`;
+        },
       });
 
       const link = document.createElement("a");
@@ -47,7 +87,7 @@ export default function CertificatePage() {
       toast.success("Sertifikat yuklab olindi!");
     } catch (err) {
       console.error("Download error:", err);
-      toast.error("Yuklab olishda xatolik. Print funksiyasidan foydalaning.");
+      toast.error("Yuklab olishda xatolik. Chop etish funksiyasidan foydalaning.");
     }
     setDownloading(false);
   }
@@ -76,6 +116,35 @@ export default function CertificatePage() {
             <Printer className="w-4 h-4" /> Chop etish
           </button>
         </div>
+      </motion.div>
+
+      {/* Ism tahrirlash — Gmail'dan kelgan ism boshqacha bo'lsa, yuklab olishdan oldin to'g'irlash */}
+      <motion.div className="glass-card p-4 print:hidden" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <label className="flex items-center gap-2 text-sm font-medium mb-2">
+          <Pencil className="w-4 h-4 text-neon-purple" />
+          Sertifikatdagi ism-familiya
+        </label>
+        <div className="flex gap-2 flex-wrap">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ism Familiya"
+            maxLength={60}
+            className="input-field flex-1 min-w-[220px]"
+          />
+          <button
+            onClick={saveName}
+            disabled={savingName || !name.trim() || name.trim() === cert.full_name}
+            className="btn-ghost py-2.5 px-5 flex items-center gap-2 text-sm disabled:opacity-40"
+          >
+            {savingName ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+            Saqlash
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          Yozganingiz sertifikatda va yuklab olinadigan faylda darhol ko&apos;rinadi.
+        </p>
       </motion.div>
 
       {/* Certificate */}
@@ -122,7 +191,7 @@ export default function CertificatePage() {
 
             {/* Ism */}
             <h2 style={{ fontFamily: "Georgia, serif", fontSize: "34px", fontWeight: "bold", color: "#6C5CE7", marginBottom: "6px", lineHeight: 1.1 }}>
-              {cert.full_name}
+              {name || cert.full_name}
             </h2>
             <div style={{ width: "260px", height: "1.5px", background: "linear-gradient(90deg, transparent, #c9a227, transparent)", marginBottom: "16px" }} />
 
