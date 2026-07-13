@@ -526,7 +526,8 @@ export default function LandingPage() {
     { href: "/explore/challenges", label: "Topshiriqlar" },
     { href: "/playground", label: "Playground" },
     { href: "/explore/games", label: "O'yinlar" },
-    { href: "/explore/about", label: "Tizim haqida" },
+    { href: "/blog", label: "Blog" },
+    { href: "/explore/about", label: "Platforma haqida" },
   ];
 
   async function handleLogout() { await supabase.auth.signOut(); document.cookie = "user-role=; path=/; max-age=0"; setUser(null); setMenuOpen(false); }

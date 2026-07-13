@@ -48,6 +48,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     /^\/courses\/[^\/]+\/topics\/[^\/]+$/.test(pathname) ||
     /^\/challenges\/[^\/]+$/.test(pathname);
 
+  // Playground to'liq balandlikni egallaydi — sarlavha/toolbar fixed navbar tagida qolmasligi uchun
+  const isPlaygroundPage = pathname === "/playground";
+
   const loadProfile = useCallback(async () => {
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
@@ -236,6 +239,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <Link href="/explore/challenges" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Topshiriqlar</Link>
               <Link href="/playground" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Playground</Link>
               <Link href="/explore/games" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">O'yinlar</Link>
+              <Link href="/blog" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Blog</Link>
               <Link href="/explore/about" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Platforma haqida</Link>
             </div>
             <div className="flex items-center gap-2">
@@ -251,9 +255,15 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
         </nav>
-        <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6">
-          <div className="max-w-6xl mx-auto overflow-x-hidden">{children}</div>
-        </main>
+        {isPlaygroundPage ? (
+          <main className="pt-16">
+            <div className="h-[calc(100dvh-4rem)] p-3 md:p-4">{children}</div>
+          </main>
+        ) : (
+          <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6">
+            <div className="max-w-6xl mx-auto overflow-x-hidden">{children}</div>
+          </main>
+        )}
       </div>
     );
   }
@@ -367,10 +377,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         "min-h-screen transition-all duration-300 pt-16 lg:pt-0",
         collapsed ? "lg:pl-[72px]" : "lg:pl-64"
       )}>
-        <div className="p-6 lg:p-8">
-          <AutoLogout />
-          {children}
-        </div>
+        {isPlaygroundPage ? (
+          <div className="h-[calc(100dvh-4rem)] lg:h-dvh p-3 md:p-4">
+            <AutoLogout />
+            {children}
+          </div>
+        ) : (
+          <div className="p-6 lg:p-8">
+            <AutoLogout />
+            {children}
+          </div>
+        )}
       </main>
 
       {/* Click outside to close user menu */}

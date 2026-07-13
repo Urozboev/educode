@@ -364,8 +364,8 @@ export default function PlaygroundPage() {
   }, [running, awaitingInput, code, lang, stdin]);
 
   return (
-    // Layout padding'ini negativ margin bilan bekor qilib, butun ekranga yoyamiz
-    <div className="flex flex-col h-[calc(100dvh-3.5rem)] lg:h-[100dvh] -m-4 md:-m-6 lg:-m-8 p-3 md:p-4">
+    // Balandlik ota-konteynerdan keladi (layout playground uchun to'g'ri o'lchamli konteyner beradi)
+    <div className="flex flex-col h-full">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-3 pb-3 flex-shrink-0 flex-wrap">
         <div className="flex items-center gap-2.5">
