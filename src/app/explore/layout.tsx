@@ -24,6 +24,8 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
   const { theme, setTheme } = useTheme();
   const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     (async () => {
@@ -54,9 +56,9 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
           </div>
 
           <div className="flex items-center gap-2">
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            <button suppressHydrationWarning onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors" title="Mavzu o'zgartirish">
-              {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+              {mounted && theme === "light" ? <Moon className="w-[18px] h-[18px]" /> : <Sun className="w-[18px] h-[18px]" />}
             </button>
 
             {user ? (
