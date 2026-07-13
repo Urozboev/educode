@@ -251,9 +251,39 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
               </button>
               <Link href="/login" className="hidden md:block px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kirish</Link>
-              <Link href="/register" className="px-4 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+              <Link href="/register" className="hidden md:block px-4 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+              {/* Mobil menyu tugmasi */}
+              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 hover:bg-accent rounded-lg" aria-label="Menyu">
+                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
           </div>
+
+          {/* Mobil dropdown */}
+          <AnimatePresence>
+            {mobileOpen && (
+              <motion.div className="md:hidden bg-card border-b border-border px-4 py-3 space-y-1"
+                initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                {[
+                  { href: "/explore/courses", label: "Kurslar" },
+                  { href: "/explore/challenges", label: "Topshiriqlar" },
+                  { href: "/playground", label: "Playground" },
+                  { href: "/explore/games", label: "O'yinlar" },
+                  { href: "/blog", label: "Blog" },
+                  { href: "/explore/about", label: "Platforma haqida" },
+                ].map(l => (
+                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
+                    className={cn("block py-2.5 px-3 rounded-lg text-sm", pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent")}>
+                    {l.label}
+                  </Link>
+                ))}
+                <div className="flex gap-2 pt-2 border-t border-border mt-2">
+                  <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-medium border border-border hover:bg-accent transition-all">Kirish</Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </nav>
         {isPlaygroundPage ? (
           <main className="pt-16">
