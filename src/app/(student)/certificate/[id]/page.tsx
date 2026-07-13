@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 import type { Certificate } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Printer, Loader2, Pencil, Check } from "lucide-react";
+import { ArrowLeft, Download, Printer, Loader2, Pencil, Check, FileText } from "lucide-react";
 
 export default function CertificatePage() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +16,7 @@ export default function CertificatePage() {
   const [cert, setCert] = useState<Certificate | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   // Sertifikatda ko'rinadigan ism — Gmail'dan kelgan ism boshqacha bo'lishi mumkin,
   // shuning uchun foydalanuvchi tahrirlashi mumkin
   const [name, setName] = useState("");
@@ -52,44 +53,66 @@ export default function CertificatePage() {
     setSavingName(false);
   }
 
+  // Sertifikatni yuqori sifatli canvas'ga aylantirish (PNG va PDF uchun umumiy)
+  async function captureCanvas(): Promise<HTMLCanvasElement> {
+    const node = certRef.current!;
+    const html2canvas = (await import("html2canvas")).default;
+    // aspect-ratio orqali hisoblangan balandlik — klonda yo'qolmasligi uchun aniq px beramiz
+    const w = node.offsetWidth;
+    const h = node.offsetHeight;
+    return html2canvas(node, {
+      scale: 2,
+      backgroundColor: "#fffdf7",
+      useCORS: true,
+      logging: false,
+      width: w,
+      height: h,
+      windowWidth: w,
+      windowHeight: h,
+      onclone: (_doc, clone) => {
+        // Klonda aspect-ratio qo'llab-quvvatlanmaydi → aniq balandlik o'rnatamiz
+        clone.style.aspectRatio = "auto";
+        clone.style.width = `${w}px`;
+        clone.style.height = `${h}px`;
+      },
+    });
+  }
+
   async function handleDownload() {
-    const node = certRef.current;
-    if (!node) return;
+    if (!certRef.current) return;
     setDownloading(true);
-
     try {
-      // html2canvas dinamik import
-      const html2canvas = (await import("html2canvas")).default;
-      // aspect-ratio orqali hisoblangan balandlik — klonda yo'qolmasligi uchun aniq px beramiz
-      const w = node.offsetWidth;
-      const h = node.offsetHeight;
-      const canvas = await html2canvas(node, {
-        scale: 2,
-        backgroundColor: "#fffdf7",
-        useCORS: true,
-        logging: false,
-        width: w,
-        height: h,
-        windowWidth: w,
-        windowHeight: h,
-        onclone: (_doc, clone) => {
-          // Klonda aspect-ratio qo'llab-quvvatlanmaydi → aniq balandlik o'rnatamiz
-          clone.style.aspectRatio = "auto";
-          clone.style.width = `${w}px`;
-          clone.style.height = `${h}px`;
-        },
-      });
-
+      const canvas = await captureCanvas();
       const link = document.createElement("a");
       link.download = `EduCode-Sertifikat-${cert?.certificate_number || "cert"}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
-      toast.success("Sertifikat yuklab olindi!");
+      toast.success("PNG yuklab olindi!");
     } catch (err) {
-      console.error("Download error:", err);
+      console.error("PNG download error:", err);
       toast.error("Yuklab olishda xatolik. Chop etish funksiyasidan foydalaning.");
     }
     setDownloading(false);
+  }
+
+  async function handleDownloadPdf() {
+    if (!certRef.current) return;
+    setDownloadingPdf(true);
+    try {
+      const canvas = await captureCanvas();
+      const { jsPDF } = await import("jspdf");
+      // Sertifikat nisbati 1.414:1 — aynan A4 landshaft (297×210mm)
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const pw = pdf.internal.pageSize.getWidth();
+      const ph = pdf.internal.pageSize.getHeight();
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pw, ph, undefined, "FAST");
+      pdf.save(`EduCode-Sertifikat-${cert?.certificate_number || "cert"}.pdf`);
+      toast.success("PDF yuklab olindi!");
+    } catch (err) {
+      console.error("PDF download error:", err);
+      toast.error("PDF yaratishda xatolik. Chop etish funksiyasidan foydalaning.");
+    }
+    setDownloadingPdf(false);
   }
 
   function handlePrint() {
@@ -107,10 +130,15 @@ export default function CertificatePage() {
           <ArrowLeft className="w-4 h-4" /> Natijalarimga qaytish
         </Link>
         <div className="flex gap-2">
-          <button onClick={handleDownload} disabled={downloading}
+          <button onClick={handleDownloadPdf} disabled={downloadingPdf || downloading}
             className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm disabled:opacity-50">
+            {downloadingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+            PDF yuklab olish
+          </button>
+          <button onClick={handleDownload} disabled={downloading || downloadingPdf}
+            className="btn-ghost py-2.5 px-5 flex items-center gap-2 text-sm disabled:opacity-50">
             {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            PNG yuklab olish
+            PNG
           </button>
           <button onClick={handlePrint} className="btn-ghost py-2.5 px-5 flex items-center gap-2 text-sm">
             <Printer className="w-4 h-4" /> Chop etish
