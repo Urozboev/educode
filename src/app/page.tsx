@@ -724,7 +724,7 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Bento grid: 6 ustun, turli o'lchamli bloklar */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 auto-rows-[140px] md:auto-rows-[160px]">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 auto-rows-auto md:auto-rows-[160px]">
             {/* 1. AI Tahlil — KATTA (col-span 3, row-span 2) */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
