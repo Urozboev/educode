@@ -37,6 +37,30 @@ export default function CertificatePage() {
   // Ekranga sig'dirish koeffitsienti (capture'ga ta'sir qilmaydi)
   const shellRef = useRef<HTMLDivElement>(null);
   const [fit, setFit] = useState(1);
+  // QR kod — sertifikatni ommaviy tekshirish havolasiga olib boradi
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [verifyUrl, setVerifyUrl] = useState("");
+
+  // Sertifikat yuklangach QR kod tayyorlanadi
+  useEffect(() => {
+    if (!cert?.certificate_number) return;
+    const url = `${window.location.origin}/sertifikat/${cert.certificate_number}`;
+    setVerifyUrl(url);
+    (async () => {
+      try {
+        const QR = (await import("qrcode")).default;
+        const data = await QR.toDataURL(url, {
+          width: 240,
+          margin: 0,
+          errorCorrectionLevel: "M",
+          color: { dark: "#1a1a2e", light: "#fffdf7" },
+        });
+        setQrDataUrl(data);
+      } catch {
+        // QR chiqmasa sertifikat baribir ishlayveradi
+      }
+    })();
+  }, [cert?.certificate_number]);
 
   useEffect(() => {
     const el = shellRef.current;
@@ -138,24 +162,39 @@ export default function CertificatePage() {
     setDownloading(false);
   }
 
+  /**
+   * PDF sahifadan surat olib emas, vektor sifatida chiziladi.
+   * Sabab: html2canvas layoutni brauzerdan boshqacha hisoblab, elementlarni
+   * siljitib yuborardi va matn rasm bo'lgani uchun loyqalanardi.
+   */
   async function handleDownloadPdf() {
-    if (!certRef.current) return;
+    if (!cert) return;
     setDownloadingPdf(true);
     try {
-      const canvas = await captureCanvas();
-      const { jsPDF } = await import("jspdf");
-      // Sertifikat nisbati 1.414:1 — aynan A4 landshaft (297×210mm)
-      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-      const pw = pdf.internal.pageSize.getWidth();
-      const ph = pdf.internal.pageSize.getHeight();
-      /**
-       * PDF uchun JPEG: shu o'lchamdagi PNG data-URL o'nlab megabayt bo'lib,
-       * jsPDF'ni sekinlashtiradi yoki xotira yetmay fayl buzilib chiqadi.
-       * 0.92 sifatda bosma uchun farq sezilmaydi.
-       */
-      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, pw, ph, undefined, "FAST");
-      pdf.save(`EduCode-Sertifikat-${cert?.certificate_number || "cert"}.pdf`);
-      toast.success("PDF yuklab olindi!");
+      const [{ pdf }, { CertificatePdf }] = await Promise.all([
+        import("@react-pdf/renderer"),
+        import("@/components/certificate/CertificatePdf"),
+      ]);
+
+      const blob = await pdf(
+        <CertificatePdf
+          fullName={name || cert.full_name}
+          courseTitle={cert.course_title}
+          certificateNumber={cert.certificate_number}
+          completionDate={cert.completion_date}
+          scorePercentage={cert.score_percentage}
+          qrDataUrl={qrDataUrl}
+          verifyUrl={verifyUrl}
+        />
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `EduCode-Sertifikat-${cert.certificate_number}.pdf`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success("PDF yuklab olindi");
     } catch (err) {
       console.error("PDF download error:", err);
       toast.error("PDF yaratishda xatolik. Chop etish funksiyasidan foydalaning.");
@@ -324,6 +363,18 @@ export default function CertificatePage() {
             {/* Footer: raqam + verifikatsiya */}
             <div style={{ width: "100%", borderTop: "1px solid #e8e2cf", paddingTop: "10px", marginTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <p style={{ fontSize: "10px", color: "#999", fontFamily: "monospace" }}>№ {cert.certificate_number}</p>
+
+              {/* QR — telefon kamerasi bilan skanerlab haqiqiyligini tekshirish */}
+              {qrDataUrl && (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={qrDataUrl} alt="Tekshirish QR kodi" style={{ width: "58px", height: "58px" }} />
+                  <span style={{ fontSize: "7px", color: "#aaa", marginTop: "2px" }}>
+                    Haqiqiyligini tekshirish
+                  </span>
+                </div>
+              )}
+
               <p style={{ fontSize: "10px", color: "#aaa" }}>malla.uz — Raqamli intellektual ta&apos;lim platformasi</p>
             </div>
           </div>

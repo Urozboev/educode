@@ -15,6 +15,8 @@ oldingisiga tayanadi.
 | 22 | `22_contests.sql` | Olimpiada: `contests`, masalalar, ishtirokchilar, reyting |
 | 23 | `23_portfolio_progress.sql` | Portfolioga progress qo'shadi (21 dan keyin) |
 | 24 | `24_classroom_and_live.sql` | Guruh kodlari, o'yinlar barcha o'qituvchilarga, jonli sessiya (Kahoot) |
+| 25 | `25_certificate_public.sql` | Sertifikatni raqami/QR orqali ommaviy tekshirish |
+| 26 | `26_teacher_visibility.sql` | O'qituvchi o'z o'quvchilarining o'yin natijalarini ko'rsin |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -46,6 +48,10 @@ o'quvchilar telefonidan `/live` ga kirib PIN kiritadi → "Boshlash".
 > Jonli o'yin uchun Supabase'da **Realtime** yoqilgan bo'lishi kerak
 > (Database → Replication). Yoqilmasa ham ishlaydi, lekin ekran har 4
 > soniyada yangilanadi — bir oz kechikish bilan.
+
+**25** — Sertifikat sahifasida QR kod paydo bo'ladi. Telefon kamerasi bilan
+skanerlasangiz `/sertifikat/<raqam>` ochiladi — u yerda sertifikat haqiqiyligi
+login'siz tasdiqlanadi. Raqamni qo'lda kiritib ham tekshirsa bo'ladi.
 
 ## Muhim eslatmalar
 

@@ -11,10 +11,16 @@ import {
   BookOpen, Terminal, Shield, Globe, ArrowRight, ArrowUpRight,
   LayoutDashboard, LogOut, Menu, X, Star, Quote, Moon, Sun,
   Sparkles, Play, CheckCircle2, GraduationCap, MessageCircle,
-  Cpu, Layers, Binary, Zap, Monitor, Plus, Clock
+  Cpu, Layers, Binary, Zap, Monitor, Plus, Clock, ChevronDown
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 import { OrganizationJsonLd, WebsiteJsonLd, FaqJsonLd } from "@/components/seo/JsonLd";
+import {
+  PRIMARY_LINKS as primaryLinks,
+  RESOURCE_LINKS as resourceLinks,
+  TAIL_LINKS as tailLinks,
+  ALL_GUEST_LINKS as allGuestLinks,
+} from "@/lib/nav";
 
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -478,6 +484,7 @@ export default function LandingPage() {
   const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
   const [stats, setStats] = useState({ users: 0, courses: 0, challenges: 0, submissions: 0 });
   const [courses, setCourses] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
@@ -521,14 +528,6 @@ export default function LandingPage() {
     if (key === "algorithms") return <Binary className="text-neon-green" style={{ width: size, height: size }} />;
     return <BookOpen className="text-muted-foreground" style={{ width: size, height: size }} />;
   };
-  const navLinks = [
-    { href: "/explore/courses", label: "Kurslar" },
-    { href: "/explore/challenges", label: "Topshiriqlar" },
-    { href: "/playground", label: "Playground" },
-    { href: "/explore/games", label: "O'yinlar" },
-    { href: "/blog", label: "Blog" },
-    { href: "/explore/about", label: "Platforma haqida" },
-  ];
 
   async function handleLogout() { await supabase.auth.signOut(); document.cookie = "user-role=; path=/; max-age=0"; setUser(null); setMenuOpen(false); }
 
@@ -576,9 +575,55 @@ export default function LandingPage() {
             <span className="font-display font-bold text-xl tracking-tight">Edu<span className="gradient-text">Code</span></span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map(l => (
-              <Link key={l.href} href={l.href} className="px-4 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
+          {/* Menyu explore layout'idagi bilan bir xil — manba: lib/nav.ts */}
+          <div className="hidden lg:flex items-center gap-1">
+            {primaryLinks.map(l => (
+              <Link key={l.href} href={l.href} className="px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
+            ))}
+
+            <div
+              className="relative"
+              onMouseEnter={() => setResourcesOpen(true)}
+              onMouseLeave={() => setResourcesOpen(false)}
+            >
+              <button
+                onClick={() => setResourcesOpen(o => !o)}
+                aria-expanded={resourcesOpen}
+                className="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
+              >
+                Resurslar
+                <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              <AnimatePresence>
+                {resourcesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 top-full pt-2 w-64"
+                  >
+                    <div className="rounded-xl border border-border bg-card shadow-lift p-1.5">
+                      {resourceLinks.map(r => (
+                        <Link
+                          key={r.href}
+                          href={r.href}
+                          onClick={() => setResourcesOpen(false)}
+                          className="block px-3 py-2.5 rounded-lg hover:bg-accent transition-colors"
+                        >
+                          <span className="block text-sm font-medium">{r.label}</span>
+                          <span className="block text-[11px] text-muted-foreground mt-0.5">{r.hint}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {tailLinks.map(l => (
+              <Link key={l.href} href={l.href} className="px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
             ))}
           </div>
 
@@ -612,16 +657,16 @@ export default function LandingPage() {
               </div>
             )}
 
-            <button onClick={() => setMobileNav(!mobileNav)} className="md:hidden p-2.5 hover:bg-accent rounded-xl">
+            <button onClick={() => setMobileNav(!mobileNav)} className="lg:hidden p-2.5 hover:bg-accent rounded-xl">
               {mobileNav ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
         <AnimatePresence>{mobileNav && (
-          <motion.div className="md:hidden bg-card/95 backdrop-blur-xl border-b border-border px-5 py-4 space-y-1"
+          <motion.div className="lg:hidden bg-card/95 backdrop-blur-xl border-b border-border px-5 py-4 space-y-1"
             initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-            {navLinks.map(l => <Link key={l.href} href={l.href} onClick={() => setMobileNav(false)} className="block py-3 px-3 rounded-xl text-[0.95rem] hover:bg-accent/50 transition-colors">{l.label}</Link>)}
+            {allGuestLinks.map(l => <Link key={l.href} href={l.href} onClick={() => setMobileNav(false)} className="block py-3 px-3 rounded-xl text-[0.95rem] hover:bg-accent/50 transition-colors">{l.label}</Link>)}
             {!user && (
               <div className="flex gap-2 pt-3 mt-2 border-t border-border">
                 <Link href="/login" onClick={() => setMobileNav(false)} className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium bg-surface hover:bg-surface-hover border border-border transition-all">Kirish</Link>
@@ -1166,7 +1211,7 @@ export default function LandingPage() {
             <div>
               <h4 className="font-semibold text-sm mb-3">Platforma</h4>
               <div className="space-y-2">
-                {navLinks.map(l => <Link key={l.href} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</Link>)}
+                {allGuestLinks.map(l => <Link key={l.href} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</Link>)}
               </div>
             </div>
             <div>

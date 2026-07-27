@@ -16,6 +16,7 @@ import {
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import AutoLogout from "@/components/AutoLogout";
+import { ALL_GUEST_LINKS as allGuestLinks } from "@/lib/nav";
 
 const studentLinks = [
   { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
@@ -270,18 +271,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             {mobileOpen && (
               <motion.div className="md:hidden bg-card border-b border-border px-4 py-3 space-y-1"
                 initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                {[
-                  { href: "/explore/courses", label: "Kurslar" },
-                  { href: "/explore/challenges", label: "Topshiriqlar" },
-                  { href: "/playground", label: "Playground" },
-                  { href: "/explore/games", label: "O'yinlar" },
-                  { href: "/explore/books", label: "Kitoblar" },
-                  { href: "/explore/glossary", label: "Terminlar" },
-                  { href: "/explore/labs", label: "Laboratoriya" },
-                  { href: "/explore/methods", label: "Metodlar" },
-                  { href: "/blog", label: "Blog" },
-                  { href: "/explore/about", label: "Platforma haqida" },
-                ].map(l => (
+                {allGuestLinks.map(l => (
                   <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
                     className={cn("block py-2.5 px-3 rounded-lg text-sm", pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent")}>
                     {l.label}

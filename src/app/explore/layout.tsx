@@ -9,38 +9,12 @@ import { Code2, LayoutDashboard, Menu, X, Moon, Sun, LogOut, ChevronDown } from 
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
-/**
- * Modullar ko'payib, tekis menyu 1000px ekranda ham sig'may qoldi.
- * Shuning uchun ikki qatlam: o'quv yo'lining asosiy bosqichlari doim
- * ko'rinadi, qolgan resurslar ochiladigan ro'yxatga yig'ildi.
- */
-const primaryLinks = [
-  { href: "/explore/courses", label: "Kurslar" },
-  { href: "/explore/challenges", label: "Topshiriqlar" },
-  { href: "/playground", label: "Playground" },
-  { href: "/explore/contests", label: "Olimpiada" },
-];
-
-const resourceLinks = [
-  { href: "/explore/books", label: "Kitoblar", hint: "Bepul PDF kitoblar" },
-  { href: "/explore/glossary", label: "Terminlar", hint: "Lug'at va flash-cardlar" },
-  { href: "/explore/labs", label: "Laboratoriya", hint: "Interaktiv vizualizatorlar" },
-  { href: "/explore/games", label: "O'yinlar", hint: "Dars o'yinlari va arkada" },
-  { href: "/explore/methods", label: "Metodlar", hint: "O'qituvchiga yo'riqnoma" },
-  { href: "/explore/portfolios", label: "Portfoliolar", hint: "Talabalar ishlari" },
-];
-
-const tailLinks = [
-  { href: "/blog", label: "Blog" },
-];
-
-/** Yuqori panelga sig'magani — faqat mobil menyu va footerda */
-const extraLinks = [
-  { href: "/explore/about", label: "Platforma haqida" },
-];
-
-/** Mobil menyu uchun hammasi bitta ro'yxatda */
-const allLinks = [...primaryLinks, ...resourceLinks, ...tailLinks, ...extraLinks];
+import {
+  PRIMARY_LINKS as primaryLinks,
+  RESOURCE_LINKS as resourceLinks,
+  TAIL_LINKS as tailLinks,
+  ALL_GUEST_LINKS as allLinks,
+} from "@/lib/nav";
 
 export default function ExploreLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
