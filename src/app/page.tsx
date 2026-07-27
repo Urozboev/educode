@@ -155,41 +155,41 @@ function HeroMosaic() {
   const cells: MosaicCell[] = [
     // Row 1 (6)
     { kind: "lang", lang: "python" },
-    { kind: "snippet", text: "print()", color: "#00D2FF" },
+    { kind: "snippet", text: "print()", color: "hsl(var(--brand-blue))" },
     { kind: "empty", tone: "purple" },
-    { kind: "icon", Icon: Sparkles, color: "#FFD600", badge: "AI" },
+    { kind: "icon", Icon: Sparkles, color: "hsl(var(--brand-amber))", badge: "AI" },
     { kind: "lang", lang: "javascript" },
-    { kind: "stat", value: "7", label: "til", color: "#6C5CE7" },
+    { kind: "stat", value: "7", label: "til", color: "hsl(var(--brand-purple))" },
     // Row 2 — big at cols 2,3 → normal cells at cols 1,4,5,6 (4 cells)
     { kind: "empty", tone: "green" },
-    { kind: "icon", Icon: Trophy, color: "#FFD600" },
+    { kind: "icon", Icon: Trophy, color: "hsl(var(--brand-amber))" },
     { kind: "lang", lang: "typescript" },
-    { kind: "snippet", text: "if x > 0:", color: "#FF6B9D" },
+    { kind: "snippet", text: "if x > 0:", color: "hsl(var(--brand-orchid))" },
     // Row 3 — big continues → 4 cells at cols 1,4,5,6
-    { kind: "stat", value: "+50", label: "XP", color: "#FFD600" },
+    { kind: "stat", value: "+50", label: "XP", color: "hsl(var(--brand-amber))" },
     { kind: "lang", lang: "react" },
     { kind: "empty", tone: "blue" },
-    { kind: "snippet", text: "for i in..", color: "#00E676" },
+    { kind: "snippet", text: "for i in..", color: "hsl(var(--brand-green))" },
     // Row 4 (6)
     { kind: "check", label: "4/4" },
-    { kind: "progress", value: 72, color: "#6C5CE7", label: "Py" },
+    { kind: "progress", value: 72, color: "hsl(var(--brand-purple))", label: "Py" },
     { kind: "empty", tone: "yellow" },
     { kind: "lang", lang: "c++" },
-    { kind: "icon", Icon: Brain, color: "#00D2FF" },
-    { kind: "snippet", text: "return 0", color: "#FF5252" },
+    { kind: "icon", Icon: Brain, color: "hsl(var(--brand-blue))" },
+    { kind: "snippet", text: "return 0", color: "hsl(var(--brand-coral))" },
     // Row 5 (6)
     { kind: "lang", lang: "java" },
     { kind: "empty", tone: "pink" },
-    { kind: "stat", value: "100+", label: "kurs", color: "#00E676" },
-    { kind: "snippet", text: "while..", color: "#00D2FF" },
+    { kind: "stat", value: "100+", label: "kurs", color: "hsl(var(--brand-green))" },
+    { kind: "snippet", text: "while..", color: "hsl(var(--brand-blue))" },
     { kind: "empty", tone: "plain" },
-    { kind: "icon", Icon: Gamepad2, color: "#FF6B9D" },
+    { kind: "icon", Icon: Gamepad2, color: "hsl(var(--brand-orchid))" },
     // Row 6 (6)
-    { kind: "icon", Icon: CheckCircle2, color: "#00E676" },
-    { kind: "snippet", text: "=> ok", color: "#00E676" },
+    { kind: "icon", Icon: CheckCircle2, color: "hsl(var(--brand-green))" },
+    { kind: "snippet", text: "=> ok", color: "hsl(var(--brand-green))" },
     { kind: "lang", lang: "csharp" },
     { kind: "empty", tone: "purple" },
-    { kind: "progress", value: 45, color: "#00D2FF", label: "JS" },
+    { kind: "progress", value: 45, color: "hsl(var(--brand-blue))", label: "JS" },
     { kind: "lang", lang: "html" },
   ];
 
@@ -308,21 +308,21 @@ function HeroMosaic() {
 
       {/* Floating chips over the grid */}
       <motion.div
-        className="absolute -top-5 left-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-yellow/95 backdrop-blur text-[#1a1a00] text-[11px] font-extrabold shadow-xl shadow-neon-yellow/40 rotate-[-4deg]"
+        className="absolute -top-5 left-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-yellow/95 backdrop-blur text-white dark:text-[#1a1a00] text-[11px] font-extrabold shadow-xl shadow-neon-yellow/40 rotate-[-4deg]"
         animate={{ y: [0, -4, 0] }}
         transition={{ duration: 3, repeat: Infinity }}
       >
         <Trophy className="w-3.5 h-3.5" /> +50 XP
       </motion.div>
       <motion.div
-        className="absolute -bottom-4 -right-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-blue/95 backdrop-blur text-white text-[11px] font-extrabold shadow-xl shadow-neon-blue/40 rotate-[3deg]"
+        className="absolute -bottom-4 -right-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-blue/95 backdrop-blur text-white dark:text-[#04202b] text-[11px] font-extrabold shadow-xl shadow-neon-blue/40 rotate-[3deg]"
         animate={{ y: [0, 4, 0] }}
         transition={{ duration: 3.5, repeat: Infinity }}
       >
         <Brain className="w-3.5 h-3.5" /> AI Tahlil
       </motion.div>
       <motion.div
-        className="absolute top-[48%] -left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-green/95 backdrop-blur text-[#001a00] text-[11px] font-extrabold shadow-xl shadow-neon-green/40 rotate-[-6deg]"
+        className="absolute top-[48%] -left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-green/95 backdrop-blur text-white dark:text-[#001a00] text-[11px] font-extrabold shadow-xl shadow-neon-green/40 rotate-[-6deg]"
         animate={{ y: [0, -3, 0] }}
         transition={{ duration: 2.8, repeat: Infinity }}
       >
@@ -972,7 +972,7 @@ export default function LandingPage() {
                       <div className="absolute top-3 right-3.5">
                         {c.is_free
                           ? <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-neon-green/90 text-background shadow-lg shadow-neon-green/30">BEPUL</span>
-                          : <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-neon-yellow/90 text-[#1a1a00] shadow-lg shadow-neon-yellow/30">{c.price_coins} coin</span>}
+                          : <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-neon-yellow/90 text-white dark:text-[#1a1a00] shadow-lg shadow-neon-yellow/30">{c.price_coins} coin</span>}
                       </div>
                     </div>
 
@@ -1036,17 +1036,28 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: "01", title: "Ro'yxatdan o'ting", desc: "Email yoki Google orqali. Bepul 100 coin beriladi.", icon: Users, color: "#6C5CE7" },
-              { step: "02", title: "Darajangizni bilin", desc: "AI testi bilim darajangizni aniqlaydi va mos kurs tavsiya etadi.", icon: Brain, color: "#00D2FF" },
-              { step: "03", title: "O'rganing va bajarin", desc: "Ma'ruzalar, testlar, amaliy topshiriqlar va o'yinlar orqali.", icon: Code2, color: "#00E676" },
-              { step: "04", title: "Sertifikat oling", desc: "Kursni tugatib, professional sertifikat va sovg'alar oling.", icon: GraduationCap, color: "#FFD600" },
+              // Ranglar brend tokenlaridan olinadi — temaga qarab o'zi moslashadi
+              { step: "01", title: "Ro'yxatdan o'ting", desc: "Email yoki Google orqali. Bepul 100 coin beriladi.", icon: Users, color: "hsl(var(--brand-purple))" },
+              { step: "02", title: "Darajangizni bilin", desc: "AI testi bilim darajangizni aniqlaydi va mos kurs tavsiya etadi.", icon: Brain, color: "hsl(var(--brand-blue))" },
+              { step: "03", title: "O'rganing va bajarin", desc: "Ma'ruzalar, testlar, amaliy topshiriqlar va o'yinlar orqali.", icon: Code2, color: "hsl(var(--brand-green))" },
+              { step: "04", title: "Sertifikat oling", desc: "Kursni tugatib, professional sertifikat va sovg'alar oling.", icon: GraduationCap, color: "hsl(var(--brand-amber))" },
             ].map((s, i) => (
               <motion.div key={s.step} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp(i * 0.08)} className="relative">
-                {i < 3 && <div className="hidden md:block absolute top-10 left-[calc(100%_-_12px)] w-[calc(100%_-_48px)] h-[1px] bg-border/60" />}
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: `${s.color}10`, border: `1px solid ${s.color}20` }}>
+                {/* Ulovchi chiziq: ikonka markazidan (top-6) boshlanib, keyingi
+                    ustun ikonkasigacha boradi. Ustun kengligi 100%, grid oralig'i
+                    24px, ikonka 48px — shuning uchun 56px dan boshlab
+                    (100% + 24px − 8px) gacha, ya'ni kengligi 100% − 40px. */}
+                {i < 3 && <div className="hidden md:block absolute top-6 left-14 w-[calc(100%_-_40px)] h-px bg-border" />}
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 relative z-10"
+                  style={{
+                    backgroundColor: s.color.replace("))", ") / 0.1)"),
+                    border: `1px solid ${s.color.replace("))", ") / 0.22)")}`,
+                  }}
+                >
                   <s.icon className="w-5 h-5" style={{ color: s.color }} />
                 </div>
-                <div className="text-xs font-mono text-muted-foreground/40 mb-1">{s.step}</div>
+                <div className="numeric text-sm text-muted-foreground/50 mb-1">{s.step}</div>
                 <h3 className="font-display font-bold mb-2">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </motion.div>
@@ -1121,12 +1132,12 @@ export default function LandingPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { icon: CheckCircle2, text: "7 ta dasturlash tili", color: "#6C5CE7" },
-                { icon: Brain, text: "AI kod tahlili", color: "#00D2FF" },
-                { icon: Trophy, text: "Coin va sovg'alar", color: "#FFD600" },
-                { icon: GraduationCap, text: "Professional sertifikat", color: "#00E676" },
-                { icon: Gamepad2, text: "7 ta interaktiv o'yin (3D bilan)", color: "#FF6B9D" },
-                { icon: Globe, text: "To'liq o'zbek tilida", color: "#FF5252" },
+                { icon: CheckCircle2, text: "7 ta dasturlash tili", color: "hsl(var(--brand-purple))" },
+                { icon: Brain, text: "AI kod tahlili", color: "hsl(var(--brand-blue))" },
+                { icon: Trophy, text: "Coin va sovg'alar", color: "hsl(var(--brand-amber))" },
+                { icon: GraduationCap, text: "Professional sertifikat", color: "hsl(var(--brand-green))" },
+                { icon: Gamepad2, text: "7 ta interaktiv o'yin (3D bilan)", color: "hsl(var(--brand-orchid))" },
+                { icon: Globe, text: "To'liq o'zbek tilida", color: "hsl(var(--brand-coral))" },
               ].map(f => (
                 <div key={f.text} className="flex items-center gap-3 p-3.5 rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm hover:border-border transition-colors">
                   <f.icon className="w-5 h-5 flex-shrink-0" style={{ color: f.color }} />

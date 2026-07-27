@@ -43,13 +43,18 @@ const config: Config = {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+        /**
+         * Brend ranglari — "Syntax" palitrasi.
+         * Nomlar eski `neon-*` bilan bir xil qoldirildi (66 faylda ishlatilgan),
+         * lekin qiymatlar CSS o'zgaruvchilaridan olinadi va light/dark'da almashadi.
+         */
         neon: {
-          purple: "#6C5CE7",
-          blue: "#00D2FF",
-          green: "#00E676",
-          yellow: "#FFD600",
-          red: "#FF5252",
-          pink: "#FF6B9D",
+          purple: "hsl(var(--brand-purple) / <alpha-value>)",
+          blue: "hsl(var(--brand-blue) / <alpha-value>)",
+          green: "hsl(var(--brand-green) / <alpha-value>)",
+          yellow: "hsl(var(--brand-amber) / <alpha-value>)",
+          red: "hsl(var(--brand-coral) / <alpha-value>)",
+          pink: "hsl(var(--brand-orchid) / <alpha-value>)",
         },
         surface: {
           DEFAULT: "hsl(var(--surface))",
@@ -57,14 +62,38 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["Space Grotesk", "sans-serif"],
-        body: ["Manrope", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        display: ["var(--font-display)", "Sora", "system-ui", "sans-serif"],
+        body: ["var(--font-body)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "JetBrains Mono", "ui-monospace", "monospace"],
+      },
+      /**
+       * Tipografik shkala. Ilgari `.text-sm { !important }` hacklari bilan
+       * kattalashtirilgan edi — endi shkala manbasining o'zi sozlandi.
+       */
+      fontSize: {
+        xs: ["0.8rem", { lineHeight: "1.5" }],
+        sm: ["0.9rem", { lineHeight: "1.55" }],
+        base: ["1rem", { lineHeight: "1.65" }],
+        lg: ["1.125rem", { lineHeight: "1.6" }],
+        xl: ["1.28rem", { lineHeight: "1.45", letterSpacing: "-0.01em" }],
+        "2xl": ["1.56rem", { lineHeight: "1.3", letterSpacing: "-0.015em" }],
+        "3xl": ["1.95rem", { lineHeight: "1.2", letterSpacing: "-0.02em" }],
+        "4xl": ["2.44rem", { lineHeight: "1.12", letterSpacing: "-0.025em" }],
+        "5xl": ["3.05rem", { lineHeight: "1.06", letterSpacing: "-0.03em" }],
+        "6xl": ["3.8rem", { lineHeight: "1.02", letterSpacing: "-0.035em" }],
+        "7xl": ["4.75rem", { lineHeight: "1", letterSpacing: "-0.04em" }],
+        "8xl": ["6rem", { lineHeight: "1", letterSpacing: "-0.04em" }],
+        "9xl": ["8rem", { lineHeight: "1", letterSpacing: "-0.045em" }],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        soft: "0 1px 2px hsl(var(--shadow-color) / 0.04), 0 4px 16px -4px hsl(var(--shadow-color) / 0.06)",
+        lift: "0 2px 4px hsl(var(--shadow-color) / 0.04), 0 12px 32px -8px hsl(var(--shadow-color) / 0.10)",
+        terminal: "0 24px 64px -16px hsl(var(--shadow-color) / 0.28)",
       },
       keyframes: {
         "accordion-down": {
@@ -92,8 +121,8 @@ const config: Config = {
           "100%": { backgroundPosition: "200% 0" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 5px rgba(108,92,231,0.3)" },
-          "50%": { boxShadow: "0 0 20px rgba(108,92,231,0.6)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--brand-purple) / 0.28)" },
+          "50%": { boxShadow: "0 0 0 10px hsl(var(--brand-purple) / 0)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
@@ -102,6 +131,16 @@ const config: Config = {
         "coin-spin": {
           "0%": { transform: "rotateY(0deg)" },
           "100%": { transform: "rotateY(360deg)" },
+        },
+        /* Terminal kursori — brendning imzo elementi */
+        caret: {
+          "0%, 45%": { opacity: "1" },
+          "50%, 95%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "type-in": {
+          from: { width: "0" },
+          to: { width: "100%" },
         },
       },
       animation: {
@@ -114,12 +153,16 @@ const config: Config = {
         "pulse-glow": "pulse-glow 2s infinite",
         float: "float 3s ease-in-out infinite",
         "coin-spin": "coin-spin 0.6s ease-in-out",
+        caret: "caret 1.1s steps(1) infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "hero-gradient": "linear-gradient(135deg, #6C5CE7 0%, #00D2FF 100%)",
-        "card-gradient": "linear-gradient(180deg, rgba(108,92,231,0.08) 0%, rgba(0,210,255,0.03) 100%)",
-        "glass-gradient": "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+        "hero-gradient":
+          "linear-gradient(135deg, hsl(var(--brand-purple)) 0%, hsl(var(--brand-blue)) 100%)",
+        "card-gradient":
+          "linear-gradient(180deg, hsl(var(--brand-purple) / 0.06) 0%, hsl(var(--brand-blue) / 0.02) 100%)",
+        "glass-gradient":
+          "linear-gradient(135deg, hsl(var(--surface) / 0.9) 0%, hsl(var(--surface) / 0.5) 100%)",
       },
     },
   },

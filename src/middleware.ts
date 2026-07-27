@@ -25,6 +25,46 @@ export async function middleware(request: NextRequest) {
   }
 
   // ============================================
+  // MAVJUD BO'LMAGAN MANZILLAR
+  // ============================================
+  // Faqat quyidagi prefikslar himoyalanadi. Ro'yxatga kirmagan manzil
+  // umuman mavjud emas — uni /login ga yo'naltirish o'rniga Next.js ning
+  // not-found.tsx sahifasiga o'tkazamiz. Aks holda noto'g'ri havolani
+  // ochgan mehmon 404 o'rniga login formasini ko'radi.
+  const protectedPrefixes = [
+    '/dashboard',
+    '/courses',
+    '/challenges',
+    '/certificate',
+    '/chat',
+    '/games',
+    '/leaderboard',
+    '/my-results',
+    '/profile',
+    '/store',
+    // Kitoblar/terminlar kabinet ichidagi ko'rinishi. Ommaviy nusxasi
+    // /explore/books va /explore/glossary'da, u login talab qilmaydi.
+    '/books',
+    '/glossary',
+    '/lesson-games',
+    '/portfolio',
+    '/placement-test',
+    // O'qituvchi arizasi: login shart, lekin rol hali 'student'
+    '/teacher-apply',
+    '/a-',
+    '/t-',
+    '/p-',
+  ];
+
+  const isProtected = protectedPrefixes.some(
+    (p) => pathname === p || pathname.startsWith(p.endsWith('-') ? p : `${p}/`)
+  );
+
+  if (!isProtected) {
+    return NextResponse.next();
+  }
+
+  // ============================================
   // HIMOYALANGAN SAHIFALAR
   // ============================================
 

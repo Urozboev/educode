@@ -3,33 +3,35 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { cn, getDifficultyConfig } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { Course } from "@/types";
 import { motion } from "framer-motion";
 import {
   BookOpen, Search, Clock, Coins, Star,
   ChevronRight, Play, Lock, ArrowRight, Layers,
 } from "lucide-react";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
+import { LevelBadge } from "@/components/ui/LevelBadge";
 
 const categories = [
-  { value: "all", label: "Barchasi", icon: "✨" },
-  { value: "python", label: "Python", icon: "🐍" },
-  { value: "programming", label: "Dasturlash", icon: "💻" },
-  { value: "frontend", label: "Frontend", icon: "⚛️" },
-  { value: "computer_literacy", label: "Kompyuter", icon: "🖥️" },
-  { value: "algorithms", label: "Algoritmlar", icon: "🧠" },
+  { value: "all", label: "Barchasi" },
+  { value: "python", label: "Python" },
+  { value: "programming", label: "Dasturlash" },
+  { value: "frontend", label: "Frontend" },
+  { value: "computer_literacy", label: "Kompyuter" },
+  { value: "algorithms", label: "Algoritmlar" },
 ];
 
-/** Kategoriya bo'yicha cover gradient + emoji */
-const categoryStyle: Record<string, { gradient: string; emoji: string; accent: string }> = {
-  python: { gradient: "from-[#3776AB]/30 via-[#FFD43B]/10 to-transparent", emoji: "🐍", accent: "#3776AB" },
-  programming: { gradient: "from-neon-purple/30 via-neon-blue/10 to-transparent", emoji: "💻", accent: "#6C5CE7" },
-  frontend: { gradient: "from-[#61DAFB]/25 via-neon-purple/10 to-transparent", emoji: "⚛️", accent: "#61DAFB" },
-  computer_literacy: { gradient: "from-neon-blue/25 via-neon-green/10 to-transparent", emoji: "🖥️", accent: "#00D2FF" },
-  prompt_engineering: { gradient: "from-neon-pink/25 via-neon-purple/10 to-transparent", emoji: "🤖", accent: "#FF6BCB" },
-  algorithms: { gradient: "from-neon-green/25 via-neon-blue/10 to-transparent", emoji: "🧠", accent: "#00E676" },
+/** Kategoriya bo'yicha cover gradienti va bezak rangi */
+const categoryStyle: Record<string, { gradient: string; accent: string }> = {
+  python: { gradient: "from-[#3776AB]/30 via-[#FFD43B]/10 to-transparent", accent: "#3776AB" },
+  programming: { gradient: "from-neon-purple/30 via-neon-blue/10 to-transparent", accent: "#6A55E8" },
+  frontend: { gradient: "from-[#61DAFB]/25 via-neon-purple/10 to-transparent", accent: "#3F97BC" },
+  computer_literacy: { gradient: "from-neon-blue/25 via-neon-green/10 to-transparent", accent: "#2196C9" },
+  prompt_engineering: { gradient: "from-neon-pink/25 via-neon-purple/10 to-transparent", accent: "#C2479B" },
+  algorithms: { gradient: "from-neon-green/25 via-neon-blue/10 to-transparent", accent: "#16A085" },
 };
-const defaultStyle = { gradient: "from-neon-purple/25 via-neon-blue/10 to-transparent", emoji: "📚", accent: "#6C5CE7" };
+const defaultStyle = { gradient: "from-neon-purple/25 via-neon-blue/10 to-transparent", accent: "#6A55E8" };
 
 /** Teglar bo'sh bo'lsa kategoriyadan fallback */
 const fallbackTags: Record<string, string[]> = {
@@ -120,7 +122,7 @@ export default function ExploreCourses() {
                   : "bg-surface/40 text-muted-foreground border-border/50 hover:border-border hover:text-foreground"
               )}
             >
-              <span>{c.icon}</span> {c.label}
+              <CategoryIcon category={c.value} size={17} /> {c.label}
             </button>
           ))}
         </div>
@@ -144,7 +146,6 @@ export default function ExploreCourses() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((course, i) => {
-            const diff = getDifficultyConfig(course.difficulty || "beginner");
             const style = categoryStyle[course.category] || defaultStyle;
             return (
               <motion.div
@@ -184,8 +185,11 @@ export default function ExploreCourses() {
                           className="absolute inset-0 opacity-[0.15]"
                           style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "16px 16px" }}
                         />
-                        <div className="absolute bottom-3 left-5 text-6xl drop-shadow-lg group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left">
-                          {style.emoji}
+                        <div
+                          className="absolute bottom-4 left-5 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left"
+                          style={{ color: style.accent }}
+                        >
+                          <CategoryIcon category={course.category} size={56} strokeWidth={1.2} />
                         </div>
                       </>
                     )}
@@ -199,7 +203,7 @@ export default function ExploreCourses() {
                           BEPUL
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/90 text-[#1a1a00] backdrop-blur-sm shadow-lg shadow-neon-yellow/30">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/90 text-white dark:text-[#1a1a00] backdrop-blur-sm shadow-lg shadow-neon-yellow/30">
                           <Coins className="w-3 h-3" />{course.price_coins}
                         </span>
                       )}
@@ -209,7 +213,7 @@ export default function ExploreCourses() {
                   {/* Body */}
                   <div className="flex flex-col flex-1 p-5 md:p-6">
                     <div className="mb-3">
-                      <span className={diff.class}>{diff.label}</span>
+                      <LevelBadge difficulty={course.difficulty || "beginner"} />
                     </div>
 
                     <h3 className="font-display font-bold text-lg leading-snug mb-2 group-hover:text-neon-purple transition-colors line-clamp-2 min-h-[3.25rem]">
@@ -249,7 +253,9 @@ export default function ExploreCourses() {
                           <span className="inline-flex items-center gap-1"><Coins className="w-4 h-4" />{course.price_coins} coin</span>
                         )}
                       </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm font-bold transition-all group-hover:gap-2.5" style={{ color: style.accent }}>
+                      {/* Rang tokendan olinadi — kategoriya accent'i (masalan React'ning
+                          och siyanı) matn sifatida oq fonda o'qilmaydi */}
+                      <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple transition-all group-hover:gap-2.5">
                         <Play className="w-3.5 h-3.5" /> Ko'rish <ChevronRight className="w-4 h-4" />
                       </span>
                     </div>

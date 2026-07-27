@@ -71,12 +71,20 @@ export function getLevelLabel(level: string): string {
   }
 }
 
+/**
+ * Ikki xil shkala bitta joyda: topshiriqlar `easy/medium/hard`,
+ * kurslar `beginner/intermediate/advanced` qiymatlarini ishlatadi.
+ * `level` — 1..3 tartib raqami (LevelBadge ustunchalari uchun).
+ */
 export function getDifficultyConfig(difficulty: string) {
   switch (difficulty) {
-    case 'easy': return { label: 'Oson', class: 'badge-easy', color: '#00E676' };
-    case 'medium': return { label: "O'rta", class: 'badge-medium', color: '#FFD600' };
-    case 'hard': return { label: 'Qiyin', class: 'badge-hard', color: '#FF5252' };
-    default: return { label: difficulty, class: '', color: '#94A3B8' };
+    case 'easy': return { label: 'Oson', class: 'badge-easy', color: '#00E676', level: 1 };
+    case 'medium': return { label: "O'rta", class: 'badge-medium', color: '#FFD600', level: 2 };
+    case 'hard': return { label: 'Qiyin', class: 'badge-hard', color: '#FF5252', level: 3 };
+    case 'beginner': return { label: "Boshlang'ich", class: 'badge-easy', color: '#00E676', level: 1 };
+    case 'intermediate': return { label: "O'rta", class: 'badge-medium', color: '#FFD600', level: 2 };
+    case 'advanced': return { label: 'Yuqori', class: 'badge-hard', color: '#FF5252', level: 3 };
+    default: return { label: difficulty, class: '', color: '#94A3B8', level: 1 };
   }
 }
 
@@ -111,4 +119,14 @@ export function calculateXpLevel(xp: number): { level: string; progress: number;
 
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/** Fayl hajmini o'qiladigan ko'rinishga o'tkazadi: 5242880 → "5.0 MB" */
+export function formatBytes(bytes: number): string {
+  if (!bytes || bytes < 0) return '—';
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(0)} KB`;
+  const mb = kb / 1024;
+  return `${mb.toFixed(mb < 10 ? 1 : 0)} MB`;
 }

@@ -10,7 +10,8 @@ import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, BookOpen, Swords, Users, Award,
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
-  ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins, Newspaper
+  ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins, Newspaper,
+  Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,13 +21,19 @@ const adminLinks = [
   { href: "/a-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
   { href: "/a-courses", label: "Kurslar", icon: BookOpen },
   { href: "/a-challenges", label: "Topshiriqlar", icon: Swords },
+  { href: "/a-games", label: "Dars o'yinlari", icon: Gamepad2 },
+  { href: "/a-contests", label: "Olimpiadalar", icon: Trophy },
   { href: "/a-users", label: "Foydalanuvchilar", icon: Users },
+  { href: "/a-teachers", label: "O'qituvchi arizalari", icon: Presentation },
   { href: "/a-store", label: "Do'kon", icon: ShoppingBag },
   { href: "/a-payments", label: "Coin so'rovlari", icon: Coins },
   { href: "/a-achievements", label: "Yutuqlar", icon: Award },
   { href: "/a-certificates", label: "Sertifikatlar", icon: GraduationCap },
   { href: "/a-testimonials", label: "Izohlar", icon: MessageSquare },
   { href: "/a-blog", label: "Blog", icon: Newspaper },
+  { href: "/a-books", label: "Kitoblar", icon: Library },
+  { href: "/a-glossary", label: "Terminlar", icon: BookMarked },
+  { href: "/a-methods", label: "Metodlar", icon: Lightbulb },
   { href: "/a-analytics", label: "Tahlillar", icon: BarChart3 },
   { href: "/a-about", label: "Platforma haqida", icon: Info },
   { href: "/a-settings", label: "Sozlamalar", icon: Settings },

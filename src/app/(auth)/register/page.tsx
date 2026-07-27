@@ -16,10 +16,17 @@ import {
   ArrowRight,
   GraduationCap,
   Users,
+  Presentation,
+  Info,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-type Role = "student" | "parent";
+/**
+ * "teacher" — bu yerda faqat niyat. Baza trigger'i yangi foydalanuvchini
+ * har doim 'student' qilib yaratadi; o'qituvchi roli ariza admin tomonidan
+ * tasdiqlangandan keyin beriladi (18_teacher_applications.sql).
+ */
+type Role = "student" | "parent" | "teacher";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,7 +42,10 @@ export default function RegisterPage() {
   const supabase = createClient();
 
   // Rolga qarab ro'yxatdan keyingi yo'nalish
-  const nextPath = role === "parent" ? "/p-dashboard" : "/placement-test";
+  const nextPath =
+    role === "parent" ? "/p-dashboard"
+    : role === "teacher" ? "/teacher-apply"
+    : "/placement-test";
 
   const passwordChecks = [
     { label: "Kamida 8 ta belgi", valid: password.length >= 8 },
@@ -134,12 +144,15 @@ export default function RegisterPage() {
           <p className="text-muted-foreground text-base">
             {role === "parent"
               ? "Farzandingiz o'quv jarayonini kuzating."
+              : role === "teacher"
+              ? "Hisob yaratgach ariza to'ldirasiz — admin tasdiqlagach o'qituvchi kabineti ochiladi."
               : "Bepul 100 coin va barcha kurslarga kirish huquqi."}
           </p>
         </div>
 
-        {/* Rol tanlash */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        {/* Rol tanlash — 360px ekranda uch ustun siqiladi, shuning uchun
+            mobilda ikki ustun va uchinchisi butun qatorni egallaydi */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
           <button
             type="button"
             onClick={() => setRole("student")}
@@ -166,7 +179,31 @@ export default function RegisterPage() {
             <span className="text-sm font-semibold">Ota-ona</span>
             <span className="text-[11px] text-muted-foreground text-center leading-tight">Kuzataman</span>
           </button>
+          <button
+            type="button"
+            onClick={() => setRole("teacher")}
+            className={`col-span-2 sm:col-span-1 flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+              role === "teacher"
+                ? "border-neon-green bg-neon-green/10"
+                : "border-border bg-surface/40 hover:bg-surface/60"
+            }`}
+          >
+            <Presentation className={`w-6 h-6 ${role === "teacher" ? "text-neon-green" : "text-muted-foreground"}`} />
+            <span className="text-sm font-semibold">O&apos;qituvchi</span>
+            <span className="text-[11px] text-muted-foreground text-center leading-tight">O&apos;rgataman</span>
+          </button>
         </div>
+
+        {role === "teacher" && (
+          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-neon-blue/[0.07] border border-neon-blue/20 text-sm mb-6">
+            <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-neon-blue" />
+            <span className="leading-relaxed text-muted-foreground">
+              O&apos;qituvchi huquqi tekshiruvdan keyin beriladi. Hisob yaratilgach
+              qisqa ariza to&apos;ldirasiz; tasdiqlanguncha platformadan o&apos;quvchi
+              sifatida foydalanishingiz mumkin.
+            </span>
+          </div>
+        )}
 
         {errorMsg && (
           <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-neon-red/8 border border-neon-red/20 text-neon-red text-sm mb-6">

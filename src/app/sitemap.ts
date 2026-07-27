@@ -25,6 +25,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/explore/courses`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/explore/challenges`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/explore/games`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${SITE_URL}/explore/books`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/explore/glossary`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/explore/methods`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${SITE_URL}/explore/labs`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/explore/portfolios`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
+    { url: `${SITE_URL}/explore/contests`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    { url: `${SITE_URL}/explore/labs/sorting`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
   ];
 

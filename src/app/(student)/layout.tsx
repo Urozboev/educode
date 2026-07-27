@@ -10,7 +10,8 @@ import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, BookOpen, Swords, Gamepad2,
   BarChart3, Trophy, Store, User, LogOut, ChevronLeft,
-  Menu, X, Moon, Sun, Flame, Coins, ChevronDown, MessageCircle
+  Menu, X, Moon, Sun, Flame, Coins, ChevronDown, MessageCircle,
+  Library, BookMarked, Puzzle, Briefcase
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,7 +26,11 @@ const studentLinks = [
   { href: "/chat", label: "AI Yordamchi", icon: MessageCircle },
   { href: "/my-results", label: "Natijalarim", icon: BarChart3 },
   { href: "/leaderboard", label: "Reyting", icon: Trophy },
+  { href: "/lesson-games", label: "Dars o'yinlari", icon: Puzzle },
+  { href: "/books", label: "Kitoblar", icon: Library },
+  { href: "/glossary", label: "Terminlar", icon: BookMarked },
   { href: "/store", label: "Do'kon", icon: Store },
+  { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/profile", label: "Profil", icon: User },
 ];
 
@@ -269,6 +274,10 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                   { href: "/explore/challenges", label: "Topshiriqlar" },
                   { href: "/playground", label: "Playground" },
                   { href: "/explore/games", label: "O'yinlar" },
+                  { href: "/explore/books", label: "Kitoblar" },
+                  { href: "/explore/glossary", label: "Terminlar" },
+                  { href: "/explore/labs", label: "Laboratoriya" },
+                  { href: "/explore/methods", label: "Metodlar" },
                   { href: "/blog", label: "Blog" },
                   { href: "/explore/about", label: "Platforma haqida" },
                 ].map(l => (

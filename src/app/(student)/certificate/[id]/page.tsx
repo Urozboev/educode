@@ -10,6 +10,18 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowLeft, Download, Printer, Loader2, Pencil, Check, FileText } from "lucide-react";
 
+/**
+ * Sertifikat qat'iy o'lchamda chiziladi.
+ * Ichidagi hamma narsa (padding, shrift, medal) px'da berilgani uchun
+ * konteyner kichrayganda kontent sig'may qolib, `overflow:hidden` uni kesib
+ * tashlaydi. Shuning uchun blok doim CERT_W×CERT_H bo'lib qoladi va ekranga
+ * faqat CSS `scale` bilan moslashtiriladi — capture esa har doim to'liq
+ * o'lchamda, ekran kengligidan qat'i nazar bir xil natija beradi.
+ * Nisbat 1.414:1 — aynan A4 landshaft.
+ */
+const CERT_W = 900;
+const CERT_H = Math.round(CERT_W / 1.414);
+
 export default function CertificatePage() {
   const { id } = useParams<{ id: string }>();
   const supabase = createClient();
@@ -22,6 +34,19 @@ export default function CertificatePage() {
   const [name, setName] = useState("");
   const [savingName, setSavingName] = useState(false);
   const certRef = useRef<HTMLDivElement>(null);
+  // Ekranga sig'dirish koeffitsienti (capture'ga ta'sir qilmaydi)
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState(1);
+
+  useEffect(() => {
+    const el = shellRef.current;
+    if (!el) return;
+    const update = () => setFit(Math.min(1, el.clientWidth / CERT_W));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [loading]);
 
   useEffect(() => {
     (async () => {
@@ -53,15 +78,27 @@ export default function CertificatePage() {
     setSavingName(false);
   }
 
+  /** A4 landshaft 300 dpi uchun kerakli kenglik (297mm × 300/25.4) */
+  const TARGET_PX = 3508;
+
   // Sertifikatni yuqori sifatli canvas'ga aylantirish (PNG va PDF uchun umumiy)
   async function captureCanvas(): Promise<HTMLCanvasElement> {
     const node = certRef.current!;
     const html2canvas = (await import("html2canvas")).default;
-    // aspect-ratio orqali hisoblangan balandlik — klonda yo'qolmasligi uchun aniq px beramiz
-    const w = node.offsetWidth;
-    const h = node.offsetHeight;
+
+    // Shriftlar yuklanmasdan capture qilinsa, matn zaxira shrift bilan
+    // o'lchanadi va qatorlar boshqa joyga tushadi
+    if (document.fonts?.ready) await document.fonts.ready;
+
+    // Ekrandagi `scale` capture'ga ta'sir qilmasligi uchun qat'iy o'lcham
+    const w = CERT_W;
+    const h = CERT_H;
+
+    // Natija har doim A4 300 dpi ga yetadi (ekran kengligiga bog'liq emas)
+    const scale = Math.min(6, Math.max(2, TARGET_PX / w));
+
     return html2canvas(node, {
-      scale: 2,
+      scale,
       backgroundColor: "#fffdf7",
       useCORS: true,
       logging: false,
@@ -70,10 +107,16 @@ export default function CertificatePage() {
       windowWidth: w,
       windowHeight: h,
       onclone: (_doc, clone) => {
-        // Klonda aspect-ratio qo'llab-quvvatlanmaydi → aniq balandlik o'rnatamiz
-        clone.style.aspectRatio = "auto";
         clone.style.width = `${w}px`;
         clone.style.height = `${h}px`;
+        // Ota-elementlardagi sig'dirish transformini bekor qilamiz, aks holda
+        // html2canvas kichraytirilgan holatda rasmga oladi
+        let p = clone.parentElement;
+        while (p) {
+          p.style.transform = "none";
+          p.style.height = "auto";
+          p = p.parentElement;
+        }
       },
     });
   }
@@ -105,7 +148,12 @@ export default function CertificatePage() {
       const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
       const pw = pdf.internal.pageSize.getWidth();
       const ph = pdf.internal.pageSize.getHeight();
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pw, ph, undefined, "FAST");
+      /**
+       * PDF uchun JPEG: shu o'lchamdagi PNG data-URL o'nlab megabayt bo'lib,
+       * jsPDF'ni sekinlashtiradi yoki xotira yetmay fayl buzilib chiqadi.
+       * 0.92 sifatda bosma uchun farq sezilmaydi.
+       */
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, pw, ph, undefined, "FAST");
       pdf.save(`EduCode-Sertifikat-${cert?.certificate_number || "cert"}.pdf`);
       toast.success("PDF yuklab olindi!");
     } catch (err) {
@@ -176,8 +224,11 @@ export default function CertificatePage() {
       </motion.div>
 
       {/* Certificate */}
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
-        <div ref={certRef} className="relative overflow-hidden shadow-2xl" style={{ aspectRatio: "1.414/1", background: "#fffdf7", borderRadius: "8px" }}>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+        {/* Sig'dirish qobig'i: ichidagi blok doim CERT_W×CERT_H, faqat vizual kichrayadi */}
+        <div ref={shellRef} className="w-full overflow-hidden" style={{ height: CERT_H * fit }}>
+          <div style={{ width: CERT_W, height: CERT_H, transform: `scale(${fit})`, transformOrigin: "top left" }}>
+        <div ref={certRef} className="relative overflow-hidden shadow-2xl" style={{ width: CERT_W, height: CERT_H, background: "#fffdf7", borderRadius: "8px" }}>
           {/* Fon: nozik guilloche naqsh + burchak gradientlari */}
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 15% 15%, rgba(108,92,231,0.06), transparent 45%), radial-gradient(circle at 85% 85%, rgba(0,120,200,0.06), transparent 45%), #fffdf7" }} />
           <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: "repeating-linear-gradient(45deg, #6C5CE7 0, #6C5CE7 1px, transparent 1px, transparent 11px)" }} />
@@ -275,6 +326,8 @@ export default function CertificatePage() {
               <p style={{ fontSize: "10px", color: "#999", fontFamily: "monospace" }}>№ {cert.certificate_number}</p>
               <p style={{ fontSize: "10px", color: "#aaa" }}>malla.uz — Raqamli intellektual ta&apos;lim platformasi</p>
             </div>
+          </div>
+        </div>
           </div>
         </div>
       </motion.div>

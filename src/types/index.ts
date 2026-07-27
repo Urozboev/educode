@@ -2,7 +2,8 @@
 // Database Types
 // ====================================
 
-export type UserRole = 'student' | 'teacher' | 'admin';
+// 'parent' bazada va middleware'da bor edi, lekin bu tipda yo'q edi
+export type UserRole = 'student' | 'teacher' | 'parent' | 'admin';
 export type UserLevel = 'beginner' | 'elementary' | 'intermediate' | 'advanced';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type CourseDifficulty = 'beginner' | 'intermediate' | 'advanced';
@@ -415,3 +416,310 @@ export const LANGUAGE_CONFIG: Record<SupportedLanguage, { label: string; monacoI
   java: { label: 'Java', monacoId: 'java', icon: '☕' },
   go: { label: 'Go', monacoId: 'go', icon: '🐹' },
 };
+
+// ====================================
+// Kutubxona bloki (books / glossary / methods)
+// ====================================
+
+export type BookFileType = 'pdf' | 'epub' | 'djvu' | 'doc' | 'link';
+export type BookLanguage = 'uz' | 'ru' | 'en';
+
+export interface Book {
+  id: string;
+  title: string;
+  slug: string;
+  author: string | null;
+  description: string | null;
+  cover_url: string | null;
+  file_url: string;
+  file_size_bytes: number | null;
+  file_type: BookFileType;
+  page_count: number | null;
+  language: BookLanguage;
+  category: string;
+  tags: string[];
+  publisher: string | null;
+  published_year: number | null;
+  downloads: number;
+  order_index: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GlossaryTerm {
+  id: string;
+  term: string;
+  slug: string;
+  definition: string;
+  details_html: string | null;
+  example: string | null;
+  term_en: string | null;
+  synonyms: string[];
+  category: string;
+  difficulty: CourseDifficulty;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type MethodGroupSize = 'individual' | 'small' | 'class' | 'any';
+export type MethodStage = 'warmup' | 'explain' | 'practice' | 'assess' | 'reflect';
+
+export interface TeachingMethod {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  guide_html: string | null;
+  advantages: string[];
+  disadvantages: string[];
+  materials: string[];
+  duration_minutes: number | null;
+  group_size: MethodGroupSize;
+  stage: MethodStage;
+  order_index: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// ====================================
+// O'qituvchi arizasi
+// ====================================
+
+export type TeacherApplicationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface TeacherApplication {
+  id: string;
+  user_id: string;
+  full_name: string;
+  phone: string;
+  region: string | null;
+  district: string | null;
+  school: string;
+  subject: string;
+  experience_years: number;
+  about: string | null;
+  status: TeacherApplicationStatus;
+  reject_reason: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ====================================
+// Dars o'yinlari (Kahoot / Jeopardy / Wordwall muqobili)
+// ====================================
+
+export type LessonGameType = 'quiz_race' | 'jeopardy' | 'match_pairs' | 'crossword';
+
+export interface QuizRaceOption { text: string; correct: boolean }
+export interface QuizRaceQuestion {
+  text: string;
+  /** Shu savolga beriladigan vaqt (soniya) */
+  seconds: number;
+  options: QuizRaceOption[];
+}
+export interface QuizRaceContent { questions: QuizRaceQuestion[] }
+
+export interface JeopardyCell { value: number; question: string; answer: string }
+export interface JeopardyCategory { name: string; cells: JeopardyCell[] }
+export interface JeopardyContent { categories: JeopardyCategory[] }
+
+export interface MatchPair { left: string; right: string }
+export interface MatchPairsContent { pairs: MatchPair[] }
+
+export type LessonGameContent = QuizRaceContent | JeopardyContent | MatchPairsContent | CrosswordContent;
+
+export interface LessonGame {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  type: LessonGameType;
+  content: LessonGameContent;
+  category: string;
+  difficulty: CourseDifficulty;
+  course_id: string | null;
+  topic_id: string | null;
+  coin_reward: number;
+  xp_reward: number;
+  plays: number;
+  order_index: number;
+  author_id: string | null;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GameResult {
+  id: string;
+  game_id: string;
+  user_id: string;
+  score: number;
+  max_score: number;
+  correct_count: number;
+  total_count: number;
+  duration_seconds: number | null;
+  created_at: string;
+}
+
+// ====================================
+// Krossvord (dars o'yinlarining 4-turi)
+// ====================================
+
+export type CrosswordDir = 'across' | 'down';
+
+export interface CrosswordWord {
+  /** Normalizatsiya qilingan javob: bosh harf, apostrofsiz */
+  answer: string;
+  clue: string;
+  row: number;
+  col: number;
+  dir: CrosswordDir;
+  /** Krossvord raqami — buildCrossword hisoblab qo'yadi */
+  num?: number;
+}
+
+export interface CrosswordContent {
+  rows: number;
+  cols: number;
+  words: CrosswordWord[];
+}
+
+// ====================================
+// Portfolio
+// ====================================
+
+export interface PortfolioProject {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  cover_url: string | null;
+  demo_url: string | null;
+  repo_url: string | null;
+  tech: string[];
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** `get_public_portfolio` RPC qaytaradigan tuzilma */
+export interface PublicPortfolio {
+  profile: {
+    id: string;
+    full_name: string;
+    username: string;
+    avatar_url: string | null;
+    bio: string | null;
+    headline: string | null;
+    skills: string[];
+    level: UserLevel;
+    xp: number;
+    longest_streak: number;
+    created_at: string;
+    github_url: string | null;
+    telegram_username: string | null;
+    linkedin_url: string | null;
+    website_url: string | null;
+    is_public: boolean;
+  };
+  stats: {
+    courses_completed: number;
+    certificates: number;
+    challenges_solved: number;
+    games_played: number;
+    achievements: number;
+    topics_completed: number;
+  };
+  completed_courses: {
+    id: string;
+    title: string;
+    slug: string;
+    category: string;
+    difficulty: CourseDifficulty | null;
+    completed_at: string | null;
+  }[];
+  active_courses: {
+    id: string;
+    title: string;
+    slug: string;
+    category: string;
+    progress_percent: number;
+    completed_topics: number;
+    total_topics: number;
+  }[];
+  achievements: {
+    id: string;
+    title: string;
+    description: string | null;
+    icon: string;
+    color: string;
+    earned_at: string;
+  }[];
+  /** Oxirgi 12 hafta: hafta boshi sanasi va qabul qilingan yechimlar soni */
+  activity: { week: string; count: number }[];
+  certificates: {
+    id: string;
+    course_title: string;
+    certificate_number: string;
+    completion_date: string;
+    score_percentage: number | null;
+  }[];
+  projects: Pick<PortfolioProject, 'id' | 'title' | 'description' | 'cover_url' | 'demo_url' | 'repo_url' | 'tech'>[];
+}
+
+// ====================================
+// Olimpiada (musobaqa)
+// ====================================
+
+export interface Contest {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  rules_html: string | null;
+  starts_at: string;
+  ends_at: string;
+  penalty_minutes: number;
+  freeze_minutes: number;
+  is_published: boolean;
+  author_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ContestProblem {
+  letter: string;
+  slug: string;
+  title: string;
+  difficulty: Difficulty;
+  solved_by: number;
+}
+
+/** `contest_overview` RPC natijasi */
+export interface ContestOverview {
+  contest: Pick<Contest,
+    'id' | 'title' | 'slug' | 'description' | 'rules_html' |
+    'starts_at' | 'ends_at' | 'penalty_minutes' | 'freeze_minutes'>;
+  participants: number;
+  is_registered: boolean;
+  problems: ContestProblem[];
+  problem_count: number;
+}
+
+/** `contest_standings` RPC qatori */
+export interface ContestStanding {
+  rank: number;
+  user_id: string;
+  full_name: string;
+  username: string | null;
+  avatar_url: string | null;
+  solved: number;
+  penalty: number;
+  /** { "A": { minute, wrong }, ... } */
+  details: Record<string, { minute: number; wrong: number }>;
+}

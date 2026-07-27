@@ -9,7 +9,8 @@ import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, Users, ClipboardList, BarChart3,
-  Download, LogOut, Moon, Sun, ChevronLeft, Menu
+  Download, LogOut, Moon, Sun, ChevronLeft, Menu,
+  Library, BookMarked, Lightbulb, Gamepad2
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,6 +20,10 @@ const teacherLinks = [
   { href: "/t-students", label: "Talabalarim", icon: Users },
   { href: "/t-assignments", label: "Topshiriqlar", icon: ClipboardList },
   { href: "/t-analytics", label: "Tahlillar", icon: BarChart3 },
+  { href: "/t-lesson-games", label: "Dars o'yinlari", icon: Gamepad2 },
+  { href: "/t-methods", label: "Metodlar", icon: Lightbulb },
+  { href: "/t-books", label: "Kitoblar", icon: Library },
+  { href: "/t-glossary", label: "Terminlar", icon: BookMarked },
   { href: "/t-export", label: "Eksport", icon: Download },
 ];
 

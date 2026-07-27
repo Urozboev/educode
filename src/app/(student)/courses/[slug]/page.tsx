@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { cn, getDifficultyConfig, formatDuration, getLevelLabel } from "@/lib/utils";
+import { cn, formatDuration, getLevelLabel } from "@/lib/utils";
+import { LevelBadge } from "@/components/ui/LevelBadge";
 import type { Course, TopicTocEntry, CourseSection, Enrollment, TopicProgress } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -128,7 +129,6 @@ export default function CourseDetailPage() {
   }
 
   if (!course) return null;
-  const diffConfig = getDifficultyConfig(course.difficulty || "beginner");
 
   return (
     <div className="space-y-10 max-w-4xl">
@@ -160,11 +160,11 @@ export default function CourseDetailPage() {
             {/* Banner ustidagi kontent */}
             <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className={diffConfig.class}>{diffConfig.label}</span>
+                <LevelBadge difficulty={course.difficulty || "beginner"} variant="onDark" />
                 {course.is_free ? (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-green/90 text-background shadow-lg shadow-neon-green/30">BEPUL</span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/90 text-[#1a1a00] shadow-lg shadow-neon-yellow/30"><Coins className="w-3 h-3" />{course.price_coins} coin</span>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/90 text-white dark:text-[#1a1a00] shadow-lg shadow-neon-yellow/30"><Coins className="w-3 h-3" />{course.price_coins} coin</span>
                 )}
                 {course.tags && course.tags.length > 0 && course.tags.slice(0, 3).map(tag => (
                   <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-black/40 border border-white/15 text-white/90 uppercase tracking-wide backdrop-blur-sm">

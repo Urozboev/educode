@@ -2,56 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/**
+ * EduCode dizayn tizimi — "Syntax".
+ * Ranglar sintaksis bo'yash tokenlaridan olingan: kalit so'z (indigo),
+ * satr (amber), funksiya (teal), xato (coral). Amber ayni paytda
+ * platformadagi tanga (coin) rangi ham.
+ */
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 84% 5%;
+    /**
+     * Brend — light rejim.
+     * Har bir qiymat oq fonda kichik matn uchun ham WCAG AA (4.5:1) beradi,
+     * chunki bu ranglar `text-neon-*` sifatida yorliq va narxlarda ishlatiladi.
+     */
+    --brand-purple: 248 68% 53%;  /* 7.6:1 */
+    --brand-blue: 205 88% 38%;    /* 5.0:1 */
+    --brand-green: 167 84% 27%;   /* 5.1:1 */
+    --brand-amber: 33 96% 30%;    /* 6.1:1 — tanga yorliqlari rangli fon ustida turadi */
+    --brand-coral: 3 72% 47%;     /* 5.3:1 */
+    --brand-orchid: 329 58% 46%;  /* 5.5:1 */
+
+    /* Yuza va matn */
+    --background: 240 30% 98%;
+    --foreground: 232 33% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 222 84% 5%;
+    --card-foreground: 232 33% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 5%;
-    --primary: 258 68% 63%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 258 68% 63%;
-    --radius: 0.75rem;
-    --surface: 210 40% 96%;
-    --surface-hover: 210 40% 93%;
+    --popover-foreground: 232 33% 10%;
+    --primary: var(--brand-purple);
+    --primary-foreground: 0 0% 100%;
+    --secondary: 235 30% 96%;
+    --secondary-foreground: 232 33% 14%;
+    --muted: 235 30% 96%;
+    --muted-foreground: 232 12% 42%;
+    --accent: 235 30% 94%;
+    --accent-foreground: 232 33% 14%;
+    --destructive: var(--brand-coral);
+    --destructive-foreground: 0 0% 100%;
+    --border: 233 20% 90%;
+    --input: 233 20% 90%;
+    --ring: var(--brand-purple);
+    --surface: 235 33% 96.5%;
+    --surface-hover: 235 33% 93%;
+
+    --shadow-color: 232 33% 20%;
+    --radius: 0.875rem;
   }
 
   .dark {
-    --background: 228 47% 7%;
-    --foreground: 210 40% 98%;
-    --card: 226 39% 15%;
-    --card-foreground: 210 40% 98%;
-    --popover: 226 39% 15%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 258 68% 63%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 224 30% 18%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 224 30% 18%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 224 30% 22%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 224 20% 20%;
-    --input: 224 20% 20%;
-    --ring: 258 68% 63%;
-    --surface: 226 35% 12%;
-    --surface-hover: 226 35% 16%;
+    /* Qorong'i fonda porlashi uchun yorug'roq va to'yingan variantlar */
+    --brand-purple: 252 92% 74%;
+    --brand-blue: 199 92% 62%;
+    --brand-green: 160 68% 52%;
+    --brand-amber: 40 96% 62%;
+    --brand-coral: 2 88% 69%;
+    --brand-orchid: 330 85% 70%;
+
+    /**
+     * Qorong'i tema qop-qora emas — ko'kimtir-kulrang chuqur slate.
+     * Yuzalar orasidagi farq yorug'lik bilan beriladi, shuning uchun
+     * kartochkalar fonda "suzib" turadi.
+     */
+    --background: 231 20% 14%;
+    --foreground: 232 26% 95%;
+    --card: 231 18% 18%;
+    --card-foreground: 232 26% 95%;
+    --popover: 231 18% 18%;
+    --popover-foreground: 232 26% 95%;
+    --primary: var(--brand-purple);
+    --primary-foreground: 231 30% 12%;
+    --secondary: 231 15% 24%;
+    --secondary-foreground: 232 26% 95%;
+    --muted: 231 15% 24%;
+    --muted-foreground: 230 13% 69%;
+    --accent: 231 15% 28%;
+    --accent-foreground: 232 26% 95%;
+    --destructive: var(--brand-coral);
+    --destructive-foreground: 231 30% 12%;
+    --border: 231 13% 29%;
+    --input: 231 13% 29%;
+    --ring: var(--brand-purple);
+    --surface: 231 18% 17%;
+    --surface-hover: 231 17% 23%;
+
+    --shadow-color: 231 45% 4%;
   }
 }
 
@@ -60,33 +95,51 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    /* Asosiy matn o'lchami shu yerda — Tailwind shkalasi rem'ga bog'langan */
+    font-size: 103%;
+  }
+
   body {
     @apply bg-background text-foreground font-body antialiased;
-    font-size: 16.5px;
-    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv01";
   }
 
-  /* Matn o'lchamini kattalashtirish */
-  .text-sm { font-size: 0.9rem !important; }
-  .text-xs { font-size: 0.8rem !important; }
-  .text-\[10px\] { font-size: 11px !important; }
-
+  /**
+   * `text-balance` ataylab qo'yilmagan: html2canvas uni qo'llab-quvvatlamaydi,
+   * shuning uchun sertifikat kabi rasmga olinadigan bloklarda ekrandagi va
+   * yuklab olingan fayldagi qator uzilishlari bir-biriga mos kelmay qoladi.
+   */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
+    @apply font-display font-semibold;
   }
 
-  code, pre, .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+  code, pre, kbd, samp {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-feature-settings: normal;
+  }
+
+  /* Klaviatura bilan yurish ko'rinadigan bo'lsin */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring/60 ring-offset-2 ring-offset-background rounded-sm;
+  }
+
+  ::selection {
+    background: hsl(var(--brand-purple) / 0.22);
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-white/[0.08] rounded-2xl;
+    @apply bg-card/85 backdrop-blur-xl border border-border rounded-2xl shadow-soft;
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:bg-card hover:shadow-lg hover:shadow-neon-purple/5 hover:border-neon-purple/20;
+    @apply glass-card transition-all duration-300
+           hover:bg-card hover:shadow-lift hover:border-neon-purple/30;
   }
 
   .gradient-text {
@@ -105,40 +158,41 @@
     inset: -1px;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, #6C5CE7, #00D2FF);
+    background: linear-gradient(135deg, hsl(var(--brand-purple)), hsl(var(--brand-blue)));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
 
+  /* Porlash light rejimda "neon" emas, yumshoq rangli soya sifatida ishlaydi */
   .neon-glow-purple {
-    box-shadow: 0 0 15px rgba(108, 92, 231, 0.3), 0 0 30px rgba(108, 92, 231, 0.1);
+    box-shadow: 0 8px 28px -8px hsl(var(--brand-purple) / 0.45);
   }
 
   .neon-glow-blue {
-    box-shadow: 0 0 15px rgba(0, 210, 255, 0.3), 0 0 30px rgba(0, 210, 255, 0.1);
+    box-shadow: 0 8px 28px -8px hsl(var(--brand-blue) / 0.45);
   }
 
   .neon-glow-green {
-    box-shadow: 0 0 15px rgba(0, 230, 118, 0.3), 0 0 30px rgba(0, 230, 118, 0.1);
+    box-shadow: 0 8px 28px -8px hsl(var(--brand-green) / 0.45);
   }
 
   .btn-primary {
     @apply bg-hero-gradient text-white font-display font-semibold px-6 py-3 rounded-full
-           transition-all duration-300 hover:shadow-lg hover:shadow-neon-purple/25
-           hover:scale-[1.02] active:scale-[0.98];
+           transition-all duration-300 hover:shadow-lift
+           hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply bg-transparent border border-white/10 text-foreground font-display font-medium
+    @apply bg-transparent border border-border text-foreground font-display font-medium
            px-6 py-3 rounded-full transition-all duration-300
-           hover:bg-white/5 hover:border-white/20;
+           hover:bg-surface hover:border-neon-purple/40;
   }
 
   .btn-neon {
-    @apply relative overflow-hidden bg-transparent border border-neon-purple/50 text-neon-purple
+    @apply relative overflow-hidden bg-neon-purple/[0.06] border border-neon-purple/40 text-neon-purple
            font-display font-semibold px-6 py-3 rounded-full transition-all duration-300
-           hover:bg-neon-purple/10 hover:border-neon-purple hover:shadow-lg hover:shadow-neon-purple/20;
+           hover:bg-neon-purple/[0.12] hover:border-neon-purple/70;
   }
 
   .sidebar-link {
@@ -155,33 +209,48 @@
   }
 
   .input-field {
-    @apply w-full bg-surface border border-border rounded-xl px-4 py-3 text-foreground
-           placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/50
+    @apply w-full bg-card border border-border rounded-xl px-4 py-3 text-foreground
+           placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50
            focus:border-neon-purple/50 transition-all duration-200;
   }
 
   .badge-easy {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-           bg-neon-green/10 text-neon-green border border-neon-green/20;
+           bg-neon-green/10 text-neon-green border border-neon-green/25;
   }
 
   .badge-medium {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-           bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20;
+           bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/25;
   }
 
   .badge-hard {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-           bg-neon-red/10 text-neon-red border border-neon-red/20;
+           bg-neon-red/10 text-neon-red border border-neon-red/25;
   }
 
   .coin-badge {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold
-           bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20;
+           bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/25;
+  }
+
+  /* Mono "eyebrow" — kod izohi kabi bo'lim yorlig'i */
+  .eyebrow {
+    @apply font-mono text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground;
+  }
+
+  /**
+   * Raqamlar uchun. Sora'ning qalin raqamlari xarakterli — statistika,
+   * ballar va narxlarda shu klassdan foydalaniladi. `tabular-nums` raqam
+   * o'zgarganda kenglik sakramasligini ta'minlaydi (hisoblagichlar uchun).
+   */
+  .numeric {
+    @apply font-display font-extrabold tabular-nums tracking-tight;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .progress-gradient {
-    background: linear-gradient(90deg, #6C5CE7, #00D2FF);
+    background: linear-gradient(90deg, hsl(var(--brand-purple)), hsl(var(--brand-blue)));
   }
 
   /* Code Editor Styles */
@@ -193,6 +262,7 @@
     @apply flex items-center justify-between px-4 py-2 bg-surface border-b border-border;
   }
 
+  /* Kod chiqishi ikkala temada ham qorong'i qoladi — muharrir bilan bir xil */
   .output-panel {
     @apply bg-[#0d1117] text-[#c9d1d9] font-mono text-sm p-4 rounded-xl overflow-auto;
   }
@@ -241,15 +311,19 @@
     }
   }
 
-  /* Noise texture overlay */
+  /* Qog'oz tuzilishi — faqat qorong'i temada seziladi */
   .noise-overlay::before {
     content: '';
     position: fixed;
     inset: 0;
-    opacity: 0.015;
+    opacity: 0.012;
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     z-index: 50;
+  }
+
+  .dark .noise-overlay::before {
+    opacity: 0.02;
   }
 }
 
@@ -262,11 +336,9 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 
 /* ===== Mobil moslashuv ===== */
 @media (max-width: 640px) {
-  body { font-size: 15px; line-height: 1.6; }
-  .text-sm { font-size: 0.85rem !important; }
-  .text-xs { font-size: 0.75rem !important; }
+  html { font-size: 97%; }
 
-  /* Rasm/video/jadval hech qachon ekranни kesib chiqmasin */
+  /* Rasm/video/jadval hech qachon ekranni kesib chiqmasin */
   img, video, iframe, table, pre { max-width: 100%; }
   pre { overflow-x: auto; }
 
@@ -279,3 +351,13 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 /* Prose ichidagi rasmlar/jadvallar (dars matni) toshib ketmasin */
 .prose img { height: auto; }
 .prose table { display: block; overflow-x: auto; }
+
+/* Harakatni kamaytirish sozlamasi hurmat qilinadi */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

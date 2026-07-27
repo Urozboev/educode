@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Sora, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "sonner";
@@ -12,6 +13,32 @@ import {
   ogImageUrl,
 } from "@/lib/seo";
 import "./globals.css";
+
+/**
+ * Tipografika: Sora sarlavhalar va raqamlar uchun (qalin holatda raqamlari
+ * ayniqsa xarakterli), Plus Jakarta Sans o'qish uchun, JetBrains Mono kod uchun.
+ * next/font orqali — tashqi so'rov yo'q, FOUT yo'q.
+ */
+const fontDisplay = Sora({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const fontBody = Plus_Jakarta_Sans({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const fontMono = JetBrains_Mono({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -86,8 +113,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
+    { media: "(prefers-color-scheme: light)", color: "#f9f9fc" },
+    { media: "(prefers-color-scheme: dark)", color: "#1c1e2b" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -98,22 +125,21 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="uz" suppressHydrationWarning>
+    <html
+      lang="uz"
+      suppressHydrationWarning
+      className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}
+    >
       <body className="min-h-screen font-body antialiased noise-overlay">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
           <QueryProvider>
             {children}
-            <Toaster
-              position="top-right"
-              richColors
-              closeButton
-              theme="dark"
-            />
+            <Toaster position="top-right" richColors closeButton />
           </QueryProvider>
         </ThemeProvider>
       </body>

@@ -5,18 +5,42 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
-import { Code2, LayoutDashboard, Menu, X, Moon, Sun, LogOut } from "lucide-react";
+import { Code2, LayoutDashboard, Menu, X, Moon, Sun, LogOut, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
-const navLinks = [
+/**
+ * Modullar ko'payib, tekis menyu 1000px ekranda ham sig'may qoldi.
+ * Shuning uchun ikki qatlam: o'quv yo'lining asosiy bosqichlari doim
+ * ko'rinadi, qolgan resurslar ochiladigan ro'yxatga yig'ildi.
+ */
+const primaryLinks = [
   { href: "/explore/courses", label: "Kurslar" },
   { href: "/explore/challenges", label: "Topshiriqlar" },
   { href: "/playground", label: "Playground" },
-  { href: "/explore/games", label: "O'yinlar" },
+  { href: "/explore/contests", label: "Olimpiada" },
+];
+
+const resourceLinks = [
+  { href: "/explore/books", label: "Kitoblar", hint: "Bepul PDF kitoblar" },
+  { href: "/explore/glossary", label: "Terminlar", hint: "Lug'at va flash-cardlar" },
+  { href: "/explore/labs", label: "Laboratoriya", hint: "Interaktiv vizualizatorlar" },
+  { href: "/explore/games", label: "O'yinlar", hint: "Dars o'yinlari va arkada" },
+  { href: "/explore/methods", label: "Metodlar", hint: "O'qituvchiga yo'riqnoma" },
+  { href: "/explore/portfolios", label: "Portfoliolar", hint: "Talabalar ishlari" },
+];
+
+const tailLinks = [
   { href: "/blog", label: "Blog" },
+];
+
+/** Yuqori panelga sig'magani — faqat mobil menyu va footerda */
+const extraLinks = [
   { href: "/explore/about", label: "Platforma haqida" },
 ];
+
+/** Mobil menyu uchun hammasi bitta ro'yxatda */
+const allLinks = [...primaryLinks, ...resourceLinks, ...tailLinks, ...extraLinks];
 
 export default function ExploreLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
@@ -25,6 +49,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
   const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
@@ -49,8 +74,60 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map(l => (
+          <div className="hidden lg:flex items-center gap-1">
+            {primaryLinks.map(l => (
+              <Link key={l.href} href={l.href} className={`px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${pathname === l.href ? "text-neon-purple bg-neon-purple/8" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>{l.label}</Link>
+            ))}
+
+            {/* Resurslar — ochiladigan ro'yxat */}
+            <div
+              className="relative"
+              onMouseEnter={() => setResourcesOpen(true)}
+              onMouseLeave={() => setResourcesOpen(false)}
+            >
+              <button
+                onClick={() => setResourcesOpen(o => !o)}
+                aria-expanded={resourcesOpen}
+                className={`inline-flex items-center gap-1 px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${
+                  resourceLinks.some(r => pathname === r.href)
+                    ? "text-neon-purple bg-neon-purple/8"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                Resurslar
+                <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              <AnimatePresence>
+                {resourcesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 top-full pt-2 w-64"
+                  >
+                    <div className="rounded-xl border border-border bg-card shadow-lift p-1.5">
+                      {resourceLinks.map(r => (
+                        <Link
+                          key={r.href}
+                          href={r.href}
+                          onClick={() => setResourcesOpen(false)}
+                          className={`block px-3 py-2.5 rounded-lg transition-colors ${
+                            pathname === r.href ? "bg-neon-purple/8 text-neon-purple" : "hover:bg-accent"
+                          }`}
+                        >
+                          <span className="block text-sm font-medium">{r.label}</span>
+                          <span className="block text-[11px] text-muted-foreground mt-0.5">{r.hint}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {tailLinks.map(l => (
               <Link key={l.href} href={l.href} className={`px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${pathname === l.href ? "text-neon-purple bg-neon-purple/8" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>{l.label}</Link>
             ))}
           </div>
@@ -64,14 +141,14 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
             {user ? (
               <Link href={dashboardUrl} className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Dashboard</Link>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden lg:flex items-center gap-2">
                 <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kirish</Link>
                 <Link href="/register" className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
               </div>
             )}
 
             {/* Mobile menu toggle */}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 hover:bg-accent rounded-lg">
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-2 hover:bg-accent rounded-lg">
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
@@ -80,9 +157,9 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
         {/* Mobile dropdown */}
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div className="md:hidden bg-card border-b border-border px-4 py-3 space-y-1"
+            <motion.div className="lg:hidden bg-card border-b border-border px-4 py-3 space-y-1"
               initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-              {navLinks.map(l => (
+              {allLinks.map(l => (
                 <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
                   className={`block py-2.5 px-3 rounded-lg text-sm ${pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent"}`}>{l.label}</Link>
               ))}

@@ -15,10 +15,10 @@ export async function GET(req: NextRequest) {
 
   // Type → rang/emoji
   const typeBadge: Record<string, { label: string; color: string; emoji: string }> = {
-    course: { label: "KURS", color: "#6C5CE7", emoji: "📚" },
-    challenge: { label: "TOPSHIRIQ", color: "#00D2FF", emoji: "⚡" },
-    topic: { label: "MAVZU", color: "#00E676", emoji: "🎯" },
-    default: { label: "EDUCODE", color: "#6C5CE7", emoji: "🚀" },
+    course: { label: "KURS", color: "#8A7BF7", emoji: "📚" },
+    challenge: { label: "TOPSHIRIQ", color: "#4FC3F7", emoji: "⚡" },
+    topic: { label: "MAVZU", color: "#3DD9AC", emoji: "🎯" },
+    default: { label: "EDUCODE", color: "#8A7BF7", emoji: "🚀" },
   };
   const badge = typeBadge[type] || typeBadge.default;
 
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
           display: "flex",
           flexDirection: "column",
           background:
-            "linear-gradient(135deg, #0a0a0f 0%, #16121f 50%, #0e0a18 100%)",
+            "linear-gradient(135deg, #0e1018 0%, #191634 50%, #120f26 100%)",
           padding: "72px",
           color: "#ffffff",
           fontFamily: "system-ui, -apple-system, sans-serif",
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
             right: -100,
             width: 400,
             height: 400,
-            background: "radial-gradient(circle, rgba(108,92,231,0.4), transparent 70%)",
+            background: "radial-gradient(circle, rgba(138,123,247,0.4), transparent 70%)",
             filter: "blur(40px)",
           }}
         />
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
               width: 56,
               height: 56,
               borderRadius: 14,
-              background: "linear-gradient(135deg, #6C5CE7, #00D2FF)",
+              background: "linear-gradient(135deg, #8A7BF7, #4FC3F7)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

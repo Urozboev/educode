@@ -3,34 +3,36 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { cn, getDifficultyConfig } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { Course, Enrollment } from "@/types";
 import { motion } from "framer-motion";
 import {
   BookOpen, Search, Clock, Users, Coins, Star,
   ChevronRight, CheckCircle2, Play, Sparkles, Layers,
 } from "lucide-react";
+import { CategoryIcon } from "@/components/icons/CategoryIcon";
+import { LevelBadge } from "@/components/ui/LevelBadge";
 
 const categories = [
-  { value: "all", label: "Barchasi", icon: "✨" },
-  { value: "python", label: "Python", icon: "🐍" },
-  { value: "programming", label: "Dasturlash", icon: "💻" },
-  { value: "frontend", label: "Frontend", icon: "⚛️" },
-  { value: "computer_literacy", label: "Kompyuter savodxonligi", icon: "🖥️" },
-  { value: "prompt_engineering", label: "Prompt Engineering", icon: "🤖" },
-  { value: "algorithms", label: "Algoritmlar", icon: "🧠" },
+  { value: "all", label: "Barchasi" },
+  { value: "python", label: "Python" },
+  { value: "programming", label: "Dasturlash" },
+  { value: "frontend", label: "Frontend" },
+  { value: "computer_literacy", label: "Kompyuter savodxonligi" },
+  { value: "prompt_engineering", label: "Prompt Engineering" },
+  { value: "algorithms", label: "Algoritmlar" },
 ];
 
-/** Kategoriya bo'yicha cover gradient + emoji */
-const categoryStyle: Record<string, { gradient: string; emoji: string; accent: string }> = {
-  python: { gradient: "from-[#3776AB]/30 via-[#FFD43B]/10 to-transparent", emoji: "🐍", accent: "#3776AB" },
-  programming: { gradient: "from-neon-purple/30 via-neon-blue/10 to-transparent", emoji: "💻", accent: "#6C5CE7" },
-  frontend: { gradient: "from-[#61DAFB]/25 via-neon-purple/10 to-transparent", emoji: "⚛️", accent: "#61DAFB" },
-  computer_literacy: { gradient: "from-neon-blue/25 via-neon-green/10 to-transparent", emoji: "🖥️", accent: "#00D2FF" },
-  prompt_engineering: { gradient: "from-neon-pink/25 via-neon-purple/10 to-transparent", emoji: "🤖", accent: "#FF6BCB" },
-  algorithms: { gradient: "from-neon-green/25 via-neon-blue/10 to-transparent", emoji: "🧠", accent: "#00E676" },
+/** Kategoriya bo'yicha cover gradienti va bezak rangi */
+const categoryStyle: Record<string, { gradient: string; accent: string }> = {
+  python: { gradient: "from-[#3776AB]/30 via-[#FFD43B]/10 to-transparent", accent: "#3776AB" },
+  programming: { gradient: "from-neon-purple/30 via-neon-blue/10 to-transparent", accent: "#6A55E8" },
+  frontend: { gradient: "from-[#61DAFB]/25 via-neon-purple/10 to-transparent", accent: "#3F97BC" },
+  computer_literacy: { gradient: "from-neon-blue/25 via-neon-green/10 to-transparent", accent: "#2196C9" },
+  prompt_engineering: { gradient: "from-neon-pink/25 via-neon-purple/10 to-transparent", accent: "#C2479B" },
+  algorithms: { gradient: "from-neon-green/25 via-neon-blue/10 to-transparent", accent: "#16A085" },
 };
-const defaultStyle = { gradient: "from-neon-purple/25 via-neon-blue/10 to-transparent", emoji: "📚", accent: "#6C5CE7" };
+const defaultStyle = { gradient: "from-neon-purple/25 via-neon-blue/10 to-transparent", accent: "#6A55E8" };
 
 /** Teglar bo'sh bo'lsa kategoriyadan fallback */
 const fallbackTags: Record<string, string[]> = {
@@ -186,7 +188,7 @@ export default function CoursesPage() {
                   : "bg-surface text-muted-foreground hover:bg-surface-hover border-transparent hover:border-border/60"
               )}
             >
-              <span className="text-sm">{cat.icon}</span> {cat.label}
+              <CategoryIcon category={cat.value} size={17} /> {cat.label}
             </button>
           ))}
         </div>
@@ -209,7 +211,6 @@ export default function CoursesPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredCourses.map((course, i) => {
             const enrollment = getEnrollment(course.id);
-            const diffConfig = getDifficultyConfig(course.difficulty || "beginner");
             const style = categoryStyle[course.category] || defaultStyle;
 
             return (
@@ -252,8 +253,11 @@ export default function CoursesPage() {
                           className="absolute inset-0 opacity-[0.15]"
                           style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "16px 16px" }}
                         />
-                        <div className="absolute bottom-3 left-5 text-6xl drop-shadow-lg group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left">
-                          {style.emoji}
+                        <div
+                          className="absolute bottom-4 left-5 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left"
+                          style={{ color: style.accent }}
+                        >
+                          <CategoryIcon category={course.category} size={56} strokeWidth={1.2} />
                         </div>
                       </>
                     )}
@@ -268,7 +272,7 @@ export default function CoursesPage() {
                           BEPUL
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/90 text-[#1a1a00] backdrop-blur-sm shadow-lg shadow-neon-yellow/30">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-neon-yellow/90 text-white dark:text-[#1a1a00] backdrop-blur-sm shadow-lg shadow-neon-yellow/30">
                           <Coins className="w-3 h-3" />{course.price_coins}
                         </span>
                       )}
@@ -283,9 +287,9 @@ export default function CoursesPage() {
 
                   {/* Body — toza, havodor uslub */}
                   <div className="flex flex-col flex-1 p-5 md:p-6">
-                    {/* Daraja chipi */}
+                    {/* Daraja ko'rsatkichi */}
                     <div className="mb-3">
-                      <span className={diffConfig.class}>{diffConfig.label}</span>
+                      <LevelBadge difficulty={course.difficulty || "beginner"} />
                     </div>
 
                     {/* Sarlavha — barcha kartalarda teng balandlik (2 qator joyi) */}
