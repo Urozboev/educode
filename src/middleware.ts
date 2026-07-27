@@ -47,6 +47,7 @@ export async function middleware(request: NextRequest) {
     '/books',
     '/glossary',
     '/lesson-games',
+    '/join',
     '/portfolio',
     '/placement-test',
     // O'qituvchi arizasi: login shart, lekin rol hali 'student'

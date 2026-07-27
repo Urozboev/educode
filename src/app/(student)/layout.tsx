@@ -11,7 +11,7 @@ import {
   Code2, LayoutDashboard, BookOpen, Swords, Gamepad2,
   BarChart3, Trophy, Store, User, LogOut, ChevronLeft,
   Menu, X, Moon, Sun, Flame, Coins, ChevronDown, MessageCircle,
-  Library, BookMarked, Puzzle, Briefcase
+  Library, BookMarked, Puzzle, Briefcase, School
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +27,7 @@ const studentLinks = [
   { href: "/my-results", label: "Natijalarim", icon: BarChart3 },
   { href: "/leaderboard", label: "Reyting", icon: Trophy },
   { href: "/lesson-games", label: "Dars o'yinlari", icon: Puzzle },
+  { href: "/join", label: "Guruhga qo'shilish", icon: School },
   { href: "/books", label: "Kitoblar", icon: Library },
   { href: "/glossary", label: "Terminlar", icon: BookMarked },
   { href: "/store", label: "Do'kon", icon: Store },

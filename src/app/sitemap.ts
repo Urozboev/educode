@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/seo";
+import { LABS } from "@/lib/labs";
 
 export const revalidate = 3600; // har soatda yangilanadi
 
@@ -31,8 +32,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/explore/labs`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/explore/portfolios`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
     { url: `${SITE_URL}/explore/contests`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
-    { url: `${SITE_URL}/explore/labs/sorting`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/explore/lesson-games`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    // Laboratoriyalar reyestrdan olinadi — yangisi qo'shilsa sitemap o'zi yangilanadi
+    ...LABS.map((l): Item => ({
+      url: `${SITE_URL}/explore/labs/${l.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    })),
   ];
 
   // 2) Dinamik mazmun
@@ -40,6 +48,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let courses: Item[] = [];
   let challenges: Item[] = [];
   let topics: Item[] = [];
+  let games: Item[] = [];
+  let contests: Item[] = [];
+  let portfolios: Item[] = [];
 
   try {
     const supabase = createAdminClient();
@@ -97,6 +108,57 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }));
     }
 
+    /**
+     * Quyidagi uch jadval keyingi migratsiyalarda qo'shilgan. Jadval hali
+     * yaratilmagan bo'lsa supabase-js xato tashlamaydi — `data` null bo'ladi
+     * va bo'lim shunchaki tushib qoladi, qolgan sitemap buzilmaydi.
+     */
+
+    // Nashr qilingan dars o'yinlari
+    const { data: gameRows } = await supabase
+      .from("lesson_games")
+      .select("slug, updated_at")
+      .eq("is_published", true);
+    if (gameRows) {
+      games = gameRows.map((g: any) => ({
+        url: `${SITE_URL}/play/${g.slug}`,
+        lastModified: g.updated_at ? new Date(g.updated_at) : now,
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }));
+    }
+
+    // E'lon qilingan olimpiadalar
+    const { data: contestRows } = await supabase
+      .from("contests")
+      .select("slug, updated_at")
+      .eq("is_published", true);
+    if (contestRows) {
+      contests = contestRows.map((c: any) => ({
+        url: `${SITE_URL}/explore/contests/${c.slug}`,
+        lastModified: c.updated_at ? new Date(c.updated_at) : now,
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+      }));
+    }
+
+    // Ochiq portfoliolar — faqat talaba o'zi ochganlari
+    const { data: portfolioRows } = await supabase
+      .from("profiles")
+      .select("username, updated_at")
+      .eq("is_portfolio_public", true)
+      .eq("is_blocked", false)
+      .not("username", "is", null)
+      .limit(1000);
+    if (portfolioRows) {
+      portfolios = portfolioRows.map((p: any) => ({
+        url: `${SITE_URL}/u/${p.username}`,
+        lastModified: p.updated_at ? new Date(p.updated_at) : now,
+        changeFrequency: "weekly" as const,
+        priority: 0.5,
+      }));
+    }
+
     // Blog maqolalari
     const { data: blogRows } = await supabase
       .from("blog_posts")
@@ -114,5 +176,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.warn("[sitemap] Supabase fetch failed:", e);
   }
 
-  return [...staticRoutes, ...courses, ...challenges, ...topics, ...blog];
+  return [
+    ...staticRoutes,
+    ...courses, ...challenges, ...topics, ...blog,
+    ...games, ...contests, ...portfolios,
+  ];
 }

@@ -18,13 +18,30 @@ export function formatDuration(minutes: number): string {
   return mins > 0 ? `${hours} soat ${mins} daqiqa` : `${hours} soat`;
 }
 
+/**
+ * O'zbekcha oy nomlari.
+ * `toLocaleDateString('uz-UZ')` Chrome va Node'da oyni "M01" ko'rinishida
+ * qaytaradi ("2026 M01 15"), shuning uchun nomlarni o'zimiz beramiz.
+ */
+export const UZ_MONTHS = [
+  'yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun',
+  'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr',
+];
+
+/** "15-yanvar, 2026" */
 export function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('uz-UZ', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  if (isNaN(date.getTime())) return '—';
+  return `${date.getDate()}-${UZ_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
+}
+
+/** "15-yanvar, 14:30" — yil ko'rsatilmaydi (joriy yil nazarda tutiladi) */
+export function formatDateTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '—';
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${date.getDate()}-${UZ_MONTHS[date.getMonth()]}, ${hh}:${mm}`;
 }
 
 export function formatRelativeDate(dateStr: string): string {

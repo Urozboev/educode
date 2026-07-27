@@ -10,13 +10,14 @@ import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, Users, ClipboardList, BarChart3,
   Download, LogOut, Moon, Sun, ChevronLeft, Menu,
-  Library, BookMarked, Lightbulb, Gamepad2
+  Library, BookMarked, Lightbulb, Gamepad2, School
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 
 const teacherLinks = [
   { href: "/t-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
+  { href: "/t-groups", label: "Guruhlar", icon: School },
   { href: "/t-students", label: "Talabalarim", icon: Users },
   { href: "/t-assignments", label: "Topshiriqlar", icon: ClipboardList },
   { href: "/t-analytics", label: "Tahlillar", icon: BarChart3 },

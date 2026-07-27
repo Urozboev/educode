@@ -27,6 +27,8 @@ export function GamePlayer({ slug }: { slug: string }) {
   const [result, setResult] = useState<Finished | null>(null);
   const [saving, setSaving] = useState(false);
   const [reward, setReward] = useState<{ coins: number; xp: number } | null>(null);
+  /** Mukofot berilmasa sababi — o'quvchi jimlikda qolmasligi uchun */
+  const [outcome, setOutcome] = useState<string | null>(null);
   const [runKey, setRunKey] = useState(0);
 
   useEffect(() => {
@@ -50,7 +52,11 @@ export function GamePlayer({ slug }: { slug: string }) {
     // Natija faqat login qilganlar uchun saqlanadi — o'qituvchi darsda
     // proyektorda login'siz ham o'ynay olishi kerak
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user || !game) { setSaving(false); return; }
+    if (!user || !game) {
+      setSaving(false);
+      setOutcome("guest");
+      return;
+    }
 
     const { data, error } = await supabase.rpc("finish_lesson_game", {
       p_game_id: game.id,
@@ -62,13 +68,20 @@ export function GamePlayer({ slug }: { slug: string }) {
     });
 
     setSaving(false);
-    if (error) { toast.error("Natijani saqlashda xatolik"); return; }
+    if (error) {
+      // Xatoning o'zini ko'rsatamiz — "xatolik yuz berdi" hech narsa tushuntirmaydi
+      toast.error(error.message || "Natijani saqlashda xatolik");
+      setOutcome("error");
+      return;
+    }
+    setOutcome(data?.reason ?? null);
     if (data?.rewarded) setReward({ coins: data.coins, xp: data.xp });
   }
 
   function replay() {
     setResult(null);
     setReward(null);
+    setOutcome(null);
     setStartedAt(Date.now());
     setRunKey(k => k + 1);
   }
@@ -138,6 +151,19 @@ export function GamePlayer({ slug }: { slug: string }) {
               </span>
             )}
           </motion.div>
+        )}
+
+        {/* Mukofot berilmagan bo'lsa sababini aytamiz */}
+        {!reward && !saving && outcome && outcome !== "ok" && (
+          <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto leading-relaxed">
+            {{
+              already_played: "Natija saqlandi. Coin va XP faqat birinchi o'ynaganda beriladi.",
+              low_score: "Natija saqlandi. Coin olish uchun savollarning yarmidan ko'pini to'g'ri yechish kerak.",
+              draft: "Bu o'yin hali nashr qilinmagan — natija saqlandi, lekin mukofot berilmaydi.",
+              guest: "Natijani saqlash uchun tizimga kiring.",
+              error: "Natijani saqlab bo'lmadi.",
+            }[outcome] ?? ""}
+          </p>
         )}
 
         <div className="flex flex-wrap items-center justify-center gap-3">

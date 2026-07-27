@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type {
   LessonGame, LessonGameType, LessonGameContent, CourseDifficulty,
@@ -15,7 +16,7 @@ import { GAME_TYPES, emptyContent, validateContent, cleanContent, gameTypeLabel 
 import { CrosswordEditor } from "./CrosswordEditor";
 import {
   Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Gamepad2,
-  Trophy, Play, Timer, Grid3x3, Link2, Users, Table2,
+  Trophy, Play, Timer, Grid3x3, Link2, Users, Table2, Radio,
 } from "lucide-react";
 
 const TYPE_ICON: Record<LessonGameType, React.ElementType> = {
@@ -71,6 +72,8 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
   const [form, setForm] = useState<Form>(emptyForm());
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [busyLive, setBusyLive] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => { load(); }, []);
 
@@ -78,10 +81,15 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
     const { data: { user } } = await supabase.auth.getUser();
     setUserId(user?.id ?? null);
 
-    let q = supabase.from("lesson_games").select("*").order("created_at", { ascending: false });
-    if (scope === "teacher" && user) q = q.eq("author_id", user.id);
-
-    const { data } = await q;
+    /**
+     * O'qituvchi barcha o'yinlarni ko'radi — hamkasbining ishini olib
+     * darsda ishlatishi mumkin. Tahrirlash va o'chirish faqat o'zinikida
+     * (RLS ham shuni ta'minlaydi, interfeys esa yo'q tugmani ko'rsatmaydi).
+     */
+    const { data } = await supabase
+      .from("lesson_games")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (data) setGames(data as LessonGame[]);
     setLoading(false);
   }
@@ -151,6 +159,22 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
     load();
   }
 
+  /** Tahrirlash faqat o'z o'yinida; admin hammasini tahrirlaydi */
+  const canEdit = (g: LessonGame) => scope === "admin" || g.author_id === userId;
+
+  /**
+   * Jonli sessiya — hozircha faqat tezlik viktorinasi uchun.
+   * Qolgan turlar navbat bilan emas, erkin o'ynaladi, shuning uchun
+   * "hamma birga bir savolda" modeli ularga to'g'ri kelmaydi.
+   */
+  async function startLive(g: LessonGame) {
+    setBusyLive(g.id);
+    const { data, error } = await supabase.rpc("create_game_session", { p_game_id: g.id });
+    setBusyLive(null);
+    if (error) { toast.error(error.message); return; }
+    router.push(`/t-live/${data.session_id}`);
+  }
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between gap-4">
@@ -159,7 +183,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
             <Gamepad2 className="w-6 h-6 text-neon-purple" /> Dars o&apos;yinlari
           </h1>
           <p className="text-sm text-muted-foreground">
-            {scope === "teacher" ? "O'zingiz yaratgan o'yinlar" : `${games.length} ta o'yin`}
+            {`${games.length} ta o'yin`}{scope === "teacher" && " · hamkasblarnikini ham ko'rishingiz mumkin"}
           </p>
         </div>
         <button onClick={openNew} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
@@ -308,11 +332,28 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
                   <Play className="w-4 h-4" />
                 </Link>
               )}
-              <button onClick={() => togglePublish(g)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title={g.is_published ? "Yashirish" : "Nashr"}>
-                {g.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-              <button onClick={() => openEdit(g)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
-              <button onClick={() => del(g)} className="p-2 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
+              {g.type === "quiz_race" && (
+                <button
+                  onClick={() => startLive(g)}
+                  disabled={busyLive === g.id}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-neon-purple/30 text-neon-purple bg-neon-purple/[0.06] hover:bg-neon-purple/[0.12] disabled:opacity-50 transition-colors"
+                  title="Sinf bilan jonli o'ynash"
+                >
+                  {busyLive === g.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Radio className="w-3.5 h-3.5" />}
+                  Jonli
+                </button>
+              )}
+              {canEdit(g) ? (
+                <>
+                  <button onClick={() => togglePublish(g)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title={g.is_published ? "Yashirish" : "Nashr"}>
+                    {g.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                  <button onClick={() => openEdit(g)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
+                  <button onClick={() => del(g)} className="p-2 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
+                </>
+              ) : (
+                <span className="text-[11px] text-muted-foreground px-2 whitespace-nowrap">boshqa muallif</span>
+              )}
             </div>
           );
         })}

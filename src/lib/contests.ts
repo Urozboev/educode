@@ -50,13 +50,6 @@ export function contestDuration(startsAt: string, endsAt: string): string {
   return `${rest} daqiqa`;
 }
 
-/** Sana va vaqt: "12-avgust, 15:00" */
-export function formatDateTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleString("uz-UZ", {
-    day: "numeric",
-    month: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+/** Sana va vaqt '@/lib/utils' dan qayta eksport qilinadi — uz-UZ lokali
+ * oy nomini noto'g'ri beradi, tuzatilgan varianti o'sha yerda. */
+export { formatDateTime } from "@/lib/utils";
