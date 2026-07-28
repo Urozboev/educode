@@ -146,11 +146,10 @@ Chiqish:
  'n berilgan. n qatorli piramida chizing: i-qatorda i ta raqam bo''ladi (1 dan boshlab), oldida (n − i) ta bo''shliq turadi.
 
 n = 3 uchun:
-```
   1
  12
 123
-```
+
 Raqam 9 dan oshsa, uning oxirgi raqami yoziladi (10 → 0).
 
 Kirish: bitta butun son n

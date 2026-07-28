@@ -39,14 +39,19 @@ BEGIN
      {"id":"d","text":"equals","is_correct":false}]'::jsonb,
    'Bitta teng belgisi qiymat beradi, ikkitasi taqqoslaydi. Pythonda === yo''q.', 1, 0),
 
-  (t_shart, 'Quyidagi kod nima chiqaradi?<br><code>ball = 95<br>if ball &gt;= 60:<br>&nbsp;&nbsp;&nbsp;&nbsp;print("Qoniqarli")<br>elif ball &gt;= 90:<br>&nbsp;&nbsp;&nbsp;&nbsp;print("A''lo")</code>', 'single',
+  (t_shart, 'Quyidagi kod nima chiqaradi?
+ball = 95
+if ball >= 60:
+    print("Qoniqarli")
+elif ball >= 90:
+    print("A''lo")', 'single',
    '[{"id":"a","text":"A''lo","is_correct":false},
      {"id":"b","text":"Qoniqarli","is_correct":true},
      {"id":"c","text":"Ikkalasi ham","is_correct":false},
      {"id":"d","text":"Hech nima","is_correct":false}]'::jsonb,
    'Shartlar yuqoridan pastga tekshiriladi va birinchi rost topilgani bajariladi. Bu yerda shartlar tartibi noto''g''ri qo''yilgan — qat''iyroq shart yuqorida turishi kerak edi.', 1, 1),
 
-  (t_shart, '<code>and</code> operatori qachon <code>True</code> qaytaradi?', 'single',
+  (t_shart, 'and operatori qachon True qaytaradi?', 'single',
    '[{"id":"a","text":"Kamida bitta shart rost bo''lsa","is_correct":false},
      {"id":"b","text":"Ikkala shart ham rost bo''lsa","is_correct":true},
      {"id":"c","text":"Ikkala shart ham yolg''on bo''lsa","is_correct":false},
@@ -60,21 +65,21 @@ BEGIN
      {"id":"d","text":"while","is_correct":false}]'::jsonb,
    'Uchta bir-birini istisno qiluvchi variant bor, shuning uchun if - elif - else eng mos.', 1, 3),
 
-  (t_shart, 'Qaysi ifodalar <code>True</code> qiymat beradi?', 'multiple',
+  (t_shart, 'Qaysi ifodalar True qiymat beradi?', 'multiple',
    '[{"id":"a","text":"5 != 3","is_correct":true},
-     {"id":"b","text":"10 &lt;= 10","is_correct":true},
-     {"id":"c","text":"not (2 &gt; 1)","is_correct":false},
-     {"id":"d","text":"3 &gt; 1 and 1 &gt; 0","is_correct":true}]'::jsonb,
+     {"id":"b","text":"10 <= 10","is_correct":true},
+     {"id":"c","text":"not (2 > 1)","is_correct":false},
+     {"id":"d","text":"3 > 1 and 1 > 0","is_correct":true}]'::jsonb,
    '2 > 1 rost, not uni yolg''onga aylantiradi. Qolgan uchtasi rost.', 2, 4),
 
-  (t_shart, '<code>0 &lt;= x &lt;= 100</code> yozuvi nimani anglatadi?', 'single',
+  (t_shart, '0 <= x <= 100 yozuvi nimani anglatadi?', 'single',
    '[{"id":"a","text":"x 0 va 100 orasida (chegaralar kiradi)","is_correct":true},
      {"id":"b","text":"x 0 yoki 100 ga teng","is_correct":false},
      {"id":"c","text":"Bu xato yozuv","is_correct":false},
      {"id":"d","text":"x 0 dan katta va 100 dan katta","is_correct":false}]'::jsonb,
    'Pythonda zanjirli taqqoslash matematikadagidek ishlaydi. Bu x >= 0 and x <= 100 ning qisqa ko''rinishi.', 1, 5),
 
-  (t_shart, '<code>else</code> bloki qanday hollarda bajariladi?', 'single',
+  (t_shart, 'else bloki qanday hollarda bajariladi?', 'single',
    '[{"id":"a","text":"Har doim","is_correct":false},
      {"id":"b","text":"Yuqoridagi barcha shartlar yolg''on bo''lganda","is_correct":true},
      {"id":"c","text":"Faqat xato yuz berganda","is_correct":false},
@@ -90,7 +95,7 @@ BEGIN
 
   INSERT INTO topic_tasks (topic_id, title, description, starter_code, solution_code, language, test_cases, hints, difficulty, coin_reward, xp_reward, order_index) VALUES
   (t_shart, 'Juft yoki toq',
-   'Bir butun son kiritiladi. Agar u juft bo''lsa <code>juft</code>, toq bo''lsa <code>toq</code> deb chiqaring.',
+   'Bir butun son kiritiladi. Agar u juft bo''lsa juft, toq bo''lsa toq deb chiqaring.',
    'son = int(input())
 # Kodingizni shu yerga yozing',
    'son = int(input())
@@ -108,7 +113,11 @@ else:
    'easy', 5, 15, 0),
 
   (t_shart, 'Baho qo''yish',
-   'Talabaning bali (0 dan 100 gacha butun son) kiritiladi. Quyidagi shkala bo''yicha bahoni chiqaring:<br>90 va undan yuqori — <code>A''lo</code><br>70-89 — <code>Yaxshi</code><br>60-69 — <code>Qoniqarli</code><br>60 dan past — <code>Qoniqarsiz</code>',
+   'Talabaning bali (0 dan 100 gacha butun son) kiritiladi. Quyidagi shkala bo''yicha bahoni chiqaring:
+90 va undan yuqori — A''lo
+70-89 — Yaxshi
+60-69 — Qoniqarli
+60 dan past — Qoniqarsiz',
    'ball = int(input())
 # Kodingizni shu yerga yozing',
    'ball = int(input())
@@ -131,7 +140,8 @@ else:
    'easy', 5, 15, 1),
 
   (t_shart, 'Uchburchak mavjudmi?',
-   'Uch qatorda uchburchak tomonlari (butun sonlar) kiritiladi. Bunday uchburchak mavjud bo''lsa <code>Ha</code>, aks holda <code>Yoq</code> deb chiqaring.<br>Eslatma: uchburchak mavjud bo''lishi uchun har ikki tomon yig''indisi uchinchisidan katta bo''lishi kerak.',
+   'Uch qatorda uchburchak tomonlari (butun sonlar) kiritiladi. Bunday uchburchak mavjud bo''lsa Ha, aks holda Yoq deb chiqaring.
+Eslatma: uchburchak mavjud bo''lishi uchun har ikki tomon yig''indisi uchinchisidan katta bo''lishi kerak.',
    'a = int(input())
 b = int(input())
 c = int(input())
@@ -160,17 +170,17 @@ else:
    '[{"id":"a","text":"[ ]","is_correct":false},
      {"id":"b","text":"{ }","is_correct":true},
      {"id":"c","text":"( )","is_correct":false},
-     {"id":"d","text":"&lt; &gt;","is_correct":false}]'::jsonb,
+     {"id":"d","text":"< >","is_correct":false}]'::jsonb,
    'Lug''at va to''plam figurali qavsda yoziladi. Ro''yxat kvadrat, tuple oddiy qavsda.', 1, 0),
 
-  (t_lugat, 'Mavjud bo''lmagan kalitga <code>d["yoq"]</code> orqali murojaat qilinsa nima bo''ladi?', 'single',
+  (t_lugat, 'Mavjud bo''lmagan kalitga d["yoq"] orqali murojaat qilinsa nima bo''ladi?', 'single',
    '[{"id":"a","text":"None qaytadi","is_correct":false},
      {"id":"b","text":"KeyError xatosi chiqadi","is_correct":true},
      {"id":"c","text":"Bo''sh matn qaytadi","is_correct":false},
      {"id":"d","text":"Yangi kalit yaratiladi","is_correct":false}]'::jsonb,
    'Xatosiz o''qish uchun get() metodi ishlatiladi: d.get("yoq") None qaytaradi.', 1, 1),
 
-  (t_lugat, '<code>{1, 2, 2, 3, 3, 3}</code> to''plamda nechta element bo''ladi?', 'single',
+  (t_lugat, '{1, 2, 2, 3, 3, 3} to''plamda nechta element bo''ladi?', 'single',
    '[{"id":"a","text":"6","is_correct":false},
      {"id":"b","text":"3","is_correct":true},
      {"id":"c","text":"1","is_correct":false},
@@ -191,7 +201,7 @@ else:
      {"id":"d","text":"pairs()","is_correct":false}]'::jsonb,
    'for k, v in d.items(): — eng qulay usul.', 1, 4),
 
-  (t_lugat, '<code>{1,2,3} &amp; {2,3,4}</code> natijasi nima?', 'single',
+  (t_lugat, '{1,2,3} & {2,3,4} natijasi nima?', 'single',
    '[{"id":"a","text":"{1, 2, 3, 4}","is_correct":false},
      {"id":"b","text":"{2, 3}","is_correct":true},
      {"id":"c","text":"{1, 4}","is_correct":false},
@@ -214,7 +224,7 @@ else:
 
   INSERT INTO topic_tasks (topic_id, title, description, starter_code, solution_code, language, test_cases, hints, difficulty, coin_reward, xp_reward, order_index) VALUES
   (t_lugat, 'Takrorlarni yo''qotish',
-   'Birinchi qatorda sonlar soni <code>n</code>, keyingi qatorda <code>n</code> ta son bo''shliq bilan kiritiladi. Takrorlarni yo''qotib, sonlarni o''sish tartibida bitta qatorda bo''shliq bilan chiqaring.',
+   'Birinchi qatorda sonlar soni n, keyingi qatorda n ta son bo''shliq bilan kiritiladi. Takrorlarni yo''qotib, sonlarni o''sish tartibida bitta qatorda bo''shliq bilan chiqaring.',
    'n = int(input())
 sonlar = list(map(int, input().split()))
 # Kodingizni shu yerga yozing',
@@ -231,7 +241,8 @@ print(*noyob)',
    'medium', 8, 20, 0),
 
   (t_lugat, 'Harflar sanog''i',
-   'Bir qator matn kiritiladi (bo''shliqsiz, kichik harflar). Har bir harf necha marta uchraganini alifbo tartibida chiqaring.<br>Har qator <code>harf sanoq</code> ko''rinishida bo''lsin.',
+   'Bir qator matn kiritiladi (bo''shliqsiz, kichik harflar). Har bir harf necha marta uchraganini alifbo tartibida chiqaring.
+Har qator harf sanoq ko''rinishida bo''lsin.',
    'matn = input()
 sanoq = {}
 # Kodingizni shu yerga yozing',
@@ -250,7 +261,8 @@ for harf in sorted(sanoq):
    'medium', 8, 20, 1),
 
   (t_lugat, 'Ikki guruhning umumiy a''zolari',
-   'To''rt qator kiritiladi: 1-guruh a''zolari soni, ularning ismlari bo''shliq bilan, 2-guruh a''zolari soni, ularning ismlari.<br>Ikkala guruhda ham bor ismlarni alifbo tartibida bitta qatorda chiqaring. Umumiy a''zo bo''lmasa <code>yoq</code> deb yozing.',
+   'To''rt qator kiritiladi: 1-guruh a''zolari soni, ularning ismlari bo''shliq bilan, 2-guruh a''zolari soni, ularning ismlari.
+Ikkala guruhda ham bor ismlarni alifbo tartibida bitta qatorda chiqaring. Umumiy a''zo bo''lmasa yoq deb yozing.',
    'n = int(input())
 a = set(input().split())
 m = int(input())
@@ -277,56 +289,63 @@ else:
   -- 9-MAVZU: While sikli
   -- ============================================
   INSERT INTO quizzes (topic_id, question, question_type, options, explanation, points, order_index) VALUES
-  (t_while, '<code>while</code> sikli qachon to''xtaydi?', 'single',
+  (t_while, 'while sikli qachon to''xtaydi?', 'single',
    '[{"id":"a","text":"Belgilangan marta takrorlangach","is_correct":false},
      {"id":"b","text":"Shart yolg''on bo''lganda","is_correct":true},
      {"id":"c","text":"Hech qachon","is_correct":false},
      {"id":"d","text":"10 marta aylangach","is_correct":false}]'::jsonb,
    'while har aylanishdan oldin shartni tekshiradi. Shart False bo''lishi bilan sikl tugaydi.', 1, 0),
 
-  (t_while, 'Nima uchun bu sikl cheksiz?<br><code>i = 1<br>while i &lt;= 5:<br>&nbsp;&nbsp;&nbsp;&nbsp;print(i)</code>', 'single',
+  (t_while, 'Nima uchun bu sikl cheksiz?
+i = 1
+while i <= 5:
+    print(i)', 'single',
    '[{"id":"a","text":"Shart noto''g''ri yozilgan","is_correct":false},
      {"id":"b","text":"i ning qiymati sikl ichida o''zgarmaydi","is_correct":true},
      {"id":"c","text":"print() siklni to''xtatadi","is_correct":false},
      {"id":"d","text":"i boshlang''ich qiymat olmagan","is_correct":false}]'::jsonb,
    'i har doim 1 bo''lib qoladi, shuning uchun shart hech qachon yolg''on bo''lmaydi. i += 1 yozilishi kerak edi.', 1, 1),
 
-  (t_while, '<code>break</code> nima qiladi?', 'single',
+  (t_while, 'break nima qiladi?', 'single',
    '[{"id":"a","text":"Siklni butunlay tugatadi","is_correct":true},
      {"id":"b","text":"Keyingi aylanishga o''tadi","is_correct":false},
      {"id":"c","text":"Dasturni to''xtatadi","is_correct":false},
      {"id":"d","text":"Shartni teskarisiga o''zgartiradi","is_correct":false}]'::jsonb,
    'break sikldan chiqadi, dastur esa sikldan keyingi qatordan davom etadi.', 1, 2),
 
-  (t_while, '<code>continue</code> nima qiladi?', 'single',
+  (t_while, 'continue nima qiladi?', 'single',
    '[{"id":"a","text":"Siklni tugatadi","is_correct":false},
      {"id":"b","text":"Joriy aylanishning qolganini o''tkazib, keyingisiga o''tadi","is_correct":true},
      {"id":"c","text":"Siklni boshidan qayta boshlaydi","is_correct":false},
      {"id":"d","text":"Hech nima qilmaydi","is_correct":false}]'::jsonb,
    'continue faqat joriy aylanishning qolgan qismini o''tkazib yuboradi, sikl davom etadi.', 1, 3),
 
-  (t_while, 'Bu kod nechta son chiqaradi?<br><code>i = 0<br>while i &lt; 3:<br>&nbsp;&nbsp;&nbsp;&nbsp;print(i)<br>&nbsp;&nbsp;&nbsp;&nbsp;i += 1</code>', 'single',
+  (t_while, 'Bu kod nechta son chiqaradi?
+i = 0
+while i < 3:
+    print(i)
+    i += 1', 'single',
    '[{"id":"a","text":"2 ta","is_correct":false},
      {"id":"b","text":"3 ta","is_correct":true},
      {"id":"c","text":"4 ta","is_correct":false},
      {"id":"d","text":"Cheksiz","is_correct":false}]'::jsonb,
    '0, 1, 2 chiqadi. i=3 bo''lganda shart yolg''on bo''ladi.', 1, 4),
 
-  (t_while, '<code>son % 10</code> va <code>son // 10</code> juftligi nima uchun ishlatiladi?', 'single',
+  (t_while, 'son % 10 va son // 10 juftligi nima uchun ishlatiladi?', 'single',
    '[{"id":"a","text":"Sonni ikkiga bo''lish uchun","is_correct":false},
      {"id":"b","text":"Sonning raqamlarini birma-bir ajratib olish uchun","is_correct":true},
      {"id":"c","text":"Sonni matnga aylantirish uchun","is_correct":false},
      {"id":"d","text":"Sonni yaxlitlash uchun","is_correct":false}]'::jsonb,
    '% 10 oxirgi raqamni beradi, // 10 uni tashlaydi. Sikl ichida takrorlansa barcha raqamlar olinadi.', 2, 5),
 
-  (t_while, 'Qaysi holatlarda <code>while</code> <code>for</code> dan afzalroq?', 'multiple',
+  (t_while, 'Qaysi holatlarda while for dan afzalroq?', 'multiple',
    '[{"id":"a","text":"Foydalanuvchi to''g''ri javob bermaguncha so''rashda","is_correct":true},
      {"id":"b","text":"Ro''yxatning har bir elementini ko''rib chiqishda","is_correct":false},
      {"id":"c","text":"Takrorlar soni oldindan noma''lum bo''lganda","is_correct":true},
      {"id":"d","text":"Aniq 10 marta takrorlashda","is_correct":false}]'::jsonb,
    'Takrorlar soni ma''lum bo''lsa for + range() qulayroq va xavfsizroq.', 2, 6),
 
-  (t_while, '<code>while True:</code> qanday holatda xavfsiz?', 'single',
+  (t_while, 'while True: qanday holatda xavfsiz?', 'single',
    '[{"id":"a","text":"Hech qachon xavfsiz emas","is_correct":false},
      {"id":"b","text":"Ichida break bo''lsa","is_correct":true},
      {"id":"c","text":"Ichida print() bo''lsa","is_correct":false},
@@ -335,7 +354,7 @@ else:
 
   INSERT INTO topic_tasks (topic_id, title, description, starter_code, solution_code, language, test_cases, hints, difficulty, coin_reward, xp_reward, order_index) VALUES
   (t_while, 'Nolgacha yig''indi',
-   'Har qatorda bittadan butun son kiritiladi. <code>0</code> kiritilgunga qadar sonlarni qo''shib boring va yig''indini chiqaring. <code>0</code> yig''indiga kirmaydi.',
+   'Har qatorda bittadan butun son kiritiladi. 0 kiritilgunga qadar sonlarni qo''shib boring va yig''indini chiqaring. 0 yig''indiga kirmaydi.',
    'jami = 0
 # Kodingizni shu yerga yozing',
    'jami = 0
@@ -353,7 +372,8 @@ print(jami)',
    'medium', 8, 20, 0),
 
   (t_while, 'Raqamlar yig''indisi',
-   'Bir musbat butun son kiritiladi. Uning raqamlari yig''indisini chiqaring.<br>Masalan <code>472</code> uchun javob <code>13</code> (4+7+2).',
+   'Bir musbat butun son kiritiladi. Uning raqamlari yig''indisini chiqaring.
+Masalan 472 uchun javob 13 (4+7+2).',
    'son = int(input())
 yigindi = 0
 # Kodingizni shu yerga yozing',
@@ -373,7 +393,8 @@ print(yigindi)',
    'medium', 8, 20, 1),
 
   (t_while, 'Sonni teskari o''girish',
-   'Bir musbat butun son kiritiladi. Uning raqamlarini teskari tartibda joylashtirib, hosil bo''lgan sonni chiqaring.<br>Masalan <code>1234</code> → <code>4321</code>.',
+   'Bir musbat butun son kiritiladi. Uning raqamlarini teskari tartibda joylashtirib, hosil bo''lgan sonni chiqaring.
+Masalan 1234 → 4321.',
    'son = int(input())
 teskari = 0
 # Kodingizni shu yerga yozing',
@@ -402,14 +423,19 @@ print(teskari)',
      {"id":"d","text":"define","is_correct":false}]'::jsonb,
    'def — define so''zining qisqartmasi.', 1, 0),
 
-  (t_funk, '<code>return</code> va <code>print()</code> farqi nimada?', 'single',
+  (t_funk, 'return va print() farqi nimada?', 'single',
    '[{"id":"a","text":"Farqi yo''q","is_correct":false},
      {"id":"b","text":"return qiymat qaytaradi, print() ekranga chiqaradi","is_correct":true},
      {"id":"c","text":"return faqat sonlar uchun","is_correct":false},
      {"id":"d","text":"print() tezroq ishlaydi","is_correct":false}]'::jsonb,
    'return natijani keyingi hisoblarda ishlatish imkonini beradi, print() esa faqat ko''rsatadi.', 1, 1),
 
-  (t_funk, 'Quyidagi kod nima chiqaradi?<br><code>def f(x):<br>&nbsp;&nbsp;&nbsp;&nbsp;return x * 2<br>&nbsp;&nbsp;&nbsp;&nbsp;print("salom")<br><br>print(f(3))</code>', 'single',
+  (t_funk, 'Quyidagi kod nima chiqaradi?
+def f(x):
+    return x * 2
+    print("salom")
+
+print(f(3))', 'single',
    '[{"id":"a","text":"6 va salom","is_correct":false},
      {"id":"b","text":"6","is_correct":true},
      {"id":"c","text":"salom","is_correct":false},
@@ -430,7 +456,7 @@ print(teskari)',
      {"id":"d","text":"Parametr faqat sonlar bo''ladi","is_correct":false}]'::jsonb,
    'def kvadrat(x) — bu yerda x parametr. kvadrat(5) — bu yerda 5 argument.', 1, 4),
 
-  (t_funk, '<code>def f(a, b=10)</code> uchun <code>f(3)</code> chaqiruvi qanday ishlaydi?', 'single',
+  (t_funk, 'def f(a, b=10) uchun f(3) chaqiruvi qanday ishlaydi?', 'single',
    '[{"id":"a","text":"Xato beradi","is_correct":false},
      {"id":"b","text":"a=3, b=10 bo''ladi","is_correct":true},
      {"id":"c","text":"a=3, b=None bo''ladi","is_correct":false},
@@ -444,7 +470,7 @@ print(teskari)',
      {"id":"d","text":"Natijani return bilan qaytaradi","is_correct":true}]'::jsonb,
    'Funksiya qancha qisqa va bir vazifaga qaratilgan bo''lsa, shuncha oson tushuniladi va sinovdan o''tkaziladi.', 2, 6),
 
-  (t_funk, '<code>return max(a), min(a)</code> nima qaytaradi?', 'single',
+  (t_funk, 'return max(a), min(a) nima qaytaradi?', 'single',
    '[{"id":"a","text":"Faqat max qiymatni","is_correct":false},
      {"id":"b","text":"Ikki qiymatli tuple","is_correct":true},
      {"id":"c","text":"Ro''yxat","is_correct":false},
@@ -453,7 +479,7 @@ print(teskari)',
 
   INSERT INTO topic_tasks (topic_id, title, description, starter_code, solution_code, language, test_cases, hints, difficulty, coin_reward, xp_reward, order_index) VALUES
   (t_funk, 'Kvadrat funksiyasi',
-   'Sonning kvadratini qaytaruvchi <code>kvadrat</code> funksiyasini yozing. Keyin bitta son kiritib, uning kvadratini chiqaring.',
+   'Sonning kvadratini qaytaruvchi kvadrat funksiyasini yozing. Keyin bitta son kiritib, uning kvadratini chiqaring.',
    'def kvadrat(x):
     # Kodingizni shu yerga yozing
     pass
@@ -474,7 +500,8 @@ print(kvadrat(son))',
    'easy', 5, 15, 0),
 
   (t_funk, 'O''rtacha qiymat funksiyasi',
-   'Ro''yxatdagi sonlarning o''rtachasini qaytaruvchi <code>ortacha</code> funksiyasini yozing.<br>Birinchi qatorda sonlar soni, ikkinchi qatorda sonlar bo''shliq bilan kiritiladi. Natijani 2 xonagacha yaxlitlab chiqaring.',
+   'Ro''yxatdagi sonlarning o''rtachasini qaytaruvchi ortacha funksiyasini yozing.
+Birinchi qatorda sonlar soni, ikkinchi qatorda sonlar bo''shliq bilan kiritiladi. Natijani 2 xonagacha yaxlitlab chiqaring.',
    'def ortacha(sonlar):
     # Kodingizni shu yerga yozing
     pass
@@ -497,7 +524,9 @@ print(f"{ortacha(sonlar):.2f}")',
    'medium', 8, 20, 1),
 
   (t_funk, 'Tub sonni aniqlash',
-   'Berilgan sonning tub ekanini aniqlaydigan <code>tubmi</code> funksiyasini yozing. U <code>True</code> yoki <code>False</code> qaytarsin.<br>Bitta son kiritiladi; tub bo''lsa <code>tub</code>, aks holda <code>tub emas</code> deb chiqaring.<br>Eslatma: 1 tub son emas.',
+   'Berilgan sonning tub ekanini aniqlaydigan tubmi funksiyasini yozing. U True yoki False qaytarsin.
+Bitta son kiritiladi; tub bo''lsa tub, aks holda tub emas deb chiqaring.
+Eslatma: 1 tub son emas.',
    'def tubmi(n):
     # Kodingizni shu yerga yozing
     pass
@@ -543,21 +572,21 @@ else:
      {"id":"d","text":"require","is_correct":false}]'::jsonb,
    'Pythonda modul import kalit so''zi bilan ulanadi.', 1, 0),
 
-  (t_modul, '<code>import math</code> dan keyin kvadrat ildiz qanday hisoblanadi?', 'single',
+  (t_modul, 'import math dan keyin kvadrat ildiz qanday hisoblanadi?', 'single',
    '[{"id":"a","text":"sqrt(16)","is_correct":false},
      {"id":"b","text":"math.sqrt(16)","is_correct":true},
      {"id":"c","text":"math(sqrt(16))","is_correct":false},
      {"id":"d","text":"16.sqrt()","is_correct":false}]'::jsonb,
    'Oddiy import da funksiyaga modul.funksiya ko''rinishida murojaat qilinadi.', 1, 1),
 
-  (t_modul, '<code>random.randint(1, 6)</code> qanday qiymatlar qaytarishi mumkin?', 'single',
+  (t_modul, 'random.randint(1, 6) qanday qiymatlar qaytarishi mumkin?', 'single',
    '[{"id":"a","text":"1 dan 5 gacha","is_correct":false},
      {"id":"b","text":"1 dan 6 gacha (ikkalasi ham kiradi)","is_correct":true},
      {"id":"c","text":"0 dan 6 gacha","is_correct":false},
      {"id":"d","text":"2 dan 6 gacha","is_correct":false}]'::jsonb,
    'range() dan farqli o''laroq randint() da oxirgi son ham kiradi.', 1, 2),
 
-  (t_modul, '<code>math.floor(4.9)</code> nima qaytaradi?', 'single',
+  (t_modul, 'math.floor(4.9) nima qaytaradi?', 'single',
    '[{"id":"a","text":"5","is_correct":false},
      {"id":"b","text":"4","is_correct":true},
      {"id":"c","text":"4.9","is_correct":false},
@@ -571,7 +600,7 @@ else:
      {"id":"d","text":"round()","is_correct":true}]'::jsonb,
    'len(), abs(), round(), sum(), max(), min() — o''rnatilgan funksiyalar. sqrt() esa math modulida.', 2, 4),
 
-  (t_modul, '<code>from math import sqrt</code> yozilsa qanday chaqiriladi?', 'single',
+  (t_modul, 'from math import sqrt yozilsa qanday chaqiriladi?', 'single',
    '[{"id":"a","text":"math.sqrt(9)","is_correct":false},
      {"id":"b","text":"sqrt(9)","is_correct":true},
      {"id":"c","text":"from.sqrt(9)","is_correct":false},
@@ -585,7 +614,7 @@ else:
      {"id":"d","text":"Python o''zi avtomatik o''rnatadi","is_correct":false}]'::jsonb,
    'pip — Python paketlar menejeri. Buyruq terminalda beriladi, dastur kodida emas.', 1, 6),
 
-  (t_modul, 'O''zingiz yozgan <code>hisob.py</code> faylini modul sifatida ishlatish mumkinmi?', 'single',
+  (t_modul, 'O''zingiz yozgan hisob.py faylini modul sifatida ishlatish mumkinmi?', 'single',
    '[{"id":"a","text":"Ha, import hisob orqali","is_correct":true},
      {"id":"b","text":"Yo''q, faqat standart modullar ishlatiladi","is_correct":false},
      {"id":"c","text":"Faqat pip ga yuklangandan keyin","is_correct":false},
@@ -594,7 +623,7 @@ else:
 
   INSERT INTO topic_tasks (topic_id, title, description, starter_code, solution_code, language, test_cases, hints, difficulty, coin_reward, xp_reward, order_index) VALUES
   (t_modul, 'Gipotenuza',
-   'To''g''ri burchakli uchburchakning ikki kateti (butun sonlar) ikki qatorda kiritiladi. Gipotenuza uzunligini 2 xonagacha yaxlitlab chiqaring. <code>math</code> modulidan foydalaning.',
+   'To''g''ri burchakli uchburchakning ikki kateti (butun sonlar) ikki qatorda kiritiladi. Gipotenuza uzunligini 2 xonagacha yaxlitlab chiqaring. math modulidan foydalaning.',
    'import math
 a = int(input())
 b = int(input())
@@ -612,7 +641,8 @@ print(f"{math.sqrt(a * a + b * b):.2f}")',
    'easy', 5, 15, 0),
 
   (t_modul, 'EKUB va EKUK',
-   'Ikki butun son kiritiladi. Birinchi qatorda ularning eng katta umumiy bo''luvchisini (EKUB), ikkinchisida eng kichik umumiy karralisini (EKUK) chiqaring.<br><code>math.gcd()</code> dan foydalanish mumkin.',
+   'Ikki butun son kiritiladi. Birinchi qatorda ularning eng katta umumiy bo''luvchisini (EKUB), ikkinchisida eng kichik umumiy karralisini (EKUK) chiqaring.
+math.gcd() dan foydalanish mumkin.',
    'import math
 a = int(input())
 b = int(input())
@@ -693,7 +723,9 @@ print(a * b // ekub)',
 
   INSERT INTO topic_tasks (topic_id, title, description, starter_code, solution_code, language, test_cases, hints, difficulty, coin_reward, xp_reward, order_index) VALUES
   (t_si, 'Oddiy bashorat: chiziqli bog''liqlik',
-   'Model o''rgangan bog''liqlik: <code>narx = 5 * maydon</code> (mln so''m).<br>Bir qatorda uy maydoni (butun son) kiritiladi. Bashorat qilingan narxni chiqaring.<br>Bu — eng sodda ko''rinishdagi bashorat funksiyasi.',
+   'Model o''rgangan bog''liqlik: narx = 5 * maydon (mln so''m).
+Bir qatorda uy maydoni (butun son) kiritiladi. Bashorat qilingan narxni chiqaring.
+Bu — eng sodda ko''rinishdagi bashorat funksiyasi.',
    'def bashorat(maydon):
     # Kodingizni shu yerga yozing
     pass
@@ -714,7 +746,11 @@ print(bashorat(m))',
    'easy', 5, 15, 0),
 
   (t_si, 'Bashorat aniqligini baholash',
-   'Model bashoratlari va haqiqiy qiymatlar berilgan. Modelning o''rtacha absolyut xatosini (MAE) hisoblang.<br>1-qator: qiymatlar soni <code>n</code><br>2-qator: <code>n</code> ta bashorat qilingan qiymat<br>3-qator: <code>n</code> ta haqiqiy qiymat<br>Natijani 2 xonagacha yaxlitlab chiqaring.',
+   'Model bashoratlari va haqiqiy qiymatlar berilgan. Modelning o''rtacha absolyut xatosini (MAE) hisoblang.
+1-qator: qiymatlar soni n
+2-qator: n ta bashorat qilingan qiymat
+3-qator: n ta haqiqiy qiymat
+Natijani 2 xonagacha yaxlitlab chiqaring.',
    'n = int(input())
 bashorat = list(map(int, input().split()))
 haqiqiy = list(map(int, input().split()))

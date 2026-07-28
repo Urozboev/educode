@@ -274,7 +274,7 @@ export default function QuizPage() {
                     : "border-border/60 border-l-neon-red"
                 )}
               >
-                <p className="font-semibold text-[15px] mb-3">
+                <p className="font-semibold text-[15px] mb-3 whitespace-pre-line">
                   {i + 1}. {q.question}
                 </p>
                 <div className="space-y-1.5">
@@ -302,7 +302,7 @@ export default function QuizPage() {
                   ))}
                 </div>
                 {q.explanation && (
-                  <p className="text-sm text-muted-foreground mt-3 pt-3 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground mt-3 pt-3 border-t border-border/50 whitespace-pre-line">
                     {q.explanation}
                   </p>
                 )}
@@ -348,7 +348,9 @@ export default function QuizPage() {
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
             {current.question_type === "multiple" ? "Bir nechtasini tanlang" : "Bitta javobni tanlang"}
           </p>
-          <h2 className="font-display font-bold text-xl md:text-2xl tracking-tight mb-6">
+          {/* Savol matnida kod namunalari ko'p qatorli bo'lishi mumkin —
+              qator uzilishlari saqlanadi */}
+          <h2 className="font-display font-bold text-xl md:text-2xl tracking-tight mb-6 whitespace-pre-line">
             {current.question}
           </h2>
           <div className="space-y-3">

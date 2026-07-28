@@ -130,7 +130,7 @@ export default function TaskPage() {
             <h2 className="font-display font-bold text-lg">{currentTask.title}</h2>
             <span className={diffConfig.class}>{diffConfig.label}</span>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-4">{currentTask.description}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4 whitespace-pre-line">{currentTask.description}</p>
           {currentTask.instruction_html && (
             <div className="text-sm prose prose-invert prose-sm max-w-none mb-4" dangerouslySetInnerHTML={{ __html: currentTask.instruction_html }} />
           )}
