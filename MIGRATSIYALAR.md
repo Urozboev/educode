@@ -1,6 +1,6 @@
 # Migratsiyalarni ishga tushirish
 
-Yangi modullar uchun 8 ta migratsiya tayyor, lekin **hali bazaga qo'llanmagan**.
+16-23 migratsiyalar bazaga qo'llangan. **24-34 hali qo'llanmagan.**
 Ularni Supabase SQL Editor'da **shu tartibda** ishga tushiring — keyingisi
 oldingisiga tayanadi.
 
@@ -17,6 +17,14 @@ oldingisiga tayanadi.
 | 24 | `24_classroom_and_live.sql` | Guruh kodlari, o'yinlar barcha o'qituvchilarga, jonli sessiya (Kahoot) |
 | 25 | `25_certificate_public.sql` | Sertifikatni raqami/QR orqali ommaviy tekshirish |
 | 26 | `26_teacher_visibility.sql` | O'qituvchi o'z o'quvchilarining o'yin natijalarini ko'rsin |
+| 27 | `27_maruza_mavzular_1_6.sql` | Ma'ruza kursi: fan dasturi 1-6 mavzulari (nazariy kontent) |
+| 28 | `28_maruza_testlar_1_6.sql` | 1-6 mavzular uchun 48 test + 13 kod topshirig'i |
+| 29 | `29_maruza_mavzular_7_12.sql` | Ma'ruza kursi: fan dasturi 7-12 mavzulari |
+| 30 | `30_maruza_testlar_7_12.sql` | 7-12 mavzular uchun 48 test + 16 kod topshirig'i |
+| 31 | `31_amaliyot_mashgulotlar.sql` | Amaliyot kursi: 6 mashg'ulot + 30 test + 18 topshiriq |
+| 32 | `32_laboratoriya_ishlar.sql` | Laboratoriya kursi: 6 lab ishi + 24 test + 18 topshiriq |
+| 33 | `33_dars_oyinlari_kontent.sql` | 12 ta tayyor dars o'yini (4 viktorina, 4 juftlik, 2 jeopardy, 2 krossvord) |
+| 34 | `34_olimpiada_masalalar.sql` | 15 ta olimpiada masalasi + 3 bosqichli musobaqa |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -52,6 +60,29 @@ o'quvchilar telefonidan `/live` ga kirib PIN kiritadi → "Boshlash".
 **25** — Sertifikat sahifasida QR kod paydo bo'ladi. Telefon kamerasi bilan
 skanerlasangiz `/sertifikat/<raqam>` ochiladi — u yerda sertifikat haqiqiyligi
 login'siz tasdiqlanadi. Raqamni qo'lda kiritib ham tekshirsa bo'ladi.
+
+**27-32 (fan dasturi kontenti)** — Guliston DPI ning `DAS1208` "Dasturlash asoslari"
+fan dasturi asosida tayyorlangan. Uch kursga taqsimlangan:
+ma'ruza (12 mavzu), amaliyot (6 mashg'ulot), laboratoriya (6 ish).
+Tartib muhim: 27 → 28 → 29 → 30, chunki testlar mavzular yaratilgandan keyin qo'shiladi.
+
+Qo'llagandan keyin `/courses/dasturlash-asoslari-maruza` da 14 ta mavzu
+(2 ta kirish + 12 ta fan dasturi mavzusi) ko'rinishi kerak. Har mavzuda
+8 ta test va 2-3 ta kod topshirig'i bor.
+
+> **Topshiriqlar stdin → stdout tartibida ishlaydi**: dastur `input()` bilan
+> o'qiydi, `print()` bilan chiqaradi. Barcha 65 ta topshiriq yechimi CPython 3
+> da 209 ta test bo'yicha sinovdan o'tkazilgan.
+
+**33** — `/explore/lesson-games` da 12 ta o'yin paydo bo'ladi va ular barcha
+o'qituvchilarga ko'rinadi (`author_id` NULL — tizim kontenti). Viktorinalarni
+jonli rejimda ham ochish mumkin. Krossvord to'ri oldindan hisoblangan, shuning
+uchun admin panelda qayta yaratish shart emas.
+
+**34** — Uch bosqichli olimpiada: 1-bosqich (15-sentabr), 2-bosqich (20-oktabr),
+yakuniy (15-dekabr). Sanalar **namuna** — `/a-contests` da o'zingizga moslang.
+Masalalar musobaqa boshlanmaguncha yopiq turadi, lekin ular `/explore/challenges`
+da mustaqil mashq sifatida ham ochiq.
 
 ## Muhim eslatmalar
 
