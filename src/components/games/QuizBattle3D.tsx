@@ -225,6 +225,7 @@ export default function QuizBattle3D() {
   const [flashState, setFlashState] = useState<{ idx: number; kind: "correct" | "wrong" } | null>(null);
   const [particleTrigger, setParticleTrigger] = useState(0);
   const [coinsAwarded, setCoinsAwarded] = useState<number | null>(null);
+  const [rewardNote, setRewardNote] = useState<string | null>(null);
 
   // Taymer
   useEffect(() => {
@@ -241,33 +242,28 @@ export default function QuizBattle3D() {
     setQIdx(0); setScore(0); setCombo(0); setBestCombo(0); setCorrect(0);
     setTimeLeft(GAME_SECONDS); setLocked(false); setFlashState(null);
     setCoinsAwarded(null);
+    setRewardNote(null);
     setPhase("playing");
   }
 
   const finish = useCallback(async () => {
     setPhase("done");
-    // Coin mukofoti: har 3 to'g'ri javob = 1 coin (max 15)
-    const coins = Math.min(15, Math.floor(correct / 3));
-    if (coins > 0) {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: profile } = await supabase.from("profiles").select("coins").eq("id", user.id).single();
-          if (profile) {
-            const newBalance = profile.coins + coins;
-            await supabase.from("profiles").update({ coins: newBalance }).eq("id", user.id);
-            await supabase.from("coin_transactions").insert({
-              user_id: user.id, amount: coins, type: "quiz_bonus",
-              description: `Quiz Battle 3D: ${correct} to'g'ri javob`, balance_after: newBalance,
-            });
-            setCoinsAwarded(coins);
-          }
-        }
-      } catch { /* coin berilmasa ham o'yin natijasi ko'rinadi */ }
-    } else {
+    // Mukofotni server hisoblaydi va kuniga bir marta beradi. Ilgari bu
+    // yerda hisoblanardi va o'yinni qayta-qayta o'ynab cheksiz coin
+    // yig'ish mumkin edi.
+    try {
+      const { data, error } = await supabase.rpc("award_quiz_battle", {
+        p_correct: correct,
+        p_total: deck.length || 1,
+      });
+      if (error) { setCoinsAwarded(0); return; }
+      setCoinsAwarded(data?.coins ?? 0);
+      setRewardNote(data?.reason === "daily_limit" ? "Bugungi mukofot allaqachon olingan" : null);
+    } catch {
+      // Coin berilmasa ham o'yin natijasi ko'rinadi
       setCoinsAwarded(0);
     }
-  }, [correct, supabase]);
+  }, [correct, deck.length, supabase]);
 
   function answer(i: number) {
     if (locked || phase !== "playing") return;
@@ -358,6 +354,11 @@ export default function QuizBattle3D() {
             {coinsAwarded !== null && coinsAwarded > 0 && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neon-yellow/10 border border-neon-yellow/30 text-neon-yellow font-bold">
                 <Coins className="w-4 h-4" /> +{coinsAwarded} coin qo'shildi!
+              </div>
+            )}
+            {rewardNote && (
+              <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm">
+                {rewardNote} — o'ynash baribir bepul
               </div>
             )}
             <button

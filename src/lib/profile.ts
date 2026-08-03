@@ -34,7 +34,9 @@ export async function getOrCreateProfile(supabase: SupabaseClient, userId: strin
       full_name: fullName,
       avatar_url: avatarUrl,
       role: "student",
-      coins: 100,
+      // Boshlang'ich bonus. 100 emas — u 16 ta mavzu tugatishga teng edi,
+      // ya'ni ro'yxatdan o'tish eng katta daromad manbaiga aylanardi.
+      coins: 25,
       xp: 0,
       streak_days: 0,
       longest_streak: 0,
@@ -57,10 +59,10 @@ export async function getOrCreateProfile(supabase: SupabaseClient, userId: strin
   if (newProfile) {
     await supabase.from("coin_transactions").insert({
       user_id: userId,
-      amount: 100,
+      amount: 25,
       type: "registration_bonus",
       description: "Registratsiya bonusi",
-      balance_after: 100,
+      balance_after: 25,
     });
   }
 

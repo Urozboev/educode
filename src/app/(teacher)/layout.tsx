@@ -10,7 +10,7 @@ import type { Profile } from "@/types";
 import {
   Code2, LayoutDashboard, Users, ClipboardList, BarChart3,
   Download, LogOut, Moon, Sun, ChevronLeft, Menu,
-  Library, BookMarked, Lightbulb, Gamepad2, School
+  Library, BookMarked, Lightbulb, Gamepad2, School, Gift
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +22,7 @@ const teacherLinks = [
   { href: "/t-assignments", label: "Topshiriqlar", icon: ClipboardList },
   { href: "/t-analytics", label: "Tahlillar", icon: BarChart3 },
   { href: "/t-lesson-games", label: "Dars o'yinlari", icon: Gamepad2 },
+  { href: "/t-store", label: "Sovg'alarim", icon: Gift },
   { href: "/t-methods", label: "Metodlar", icon: Lightbulb },
   { href: "/t-books", label: "Kitoblar", icon: Library },
   { href: "/t-glossary", label: "Terminlar", icon: BookMarked },

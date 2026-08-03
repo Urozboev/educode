@@ -25,6 +25,8 @@ oldingisiga tayanadi.
 | 32 | `32_laboratoriya_ishlar.sql` | Laboratoriya kursi: 6 lab ishi + 24 test + 18 topshiriq |
 | 33 | `33_dars_oyinlari_kontent.sql` | 12 ta tayyor dars o'yini (4 viktorina, 4 juftlik, 2 jeopardy, 2 krossvord) |
 | 34 | `34_olimpiada_masalalar.sql` | 15 ta olimpiada masalasi + 3 bosqichli musobaqa |
+| 35 | `35_dokon_va_oqituvchi_sovgalari.sql` | Do'kon jadvallari, o'qituvchi sovg'alari, buyurtma RPC'lari |
+| 36 | `36_coin_balansi.sql` | Coin qiymatlari qayta belgilanadi + do'kon narxlari |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -83,6 +85,32 @@ uchun admin panelda qayta yaratish shart emas.
 yakuniy (15-dekabr). Sanalar **namuna** — `/a-contests` da o'zingizga moslang.
 Masalalar musobaqa boshlanmaguncha yopiq turadi, lekin ular `/explore/challenges`
 da mustaqil mashq sifatida ham ochiq.
+
+**35** — `store_items` va `store_orders` ilgari faqat Supabase panelida qo'lda
+yaratilgan edi, migratsiyada yo'q edi. Endi ular rasmiylashtirildi va kengaytirildi.
+
+O'qituvchi `/t-store` da sovg'a qo'shadi — u avtomatik `my_students` auditoriyasi
+bilan yoziladi, ya'ni faqat uning guruhlariga qo'shilgan o'quvchilar ko'radi
+(RLS `teacher_students` orqali tekshiradi). Admin `/a-store` da platforma
+sovg'asini qo'shadi, u hammaga ko'rinadi.
+
+Buyurtma berish va holat o'zgartirish **faqat RPC orqali** ishlaydi
+(`place_store_order`, `update_store_order`, `cancel_my_store_order`) —
+`store_orders` ga to'g'ridan-to'g'ri yozish RLS bilan yopilgan. Sabab: coin
+yechish, zaxira kamaytirish va buyurtma yozuvi bitta tranzaksiyada bo'lishi
+kerak. Rad etilganda yoki bekor qilinganda coin **avtomatik qaytariladi**.
+
+Shaxsiy ma'lumot (ism, telefon, manzil) faqat uch tomonga ko'rinadi:
+buyurtmachi, sovg'a egasi va admin. Boshqa o'qituvchi ko'ra olmaydi.
+
+**36** — Coin iqtisodi qayta balanslandi. Eng muhimi: `QuizBattle3D` har o'yinda
+15 coingacha berardi va **hech qanday cheklov yo'q edi** — o'yinni qayta-qayta
+o'ynab bir semestrlik coinni bir necha daqiqada yig'ish mumkin edi. Endi mukofot
+`award_quiz_battle` RPC'sida hisoblanadi va kuniga bir marta beriladi.
+
+> Bu migratsiya mavjud `coin_reward` qiymatlarining **hammasini** qayta yozadi.
+> Agar biror mavzu yoki topshiriqqa qo'lda maxsus qiymat qo'ygan bo'lsangiz,
+> u ham almashadi. Mavjud foydalanuvchilar balansi tegilmaydi.
 
 ## Muhim eslatmalar
 
