@@ -54,7 +54,14 @@ function shuffle(q: Q): Q {
 
 /* ================= 3D KOMPONENTLAR ================= */
 
-/** Javob kubi — aylanadi, hover'da kattaradi, bosilganda javob beradi */
+/**
+ * Javob kartasi — kameraga qarab turadi, hover'da biroz kattaradi.
+ *
+ * Ilgari kub uzluksiz aylanardi (rotation.y += delta). Ko'rinishi chiroyli
+ * edi, lekin matn doim harakatda bo'lgani uchun variantni o'qib bo'lmasdi —
+ * o'yin tezlikka asoslangan, ya'ni o'qish qulayligi birinchi o'rinda.
+ * Endi aylanish yo'q, faqat yengil ko'tarilib-tushish qoladi.
+ */
 function AnswerCube({
   position, text, color, onPick, disabled, flash,
 }: {
@@ -68,17 +75,17 @@ function AnswerCube({
   const mesh = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
 
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (!mesh.current) return;
-    mesh.current.rotation.y += delta * (hovered ? 1.6 : 0.35);
-    const target = hovered && !disabled ? 1.15 : 1;
-    mesh.current.scale.lerp(new THREE.Vector3(target, target, target), 0.12);
+    const target = hovered && !disabled ? 1.08 : 1;
+    mesh.current.scale.lerp(new THREE.Vector3(target, target, target), 0.15);
   });
 
   const displayColor = flash === "correct" ? "#00E676" : flash === "wrong" ? "#FF5252" : color;
 
   return (
-    <Float speed={2} rotationIntensity={0.15} floatIntensity={0.5}>
+    // rotationIntensity=0 — chayqalish ham matnni qiyshaytiradi
+    <Float speed={1.4} rotationIntensity={0} floatIntensity={0.35}>
       <group
         ref={mesh}
         position={position}
@@ -97,7 +104,7 @@ function AnswerCube({
         </RoundedBox>
         <Text
           position={[0, 0, 0.35]}
-          fontSize={text.length > 18 ? 0.16 : 0.22}
+          fontSize={text.length > 18 ? 0.18 : 0.24}
           maxWidth={2.1}
           textAlign="center"
           color="#ffffff"

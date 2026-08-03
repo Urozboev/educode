@@ -12,6 +12,7 @@ import { QuizRace } from "./QuizRace";
 import { Jeopardy } from "./Jeopardy";
 import { MatchPairs } from "./MatchPairs";
 import { Crossword } from "./Crossword";
+import { GameIntro } from "./GameIntro";
 import { GAME_TYPES } from "@/lib/lessonGames";
 import {
   ArrowLeft, Trophy, RotateCcw, Coins, Zap, Loader2, Gamepad2,
@@ -30,6 +31,8 @@ export function GamePlayer({ slug }: { slug: string }) {
   /** Mukofot berilmasa sababi — o'quvchi jimlikda qolmasligi uchun */
   const [outcome, setOutcome] = useState<string | null>(null);
   const [runKey, setRunKey] = useState(0);
+  /** Qoidalar ko'rsatilgach o'yin boshlanadi — taymer avval ishlab ketmasin */
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -82,8 +85,14 @@ export function GamePlayer({ slug }: { slug: string }) {
     setResult(null);
     setReward(null);
     setOutcome(null);
+    setPlaying(false);
     setStartedAt(Date.now());
     setRunKey(k => k + 1);
+  }
+
+  function start() {
+    setPlaying(true);
+    setStartedAt(Date.now());
   }
 
   if (loading) {
@@ -199,20 +208,31 @@ export function GamePlayer({ slug }: { slug: string }) {
         </div>
       </div>
 
-      <div key={runKey}>
-        {game.type === "quiz_race" && (
-          <QuizRace content={game.content as QuizRaceContent} onFinish={finish} />
-        )}
-        {game.type === "jeopardy" && (
-          <Jeopardy content={game.content as JeopardyContent} onFinish={finish} />
-        )}
-        {game.type === "match_pairs" && (
-          <MatchPairs content={game.content as MatchPairsContent} onFinish={finish} />
-        )}
-        {game.type === "crossword" && (
-          <Crossword content={game.content as CrosswordContent} onFinish={finish} />
-        )}
-      </div>
+      {!playing && (
+        <GameIntro type={game.type} title={game.title} onStart={start} />
+      )}
+
+      {/*
+        Boshlangunicha o'yin komponenti UMUMAN yaratilmaydi — `hidden` bilan
+        yashirish yetarli emas, QuizRace taymeri fon rejimda ishlab ketardi
+        va o'quvchi birinchi savolni ko'rmasdan yo'qotardi.
+      */}
+      {playing && (
+        <div key={runKey}>
+          {game.type === "quiz_race" && (
+            <QuizRace content={game.content as QuizRaceContent} onFinish={finish} />
+          )}
+          {game.type === "jeopardy" && (
+            <Jeopardy content={game.content as JeopardyContent} onFinish={finish} />
+          )}
+          {game.type === "match_pairs" && (
+            <MatchPairs content={game.content as MatchPairsContent} onFinish={finish} />
+          )}
+          {game.type === "crossword" && (
+            <Crossword content={game.content as CrosswordContent} onFinish={finish} />
+          )}
+        </div>
+      )}
     </div>
   );
 }

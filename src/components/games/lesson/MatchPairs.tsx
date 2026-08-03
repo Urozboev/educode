@@ -174,9 +174,12 @@ export function MatchPairs({
         </div>
       </div>
 
-      {selectedLeft === null && !allMatched && (
+      {/* Doim ko'rinadigan bitta yo'riqnoma — keyingi qadam nima ekani aniq bo'lsin */}
+      {!allMatched && (
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Avval chapdan termin tanlang
+          {selectedLeft === null
+            ? "Chapdan termin tanlang"
+            : `"${pairs[selectedLeft]?.left}" uchun o'ngdan mos ta'rifni bosing`}
         </p>
       )}
 
@@ -206,13 +209,18 @@ export function MatchPairs({
         )}
       </AnimatePresence>
 
+      {/*
+        Yarim yo'lda to'xtash imkoniyati qoladi, lekin u ko'zga tashlanmaydi.
+        Ilgari bu "Yakunlash" tugmasi asosiy tugma ko'rinishida turardi va
+        o'quvchilar o'yinni tugatmasdan bosib yuborishardi.
+      */}
       {!allMatched && matched.size > 0 && (
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-center">
           <button
             onClick={() => onFinish({ score, maxScore, correct: matched.size, total })}
-            className="btn-ghost py-2.5 px-5 text-sm"
+            className="text-xs text-muted-foreground hover:text-foreground transition"
           >
-            Yakunlash
+            Tugatmasdan chiqish ({matched.size}/{total})
           </button>
         </div>
       )}

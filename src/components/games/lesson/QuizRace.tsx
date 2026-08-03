@@ -77,7 +77,7 @@ export function QuizRace({
     return () => clearTimeout(t);
   }, [left, phase]);
 
-  function next() {
+  const next = useCallback(() => {
     if (idx + 1 >= total) {
       onFinish({ score, maxScore, correct, total });
       return;
@@ -87,7 +87,31 @@ export function QuizRace({
     setPicked(null);
     setPhase("play");
     setLeft(questions[n]?.seconds ?? 20);
-  }
+  }, [idx, total, onFinish, score, maxScore, correct, questions]);
+
+  /**
+   * Klaviatura: 1-4 variant tanlaydi, Enter keyingi savolga o'tadi.
+   * Proyektor oldida sichqonchani qidirib o'tirmaslik uchun — o'yin
+   * tezlikka asoslangan, har soniya ballga ta'sir qiladi.
+   */
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (phase === "play") {
+        const n = Number(e.key);
+        if (n >= 1 && n <= (q?.options.length ?? 0)) {
+          e.preventDefault();
+          reveal(n - 1, left);
+        }
+        return;
+      }
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        next();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [phase, q, left, reveal, next]);
 
   if (!q) return null;
 
@@ -124,18 +148,23 @@ export function QuizRace({
         />
       </div>
 
-      {/* Savol */}
-      <AnimatePresence mode="wait">
-        <motion.h2
-          key={idx}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -16 }}
-          className="font-display font-extrabold text-2xl sm:text-3xl md:text-4xl text-center text-balance mb-10 min-h-[3em] flex items-center justify-center"
-        >
-          {q.text}
-        </motion.h2>
-      </AnimatePresence>
+      {/*
+        Savol.
+
+        Ilgari bu AnimatePresence mode="wait" ichida edi va keyingi savolga
+        o'tilganda h2 `initial` holatida (opacity 0) qotib qolardi: matn
+        umuman ko'rinmasdi, faqat variantlar almashardi. Kalit o'zgarganda
+        React komponentni qaytadan yaratadi va `initial → animate` o'zi
+        ishlaydi — chiqish animatsiyasini muvofiqlashtirish shart emas.
+      */}
+      <motion.h2
+        key={idx}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="font-display font-extrabold text-2xl sm:text-3xl md:text-4xl text-center text-balance mb-10 min-h-[3em] flex items-center justify-center whitespace-pre-line"
+      >
+        {q.text}
+      </motion.h2>
 
       {/* Variantlar */}
       <div className="grid sm:grid-cols-2 gap-3">
@@ -161,6 +190,12 @@ export function QuizRace({
             >
               <span className="text-xl leading-none opacity-90">{shape.label}</span>
               <span className="flex-1">{o.text}</span>
+              {/* Klaviatura raqami — faqat kattaroq ekranda foydali */}
+              {phase === "play" && (
+                <kbd className="hidden sm:inline-flex w-6 h-6 items-center justify-center rounded border border-white/30 bg-white/10 text-xs font-mono flex-shrink-0">
+                  {i + 1}
+                </kbd>
+              )}
               {showCorrect && <Check className="w-6 h-6 flex-shrink-0" />}
               {showWrong && <X className="w-6 h-6 flex-shrink-0" />}
             </button>
@@ -185,8 +220,11 @@ export function QuizRace({
                 <span className="text-neon-red">Noto&apos;g&apos;ri</span>
               )}
             </p>
-            <button onClick={next} className="btn-primary py-2.5 px-6 text-sm">
+            <button onClick={next} className="btn-primary py-2.5 px-6 text-sm inline-flex items-center gap-2">
               {idx + 1 >= total ? "Yakunlash" : "Keyingi savol"}
+              <kbd className="hidden sm:inline px-1.5 py-0.5 rounded border border-white/25 bg-white/10 text-[10px] font-mono">
+                Enter
+              </kbd>
             </button>
           </motion.div>
         )}

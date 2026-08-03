@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getOrCreateProfile } from "@/lib/profile";
+import { getResumePoint, type ResumePoint } from "@/lib/resume";
 import { cn, formatNumber, getLevelLabel, getLevelColor, calculateXpLevel } from "@/lib/utils";
 import type { Profile, Enrollment, Course, LeaderboardEntry } from "@/types";
 import { motion } from "framer-motion";
@@ -23,6 +24,8 @@ export default function DashboardPage() {
   const supabase = createClient();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [enrollments, setEnrollments] = useState<(Enrollment & { course: Course })[]>([]);
+  /** course_id → keyingi tugallanmagan mavzu */
+  const [resumeMap, setResumeMap] = useState<Record<string, ResumePoint | null>>({});
   const [completedEnrollments, setCompletedEnrollments] = useState<(Enrollment & { course: Course })[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [stats, setStats] = useState({
@@ -84,7 +87,22 @@ export default function DashboardPage() {
     ]);
 
     if (profileData) setProfile(profileData as Profile);
-    if (enrollData) setEnrollments(enrollData as any[]);
+    if (enrollData) {
+      setEnrollments(enrollData as any[]);
+
+      // Har bir kurs uchun "qayerda qolgani" — kartadagi havola talabani
+      // kurs sahifasiga emas, aynan keyingi mavzuga olib boradi
+      const points = await Promise.all(
+        (enrollData as any[]).map(e =>
+          getResumePoint(supabase, user.id, e.course_id).catch(() => null)
+        )
+      );
+      setResumeMap(
+        Object.fromEntries(
+          (enrollData as any[]).map((e, i) => [e.course_id, points[i]]).filter(([, p]) => p)
+        )
+      );
+    }
     if (completedData) setCompletedEnrollments(completedData as any[]);
     if (certsData) setCertificates(certsData);
 
@@ -233,34 +251,46 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {enrollments.map((enrollment) => (
-                <Link
-                  key={enrollment.id}
-                  href={`/courses/${enrollment.course?.slug}`}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-surface/50 hover:bg-surface transition-all group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-6 h-6 text-neon-purple" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate group-hover:text-neon-purple transition-colors">
-                      {enrollment.course?.title}
-                    </p>
-                    <div className="flex items-center gap-3 mt-1">
-                      <div className="flex-1 h-2 bg-border rounded-full overflow-hidden">
-                        <div
-                          className="h-full progress-gradient rounded-full transition-all"
-                          style={{ width: `${enrollment.progress_percent}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground font-mono">
-                        {enrollment.progress_percent}%
-                      </span>
+              {enrollments.map((enrollment) => {
+                const point = resumeMap[enrollment.course_id];
+                // Havola kurs sahifasiga emas, aynan keyingi mavzuga olib boradi
+                const href = point
+                  ? `/courses/${enrollment.course?.slug}/topics/${point.slug}`
+                  : `/courses/${enrollment.course?.slug}`;
+                return (
+                  <Link
+                    key={enrollment.id}
+                    href={href}
+                    className="flex items-center gap-4 p-4 rounded-xl bg-surface/50 hover:bg-surface transition-all group"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-6 h-6 text-neon-purple" />
                     </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
-                </Link>
-              ))}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate group-hover:text-neon-purple transition-colors">
+                        {enrollment.course?.title}
+                      </p>
+                      {point && !point.courseDone && (
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          Davom: {point.title}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3 mt-1">
+                        <div className="flex-1 h-2 bg-border rounded-full overflow-hidden">
+                          <div
+                            className="h-full progress-gradient rounded-full transition-all"
+                            style={{ width: `${enrollment.progress_percent}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground font-mono">
+                          {enrollment.progress_percent}%
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
+                  </Link>
+                );
+              })}
             </div>
           )}
         </motion.div>

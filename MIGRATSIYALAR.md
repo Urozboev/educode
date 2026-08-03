@@ -27,6 +27,7 @@ oldingisiga tayanadi.
 | 34 | `34_olimpiada_masalalar.sql` | 15 ta olimpiada masalasi + 3 bosqichli musobaqa |
 | 35 | `35_dokon_va_oqituvchi_sovgalari.sql` | Do'kon jadvallari, o'qituvchi sovg'alari, buyurtma RPC'lari |
 | 36 | `36_coin_balansi.sql` | Coin qiymatlari qayta belgilanadi + do'kon narxlari |
+| 37 | `37_qaydlar_va_qidiruv.sql` | Mavzu bo'yicha shaxsiy qaydlar + kurs ichida qidiruv |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -111,6 +112,20 @@ o'ynab bir semestrlik coinni bir necha daqiqada yig'ish mumkin edi. Endi mukofot
 > Bu migratsiya mavjud `coin_reward` qiymatlarining **hammasini** qayta yozadi.
 > Agar biror mavzu yoki topshiriqqa qo'lda maxsus qiymat qo'ygan bo'lsangiz,
 > u ham almashadi. Mavjud foydalanuvchilar balansi tegilmaydi.
+
+**37** — Mavzu sahifasining pastida "Mening qaydlarim" paneli chiqadi. Qayd
+avtomatik saqlanadi (yozish to'xtagach 1.2 soniyada) va uni **faqat egasi**
+ko'radi — o'qituvchi ham, admin ham emas. Kurs sahifasida esa "Qaydlarim"
+bloki barcha qaydlarni bir ro'yxatda beradi (qayd bo'lmasa ko'rinmaydi).
+
+Qidiruv 6 va undan ko'p darsli kurslarda paydo bo'ladi. U `topics_toc`
+ko'rinishidan emas, `search_course_topics` RPC'sidan foydalanadi — sabab:
+`topics_toc` RLS'ni chetlab o'tadi, shuning uchun unda `content_html` YO'Q.
+RPC avval ruxsatni tekshiradi: kontent bo'yicha qidiruv faqat bepul kurs
+yoki yozilgan foydalanuvchi uchun, sarlavhalar esa hammaga ochiq.
+
+> Migratsiya qo'llanmaguncha qidiruv "hech nima topilmadi" deb turadi va
+> qaydlar paneli bo'sh ko'rinadi — bu xato emas, RPC va jadval hali yo'q.
 
 ## Muhim eslatmalar
 

@@ -42,6 +42,8 @@ export function Crossword({
   const [activeWord, setActiveWord] = useState<number>(0);
   const [checked, setChecked] = useState(false);
   const [hinted, setHinted] = useState<Set<number>>(new Set());
+  /** Oxirgi bosilgan katak — yo'nalishni almashtirishni aniqlash uchun */
+  const [lastCell, setLastCell] = useState<string | null>(null);
   const inputs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const total = words.length;
@@ -89,7 +91,52 @@ export function Crossword({
     }
   }
 
+  /** Shu katakdan o'tuvchi barcha so'zlar (kesishmada ikkita bo'ladi) */
+  const wordsAt = useCallback((r: number, c: number) =>
+    words.map((_, i) => i).filter(i => cellsOf(i).some(x => x.r === r && x.c === c)),
+    [words, cellsOf]
+  );
+
+  /**
+   * Katakni bosish. Allaqachon tanlangan katak QAYTA bosilsa yo'nalish
+   * almashadi (klassik krossvord odati). Ilgari bunday imkoniyat yo'q edi:
+   * kesishmadagi katakka bosilganda doim gorizontal so'z tanlanardi va
+   * vertikal so'zga o'tib bo'lmasdi.
+   */
+  function pickCell(r: number, c: number) {
+    const k = cellKey(r, c);
+    const here = wordsAt(r, c);
+    if (!here.length) return;
+
+    if (lastCell === k && here.length > 1) {
+      const pos = here.indexOf(activeWord);
+      setActiveWord(here[(pos + 1) % here.length]);
+    } else if (!here.includes(activeWord)) {
+      setActiveWord(here[0]);
+    }
+    setLastCell(k);
+  }
+
   function onKeyDown(e: React.KeyboardEvent, r: number, c: number) {
+    // Strelkalar bilan to'r bo'ylab yurish
+    const step: Record<string, [number, number]> = {
+      ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1],
+    };
+    if (step[e.key]) {
+      const [dr, dc] = step[e.key];
+      // Bo'sh (qora) kataklardan sakrab o'tamiz
+      for (let n = 1; n <= Math.max(content.rows, content.cols); n++) {
+        const k = cellKey(r + dr * n, c + dc * n);
+        if (inputs.current[k]) {
+          e.preventDefault();
+          inputs.current[k]?.focus();
+          inputs.current[k]?.select();
+          return;
+        }
+      }
+      return;
+    }
+
     if (e.key !== "Backspace") return;
     if (entries[cellKey(r, c)]) return;
     // Bo'sh katakda backspace — oldingisiga qaytamiz
@@ -118,6 +165,7 @@ export function Crossword({
     setHinted(new Set());
     setChecked(false);
     setActiveWord(0);
+    setLastCell(null);
   }
 
   const activeCells = new Set(cellsOf(activeWord).map(x => cellKey(x.r, x.c)));
@@ -150,14 +198,14 @@ export function Crossword({
               Array.from({ length: content.cols }).map((_, c) => {
                 const k = cellKey(r, c);
                 const cell = grid.get(k);
-                if (!cell) return <div key={k} className="w-9 h-9 sm:w-10 sm:h-10" />;
+                if (!cell) return <div key={k} className="w-8 h-8 sm:w-10 sm:h-10" />;
 
                 const val = entries[k] || "";
                 const inActive = activeCells.has(k);
                 const wrong = checked && val && val !== cell.ch;
 
                 return (
-                  <div key={k} className="relative w-9 h-9 sm:w-10 sm:h-10">
+                  <div key={k} className="relative w-8 h-8 sm:w-10 sm:h-10">
                     {cell.num != null && (
                       <span className="absolute top-0 left-0.5 numeric text-[9px] leading-none text-muted-foreground z-10 pointer-events-none">
                         {cell.num}
@@ -169,14 +217,14 @@ export function Crossword({
                       onChange={e => setCell(r, c, e.target.value)}
                       onKeyDown={e => onKeyDown(e, r, c)}
                       onFocus={() => {
-                        // Shu katakdan o'tadigan so'zlardan birini tanlaymiz;
-                        // allaqachon tanlangani shu katakni qamrasa, o'zgartirmaymiz
+                        // Tanlangan so'z shu katakni qamramasa — shu katakdan
+                        // o'tuvchi birinchi so'zga o'tamiz
                         if (activeCells.has(k)) return;
-                        const wi = words.findIndex((_, i) =>
-                          cellsOf(i).some(x => x.r === r && x.c === c)
-                        );
-                        if (wi >= 0) setActiveWord(wi);
+                        const wi = wordsAt(r, c)[0];
+                        if (wi != null) setActiveWord(wi);
                       }}
+                      // Kesishmadagi katakni qayta bosish yo'nalishni almashtiradi
+                      onClick={() => pickCell(r, c)}
                       maxLength={1}
                       inputMode="text"
                       autoComplete="off"

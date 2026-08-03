@@ -6,6 +6,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { cn, formatDuration, getLevelLabel } from "@/lib/utils";
 import { LevelBadge } from "@/components/ui/LevelBadge";
+import { ResumeCard } from "@/components/courses/ResumeCard";
+import { CourseSearch } from "@/components/courses/CourseSearch";
+import { CourseNotes } from "@/components/courses/CourseNotes";
+import { getResumePoint, type ResumePoint } from "@/lib/resume";
 import type { Course, TopicTocEntry, CourseSection, Enrollment, TopicProgress } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -30,6 +34,7 @@ export default function CourseDetailPage() {
   const [enrolling, setEnrolling] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [userCoins, setUserCoins] = useState(0);
+  const [resume, setResume] = useState<ResumePoint | null>(null);
 
   useEffect(() => {
     loadCourse();
@@ -75,6 +80,11 @@ export default function CourseDetailPage() {
       const { data: progressData } = await supabase
         .from("topic_progress").select("*").eq("user_id", user.id).eq("course_id", courseData.id);
       if (progressData) setTopicProgress(progressData as TopicProgress[]);
+
+      // Faqat kursga yozilganlarga — yozilmaganda "davom ettirish" ma'nosiz
+      if (enrollData) {
+        setResume(await getResumePoint(supabase, user.id, courseData.id));
+      }
     }
     setLoading(false);
   }
@@ -258,6 +268,12 @@ export default function CourseDetailPage() {
         </div>
       </motion.div>
 
+      {/* Qoldirgan joydan davom ettirish — mundarijadan qidirmaslik uchun */}
+      {resume && <ResumeCard courseSlug={slug} point={resume} />}
+
+      {/* Kurs bo'yicha barcha qaydlar — qayd bo'lmasa ko'rinmaydi */}
+      {course && userId && <CourseNotes courseId={course.id} courseSlug={slug} />}
+
       {/* Topics List */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
         <div className="flex items-end justify-between mb-5">
@@ -266,6 +282,17 @@ export default function CourseDetailPage() {
             {sections.length > 0 && `${sections.length} bo'lim · `}{topics.length} dars
           </span>
         </div>
+
+        {/*
+          Qidiruv. Kichik kurslarda ortiqcha, shuning uchun faqat mavzu
+          soni ko'p bo'lganda ko'rsatiladi — 5 ta darsni ko'z bilan ham
+          topsa bo'ladi.
+        */}
+        {course && topics.length >= 6 && (
+          <div className="mb-5">
+            <CourseSearch courseId={course.id} courseSlug={slug} />
+          </div>
+        )}
 
         {sections.length > 0 ? (
           /* ======== BO'LIMLAR ACCORDION ======== */

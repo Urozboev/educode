@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { completeTopic } from "@/lib/course-completion";
+import { TopicNotes } from "@/components/courses/TopicNotes";
 import type { Topic, Course, TopicProgress } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -409,6 +410,9 @@ export default function TopicPage() {
           </div>
         </motion.div>
       )}
+
+      {/* Shaxsiy qaydlar — faqat tizimga kirgan foydalanuvchi uchun */}
+      {userId && <TopicNotes topicId={topic.id} />}
 
       {/* Navigation */}
       <div className="flex items-center justify-between pt-6 border-t border-border/50">
