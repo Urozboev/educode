@@ -35,6 +35,8 @@ export async function middleware(request: NextRequest) {
     '/dashboard',
     '/courses',
     '/challenges',
+    // Kabinet ichidagi olimpiada. Ommaviy nusxasi /explore/contests da.
+    '/contests',
     '/certificate',
     '/chat',
     '/games',

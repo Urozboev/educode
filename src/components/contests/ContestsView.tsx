@@ -18,7 +18,8 @@ const STATUS_STYLE: Record<ContestStatus, string> = {
   ended: "bg-surface text-muted-foreground border-border",
 };
 
-export function ContestsView() {
+/** `basePath` — kabinetda `/contests`, mehmon sahifasida `/explore/contests` */
+export function ContestsView({ basePath = "/explore/contests" }: { basePath?: string } = {}) {
   const supabase = createClient();
   const [contests, setContests] = useState<Contest[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -95,7 +96,7 @@ export function ContestsView() {
                 <h2 className="eyebrow mb-4">{STATUS_LABEL[status]}</h2>
                 <div className="space-y-3">
                   {groups[status].map((c, i) => (
-                    <ContestCard key={c.id} contest={c} status={status} now={now}
+                    <ContestCard key={c.id} contest={c} status={status} now={now} basePath={basePath}
                       participants={counts[c.id] || 0} delay={i * 0.04} />
                   ))}
                 </div>
@@ -109,13 +110,14 @@ export function ContestsView() {
 }
 
 function ContestCard({
-  contest: c, status, now, participants, delay,
+  contest: c, status, now, participants, delay, basePath,
 }: {
   contest: Contest;
   status: ContestStatus;
   now: number;
   participants: number;
   delay: number;
+  basePath: string;
 }) {
   return (
     <motion.article
@@ -124,7 +126,7 @@ function ContestCard({
       transition={{ duration: 0.35, delay }}
     >
       <Link
-        href={`/explore/contests/${c.slug}`}
+        href={`${basePath}/${c.slug}`}
         className="group block p-5 rounded-xl border border-border/50 bg-card/40 hover:border-neon-purple/30 hover:shadow-lift transition-all duration-300"
       >
         <div className="flex flex-wrap items-start justify-between gap-4">

@@ -697,19 +697,37 @@ export interface ContestProblem {
   slug: string;
   title: string;
   difficulty: Difficulty;
+  /** Masalaning asos bali — qiyinlikka qarab: 100 / 200 / 300 */
+  points: number;
   solved_by: number;
+  /** Joriy foydalanuvchining holati: yechgan / urinib ko'rgan / tegmagan */
+  my_status: 'solved' | 'tried' | 'none';
 }
+
+/**
+ * Musobaqa bosqichi:
+ *   upcoming — hali boshlanmagan, masalalar yopiq
+ *   running  — ketmoqda, yechimlar reytingga kiradi
+ *   practice — tugagan, masalalar mashq uchun ochiq (reytingga kirmaydi)
+ */
+export type ContestPhase = 'upcoming' | 'running' | 'practice';
 
 /** `contest_overview` RPC natijasi */
 export interface ContestOverview {
   contest: Pick<Contest,
     'id' | 'title' | 'slug' | 'description' | 'rules_html' |
     'starts_at' | 'ends_at' | 'penalty_minutes' | 'freeze_minutes'>;
+  phase: ContestPhase;
   participants: number;
   is_registered: boolean;
   problems: ContestProblem[];
   problem_count: number;
 }
+
+/** Reytingdagi bitta katak holati */
+export type StandingCell =
+  | { status: 'solved'; minute: number; wrong: number; points: number }
+  | { status: 'tried'; wrong: number };
 
 /** `contest_standings` RPC qatori */
 export interface ContestStanding {
@@ -719,7 +737,8 @@ export interface ContestStanding {
   username: string | null;
   avatar_url: string | null;
   solved: number;
+  points: number;
   penalty: number;
-  /** { "A": { minute, wrong }, ... } */
-  details: Record<string, { minute: number; wrong: number }>;
+  /** { "A": { status, ... }, ... } — tegilmagan masalalar bu yerda yo'q */
+  details: Record<string, StandingCell>;
 }

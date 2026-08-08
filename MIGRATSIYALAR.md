@@ -28,6 +28,7 @@ oldingisiga tayanadi.
 | 35 | `35_dokon_va_oqituvchi_sovgalari.sql` | Do'kon jadvallari, o'qituvchi sovg'alari, buyurtma RPC'lari |
 | 36 | `36_coin_balansi.sql` | Coin qiymatlari qayta belgilanadi + do'kon narxlari |
 | 37 | `37_qaydlar_va_qidiruv.sql` | Mavzu bo'yicha shaxsiy qaydlar + kurs ichida qidiruv |
+| 38 | `38_olimpiada_ball_va_reyting.sql` | Olimpiada ball tizimi, reyting tuzatildi, mashq rejimi |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -126,6 +127,37 @@ yoki yozilgan foydalanuvchi uchun, sarlavhalar esa hammaga ochiq.
 
 > Migratsiya qo'llanmaguncha qidiruv "hech nima topilmadi" deb turadi va
 > qaydlar paneli bo'sh ko'rinadi — bu xato emas, RPC va jadval hali yo'q.
+
+**38** — Olimpiadadagi to'rtta muammo tuzatildi.
+
+Reyting **bo'sh ko'rinardi**, chunki `contest_standings` ishtirokchilarni faqat
+`contest_participants` jadvalidan olardi: masalani yechgan, lekin "Ro'yxatdan
+o'tish" bosmagan odam umuman hisobga kirmasdi. Endi ro'yxatdan o'tganlar
+**va** musobaqa vaqtida yechim yuborganlar birga olinadi, masalani ochgan
+odam esa avtomatik ro'yxatga tushadi (`join_contest`).
+
+Masalaga bosilganda endi `/explore/contests/<slug>/<harf>` ochiladi —
+yuqorida taymer, A–E harflari va reytingga havola turadi. Ilgari
+`/challenges/<slug>` ga o'tib ketardi va olimpiadaga qaytish yo'li qolmasdi.
+
+Ball: `contest_problems.points` (oson 100 / o'rta 200 / qiyin 300), yechish
+vaqti va noto'g'ri urinishlar uchun kamayadi. Tartib — yechilgan masalalar
+soni → ball → jarima vaqti.
+
+Masalalar musobaqa **tugagandan keyin** mashq uchun ochiladi; bunday yechimlar
+reytingga kirmaydi (`phase = 'practice'`).
+
+Kabinetdagi o'quvchi uchun olimpiada `/contests` da ochiladi (yon menyuda
+"Olimpiada"), mehmon uchun `/explore/contests` da. Ikkalasi bir xil
+komponentlardan foydalanadi, farqi faqat `basePath` propida.
+
+> **38 ni QAYTA ishga tushiring.** `my_status` da xato bor edi: agregat
+> so'rov mos qator topilmasa ham bitta qator qaytaradi, shuning uchun barcha
+> masalalar "urinilgan" bo'lib ko'rinardi — hatto tizimga kirmagan mehmonga
+> ham. Fayl to'liq idempotent, qayta ishga tushirish xavfsiz.
+
+> Alohida "Ishtirokchilar" tabi qo'shilmadi: reyting jadvalining o'zi
+> ishtirokchilar ro'yxati — masala yechmaganlar 0 bilan pastda turadi.
 
 ## Muhim eslatmalar
 

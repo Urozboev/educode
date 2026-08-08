@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { ContestOverview, ContestStanding } from "@/types";
 import { motion } from "framer-motion";
@@ -14,19 +14,37 @@ import {
 } from "@/lib/contests";
 import {
   Trophy, Clock, Users, ArrowLeft, ListOrdered, ScrollText, Check,
-  Loader2, LogIn, Snowflake, CircleDot,
+  Loader2, LogIn, Snowflake, CircleDot, Dumbbell,
 } from "lucide-react";
 
 type Tab = "problems" | "standings" | "rules";
 
-export function ContestPage({ slug }: { slug: string }) {
+/**
+ * `basePath` — olimpiada qaysi bo'lim ichida ochilgani.
+ *
+ * Kabinetdagi o'quvchi uchun `/contests`, mehmon uchun `/explore/contests`.
+ * Ilgari faqat `/explore/contests` bor edi: tizimga kirgan o'quvchi
+ * olimpiadaga o'tganda kabinetdan chiqib ketardi va yon menyuda
+ * olimpiadaga qaytish havolasi umuman yo'q edi.
+ */
+export function ContestPage({
+  slug,
+  basePath = "/explore/contests",
+}: {
+  slug: string;
+  basePath?: string;
+}) {
   const supabase = createClient();
   const router = useRouter();
   const [data, setData] = useState<ContestOverview | null>(null);
   const [standings, setStandings] = useState<ContestStanding[]>([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
-  const [tab, setTab] = useState<Tab>("problems");
+  // Masala sahifasidagi "Reyting" havolasi ?tab=standings bilan keladi
+  const params = useSearchParams();
+  const [tab, setTab] = useState<Tab>(
+    params.get("tab") === "standings" ? "standings" : "problems"
+  );
   const [now, setNow] = useState(() => Date.now());
   const [me, setMe] = useState<string | null>(null);
 
@@ -69,14 +87,13 @@ export function ContestPage({ slug }: { slug: string }) {
 
   async function join() {
     if (!data) return;
-    if (!me) { router.push(`/login?redirect=/explore/contests/${slug}`); return; }
+    if (!me) { router.push(`/login?redirect=${basePath}/${slug}`); return; }
     setJoining(true);
-    const { error } = await supabase.from("contest_participants").insert({
-      contest_id: data.contest.id,
-      user_id: me,
-    });
+    // RPC orqali: to'g'ridan-to'g'ri INSERT dublikat va tugagan musobaqa
+    // holatlarini o'zi hal qila olmasdi
+    const { data: res, error } = await supabase.rpc("join_contest", { p_slug: slug });
     setJoining(false);
-    if (error) { toast.error(error.message); return; }
+    if (error || !res?.ok) { toast.error(res?.message || error?.message || "Qo'shilmadi"); return; }
     toast.success("Ro'yxatdan o'tdingiz");
     loadOverview();
     loadStandings();
@@ -91,7 +108,7 @@ export function ContestPage({ slug }: { slug: string }) {
       <div className="max-w-md mx-auto text-center py-20">
         <Trophy className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
         <p className="text-muted-foreground mb-6">Olimpiada topilmadi yoki hali e&apos;lon qilinmagan</p>
-        <Link href="/explore/contests" className="btn-primary py-2.5 px-5 text-sm">
+        <Link href={basePath} className="btn-primary py-2.5 px-5 text-sm">
           Olimpiadalar ro&apos;yxati
         </Link>
       </div>
@@ -105,7 +122,7 @@ export function ContestPage({ slug }: { slug: string }) {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <Link href="/explore/contests"
+        <Link href={basePath}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
           <ArrowLeft className="w-4 h-4" /> Olimpiadalar
         </Link>
@@ -182,8 +199,19 @@ export function ContestPage({ slug }: { slug: string }) {
         ))}
       </div>
 
+      {/* Tugagan musobaqa: masalalar mashq uchun ochiq, lekin reytingga kirmaydi */}
+      {tab === "problems" && data.phase === "practice" && data.problems.length > 0 && (
+        <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-surface/60 border border-border/60 text-sm">
+          <Dumbbell className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground" />
+          <span className="leading-relaxed text-muted-foreground">
+            Olimpiada tugagan. Masalalarni mashq uchun yechish mumkin, lekin
+            bunday yechimlar reytingga ta&apos;sir qilmaydi.
+          </span>
+        </div>
+      )}
+
       {tab === "problems" && (
-        status === "upcoming" ? (
+        data.phase === "upcoming" ? (
           <div className="py-16 text-center border border-dashed border-border rounded-2xl">
             <Clock className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
             <p className="font-semibold mb-1">Masalalar hali yopiq</p>
@@ -201,18 +229,49 @@ export function ContestPage({ slug }: { slug: string }) {
               return (
                 <Link
                   key={p.letter}
-                  href={`/challenges/${p.slug}`}
-                  className="group flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-card/40 hover:border-neon-purple/30 transition-all"
+                  // Musobaqa ichidagi manzil: taymer, harflar va reyting
+                  // havolasi saqlanib qoladi
+                  href={`${basePath}/${slug}/${p.letter.toLowerCase()}`}
+                  className={cn(
+                    "group flex items-center gap-4 p-4 rounded-xl border bg-card/40 transition-all",
+                    p.my_status === "solved"
+                      ? "border-neon-green/30 hover:border-neon-green/60"
+                      : p.my_status === "tried"
+                      ? "border-neon-red/25 hover:border-neon-red/50"
+                      : "border-border/50 hover:border-neon-purple/30"
+                  )}
                 >
-                  <span className="w-10 h-10 rounded-xl bg-neon-purple/[0.08] border border-neon-purple/20 flex items-center justify-center font-display font-bold text-neon-purple flex-shrink-0">
+                  <span className={cn(
+                    "w-10 h-10 rounded-xl border flex items-center justify-center font-display font-bold flex-shrink-0",
+                    p.my_status === "solved"
+                      ? "bg-neon-green/10 border-neon-green/30 text-neon-green"
+                      : p.my_status === "tried"
+                      ? "bg-neon-red/[0.08] border-neon-red/25 text-neon-red"
+                      : "bg-neon-purple/[0.08] border-neon-purple/20 text-neon-purple"
+                  )}>
                     {p.letter}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate group-hover:text-neon-purple transition-colors">
                       {p.title}
                     </p>
-                    <span className={cn("text-[11px]", diff.class)}>{diff.label}</span>
+                    <span className="inline-flex items-center gap-2">
+                      <span className={cn("text-[11px]", diff.class)}>{diff.label}</span>
+                      <span className="text-[11px] text-neon-yellow numeric">{p.points} ball</span>
+                    </span>
                   </div>
+
+                  {p.my_status === "solved" && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-neon-green flex-shrink-0">
+                      <Check className="w-3.5 h-3.5" /> Yechildi
+                    </span>
+                  )}
+                  {p.my_status === "tried" && (
+                    <span className="text-[11px] font-semibold text-neon-red flex-shrink-0">
+                      Urinilgan
+                    </span>
+                  )}
+
                   <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground flex-shrink-0">
                     <Users className="w-3 h-3" /><span className="numeric">{p.solved_by}</span> yechdi
                   </span>
@@ -261,82 +320,120 @@ function Info({ label, value, mono, accent }: { label: string; value: string; mo
   );
 }
 
+/**
+ * Reyting jadvali.
+ *
+ * Bu ayni paytda ishtirokchilar ro'yxati ham: masala yechmaganlar 0 bilan
+ * pastda turadi. Shuning uchun alohida "Ishtirokchilar" tabi qo'shilmadi —
+ * u aynan shu ma'lumotni takrorlagan bo'lardi.
+ *
+ * Katak ranglari: yashil — yechilgan, qizil — urinilgan lekin yechilmagan,
+ * bo'sh nuqta — umuman tegilmagan.
+ */
 function Standings({ rows, problems, me }: { rows: ContestStanding[]; problems: string[]; me: string | null }) {
   if (rows.length === 0) {
     return (
       <div className="py-16 text-center border border-dashed border-border rounded-2xl">
         <Trophy className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
         <p className="text-muted-foreground">Hali ishtirokchi yo&apos;q</p>
+        <p className="text-xs text-muted-foreground/70 mt-1.5">
+          Masalani yechgan zahoti natijangiz shu yerda paydo bo&apos;ladi
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr className="border-b border-border text-left">
-            <th className="py-2.5 pr-3 font-medium text-muted-foreground text-xs">#</th>
-            <th className="py-2.5 pr-3 font-medium text-muted-foreground text-xs">Ishtirokchi</th>
-            <th className="py-2.5 px-2 font-medium text-muted-foreground text-xs text-center">Yechdi</th>
-            <th className="py-2.5 px-2 font-medium text-muted-foreground text-xs text-center">Jarima</th>
-            {problems.map(l => (
-              <th key={l} className="py-2.5 px-1.5 font-medium text-muted-foreground text-xs text-center w-12">{l}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(r => (
-            <tr
-              key={r.user_id}
-              className={cn(
-                "border-b border-border/50",
-                r.user_id === me && "bg-neon-purple/[0.06]"
-              )}
-            >
-              <td className="py-2.5 pr-3 numeric text-muted-foreground">{r.rank}</td>
-              <td className="py-2.5 pr-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-7 h-7 rounded-lg bg-hero-gradient flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0 overflow-hidden">
-                    {r.avatar_url
-                      // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
-                      : getInitials(r.full_name)}
-                  </span>
-                  {r.username ? (
-                    <Link href={`/u/${r.username}`} className="truncate hover:text-neon-purple transition-colors">
-                      {r.full_name}
-                    </Link>
-                  ) : (
-                    <span className="truncate">{r.full_name}</span>
-                  )}
-                </div>
-              </td>
-              <td className="py-2.5 px-2 text-center numeric font-semibold">{r.solved}</td>
-              <td className="py-2.5 px-2 text-center numeric text-muted-foreground">
-                {formatPenalty(r.penalty)}
-              </td>
-              {problems.map(l => {
-                const cell = r.details?.[l];
-                return (
-                  <td key={l} className="py-2.5 px-1.5 text-center">
-                    {cell ? (
-                      <span className="inline-flex flex-col items-center leading-tight">
-                        <span className="numeric text-[11px] text-neon-green">{cell.minute}</span>
-                        {cell.wrong > 0 && (
-                          <span className="numeric text-[9px] text-neon-red">−{cell.wrong}</span>
-                        )}
-                      </span>
-                    ) : (
-                      <CircleDot className="w-3 h-3 text-muted-foreground/20 mx-auto" />
-                    )}
-                  </td>
-                );
-              })}
+    <div className="space-y-3">
+      <div className="flex items-center gap-4 text-[11px] text-muted-foreground flex-wrap">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded bg-neon-green/20 border border-neon-green/40" /> yechilgan
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded bg-neon-red/[0.12] border border-neon-red/35" /> urinilgan
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <CircleDot className="w-3 h-3 text-muted-foreground/30" /> tegilmagan
+        </span>
+        <span className="ml-auto">Katakda: daqiqa · ball · noto&apos;g&apos;ri urinish</span>
+      </div>
+
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-border text-left">
+              <th className="py-2.5 pr-3 font-medium text-muted-foreground text-xs">#</th>
+              <th className="py-2.5 pr-3 font-medium text-muted-foreground text-xs">Ishtirokchi</th>
+              <th className="py-2.5 px-2 font-medium text-muted-foreground text-xs text-center">Yechdi</th>
+              <th className="py-2.5 px-2 font-medium text-neon-yellow text-xs text-center">Ball</th>
+              <th className="py-2.5 px-2 font-medium text-muted-foreground text-xs text-center">Jarima</th>
+              {problems.map(l => (
+                <th key={l} className="py-2.5 px-1.5 font-medium text-muted-foreground text-xs text-center w-14">{l}</th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map(r => (
+              <tr
+                key={r.user_id}
+                className={cn(
+                  "border-b border-border/50",
+                  r.user_id === me && "bg-neon-purple/[0.06]"
+                )}
+              >
+                <td className="py-2.5 pr-3 numeric text-muted-foreground">{r.rank}</td>
+                <td className="py-2.5 pr-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-7 h-7 rounded-lg bg-hero-gradient flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0 overflow-hidden">
+                      {r.avatar_url
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
+                        : getInitials(r.full_name)}
+                    </span>
+                    {r.username ? (
+                      <Link href={`/u/${r.username}`} className="truncate hover:text-neon-purple transition-colors">
+                        {r.full_name}
+                      </Link>
+                    ) : (
+                      <span className="truncate">{r.full_name}</span>
+                    )}
+                    {r.user_id === me && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-neon-purple/15 text-neon-purple flex-shrink-0">siz</span>
+                    )}
+                  </div>
+                </td>
+                <td className="py-2.5 px-2 text-center numeric font-semibold">{r.solved}</td>
+                <td className="py-2.5 px-2 text-center numeric font-bold text-neon-yellow">{r.points}</td>
+                <td className="py-2.5 px-2 text-center numeric text-muted-foreground">
+                  {formatPenalty(r.penalty)}
+                </td>
+                {problems.map(l => {
+                  const cell = r.details?.[l];
+                  return (
+                    <td key={l} className="py-1.5 px-1.5 text-center">
+                      {!cell ? (
+                        <CircleDot className="w-3 h-3 text-muted-foreground/20 mx-auto" />
+                      ) : cell.status === "solved" ? (
+                        <span className="inline-flex flex-col items-center leading-tight rounded-md bg-neon-green/[0.12] border border-neon-green/30 px-1.5 py-1 min-w-[42px]">
+                          <span className="numeric text-[11px] font-semibold text-neon-green">+{cell.points}</span>
+                          <span className="numeric text-[9px] text-muted-foreground">
+                            {cell.minute}&apos;{cell.wrong > 0 && <span className="text-neon-red"> −{cell.wrong}</span>}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex flex-col items-center leading-tight rounded-md bg-neon-red/[0.10] border border-neon-red/30 px-1.5 py-1 min-w-[42px]">
+                          <span className="numeric text-[11px] font-semibold text-neon-red">−{cell.wrong}</span>
+                          <span className="text-[9px] text-muted-foreground">urinish</span>
+                        </span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

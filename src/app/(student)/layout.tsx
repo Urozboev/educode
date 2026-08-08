@@ -8,7 +8,7 @@ import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials, getLevelLabel, getLevelColor } from "@/lib/utils";
 import type { Profile } from "@/types";
 import {
-  Code2, LayoutDashboard, BookOpen, Swords, Gamepad2,
+  Code2, LayoutDashboard, BookOpen, Swords, Gamepad2, Medal,
   BarChart3, Trophy, Store, User, LogOut, ChevronLeft,
   Menu, X, Moon, Sun, Flame, Coins, ChevronDown, MessageCircle,
   Library, BookMarked, Puzzle, Briefcase, School
@@ -22,6 +22,7 @@ const studentLinks = [
   { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
   { href: "/courses", label: "Kurslar", icon: BookOpen },
   { href: "/challenges", label: "Topshiriqlar", icon: Swords },
+  { href: "/contests", label: "Olimpiada", icon: Medal },
   { href: "/playground", label: "Playground", icon: Code2 },
   { href: "/games", label: "O'yinlar", icon: Gamepad2 },
   { href: "/chat", label: "AI Yordamchi", icon: MessageCircle },
