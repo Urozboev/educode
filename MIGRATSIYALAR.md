@@ -29,6 +29,7 @@ oldingisiga tayanadi.
 | 36 | `36_coin_balansi.sql` | Coin qiymatlari qayta belgilanadi + do'kon narxlari |
 | 37 | `37_qaydlar_va_qidiruv.sql` | Mavzu bo'yicha shaxsiy qaydlar + kurs ichida qidiruv |
 | 38 | `38_olimpiada_ball_va_reyting.sql` | Olimpiada ball tizimi, reyting tuzatildi, mashq rejimi |
+| 39 | `39_topshiriqlar_30ta.sql` | 30 ta mustaqil topshiriq (14 oson / 11 o'rta / 5 qiyin) |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -158,6 +159,24 @@ komponentlardan foydalanadi, farqi faqat `basePath` propida.
 
 > Alohida "Ishtirokchilar" tabi qo'shilmadi: reyting jadvalining o'zi
 > ishtirokchilar ro'yxati — masala yechmaganlar 0 bilan pastda turadi.
+
+**39** — "Topshiriqlar" bo'limiga 30 ta mustaqil mashq masalasi. Ular
+olimpiadaga bog'lanmagan, istalgan vaqtda yechiladi.
+
+Taqsimot ataylab osonga og'ishtirilgan — boshlovchi birinchi kunidan
+yecha oladigan masalalar bo'lishi kerak:
+
+| Daraja | Soni | Mukofot | Namuna |
+|---|---|---|---|
+| Oson | 14 | 10 coin / 30 XP | "Salom, dunyo!", sonning kvadrati, oxirgi raqam |
+| O'rta | 11 | 18 / 55 | Tub son, palindrom, Fibonachchi, saralash |
+| Qiyin | 5 | 30 / 90 | Qavslar balansi, ikkilik qidiruv, chastota saralash |
+
+Barcha 30 ta yechim CPython 3 da 112 test bo'yicha sinovdan o'tkazilgan,
+so'ng SQL faylidan qayta o'qib yana bir marta tekshirilgan.
+
+Yangi `basics` ("Asoslar") turkumi qo'shildi — filtrlar va turkum nomlari
+`lib/utils.ts` hamda ikkala topshiriqlar sahifasida yangilandi.
 
 ## Muhim eslatmalar
 

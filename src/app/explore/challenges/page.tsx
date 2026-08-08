@@ -11,6 +11,7 @@ import { Search, Swords, Users, Coins, Lock, ArrowRight } from "lucide-react";
 
 const categories = [
   { value: "all", label: "Barchasi" },
+  { value: "basics", label: "Asoslar" },
   { value: "math", label: "Matematika" },
   { value: "strings", label: "Satrlar" },
   { value: "arrays", label: "Massivlar" },

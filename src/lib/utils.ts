@@ -112,6 +112,7 @@ export function getCategoryLabel(category: string): string {
     computer_literacy: 'Kompyuter savodxonligi',
     prompt_engineering: 'Prompt Engineering',
     python: 'Python',
+    basics: 'Asoslar',
     algorithms: 'Algoritmlar',
     data_structures: "Ma'lumotlar tuzilmasi",
     arrays: 'Massivlar',

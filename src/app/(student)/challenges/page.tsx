@@ -13,6 +13,7 @@ import {
 
 const categories = [
   { value: "all", label: "Barchasi", icon: "✨" },
+  { value: "basics", label: "Asoslar", icon: "🌱" },
   { value: "math", label: "Matematika", icon: "🔢" },
   { value: "strings", label: "Satrlar", icon: "🔤" },
   { value: "arrays", label: "Massivlar", icon: "📊" },
