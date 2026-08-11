@@ -16,7 +16,9 @@ import {
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import AutoLogout from "@/components/AutoLogout";
-import { ALL_GUEST_LINKS as allGuestLinks } from "@/lib/nav";
+import { allGuestLinks } from "@/lib/nav";
+import { useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 const studentLinks = [
   { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
@@ -41,6 +43,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const { t } = useI18n();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -209,6 +212,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
       {/* Bottom Actions */}
       <div className="p-3 border-t border-border/50 space-y-1">
+        {!collapsed && (
+          <div className="px-1 pb-1">
+            <LanguageSwitcher />
+          </div>
+        )}
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all w-full", collapsed && "justify-center px-3")}
@@ -251,6 +259,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <Link href="/explore/about" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Platforma haqida</Link>
             </div>
             <div className="flex items-center gap-2">
+              <LanguageSwitcher compact />
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors"
@@ -272,7 +281,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             {mobileOpen && (
               <motion.div className="md:hidden bg-card border-b border-border px-4 py-3 space-y-1"
                 initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                {allGuestLinks.map(l => (
+                {allGuestLinks(t).map(l => (
                   <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
                     className={cn("block py-2.5 px-3 rounded-lg text-sm", pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent")}>
                     {l.label}

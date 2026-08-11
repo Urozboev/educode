@@ -1,8 +1,61 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import {
+  LOCALES, DEFAULT_LOCALE, LOCALE_COOKIE, isLocalizedPath,
+} from '@/lib/i18n/config';
 
 export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  let pathname = request.nextUrl.pathname;
+
+  // ============================================
+  // TIL PREFIKSI
+  //
+  // Ommaviy sahifalar /ru/explore/... ko'rinishida ochiladi. Marshrut
+  // daraxtini to'rt marta ko'chirmaslik uchun prefiks shu yerda olib
+  // tashlanadi va so'rov prefikssiz manzilga qayta yo'naltiriladi
+  // (rewrite — brauzerdagi manzil o'zgarmaydi).
+  //
+  // Tanlangan til `x-locale` sarlavhasi orqali layout'ga uzatiladi.
+  // ============================================
+  const seg = pathname.split('/')[1];
+  const urlLocale = (LOCALES as readonly string[]).includes(seg) ? seg : null;
+
+  if (urlLocale) {
+    const rest = pathname.slice(urlLocale.length + 1) || '/';
+
+    // Kabinet manzillari prefiks olmaydi — /ru/dashboard bo'lsa,
+    // uni prefikssiz manzilga qaytaramiz
+    if (!isLocalizedPath(rest)) {
+      return NextResponse.redirect(new URL(rest, request.url));
+    }
+
+    // Sukut til prefikssiz ishlaydi: /uz/explore → /explore
+    //
+    // Cookie ham yangilanadi: aks holda ilgari /ru/ ga kirgan odam
+    // /uz/... ni ochsa, prefikssiz manzilga o'tib eski tilni ko'rardi —
+    // ya'ni tilni aniq so'raganiga qaramay boshqa til chiqardi.
+    if (urlLocale === DEFAULT_LOCALE) {
+      const res = NextResponse.redirect(new URL(rest, request.url));
+      res.cookies.set(LOCALE_COOKIE, DEFAULT_LOCALE, {
+        path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax',
+      });
+      return res;
+    }
+
+    const url = request.nextUrl.clone();
+    url.pathname = rest;
+    const res = NextResponse.rewrite(url);
+    res.headers.set('x-locale', urlLocale);
+    res.cookies.set(LOCALE_COOKIE, urlLocale, {
+      path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax',
+    });
+    return res;
+  }
+
+  // Prefikssiz manzil: til cookie'dan olinadi
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
+  const activeLocale = (LOCALES as readonly string[]).includes(cookieLocale ?? '')
+    ? cookieLocale! : DEFAULT_LOCALE;
 
   // ============================================
   // OMMAVIY SAHIFALAR — hech narsa qilinmaydi
@@ -21,7 +74,9 @@ export async function middleware(request: NextRequest) {
   const isChallengePreview = /^\/challenges\/[^\/]+$/.test(pathname);
 
   if (publicPaths.includes(pathname) || isPublicPrefix || isCoursePreview || isTopicPreview || isChallengePreview) {
-    return NextResponse.next();
+    const res = NextResponse.next();
+    res.headers.set('x-locale', activeLocale);
+    return res;
   }
 
   // ============================================
@@ -158,6 +213,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  response.headers.set('x-locale', activeLocale);
   return response;
 }
 

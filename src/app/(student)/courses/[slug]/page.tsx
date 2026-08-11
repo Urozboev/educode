@@ -9,6 +9,7 @@ import { LevelBadge } from "@/components/ui/LevelBadge";
 import { ResumeCard } from "@/components/courses/ResumeCard";
 import { CourseSearch } from "@/components/courses/CourseSearch";
 import { CourseNotes } from "@/components/courses/CourseNotes";
+import { CourseReviews } from "@/components/courses/CourseReviews";
 import { getResumePoint, type ResumePoint } from "@/lib/resume";
 import type { Course, TopicTocEntry, CourseSection, Enrollment, TopicProgress } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -362,6 +363,11 @@ export default function CourseDetailPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Baholar va izohlar — mundarijadan keyin, kurs tanlashda yordam beradi */}
+      {course && (
+        <CourseReviews courseId={course.id} isEnrolled={!!enrollment} />
+      )}
     </div>
   );
 

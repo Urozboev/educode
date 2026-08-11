@@ -9,17 +9,19 @@ import { Code2, LayoutDashboard, Menu, X, Moon, Sun, LogOut, ChevronDown } from 
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
-import {
-  PRIMARY_LINKS as primaryLinks,
-  RESOURCE_LINKS as resourceLinks,
-  TAIL_LINKS as tailLinks,
-  ALL_GUEST_LINKS as allLinks,
-} from "@/lib/nav";
+import { primaryLinks, resourceLinks, tailLinks, allGuestLinks } from "@/lib/nav";
+import { useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 export default function ExploreLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const { t, href } = useI18n();
+  const primary = primaryLinks(t);
+  const resources = resourceLinks(t);
+  const tail = tailLinks(t);
+  const allLinks = allGuestLinks(t);
   const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -49,7 +51,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-1">
-            {primaryLinks.map(l => (
+            {primary.map(l => (
               <Link key={l.href} href={l.href} className={`px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${pathname === l.href ? "text-neon-purple bg-neon-purple/8" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>{l.label}</Link>
             ))}
 
@@ -63,12 +65,12 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
                 onClick={() => setResourcesOpen(o => !o)}
                 aria-expanded={resourcesOpen}
                 className={`inline-flex items-center gap-1 px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${
-                  resourceLinks.some(r => pathname === r.href)
+                  resources.some(r => pathname === r.href)
                     ? "text-neon-purple bg-neon-purple/8"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
               >
-                Resurslar
+                {t.nav.resources}
                 <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
               </button>
 
@@ -82,7 +84,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
                     className="absolute left-0 top-full pt-2 w-64"
                   >
                     <div className="rounded-xl border border-border bg-card shadow-lift p-1.5">
-                      {resourceLinks.map(r => (
+                      {resources.map(r => (
                         <Link
                           key={r.href}
                           href={r.href}
@@ -101,23 +103,25 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
               </AnimatePresence>
             </div>
 
-            {tailLinks.map(l => (
+            {tail.map(l => (
               <Link key={l.href} href={l.href} className={`px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${pathname === l.href ? "text-neon-purple bg-neon-purple/8" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>{l.label}</Link>
             ))}
           </div>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher compact />
+
             <button suppressHydrationWarning onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors" title="Mavzu o'zgartirish">
               {mounted && theme === "light" ? <Moon className="w-[18px] h-[18px]" /> : <Sun className="w-[18px] h-[18px]" />}
             </button>
 
             {user ? (
-              <Link href={dashboardUrl} className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Dashboard</Link>
+              <Link href={dashboardUrl} className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.dashboard}</Link>
             ) : (
               <div className="hidden lg:flex items-center gap-2">
-                <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kirish</Link>
-                <Link href="/register" className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+                <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.login}</Link>
+                <Link href="/register" className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.register}</Link>
               </div>
             )}
 
@@ -139,7 +143,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
               ))}
               {!user && (
                 <div className="flex gap-2 pt-2 border-t border-border mt-2">
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-ghost text-sm py-2 px-4 flex-1 text-center">Kirish</Link>
+                  <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-ghost text-sm py-2 px-4 flex-1 text-center">{t.nav.login}</Link>
                   <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary text-sm py-2 px-4 flex-1 text-center">Boshlash</Link>
                 </div>
               )}

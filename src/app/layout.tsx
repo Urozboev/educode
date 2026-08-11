@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Sora, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { I18nProvider } from "@/components/i18n/I18nProvider";
+import { DEFAULT_LOCALE, LOCALE_META, isLocale, type Locale } from "@/lib/i18n/config";
 import { Toaster } from "sonner";
 import {
   SITE_URL,
@@ -121,12 +124,19 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Tilni middleware `x-locale` sarlavhasida beradi. Prefiksli manzil
+  // (/ru/explore) rewrite qilingani uchun uni faqat shu yerdan bilish
+  // mumkin — `usePathname()` rewrite'dan keyingi manzilni ko'rsatadi.
+  const h = await headers();
+  const headerLocale = h.get("x-locale");
+  const locale: Locale = isLocale(headerLocale) ? headerLocale : DEFAULT_LOCALE;
+
   return (
     <html
-      lang="uz"
+      lang={LOCALE_META[locale].htmlLang}
       suppressHydrationWarning
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}
     >
@@ -137,10 +147,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <QueryProvider>
-            {children}
-            <Toaster position="top-right" richColors closeButton />
-          </QueryProvider>
+          <I18nProvider initialLocale={locale}>
+            <QueryProvider>
+              {children}
+              <Toaster position="top-right" richColors closeButton />
+            </QueryProvider>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,3 +1,5 @@
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+
 /**
  * Mehmon (login qilmagan foydalanuvchi) uchun navigatsiya.
  *
@@ -5,44 +7,59 @@
  * `explore` layout'ida va o'quvchi layout'idagi mehmon menyusida. Yangi
  * bo'lim qo'shilganda faqat bittasi yangilanib, menyular bir-biridan
  * farq qilib qolardi. Endi manba bitta.
+ *
+ * Matnlar endi lug'atdan olinadi: ro'yxat tarjima kalitini saqlaydi,
+ * ko'rinadigan yorliqni esa `navLinks(t)` yasab beradi.
  */
+
+export type NavKey =
+  | "courses" | "challenges" | "playground" | "contests"
+  | "books" | "glossary" | "labs" | "lessonGames" | "games" | "methods" | "portfolios"
+  | "blog" | "about";
 
 export type NavLink = { href: string; label: string };
 export type ResourceLink = NavLink & { hint: string };
 
-/** Yuqori panelda doim ko'rinadigan asosiy bosqichlar */
-export const PRIMARY_LINKS: NavLink[] = [
-  { href: "/explore/courses", label: "Kurslar" },
-  { href: "/explore/challenges", label: "Topshiriqlar" },
-  { href: "/playground", label: "Playground" },
-  { href: "/explore/contests", label: "Olimpiada" },
+const PRIMARY: { href: string; key: NavKey }[] = [
+  { href: "/explore/courses", key: "courses" },
+  { href: "/explore/challenges", key: "challenges" },
+  { href: "/playground", key: "playground" },
+  { href: "/explore/contests", key: "contests" },
 ];
+
+const RESOURCES: { href: string; key: Exclude<NavKey, "courses" | "challenges" | "playground" | "contests" | "blog" | "about"> }[] = [
+  { href: "/explore/books", key: "books" },
+  { href: "/explore/glossary", key: "glossary" },
+  { href: "/explore/labs", key: "labs" },
+  { href: "/explore/lesson-games", key: "lessonGames" },
+  { href: "/explore/games", key: "games" },
+  { href: "/explore/methods", key: "methods" },
+  { href: "/explore/portfolios", key: "portfolios" },
+];
+
+const TAIL: { href: string; key: NavKey }[] = [{ href: "/blog", key: "blog" }];
+const EXTRA: { href: string; key: NavKey }[] = [{ href: "/explore/about", key: "about" }];
+
+/** Yuqori panelda doim ko'rinadigan asosiy bosqichlar */
+export const primaryLinks = (t: Dictionary): NavLink[] =>
+  PRIMARY.map(l => ({ href: l.href, label: t.nav[l.key] }));
 
 /** "Resurslar" ochiladigan ro'yxati */
-export const RESOURCE_LINKS: ResourceLink[] = [
-  { href: "/explore/books", label: "Kitoblar", hint: "Bepul PDF kitoblar" },
-  { href: "/explore/glossary", label: "Terminlar", hint: "Lug'at va flash-cardlar" },
-  { href: "/explore/labs", label: "Laboratoriya", hint: "Interaktiv vizualizatorlar" },
-  { href: "/explore/lesson-games", label: "Dars o'yinlari", hint: "Viktorina, krossvord" },
-  { href: "/explore/games", label: "O'yinlar", hint: "Arkada mashqlar" },
-  { href: "/explore/methods", label: "Metodlar", hint: "O'qituvchiga yo'riqnoma" },
-  { href: "/explore/portfolios", label: "Portfoliolar", hint: "Talabalar ishlari" },
-];
+export const resourceLinks = (t: Dictionary): ResourceLink[] =>
+  RESOURCES.map(l => ({ href: l.href, label: t.nav[l.key], hint: t.nav.hints[l.key] }));
 
 /** Yuqori panelda "Resurslar" dan keyin */
-export const TAIL_LINKS: NavLink[] = [
-  { href: "/blog", label: "Blog" },
-];
+export const tailLinks = (t: Dictionary): NavLink[] =>
+  TAIL.map(l => ({ href: l.href, label: t.nav[l.key] }));
 
 /** Yuqori panelga sig'magani — mobil menyu va footerda ko'rinadi */
-export const EXTRA_LINKS: NavLink[] = [
-  { href: "/explore/about", label: "Platforma haqida" },
-];
+export const extraLinks = (t: Dictionary): NavLink[] =>
+  EXTRA.map(l => ({ href: l.href, label: t.nav[l.key] }));
 
 /** Mobil menyu va footer uchun — hammasi bitta ro'yxatda */
-export const ALL_GUEST_LINKS: NavLink[] = [
-  ...PRIMARY_LINKS,
-  ...RESOURCE_LINKS.map(({ href, label }) => ({ href, label })),
-  ...TAIL_LINKS,
-  ...EXTRA_LINKS,
+export const allGuestLinks = (t: Dictionary): NavLink[] => [
+  ...primaryLinks(t),
+  ...resourceLinks(t).map(({ href, label }) => ({ href, label })),
+  ...tailLinks(t),
+  ...extraLinks(t),
 ];

@@ -15,12 +15,9 @@ import {
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 import { OrganizationJsonLd, WebsiteJsonLd, FaqJsonLd } from "@/components/seo/JsonLd";
-import {
-  PRIMARY_LINKS as primaryLinks,
-  RESOURCE_LINKS as resourceLinks,
-  TAIL_LINKS as tailLinks,
-  ALL_GUEST_LINKS as allGuestLinks,
-} from "@/lib/nav";
+import { primaryLinks, resourceLinks, tailLinks, allGuestLinks } from "@/lib/nav";
+import { useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -484,6 +481,11 @@ export default function LandingPage() {
   const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const { t } = useI18n();
+  const nav = primaryLinks(t);
+  const navResources = resourceLinks(t);
+  const navTail = tailLinks(t);
+  const navAll = allGuestLinks(t);
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [stats, setStats] = useState({ users: 0, courses: 0, challenges: 0, submissions: 0 });
   const [courses, setCourses] = useState<any[]>([]);
@@ -577,7 +579,7 @@ export default function LandingPage() {
 
           {/* Menyu explore layout'idagi bilan bir xil — manba: lib/nav.ts */}
           <div className="hidden lg:flex items-center gap-1">
-            {primaryLinks.map(l => (
+            {nav.map(l => (
               <Link key={l.href} href={l.href} className="px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
             ))}
 
@@ -591,7 +593,7 @@ export default function LandingPage() {
                 aria-expanded={resourcesOpen}
                 className="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
               >
-                Resurslar
+                {t.nav.resources}
                 <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
               </button>
 
@@ -605,7 +607,7 @@ export default function LandingPage() {
                     className="absolute left-0 top-full pt-2 w-64"
                   >
                     <div className="rounded-xl border border-border bg-card shadow-lift p-1.5">
-                      {resourceLinks.map(r => (
+                      {navResources.map(r => (
                         <Link
                           key={r.href}
                           href={r.href}
@@ -622,12 +624,14 @@ export default function LandingPage() {
               </AnimatePresence>
             </div>
 
-            {tailLinks.map(l => (
+            {navTail.map(l => (
               <Link key={l.href} href={l.href} className="px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
             ))}
           </div>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher compact />
+
             {mounted && (
               <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors">
                 {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
@@ -652,8 +656,8 @@ export default function LandingPage() {
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-2">
-                <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kirish</Link>
-                <Link href="/register" className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+                <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.login}</Link>
+                <Link href="/register" className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.register}</Link>
               </div>
             )}
 
@@ -666,11 +670,11 @@ export default function LandingPage() {
         <AnimatePresence>{mobileNav && (
           <motion.div className="lg:hidden bg-card/95 backdrop-blur-xl border-b border-border px-5 py-4 space-y-1"
             initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-            {allGuestLinks.map(l => <Link key={l.href} href={l.href} onClick={() => setMobileNav(false)} className="block py-3 px-3 rounded-xl text-[0.95rem] hover:bg-accent/50 transition-colors">{l.label}</Link>)}
+            {navAll.map(l => <Link key={l.href} href={l.href} onClick={() => setMobileNav(false)} className="block py-3 px-3 rounded-xl text-[0.95rem] hover:bg-accent/50 transition-colors">{l.label}</Link>)}
             {!user && (
               <div className="flex gap-2 pt-3 mt-2 border-t border-border">
-                <Link href="/login" onClick={() => setMobileNav(false)} className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium bg-surface hover:bg-surface-hover border border-border transition-all">Kirish</Link>
-                <Link href="/register" onClick={() => setMobileNav(false)} className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+                <Link href="/login" onClick={() => setMobileNav(false)} className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium bg-surface hover:bg-surface-hover border border-border transition-all">{t.nav.login}</Link>
+                <Link href="/register" onClick={() => setMobileNav(false)} className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.register}</Link>
               </div>
             )}
           </motion.div>
@@ -1211,13 +1215,13 @@ export default function LandingPage() {
             <div>
               <h4 className="font-semibold text-sm mb-3">Platforma</h4>
               <div className="space-y-2">
-                {allGuestLinks.map(l => <Link key={l.href} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</Link>)}
+                {navAll.map(l => <Link key={l.href} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</Link>)}
               </div>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-3">Resurslar</h4>
+              <h4 className="font-semibold text-sm mb-3">{t.footer.resources}</h4>
               <div className="space-y-2">
-                <Link href={user ? dUrl : "/register"} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Boshlash</Link>
+                <Link href={user ? dUrl : "/register"} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.register}</Link>
                 <Link href="/explore/about" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Loyiha haqida</Link>
               </div>
             </div>

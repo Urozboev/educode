@@ -31,6 +31,7 @@ oldingisiga tayanadi.
 | 38 | `38_olimpiada_ball_va_reyting.sql` | Olimpiada ball tizimi, reyting tuzatildi, mashq rejimi |
 | 39 | `39_topshiriqlar_30ta.sql` | 30 ta mustaqil topshiriq (14 oson / 11 o'rta / 5 qiyin) |
 | 40 | `40_paste_belgisi.sql` | Yechimda nusxa ko'chirish belgisi + admin hisoboti |
+| 41 | `41_kurs_izohlari.sql` | Kurs baholari va izohlari (yulduzcha + matn) |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -195,6 +196,19 @@ talabasining sahifasida belgini ko'radi.
 > Ko'rsatkich **ayblov emas** — talaba o'z kodini boshqa muharrirdan
 > ko'chirgan bo'lishi mumkin. Shuning uchun belgi faqat yechim egasiga,
 > o'qituvchiga va adminga ko'rinadi; ochiq reytingda ko'rsatilmaydi.
+
+**41** — Kurs sahifasining pastida baholar va izohlar bo'limi. 1-5 yulduzcha,
+izoh ixtiyoriy. Baho qoldirish faqat **kursga yozilganlarga** ochiq —
+`upsert_course_review` ichida tekshiriladi. Bir foydalanuvchi bitta izoh
+yozadi va uni tahrirlaydi (`UNIQUE(course_id, user_id)`), aks holda bitta
+odam reytingni ko'tarib yuborishi mumkin edi.
+
+`courses.average_rating` ustuni ilgari ham bor edi, lekin hech qachon
+to'ldirilmagan. Endi trigger uni har o'zgarishda qayta hisoblaydi.
+
+> Admin nomaqbul izohni **yashiradi**, o'chirmaydi (`is_hidden`): baho
+> reytingda qoladi, faqat matn ko'rinmaydi. Shunda o'chirish orqali
+> reytingni tozalab yuborish imkoni bo'lmaydi.
 
 ## Muhim eslatmalar
 
