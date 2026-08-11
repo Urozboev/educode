@@ -11,7 +11,7 @@ import {
   Code2, LayoutDashboard, BookOpen, Swords, Users, Award,
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
   ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins, Newspaper,
-  Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy
+  Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy, ShieldCheck
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +23,7 @@ const adminLinks = [
   { href: "/a-challenges", label: "Topshiriqlar", icon: Swords },
   { href: "/a-games", label: "Dars o'yinlari", icon: Gamepad2 },
   { href: "/a-contests", label: "Olimpiadalar", icon: Trophy },
+  { href: "/a-integrity", label: "Halollik nazorati", icon: ShieldCheck },
   { href: "/a-users", label: "Foydalanuvchilar", icon: Users },
   { href: "/a-teachers", label: "O'qituvchi arizalari", icon: Presentation },
   { href: "/a-store", label: "Do'kon", icon: ShoppingBag },

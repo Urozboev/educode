@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials, getLevelLabel, getLevelColor, cn, formatDate, formatRelativeDate, calculateXpLevel } from "@/lib/utils";
 import type { Profile, Submission, Enrollment } from "@/types";
+import { PasteBadge } from "@/components/challenges/PasteBadge";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Zap, Coins, Flame, BookOpen, Target, Brain,
@@ -126,6 +127,7 @@ export default function StudentDetailPage() {
                 <div className="flex-1 min-w-0">
                   <span className="text-xs font-mono">{s.language} · {s.task_type}</span>
                 </div>
+                <PasteBadge count={s.paste_count} ratio={s.paste_ratio} chars={s.pasted_chars} compact />
                 <span className={cn("text-xs", s.status === "accepted" ? "text-neon-green" : "text-neon-red")}>
                   {s.passed_tests}/{s.total_tests}
                 </span>

@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Sparkles, Loader2, Coins, Users, Clock, Lock } from "lucide-react";
 import { cn, getDifficultyConfig, getCategoryLabel, formatRelativeDate } from "@/lib/utils";
+import { PasteBadge } from "./PasteBadge";
 
 const CodeEditor = dynamic(() => import("@/components/editor/CodeEditor"), { ssr: false });
 
@@ -113,11 +114,14 @@ export function ChallengeSolver({
             <h3 className="font-semibold text-sm mb-3">So&apos;nggi yuborishlar</h3>
             <div className="space-y-2">
               {submissions.slice(0, 5).map(sub => (
-                <div key={sub.id} className="flex items-center justify-between text-xs bg-surface rounded-lg px-3 py-2">
+                <div key={sub.id} className="flex items-center gap-2 text-xs bg-surface rounded-lg px-3 py-2">
                   <span className={cn("font-mono font-semibold", sub.status === "accepted" ? "text-neon-green" : "text-neon-red")}>
                     {sub.status === "accepted" ? "✓ Qabul qilindi" : "✗ " + sub.status.replace(/_/g, " ")}
                   </span>
-                  <span className="text-muted-foreground">
+                  {/* O'z yechimidagi nusxa belgisi — talaba nima qayd
+                      etilayotganini bilib tursin */}
+                  <PasteBadge count={sub.paste_count} ratio={sub.paste_ratio} chars={sub.pasted_chars} compact />
+                  <span className="text-muted-foreground ml-auto">
                     {sub.passed_tests}/{sub.total_tests} test · {formatRelativeDate(sub.created_at)}
                   </span>
                 </div>

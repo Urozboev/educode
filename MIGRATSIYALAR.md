@@ -30,6 +30,7 @@ oldingisiga tayanadi.
 | 37 | `37_qaydlar_va_qidiruv.sql` | Mavzu bo'yicha shaxsiy qaydlar + kurs ichida qidiruv |
 | 38 | `38_olimpiada_ball_va_reyting.sql` | Olimpiada ball tizimi, reyting tuzatildi, mashq rejimi |
 | 39 | `39_topshiriqlar_30ta.sql` | 30 ta mustaqil topshiriq (14 oson / 11 o'rta / 5 qiyin) |
+| 40 | `40_paste_belgisi.sql` | Yechimda nusxa ko'chirish belgisi + admin hisoboti |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -177,6 +178,23 @@ so'ng SQL faylidan qayta o'qib yana bir marta tekshirilgan.
 
 Yangi `basics` ("Asoslar") turkumi qo'shildi — filtrlar va turkum nomlari
 `lib/utils.ts` hamda ikkala topshiriqlar sahifasida yangilandi.
+
+**40** — Talaba kod muharririga nusxa qo'ysa, bu **yuborishning o'ziga**
+yoziladi: `paste_count`, `pasted_chars`, `paste_ratio`.
+
+Paste aniqlash ilgari ham qisman bor edi, lekin belgi faqat `code_snapshots`
+ga tushardi va chegara **40 belgi** edi — ya'ni oson masalalarning bir
+qatorlik yechimi (`print(n * n)` — 14 belgi) umuman qayd etilmasdi. Endi
+har qanday paste sanaladi.
+
+Admin `/a-integrity` ("Halollik nazorati") sahifasida ro'yxatni ko'radi:
+kim, qaysi masala, necha foizi ko'chirilgan, olimpiadaga tegishlimi.
+Yechim matnini o'sha yerda ochib ko'rish mumkin. O'qituvchi esa o'z
+talabasining sahifasida belgini ko'radi.
+
+> Ko'rsatkich **ayblov emas** — talaba o'z kodini boshqa muharrirdan
+> ko'chirgan bo'lishi mumkin. Shuning uchun belgi faqat yechim egasiga,
+> o'qituvchiga va adminga ko'rinadi; ochiq reytingda ko'rsatilmaydi.
 
 ## Muhim eslatmalar
 

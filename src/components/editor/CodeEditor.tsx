@@ -40,7 +40,26 @@ export default function CodeEditor({
   const [pendingResults, setPendingResults] = useState<SubmissionTestResult[] | null>(null);
   const pyodideRef = useRef<any>(null);
 
+  /**
+   * Paste statistikasi. `useRef`, chunki Monaco'ning onDidPaste
+   * ishlov beruvchisi bir marta o'rnatiladi va o'sha paytdagi state'ni
+   * "yodda saqlab qoladi" — setState bilan sanoq har doim 1 da qolardi.
+   */
+  const pasteStats = useRef({ count: 0, chars: 0 });
+
   useEffect(() => { if (language === "python") loadPyodide(); }, [language]);
+
+  /**
+   * Masala almashganda paste sanog'ini nolga tushiramiz.
+   *
+   * Olimpiadada A masaladan B ga o'tilganda marshrut o'zgaradi, lekin
+   * komponent qayta yaratilmaydi — faqat `taskId` propi almashadi.
+   * Reset bo'lmasa A dagi nusxa B ning yechimiga yozilib qolardi.
+   */
+  useEffect(() => {
+    pasteStats.current = { count: 0, chars: 0 };
+    setPasteDetected(false);
+  }, [taskId]);
 
   // 30 sekundlik avtomatik kod snapshot (faqat task/challenge ichida)
   useEffect(() => {
@@ -263,9 +282,19 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
     if (!user) { toast.error("Tizimga kiring"); setIsSubmitting(false); return; }
 
     // 3. Submission saqlash
+    // Yechimning qancha qismi ko'chirilgan. Chegaralanadi: talaba bir
+    // bo'lakni ko'chirib, keyin o'chirib tashlashi mumkin — u holda
+    // ko'chirilgan belgilar soni yakuniy koddan uzun bo'lib qoladi.
+    const pasteRatio = code.length > 0
+      ? Math.min(100, Math.round((pasteStats.current.chars / code.length) * 100))
+      : 0;
+
     const { data: subData, error: subErr } = await supabase.from('submissions').insert({
       user_id: user.id, task_id: taskId, task_type: taskType || 'topic_task',
       code, language, status, passed_tests: passed, total_tests: total, test_results: results,
+      paste_count: pasteStats.current.count,
+      pasted_chars: pasteStats.current.chars,
+      paste_ratio: pasteRatio,
     }).select('id').single();
     if (subErr) { toast.error(`Saqlash xatolik: ${subErr.message}`); setIsSubmitting(false); return; }
 
@@ -382,27 +411,33 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         onChange={val => setCode(val || "")}
         onMount={(editor) => {
           editor.onDidPaste(async (e: any) => {
-            const pastedRange = e.range;
-            const pastedText = editor.getModel()?.getValueInRange(pastedRange) || "";
-            if (pastedText.length >= 40) {
-              setPasteDetected(true);
-              try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user && taskId) {
-                  await supabase.from('code_snapshots').insert({
-                    user_id: user.id,
-                    task_id: taskId,
-                    task_type: taskType || 'topic_task',
-                    language,
-                    code_content: editor.getValue(),
-                    code_length: editor.getValue().length,
-                    paste_detected: true,
-                    paste_size: pastedText.length,
-                    trigger_type: 'paste',
-                  });
-                }
-              } catch (_e) { /* */ }
-            }
+            const pastedText = editor.getModel()?.getValueInRange(e.range) || "";
+            // Bo'shliqdan boshqa narsa qo'yilmagan bo'lsa hisobga olmaymiz
+            if (!pastedText.trim()) return;
+
+            // HAR QANDAY paste sanaladi. Ilgari chegara 40 belgi edi va
+            // oson masalalarning bir qatorlik yechimi (`print(n * n)`)
+            // umuman qayd etilmasdi — aynan eng ko'p nusxalanadigan holat.
+            pasteStats.current.count += 1;
+            pasteStats.current.chars += pastedText.length;
+            setPasteDetected(true);
+
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user && taskId) {
+                await supabase.from('code_snapshots').insert({
+                  user_id: user.id,
+                  task_id: taskId,
+                  task_type: taskType || 'topic_task',
+                  language,
+                  code_content: editor.getValue(),
+                  code_length: editor.getValue().length,
+                  paste_detected: true,
+                  paste_size: pastedText.length,
+                  trigger_type: 'paste',
+                });
+              }
+            } catch (_e) { /* snapshot yozilmasa ham yuborishdagi belgi qoladi */ }
           });
         }}
         theme="vs-dark"

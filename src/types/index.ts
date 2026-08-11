@@ -245,8 +245,17 @@ export interface Submission {
   execution_time_ms: number | null;
   memory_used_kb: number | null;
   ai_feedback: string | null;
+  /** Muharrirga necha marta nusxa qo'yilgani */
+  paste_count: number;
+  /** Jami ko'chirilgan belgilar soni */
+  pasted_chars: number;
+  /** Yechimning ko'chirilgan ulushi, 0..100 */
+  paste_ratio: number;
   created_at: string;
 }
+
+/** Nusxa ko'chirish darajasi — belgi rangi va matni shundan olinadi */
+export type PasteLevel = 'none' | 'low' | 'medium' | 'high';
 
 export interface SubmissionTestResult {
   input: string;
