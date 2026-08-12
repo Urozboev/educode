@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -28,6 +29,7 @@ function LoginForm() {
   const errorParam = searchParams.get("error");
 
   const [email, setEmail] = useState("");
+  const { t } = useI18n();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -134,10 +136,10 @@ function LoginForm() {
       <div className="p-8 md:p-10 rounded-3xl border border-border/60 bg-card/80 backdrop-blur-xl shadow-2xl shadow-black/5">
         <div className="mb-8">
           <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
-            Xush kelibsiz
+            {t.auth.loginTitle}
           </h1>
           <p className="text-muted-foreground text-base">
-            Hisobingizga kiring va o'rganishni davom ettiring.
+            {t.auth.loginSubtitle}
           </p>
         </div>
 
@@ -189,7 +191,7 @@ function LoginForm() {
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="text-sm font-semibold mb-2 block">Email</label>
+            <label className="text-sm font-semibold mb-2 block">{t.auth.email}</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -204,12 +206,12 @@ function LoginForm() {
           </div>
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-semibold">Parol</label>
+              <label className="text-sm font-semibold">{t.auth.password}</label>
               <Link
                 href="/forgot-password"
                 className="text-sm font-medium text-neon-purple hover:underline"
               >
-                Parolni unutdingizmi?
+                {t.auth.forgotPassword}
               </Link>
             </div>
             <div className="relative">
@@ -249,9 +251,9 @@ function LoginForm() {
         </form>
 
         <p className="text-center text-[15px] text-muted-foreground mt-7 pt-6 border-t border-border/40">
-          Hisobingiz yo'qmi?{" "}
+          {t.auth.noAccount}{" "}
           <Link href="/register" className="text-neon-purple font-semibold hover:underline">
-            Ro'yxatdan o'tish
+            {t.auth.submitRegister}
           </Link>
         </p>
       </div>

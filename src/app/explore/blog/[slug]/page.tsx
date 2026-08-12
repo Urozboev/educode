@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { serverHref } from "@/lib/i18n/server";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
@@ -52,6 +53,7 @@ function fmtDate(d: string | null) {
 }
 
 export default async function BlogPostPage({ params }: Params) {
+  const href = await serverHref();
   const post = await fetchPost(params.slug);
   if (!post) notFound();
 
@@ -75,7 +77,7 @@ export default async function BlogPostPage({ params }: Params) {
       <BreadcrumbJsonLd items={[{ name: "Bosh sahifa", url: "/" }, { name: "Blog", url: "/blog" }, { name: post.title, url: `/blog/${post.slug}` }]} />
       <BlogViewCounter slug={post.slug} />
 
-      <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-5 transition-colors">
+      <Link href={href("/blog")} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-5 transition-colors">
         <ArrowLeft className="w-4 h-4" /> Blogga qaytish
       </Link>
 

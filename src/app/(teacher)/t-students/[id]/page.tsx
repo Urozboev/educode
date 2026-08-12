@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials, getLevelLabel, getLevelColor, cn, formatDate, formatRelativeDate, calculateXpLevel } from "@/lib/utils";
 import type { Profile, Submission, Enrollment } from "@/types";

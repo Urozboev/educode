@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import type { LessonGame, LessonGameType } from "@/types";
 import { motion } from "framer-motion";
 import { cn, getCategoryLabel } from "@/lib/utils";
@@ -21,6 +23,7 @@ export function LessonGamesView() {
   const supabase = createClient();
   const [games, setGames] = useState<LessonGame[]>([]);
   const [loading, setLoading] = useState(true);
+  const { locale, t } = useI18n();
   const [search, setSearch] = useState("");
   const [type, setType] = useState<LessonGameType | "all">("all");
 
@@ -32,11 +35,12 @@ export function LessonGamesView() {
         .eq("is_published", true)
         .order("order_index")
         .order("created_at", { ascending: false });
-      if (data) setGames(data as LessonGame[]);
+      if (data) setGames(await withTranslations(supabase, "lesson_games", data as LessonGame[], locale));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
 
   const filtered = useMemo(() => games.filter(g =>
     (type === "all" || g.type === type) &&
@@ -47,7 +51,7 @@ export function LessonGamesView() {
   return (
     <div className="space-y-8 md:space-y-10">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
-        <p className="eyebrow mb-3">Darsda</p>
+        <p className="eyebrow mb-3">{t.explore.lessonGamesEyebrow}</p>
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight mb-3">
           Dars o&apos;yinlari
         </h1>
@@ -65,7 +69,7 @@ export function LessonGamesView() {
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="O'yin nomi bo'yicha qidirish..."
+            placeholder={t.explore.lessonGamesSearch}
             className="w-full bg-surface/60 border border-border rounded-2xl pl-12 pr-4 py-3.5 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
           />
         </div>

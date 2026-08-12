@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import type { GlossaryTerm } from "@/types";
 import { motion } from "framer-motion";
 import { cn, getCategoryLabel } from "@/lib/utils";
@@ -26,6 +28,7 @@ export function GlossaryView() {
   const supabase = createClient();
   const [terms, setTerms] = useState<GlossaryTerm[]>([]);
   const [loading, setLoading] = useState(true);
+  const { locale, t } = useI18n();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [mode, setMode] = useState<Mode>("list");
@@ -37,11 +40,12 @@ export function GlossaryView() {
         .select("*")
         .eq("is_published", true)
         .order("term");
-      if (data) setTerms(data as GlossaryTerm[]);
+      if (data) setTerms(await withTranslations(supabase, "glossary_terms", data as GlossaryTerm[], locale));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
 
   const filtered = useMemo(() => terms.filter(t =>
     (category === "all" || t.category === category) &&
@@ -63,7 +67,7 @@ export function GlossaryView() {
   return (
     <div className="space-y-8 md:space-y-10">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
-        <p className="eyebrow mb-3">Lug&apos;at</p>
+        <p className="eyebrow mb-3">{t.explore.glossaryEyebrow}</p>
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight mb-3">
           Terminlar
         </h1>
@@ -106,7 +110,7 @@ export function GlossaryView() {
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Termin qidirish..."
+            placeholder={t.explore.glossarySearch}
             className="w-full bg-surface/60 border border-border rounded-2xl pl-12 pr-4 py-3.5 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
           />
         </div>
@@ -181,6 +185,7 @@ export function GlossaryView() {
    ============================================================ */
 
 function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
+  const { t } = useI18n();
   const [order, setOrder] = useState<number[]>(() => terms.map((_, i) => i));
   const [pos, setPos] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -279,7 +284,7 @@ function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
             {current.term_en && (
               <p className="font-mono text-sm text-muted-foreground mt-2">{current.term_en}</p>
             )}
-            <p className="eyebrow mt-8">Javobni ko&apos;rish uchun bosing</p>
+            <p className="eyebrow mt-8">{t.explore.flipHint}</p>
           </div>
 
           {/* Orqa tomon — ta'rif */}

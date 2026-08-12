@@ -10,16 +10,19 @@ import {
   Image as ImageIcon, X, Truck, Hand, Sparkles, GraduationCap, XCircle, MapPin,
 } from "lucide-react";
 import {
-  DELIVERY_TYPES, ORDER_STATUS, ORDER_FLOW, UZ_REGIONS,
-  emptyOrderForm, validateOrderForm, needsAddress, deliveryLabel, categoryLabel,
+  ORDER_STATUS, ORDER_FLOW, UZ_REGIONS,
+  emptyOrderForm, validateOrderForm, needsAddress, deliveryLabel, deliveryHint,
+  categoryLabel, orderStatusLabel, orderStatusHint,
   type StoreItem, type StoreOrder, type OrderForm, type StoreDeliveryType,
 } from "@/lib/store";
+import { useI18n } from "@/lib/i18n";
 
 const DELIVERY_ICON: Record<StoreDeliveryType, typeof Truck> = {
   delivery: Truck, pickup: Hand, digital: Sparkles,
 };
 
 export default function StorePage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [items, setItems] = useState<StoreItem[]>([]);
   const [orders, setOrders] = useState<StoreOrder[]>([]);
@@ -68,14 +71,14 @@ export default function StorePage() {
   useEffect(() => { load(); }, [load]);
 
   function openOrder(item: StoreItem) {
-    if (coins < item.price_coins) { toast.error("Yetarli coin yo'q"); return; }
-    if (item.stock <= 0) { toast.error("Sovg'a tugagan"); return; }
+    if (coins < item.price_coins) { toast.error(t.store.notEnough); return; }
+    if (item.stock <= 0) { toast.error(t.store.outOfStock); return; }
     setActive(item);
   }
 
   async function placeOrder() {
     if (!active) return;
-    const err = validateOrderForm(form, active.delivery_type);
+    const err = validateOrderForm(form, active.delivery_type, t);
     if (err) { toast.error(err); return; }
 
     setPlacing(true);
@@ -92,10 +95,10 @@ export default function StorePage() {
     });
     setPlacing(false);
 
-    if (error) { toast.error("Buyurtma yuborilmadi: " + error.message); return; }
-    if (!data?.ok) { toast.error(data?.message || "Buyurtma qabul qilinmadi"); return; }
+    if (error) { toast.error(t.store.orderFailed + ": " + error.message); return; }
+    if (!data?.ok) { toast.error(data?.message || t.store.orderRejected); return; }
 
-    toast.success(data.message || "Buyurtma qabul qilindi");
+    toast.success(data.message || t.store.orderPlaced);
     setActive(null);
     setForm(f => ({ ...emptyOrderForm(), full_name: f.full_name, phone: f.phone, email: f.email }));
     setTab("orders");
@@ -103,12 +106,12 @@ export default function StorePage() {
   }
 
   async function cancelOrder(orderId: string) {
-    if (!confirm("Buyurtmani bekor qilasizmi? Coin qaytariladi.")) return;
+    if (!confirm(t.store.confirmCancel)) return;
     setCancelling(orderId);
     const { data, error } = await supabase.rpc("cancel_my_store_order", { p_order_id: orderId });
     setCancelling(null);
-    if (error || !data?.ok) { toast.error(data?.message || "Bekor qilinmadi"); return; }
-    toast.success("Bekor qilindi, coin qaytarildi");
+    if (error || !data?.ok) { toast.error(data?.message || t.store.cancelFailed); return; }
+    toast.success(t.store.cancelled);
     load();
   }
 
@@ -122,8 +125,8 @@ export default function StorePage() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Do'kon</h1>
-        <p className="text-muted-foreground">Yig'gan coinlaringizni sovg'aga almashtiring</p>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.store.title}</h1>
+        <p className="text-muted-foreground">{t.store.subtitle}</p>
       </motion.div>
 
       <motion.div className="glass-card p-5 flex items-center justify-between" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
@@ -132,18 +135,18 @@ export default function StorePage() {
             <Coins className="w-6 h-6 text-neon-yellow" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Balansingiz</p>
-            <p className="font-display font-bold text-2xl text-neon-yellow">{coins} coin</p>
+            <p className="text-sm text-muted-foreground">{t.store.balance}</p>
+            <p className="font-display font-bold text-2xl text-neon-yellow">{coins} {t.common.coins}</p>
           </div>
         </div>
       </motion.div>
 
       <div className="flex gap-2">
         <button onClick={() => setTab("shop")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all", tab === "shop" ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-surface text-muted-foreground")}>
-          <ShoppingBag className="w-4 h-4 inline mr-1.5" /> Sovg'alar
+          <ShoppingBag className="w-4 h-4 inline mr-1.5" /> {t.store.tabShop}
         </button>
         <button onClick={() => setTab("orders")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all", tab === "orders" ? "bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20" : "bg-surface text-muted-foreground")}>
-          <Package className="w-4 h-4 inline mr-1.5" /> Buyurtmalarim ({orders.length})
+          <Package className="w-4 h-4 inline mr-1.5" /> {t.store.tabOrders} ({orders.length})
         </button>
       </div>
 
@@ -161,26 +164,26 @@ export default function StorePage() {
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h3 className="font-display font-bold text-lg">{item.title}</h3>
                     <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground bg-surface px-2 py-1 rounded-md flex-shrink-0">
-                      {categoryLabel(item.category)}
+                      {categoryLabel(item.category, t)}
                     </span>
                   </div>
 
                   {item.owner_id && (
                     <p className="text-xs text-neon-blue flex items-center gap-1 mb-2">
                       <GraduationCap className="w-3.5 h-3.5" />
-                      {teachers[item.owner_id] ?? "O'qituvchi"} sovg'asi
+                      {teachers[item.owner_id] ?? "—"} {t.store.teacherGift}
                     </p>
                   )}
 
                   <p className="text-sm text-muted-foreground mb-3 flex-1">{item.description}</p>
 
                   <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-3">
-                    <DIcon className="w-3.5 h-3.5" /> {deliveryLabel(item.delivery_type)}
+                    <DIcon className="w-3.5 h-3.5" /> {deliveryLabel(item.delivery_type, t)}
                   </p>
 
                   <div className="flex items-center justify-between mb-3">
                     <div className="coin-badge"><Coins className="w-4 h-4" />{item.price_coins}</div>
-                    <span className="text-xs text-muted-foreground">{item.stock > 0 ? `${item.stock} ta qoldi` : "Tugagan"}</span>
+                    <span className="text-xs text-muted-foreground">{item.stock > 0 ? `${item.stock} ${t.store.left}` : t.store.soldOut}</span>
                   </div>
 
                   <button
@@ -190,7 +193,7 @@ export default function StorePage() {
                       affordable ? "btn-primary" : "bg-surface text-muted-foreground cursor-not-allowed")}
                   >
                     {affordable ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                    {item.stock <= 0 ? "Tugagan" : affordable ? "Almashish" : `Yana ${item.price_coins - coins} coin`}
+                    {item.stock <= 0 ? t.store.soldOut : affordable ? t.store.exchange : `${t.store.needMore} ${item.price_coins - coins} ${t.common.coins}`}
                   </button>
                 </div>
               </motion.div>
@@ -199,7 +202,7 @@ export default function StorePage() {
           {items.length === 0 && (
             <div className="col-span-full text-center py-16">
               <ShoppingBag className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
-              <p className="text-muted-foreground">Hozircha sovg'a yo'q</p>
+              <p className="text-muted-foreground">{t.store.noItems}</p>
             </div>
           )}
         </div>
@@ -210,7 +213,7 @@ export default function StorePage() {
           {orders.length === 0 ? (
             <div className="text-center py-16">
               <Package className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
-              <p className="text-muted-foreground">Buyurtma yo'q</p>
+              <p className="text-muted-foreground">{t.store.noOrders}</p>
             </div>
           ) : orders.map(o => {
             const sc = ORDER_STATUS[o.status] ?? ORDER_STATUS.pending;
@@ -227,10 +230,10 @@ export default function StorePage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm">{o.item_title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(o.created_at)} · {o.price_coins} coin · {deliveryLabel(o.delivery_type)}
+                      {formatDate(o.created_at)} · {o.price_coins} {t.common.coins} · {deliveryLabel(o.delivery_type, t)}
                     </p>
                   </div>
-                  <span className={cn("text-xs font-medium px-3 py-1 rounded-full border flex-shrink-0", sc.color)}>{sc.label}</span>
+                  <span className={cn("text-xs font-medium px-3 py-1 rounded-full border flex-shrink-0", sc.color)}>{orderStatusLabel(o.status, t)}</span>
                 </div>
 
                 {/* Bosqichlar chizig'i — faqat jarayondagi buyurtmalar uchun */}
@@ -244,7 +247,7 @@ export default function StorePage() {
                           <div className={cn("h-1.5 rounded-full flex-1 min-w-[24px]", done ? "bg-neon-green" : "bg-surface")} />
                           {idx === arr.length - 1 && (
                             <span className="text-[10px] text-muted-foreground ml-1 whitespace-nowrap">
-                              {sc.hint}
+                              {orderStatusHint(o.status, t)}
                             </span>
                           )}
                         </div>
@@ -254,9 +257,9 @@ export default function StorePage() {
                 )}
 
                 {o.tracking_note && <p className="text-xs text-muted-foreground pl-14">{o.tracking_note}</p>}
-                {o.reject_reason && <p className="text-xs text-neon-red pl-14">Sabab: {o.reject_reason}</p>}
+                {o.reject_reason && <p className="text-xs text-neon-red pl-14">{t.store.reason}: {o.reject_reason}</p>}
                 {o.refunded && (
-                  <p className="text-xs text-neon-green pl-14">{o.price_coins} coin balansingizga qaytarildi</p>
+                  <p className="text-xs text-neon-green pl-14">{o.price_coins} {t.store.refunded}</p>
                 )}
 
                 {o.status === "pending" && (
@@ -266,7 +269,7 @@ export default function StorePage() {
                       disabled={cancelling === o.id}
                       className="text-xs text-muted-foreground hover:text-neon-red transition disabled:opacity-50"
                     >
-                      {cancelling === o.id ? "Bekor qilinmoqda..." : "Buyurtmani bekor qilish"}
+                      {cancelling === o.id ? t.store.cancelling : t.store.cancelOrder}
                     </button>
                   </div>
                 )}
@@ -295,7 +298,7 @@ export default function StorePage() {
                   <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
                     <Coins className="w-4 h-4 text-neon-yellow" /> {active.price_coins} coin
                     <span className="text-muted-foreground/50">·</span>
-                    {deliveryLabel(active.delivery_type)}
+                    {deliveryLabel(active.delivery_type, t)}
                   </p>
                 </div>
                 <button onClick={() => setActive(null)} disabled={placing} className="p-2 rounded-lg hover:bg-surface transition">
@@ -304,44 +307,44 @@ export default function StorePage() {
               </div>
 
               <p className="text-xs text-muted-foreground bg-surface/60 border border-border/60 rounded-xl p-3">
-                {DELIVERY_TYPES.find(d => d.value === active.delivery_type)?.hint}
-                {" "}Ma'lumotlaringizni faqat sovg'ani topshiradigan shaxs ko'radi.
+                {deliveryHint(active.delivery_type, t)}
+                {" "}{t.store.privacyNote}
               </p>
 
               <div className="space-y-3">
-                <Field label="To'liq ism *" value={form.full_name} onChange={v => setForm({ ...form, full_name: v })} placeholder="Aliyev Ali Valiyevich" />
+                <Field label={t.store.formName + " *"} value={form.full_name} onChange={v => setForm({ ...form, full_name: v })} placeholder={t.store.phName} />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Telefon *" value={form.phone} onChange={v => setForm({ ...form, phone: v })} placeholder="+998 90 123 45 67" />
-                  <Field label="Pochta" value={form.email} onChange={v => setForm({ ...form, email: v })} placeholder="ali@mail.uz" />
+                  <Field label={t.store.formPhone + " *"} value={form.phone} onChange={v => setForm({ ...form, phone: v })} placeholder="+998 90 123 45 67" />
+                  <Field label={t.store.formEmail} value={form.email} onChange={v => setForm({ ...form, email: v })} placeholder="ali@mail.uz" />
                 </div>
 
                 {needsAddress(active.delivery_type) && (
                   <>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Viloyat *</label>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.formRegion} *</label>
                         <select
                           value={form.region}
                           onChange={e => setForm({ ...form, region: e.target.value })}
                           className="input-field w-full text-sm"
                         >
-                          <option value="">Tanlang...</option>
+                          <option value="">{t.store.pickRegion}</option>
                           {UZ_REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
                         </select>
                       </div>
-                      <Field label="Tuman" value={form.district} onChange={v => setForm({ ...form, district: v })} placeholder="Guliston" />
+                      <Field label={t.store.formDistrict} value={form.district} onChange={v => setForm({ ...form, district: v })} placeholder={t.store.phDistrict} />
                     </div>
-                    <Field label="Manzil *" value={form.address} onChange={v => setForm({ ...form, address: v })} placeholder="Mustaqillik ko'chasi, 42-uy, 15-xonadon" textarea />
-                    <Field label="Mo'ljal" value={form.landmark} onChange={v => setForm({ ...form, landmark: v })} placeholder="Institut binosi ro'parasida" />
+                    <Field label={t.store.formAddress + " *"} value={form.address} onChange={v => setForm({ ...form, address: v })} placeholder={t.store.phAddress} textarea />
+                    <Field label={t.store.formLandmark} value={form.landmark} onChange={v => setForm({ ...form, landmark: v })} placeholder={t.store.phLandmark} />
                   </>
                 )}
 
-                <Field label="Izoh" value={form.note} onChange={v => setForm({ ...form, note: v })} placeholder="Masalan: futbolka o'lchami L" textarea />
+                <Field label={t.store.formNote} value={form.note} onChange={v => setForm({ ...form, note: v })} placeholder={t.store.phNote} textarea />
               </div>
 
               <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/60">
                 <p className="text-sm text-muted-foreground">
-                  Balans: <span className="text-neon-yellow font-semibold">{coins}</span>
+                  {t.store.balanceShort}: <span className="text-neon-yellow font-semibold">{coins}</span>
                   {" → "}
                   <span className="font-semibold">{coins - active.price_coins}</span>
                 </p>
@@ -351,7 +354,7 @@ export default function StorePage() {
                   className="btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-60"
                 >
                   {placing ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
-                  {placing ? "Yuborilmoqda..." : "Buyurtma berish"}
+                  {placing ? t.store.placing : t.store.placeOrder}
                 </button>
               </div>
             </motion.div>

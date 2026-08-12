@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { cn, formatDuration, getLevelLabel } from "@/lib/utils";
 import { LevelBadge } from "@/components/ui/LevelBadge";
@@ -10,6 +10,8 @@ import { ResumeCard } from "@/components/courses/ResumeCard";
 import { CourseSearch } from "@/components/courses/CourseSearch";
 import { CourseNotes } from "@/components/courses/CourseNotes";
 import { CourseReviews } from "@/components/courses/CourseReviews";
+import { useI18n } from "@/lib/i18n";
+import { withTranslation, withTranslations } from "@/lib/i18n/content";
 import { getResumePoint, type ResumePoint } from "@/lib/resume";
 import type { Course, TopicTocEntry, CourseSection, Enrollment, TopicProgress } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -36,10 +38,13 @@ export default function CourseDetailPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userCoins, setUserCoins] = useState(0);
   const [resume, setResume] = useState<ResumePoint | null>(null);
+  const { locale } = useI18n();
 
   useEffect(() => {
     loadCourse();
-  }, [slug]);
+    // Til almashsa kontent qayta yuklanadi
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, locale]);
 
   async function loadCourse() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -56,7 +61,7 @@ export default function CourseDetailPage() {
       router.push(user ? "/courses" : "/explore/courses");
       return;
     }
-    setCourse(courseData as Course);
+    setCourse(await withTranslation(supabase, "courses", courseData as Course, locale));
 
     // Mundarija public view'dan (kontent ustunlari yo'q — RLS'siz o'qiladi)
     // va bo'limlar parallel yuklanadi
@@ -64,7 +69,9 @@ export default function CourseDetailPage() {
       supabase.from("topics_toc").select("*").eq("course_id", courseData.id).order("order_index"),
       supabase.from("course_sections").select("*").eq("course_id", courseData.id).eq("is_published", true).order("order_index"),
     ]);
-    if (topicsData) setTopics(topicsData as TopicTocEntry[]);
+    if (topicsData) {
+      setTopics(await withTranslations(supabase, "topics", topicsData as TopicTocEntry[], locale));
+    }
     if (sectionsData) {
       setSections(sectionsData as CourseSection[]);
       // Birinchi bo'lim ochiq holda boshlanadi
@@ -259,7 +266,7 @@ export default function CourseDetailPage() {
                     Hisobim bor
                   </Link>
                   <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-                    Ro'yxatdan o'tish bepul · 100 coin sovg'a
+                    Ro'yxatdan o'tish bepul · boshlang'ich coin sovg'a
                   </p>
                 </>
               )}

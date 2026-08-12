@@ -1,3 +1,4 @@
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -78,7 +79,21 @@ export function getLevelColor(level: string): string {
   }
 }
 
-export function getLevelLabel(level: string): string {
+/**
+ * `t` berilsa lug'atdan, berilmasa o'zbekchadan qaytaradi. Ixtiyoriy
+ * parametr — chaqiruv joylari (13 ta) bosqichma-bosqich ko'chirilyapti,
+ * ko'chirilmaganlari eski xatti-harakatda qoladi.
+ */
+export function getLevelLabel(level: string, t?: Dictionary): string {
+  if (t) {
+    switch (level) {
+      case 'beginner': return t.difficulty.beginner;
+      case 'elementary': return t.difficulty.elementary;
+      case 'intermediate': return t.difficulty.intermediate;
+      case 'advanced': return t.difficulty.advanced;
+      default: return level;
+    }
+  }
   switch (level) {
     case 'beginner': return "Boshlang'ich";
     case 'elementary': return 'Elementar';

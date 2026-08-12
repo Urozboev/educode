@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { Trophy, ArrowRight } from "lucide-react";
 

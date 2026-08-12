@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
 import {
   Mail,
   Lock,
@@ -31,6 +32,7 @@ type Role = "student" | "parent" | "teacher";
 export default function RegisterPage() {
   const router = useRouter();
   const [role, setRole] = useState<Role>("student");
+  const { t } = useI18n();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -139,14 +141,14 @@ export default function RegisterPage() {
       <div className="p-8 md:p-10 rounded-3xl border border-border/60 bg-card/80 backdrop-blur-xl shadow-2xl shadow-black/5">
         <div className="mb-6">
           <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
-            Hisob yarating
+            {t.auth.registerTitle}
           </h1>
           <p className="text-muted-foreground text-base">
             {role === "parent"
               ? "Farzandingiz o'quv jarayonini kuzating."
               : role === "teacher"
               ? "Hisob yaratgach ariza to'ldirasiz — admin tasdiqlagach o'qituvchi kabineti ochiladi."
-              : "Bepul 100 coin va barcha kurslarga kirish huquqi."}
+              : t.auth.registerSubtitle}
           </p>
         </div>
 
@@ -248,7 +250,7 @@ export default function RegisterPage() {
 
         <form onSubmit={handleRegister} className="space-y-5">
           <div>
-            <label className="text-sm font-semibold mb-2 block">To'liq ism</label>
+            <label className="text-sm font-semibold mb-2 block">{t.auth.fullName}</label>
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -263,7 +265,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold mb-2 block">Email</label>
+            <label className="text-sm font-semibold mb-2 block">{t.auth.email}</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -278,7 +280,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold mb-2 block">Parol</label>
+            <label className="text-sm font-semibold mb-2 block">{t.auth.password}</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -332,9 +334,9 @@ export default function RegisterPage() {
         </form>
 
         <p className="text-center text-[15px] text-muted-foreground mt-7 pt-6 border-t border-border/40">
-          Hisobingiz bormi?{" "}
+          {t.auth.haveAccount}{" "}
           <Link href="/login" className="text-neon-purple font-semibold hover:underline">
-            Kirish
+            {t.auth.submitLogin}
           </Link>
         </p>
       </div>

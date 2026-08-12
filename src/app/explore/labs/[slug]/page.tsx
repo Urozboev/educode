@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { notFound, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { getLab, type LabSlug } from "@/lib/labs";

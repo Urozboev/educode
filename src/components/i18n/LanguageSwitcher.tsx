@@ -27,6 +27,7 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
   const router = useRouter();
   const pathname = usePathname() || "/";
   const [open, setOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,10 +63,26 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
 
   const meta = LOCALE_META[locale];
 
+  /**
+   * Ro'yxat pastga sig'masa yuqoriga ochiladi.
+   *
+   * Yon panelning eng pastida turgan tanlagich pastga ochilganda
+   * ro'yxat ekran chetiga tushib qirqilib qolardi — oxirgi til
+   * umuman ko'rinmasdi.
+   */
+  function toggle() {
+    if (!open && box.current) {
+      const r = box.current.getBoundingClientRect();
+      const needed = LOCALES.length * 42 + 16;
+      setDropUp(window.innerHeight - r.bottom < needed && r.top > needed);
+    }
+    setOpen(o => !o);
+  }
+
   return (
     <div className="relative" ref={box}>
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={toggle}
         aria-label="Til tanlash"
         aria-expanded={open}
         className={cn(
@@ -74,23 +91,38 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
         )}
       >
         <Globe className="w-4 h-4 flex-shrink-0" />
-        <span className="uppercase">{locale}</span>
-        {!compact && <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", open && "rotate-180")} />}
+        <span>{meta.code}</span>
+        {!compact && (
+          <ChevronDown className={cn("w-3.5 h-3.5 transition-transform ml-auto", open && "rotate-180")} />
+        )}
         <span className="sr-only">{meta.native}</span>
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-border bg-card shadow-lift z-50 overflow-hidden">
+        <div
+          className={cn(
+            "absolute right-0 w-52 rounded-xl border border-border bg-card shadow-lift z-[60] overflow-hidden",
+            dropUp ? "bottom-full mb-2" : "top-full mt-2"
+          )}
+        >
           {LOCALES.map(l => (
             <button
               key={l}
               onClick={() => pick(l)}
               className={cn(
-                "w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-left transition hover:bg-surface",
+                "w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-left transition hover:bg-surface",
                 l === locale && "bg-neon-purple/[0.08] text-neon-purple"
               )}
             >
-              <span className="text-base leading-none">{LOCALE_META[l].flag}</span>
+              {/* Bayroq emas, til kodi — Windows bayroq emojilarini chizmaydi */}
+              <span className={cn(
+                "w-7 h-5 rounded flex items-center justify-center text-[10px] font-bold flex-shrink-0 border",
+                l === locale
+                  ? "bg-neon-purple/15 border-neon-purple/30 text-neon-purple"
+                  : "bg-surface border-border text-muted-foreground"
+              )}>
+                {LOCALE_META[l].code}
+              </span>
               <span className="flex-1">{LOCALE_META[l].native}</span>
               {l === locale && <Check className="w-4 h-4 flex-shrink-0" />}
             </button>

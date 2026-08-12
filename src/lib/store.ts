@@ -1,3 +1,5 @@
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+
 /**
  * Do'kon uchun umumiy ma'lumotnoma — o'quvchi sahifasi, admin paneli va
  * o'qituvchi paneli shu yerdan foydalanadi. Holat nomlari va yetkazib
@@ -77,8 +79,32 @@ export const DELIVERY_TYPES: {
   },
 ];
 
-export const deliveryLabel = (t: StoreDeliveryType) =>
-  DELIVERY_TYPES.find(d => d.value === t)?.label ?? t;
+/**
+ * Matnlar lug'atda, RANG va IKONKA kodda qoladi — tarjimon Tailwind
+ * klassiga tegmasligi kerak. `dict` berilmasa o'zbekchaga tushadi,
+ * shu sababli hali ko'chirilmagan panellar ishlayveradi.
+ */
+export const deliveryLabel = (t: StoreDeliveryType, dict?: Dictionary) => {
+  if (dict) {
+    switch (t) {
+      case "delivery": return dict.store.delivery.deliveryLabel;
+      case "pickup": return dict.store.delivery.pickupLabel;
+      case "digital": return dict.store.delivery.digitalLabel;
+    }
+  }
+  return DELIVERY_TYPES.find(d => d.value === t)?.label ?? t;
+};
+
+export const deliveryHint = (t: StoreDeliveryType, dict?: Dictionary) => {
+  if (dict) {
+    switch (t) {
+      case "delivery": return dict.store.delivery.deliveryHint;
+      case "pickup": return dict.store.delivery.pickupHint;
+      case "digital": return dict.store.delivery.digitalHint;
+    }
+  }
+  return DELIVERY_TYPES.find(d => d.value === t)?.hint ?? "";
+};
 
 export const needsAddress = (t: StoreDeliveryType) =>
   DELIVERY_TYPES.find(d => d.value === t)?.needsAddress ?? false;
@@ -151,8 +177,12 @@ export const STORE_CATEGORIES = [
   { value: "other", label: "Boshqa" },
 ];
 
-export const categoryLabel = (c: string) =>
-  STORE_CATEGORIES.find(x => x.value === c)?.label ?? c;
+export const categoryLabel = (c: string, dict?: Dictionary) => {
+  if (dict && c in dict.store.category) {
+    return dict.store.category[c as keyof Dictionary["store"]["category"]];
+  }
+  return STORE_CATEGORIES.find(x => x.value === c)?.label ?? c;
+};
 
 /** Buyurtma formasi — RPC ga yuboriladigan maydonlar */
 export interface OrderForm {
@@ -175,20 +205,27 @@ export const emptyOrderForm = (): OrderForm => ({
  * Formani yuborishdan oldingi tekshiruv. Server ham aynan shu qoidalarni
  * qayta tekshiradi — bu faqat foydalanuvchiga tezroq javob berish uchun.
  */
-export function validateOrderForm(f: OrderForm, delivery: StoreDeliveryType): string | null {
-  if (!f.full_name.trim()) return "To'liq ismingizni kiriting";
-  if (f.full_name.trim().length < 3) return "Ism juda qisqa";
-  if (!f.phone.trim()) return "Telefon raqamini kiriting";
+export function validateOrderForm(
+  f: OrderForm,
+  delivery: StoreDeliveryType,
+  dict?: Dictionary,
+): string | null {
+  const v = dict?.store.validate;
+  if (!f.full_name.trim()) return v?.nameRequired ?? "To'liq ismingizni kiriting";
+  if (f.full_name.trim().length < 3) return v?.nameShort ?? "Ism juda qisqa";
+  if (!f.phone.trim()) return v?.phoneRequired ?? "Telefon raqamini kiriting";
   // O'zbekiston raqami: +998 XX XXX XX XX yoki 9 ta raqamli qisqa shakl
   const digits = f.phone.replace(/\D/g, "");
-  if (digits.length < 9) return "Telefon raqami to'liq emas";
+  if (digits.length < 9) return v?.phoneShort ?? "Telefon raqami to'liq emas";
   if (f.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) {
-    return "Pochta manzili noto'g'ri";
+    return v?.emailBad ?? "Pochta manzili noto'g'ri";
   }
   if (needsAddress(delivery)) {
-    if (!f.region.trim()) return "Viloyatni tanlang";
-    if (!f.address.trim()) return "Manzilni kiriting";
-    if (f.address.trim().length < 10) return "Manzilni to'liqroq yozing (ko'cha, uy raqami)";
+    if (!f.region.trim()) return v?.regionRequired ?? "Viloyatni tanlang";
+    if (!f.address.trim()) return v?.addressRequired ?? "Manzilni kiriting";
+    if (f.address.trim().length < 10) {
+      return v?.addressShort ?? "Manzilni to'liqroq yozing (ko'cha, uy raqami)";
+    }
   }
   return null;
 }
@@ -198,3 +235,31 @@ export const UZ_REGIONS = [
   "Jizzax", "Xorazm", "Namangan", "Navoiy", "Qashqadaryo",
   "Qoraqalpog'iston Respublikasi", "Samarqand", "Sirdaryo", "Surxondaryo",
 ];
+
+/** Buyurtma holatining tarjima qilingan nomi */
+export function orderStatusLabel(st: StoreOrderStatus, dict?: Dictionary): string {
+  if (!dict) return ORDER_STATUS[st]?.label ?? st;
+  const m: Record<StoreOrderStatus, string> = {
+    pending: dict.store.status.pendingLabel,
+    approved: dict.store.status.approvedLabel,
+    shipped: dict.store.status.shippedLabel,
+    delivered: dict.store.status.deliveredLabel,
+    rejected: dict.store.status.rejectedLabel,
+    cancelled: dict.store.status.cancelledLabel,
+  };
+  return m[st] ?? st;
+}
+
+/** Buyurtma holatining tarjima qilingan izohi */
+export function orderStatusHint(st: StoreOrderStatus, dict?: Dictionary): string {
+  if (!dict) return ORDER_STATUS[st]?.hint ?? "";
+  const m: Record<StoreOrderStatus, string> = {
+    pending: dict.store.status.pendingHint,
+    approved: dict.store.status.approvedHint,
+    shipped: dict.store.status.shippedHint,
+    delivered: dict.store.status.deliveredHint,
+    rejected: dict.store.status.rejectedHint,
+    cancelled: dict.store.status.cancelledHint,
+  };
+  return m[st] ?? "";
+}

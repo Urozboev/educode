@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getOrCreateProfile } from "@/lib/profile";
@@ -11,11 +11,12 @@ import {
   Code2, LayoutDashboard, BookOpen, Swords, Users, Award,
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
   ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins, Newspaper,
-  Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy, ShieldCheck
+  Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy, ShieldCheck, Languages
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import AutoLogout from "@/components/AutoLogout";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 const adminLinks = [
   { href: "/a-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
@@ -23,6 +24,7 @@ const adminLinks = [
   { href: "/a-challenges", label: "Topshiriqlar", icon: Swords },
   { href: "/a-games", label: "Dars o'yinlari", icon: Gamepad2 },
   { href: "/a-contests", label: "Olimpiadalar", icon: Trophy },
+  { href: "/a-translations", label: "Tarjimalar", icon: Languages },
   { href: "/a-integrity", label: "Halollik nazorati", icon: ShieldCheck },
   { href: "/a-users", label: "Foydalanuvchilar", icon: Users },
   { href: "/a-teachers", label: "O'qituvchi arizalari", icon: Presentation },
@@ -97,6 +99,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         })}
       </nav>
       <div className="p-3 border-t border-border/50 space-y-1">
+        {!collapsed && (
+          <div className="px-1 pb-1">
+            <LanguageSwitcher />
+          </div>
+        )}
         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-accent w-full", collapsed && "justify-center px-3")}>
           {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}{!collapsed && <span>{theme === "dark" ? "Yorug'" : "Qorong'u"}</span>}

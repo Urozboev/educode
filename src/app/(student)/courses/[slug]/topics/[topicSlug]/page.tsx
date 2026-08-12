@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { completeTopic } from "@/lib/course-completion";
 import { TopicNotes } from "@/components/courses/TopicNotes";
+import { useI18n } from "@/lib/i18n";
+import { withTranslation, withTranslations } from "@/lib/i18n/content";
 import type { Topic, Course, TopicProgress } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -36,6 +38,7 @@ export default function TopicPage() {
   const [progress, setProgress] = useState<TopicProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
+  const { locale } = useI18n();
   const [showReflection, setShowReflection] = useState(false);
   const [reflectionDone, setReflectionDone] = useState(false);
   const [watchFrac, setWatchFrac] = useState(0); // video ko'rish ulushi (0–1)
@@ -47,7 +50,7 @@ export default function TopicPage() {
   useEffect(() => {
     loadTopic();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topicSlug]);
+  }, [topicSlug, locale]);
 
   async function loadTopic() {
     setLoading(true);
@@ -65,7 +68,7 @@ export default function TopicPage() {
       router.push(user ? "/courses" : "/explore/courses");
       return;
     }
-    setCourse(courseData as Course);
+    setCourse(await withTranslation(supabase, "courses", courseData as Course, locale));
 
     // topics RLS: free preview / bepul kurs / enrollment bo'lsagina qator keladi.
     // Guest foydalanuvchi faqat is_free_preview darslarni oladi.
@@ -74,9 +77,10 @@ export default function TopicPage() {
       .select("*")
       .eq("course_id", courseData.id)
       .order("order_index");
-    if (topicsData) setAllTopics(topicsData as Topic[]);
+    const translated = topicsData ? await withTranslations(supabase, "topics", topicsData as Topic[], locale) : [];
+    setAllTopics(translated);
 
-    const currentTopic = topicsData?.find((t) => t.slug === topicSlug);
+    const currentTopic = translated.find((t) => t.slug === topicSlug);
     if (!currentTopic) {
       // RLS qatorni bermadi — dars yopiq yoki mavjud emas → kurs sahifasiga
       router.push(`/courses/${slug}`);

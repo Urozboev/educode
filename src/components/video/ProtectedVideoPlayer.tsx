@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { Loader2, Lock, Video as VideoIcon, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { formatNumber, formatDate, getLevelLabel, getLevelColor, cn } from "@/lib/utils";
 import type { Profile, Enrollment, Course, Certificate, CoinTransaction } from "@/types";
@@ -10,8 +10,10 @@ import {
   BookOpen, Target, Zap, Brain, Trophy, Coins, Flame, ChevronRight,
   CheckCircle2, Clock, GraduationCap, TrendingUp, Download
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function MyResultsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [enrollments, setEnrollments] = useState<(Enrollment & { course: Course })[]>([]);
@@ -50,17 +52,17 @@ export default function MyResultsPage() {
   if (loading) return <div className="space-y-4 animate-pulse"><div className="h-8 w-48 bg-surface rounded-lg" /><div className="grid grid-cols-4 gap-4">{[1,2,3,4].map(i=><div key={i} className="glass-card h-28" />)}</div></div>;
 
   const statCards = [
-    { label: "Tugatilgan kurslar", value: stats.courses, icon: BookOpen, color: "#6C5CE7" },
-    { label: "Yechilgan topshiriqlar", value: stats.challenges, icon: Target, color: "#00D2FF" },
-    { label: "Umumiy XP", value: formatNumber(profile?.xp || 0), icon: Zap, color: "#FFD600" },
-    { label: "Jami yig'ilgan coin", value: stats.totalCoinsEarned, icon: Coins, color: "#00E676" },
+    { label: t.cabinet.dash.statCourses, value: stats.courses, icon: BookOpen, color: "#6C5CE7" },
+    { label: t.cabinet.dash.statChallenges, value: stats.challenges, icon: Target, color: "#00D2FF" },
+    { label: t.cabinet.dash.statXp, value: formatNumber(profile?.xp || 0), icon: Zap, color: "#FFD600" },
+    { label: t.cabinet.results.totalCoins, value: stats.totalCoinsEarned, icon: Coins, color: "#00E676" },
   ];
 
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Natijalarim</h1>
-        <p className="text-muted-foreground">O'quv jarayoningiz statistikasi</p>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.cabinet.results.title}</h1>
+        <p className="text-muted-foreground">{t.cabinet.results.subtitle}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -76,8 +78,8 @@ export default function MyResultsPage() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Kurslar progressi */}
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <h2 className="font-display font-semibold text-lg mb-4">Kurslar progressi</h2>
-          {enrollments.length === 0 ? <p className="text-muted-foreground text-sm">Hali kursga yozilmagansiz</p> : (
+          <h2 className="font-display font-semibold text-lg mb-4">{t.cabinet.results.courseProgress}</h2>
+          {enrollments.length === 0 ? <p className="text-muted-foreground text-sm">{t.cabinet.dash.noEnrollments}</p> : (
             <div className="space-y-3">
               {enrollments.map(e => (
                 <Link key={e.id} href={`/courses/${e.course?.slug}`} className="flex items-center gap-3 p-3 rounded-xl bg-surface/50 hover:bg-surface transition-all group">
@@ -100,8 +102,8 @@ export default function MyResultsPage() {
 
         {/* Coin tarixi */}
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-          <h2 className="font-display font-semibold text-lg mb-4">Coin tarixi</h2>
-          {coinHistory.length === 0 ? <p className="text-muted-foreground text-sm">Hali tranzaksiya yo'q</p> : (
+          <h2 className="font-display font-semibold text-lg mb-4">{t.cabinet.results.coinHistory}</h2>
+          {coinHistory.length === 0 ? <p className="text-muted-foreground text-sm">{t.cabinet.results.noCoins}</p> : (
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {coinHistory.map(c => (
                 <div key={c.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0 text-sm">
@@ -122,7 +124,7 @@ export default function MyResultsPage() {
       {/* Sertifikatlar */}
       {certificates.length > 0 && (
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-          <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><GraduationCap className="w-5 h-5 text-neon-yellow" /> Sertifikatlar</h2>
+          <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><GraduationCap className="w-5 h-5 text-neon-yellow" /> {t.cabinet.results.certificates}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {certificates.map(cert => (
               <Link key={cert.id} href={`/certificate/${cert.id}`}
@@ -138,7 +140,7 @@ export default function MyResultsPage() {
                 </div>
                 <div className="flex items-center justify-between mt-2">
                   <p className="text-[10px] font-mono text-muted-foreground">{cert.certificate_number}</p>
-                  <span className="text-xs text-neon-purple flex items-center gap-1"><Download className="w-3 h-3" /> Ko'rish va yuklash</span>
+                  <span className="text-xs text-neon-purple flex items-center gap-1"><Download className="w-3 h-3" /> {t.cabinet.results.viewDownload}</span>
                 </div>
               </Link>
             ))}

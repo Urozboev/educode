@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { cn, getInitials, formatNumber, getLevelLabel } from "@/lib/utils";
 import { motion } from "framer-motion";

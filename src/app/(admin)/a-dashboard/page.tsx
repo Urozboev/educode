@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { formatNumber, formatDate, getInitials, cn } from "@/lib/utils";
 import { motion } from "framer-motion";

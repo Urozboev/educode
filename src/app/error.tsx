@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
+import Link from "@/components/i18n/Link";
 import { usePathname } from "next/navigation";
 import { Home, RotateCw } from "lucide-react";
 import { ErrorTerminal } from "@/components/ui/ErrorTerminal";
@@ -14,6 +15,7 @@ export default function Error({
   reset: () => void;
 }) {
   const pathname = usePathname();
+  const { t } = useI18n();
 
   useEffect(() => {
     console.error(error);
@@ -27,8 +29,8 @@ export default function Error({
       steps={["sahifa tayyorlanmoqda", "bajarilish to'xtadi"]}
       detail={error.digest ? `digest: ${error.digest}` : undefined}
       tone="coral"
-      title="Sahifa yuklanmadi"
-      description="Serverda kutilmagan xatolik yuz berdi. Qayta urinib ko'ring — takrorlansa, bizga xabar bering."
+      title={t.errors.serverTitle}
+      description={t.errors.serverText}
     >
       <button
         type="button"
@@ -36,11 +38,11 @@ export default function Error({
         className="btn-primary inline-flex items-center gap-2"
       >
         <RotateCw className="w-4 h-4" />
-        Qayta urinish
+        {t.common.retry}
       </button>
       <Link href="/" className="btn-ghost inline-flex items-center gap-2">
         <Home className="w-4 h-4" />
-        Bosh sahifa
+        {t.errors.goHome}
       </Link>
     </ErrorTerminal>
   );

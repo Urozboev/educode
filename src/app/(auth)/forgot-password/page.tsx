@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { Mail, Loader2, CheckCircle2, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";

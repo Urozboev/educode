@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
 import type { Course } from "@/types";
 import { motion } from "framer-motion";
@@ -57,6 +59,7 @@ export default function ExploreCourses() {
   const [category, setCategory] = useState("all");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -67,11 +70,11 @@ export default function ExploreCourses() {
         .select("*")
         .eq("is_published", true)
         .order("order_index");
-      if (data) setCourses(data as Course[]);
+      if (data) setCourses(await withTranslations(supabase, "courses", data as Course[], locale));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [locale]);
 
   const filtered = courses.filter(
     (c) =>
@@ -89,11 +92,10 @@ export default function ExploreCourses() {
         className="max-w-2xl"
       >
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight mb-3">
-          Kurslar kutubxonasi
+          {t.explore.coursesTitle}
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Python, algoritmlar, frontend va boshqa yo'nalishlardagi kurslarni tanlang va
-          bosqichma-bosqich o'rganing.
+          {t.explore.coursesSubtitle}
         </p>
       </motion.div>
 
@@ -105,7 +107,7 @@ export default function ExploreCourses() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Kurs nomi bo'yicha qidirish..."
+            placeholder={t.explore.coursesSearch}
             className="w-full bg-surface/60 border border-border rounded-2xl pl-12 pr-4 py-3.5 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
           />
         </div>
@@ -141,7 +143,7 @@ export default function ExploreCourses() {
       ) : filtered.length === 0 ? (
         <div className="py-20 text-center">
           <BookOpen className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-base text-muted-foreground">Natija topilmadi</p>
+          <p className="text-base text-muted-foreground">{t.explore.noResults}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

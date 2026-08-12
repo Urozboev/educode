@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
 import type { Course, Enrollment } from "@/types";
 import { motion } from "framer-motion";
@@ -58,11 +60,12 @@ export default function CoursesPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+  const { locale } = useI18n();
 
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [locale]);
 
   async function loadData() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -72,7 +75,7 @@ export default function CoursesPage() {
       .select("*")
       .eq("is_published", true)
       .order("order_index");
-    if (coursesData) setCourses(coursesData as Course[]);
+    if (coursesData) setCourses(await withTranslations(supabase, "courses", coursesData as Course[], locale));
 
     if (user) {
       const { data: enrollData } = await supabase

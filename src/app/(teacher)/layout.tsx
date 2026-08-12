@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getOrCreateProfile } from "@/lib/profile";
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 const teacherLinks = [
   { href: "/t-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
@@ -69,7 +70,12 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
       )}
-      <nav className="flex-1 p-3 space-y-1">
+      {/*
+        overflow-y-auto SHART: 11 ta havola + profil bloki ekranga sig'maydi
+        va usiz pastdagi mavzu/chiqish tugmalari ko'rinmay qoladi.
+        O'quvchi va admin panellarida bu allaqachon bor edi.
+      */}
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {teacherLinks.map(link => {
           const active = pathname.startsWith(link.href);
           return (
@@ -83,6 +89,11 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
         })}
       </nav>
       <div className="p-3 border-t border-border/50 space-y-1">
+        {!collapsed && (
+          <div className="px-1 pb-1">
+            <LanguageSwitcher />
+          </div>
+        )}
         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-accent w-full", collapsed && "justify-center px-3")}>
           {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}{!collapsed && <span>{theme === "dark" ? "Yorug'" : "Qorong'u"}</span>}

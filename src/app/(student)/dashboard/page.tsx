@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { getOrCreateProfile } from "@/lib/profile";
 import { getResumePoint, type ResumePoint } from "@/lib/resume";
@@ -14,6 +14,7 @@ import {
   CheckCircle2, ArrowUpRight, GraduationCap
 } from "lucide-react";
 import CognitiveHealthCard from "@/components/ai/CognitiveHealthCard";
+import { useI18n } from "@/lib/i18n";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -22,6 +23,7 @@ const fadeUp = {
 
 export default function DashboardPage() {
   const supabase = createClient();
+  const { t } = useI18n();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [enrollments, setEnrollments] = useState<(Enrollment & { course: Course })[]>([]);
   /** course_id → keyingi tugallanmagan mavzu */
@@ -119,17 +121,17 @@ export default function DashboardPage() {
   const xpInfo = profile ? calculateXpLevel(profile.xp) : null;
 
   const statCards = [
-    { label: "Tugatilgan kurslar", value: stats.coursesCompleted, icon: BookOpen, color: "#6C5CE7", bg: "bg-neon-purple/10" },
-    { label: "Yechilgan topshiriqlar", value: stats.challengesSolved, icon: Target, color: "#00D2FF", bg: "bg-neon-blue/10" },
-    { label: "Umumiy XP", value: formatNumber(stats.totalXp), icon: Zap, color: "#FFD600", bg: "bg-neon-yellow/10" },
-    { label: "O'tilgan testlar", value: stats.quizzesPassed, icon: Brain, color: "#00E676", bg: "bg-neon-green/10" },
+    { label: t.cabinet.dash.statCourses, value: stats.coursesCompleted, icon: BookOpen, color: "#6C5CE7", bg: "bg-neon-purple/10" },
+    { label: t.cabinet.dash.statChallenges, value: stats.challengesSolved, icon: Target, color: "#00D2FF", bg: "bg-neon-blue/10" },
+    { label: t.cabinet.dash.statXp, value: formatNumber(stats.totalXp), icon: Zap, color: "#FFD600", bg: "bg-neon-yellow/10" },
+    { label: t.cabinet.dash.statQuizzes, value: stats.quizzesPassed, icon: Brain, color: "#00E676", bg: "bg-neon-green/10" },
   ];
 
   const quickActions = [
-    { label: "Kurslarni ko'rish", href: "/courses", icon: BookOpen, color: "#6C5CE7" },
-    { label: "Topshiriq yechish", href: "/challenges", icon: Code2, color: "#00D2FF" },
-    { label: "O'yin o'ynash", href: "/games", icon: Play, color: "#00E676" },
-    { label: "Reyting", href: "/leaderboard", icon: Trophy, color: "#FFD600" },
+    { label: t.cabinet.dash.actionCourses, href: "/courses", icon: BookOpen, color: "#6C5CE7" },
+    { label: t.cabinet.dash.actionChallenges, href: "/challenges", icon: Code2, color: "#00D2FF" },
+    { label: t.cabinet.dash.actionGames, href: "/games", icon: Play, color: "#00E676" },
+    { label: t.cabinet.leaderboard, href: "/leaderboard", icon: Trophy, color: "#FFD600" },
   ];
 
   if (loading) {
@@ -154,10 +156,10 @@ export default function DashboardPage() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-display font-bold text-3xl mb-1">
-          Salom, {profile?.full_name?.split(" ")[0]}! 👋
+          {t.cabinet.dash.greeting}, {profile?.full_name?.split(" ")[0]}! 👋
         </h1>
         <p className="text-muted-foreground">
-          Bugun ham yangi narsalar o'rganishga tayyormisiz?
+          {t.cabinet.dash.greetingSub}
         </p>
       </motion.div>
 
@@ -175,7 +177,7 @@ export default function DashboardPage() {
                 <Zap className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Daraja: <span className={getLevelColor(profile.level)}>{getLevelLabel(profile.level)}</span></p>
+                <p className="font-semibold text-sm">{t.cabinet.dash.level}: <span className={getLevelColor(profile.level)}>{getLevelLabel(profile.level)}</span></p>
                 <p className="text-xs text-muted-foreground">{profile.xp} / {xpInfo.nextThreshold} XP</p>
               </div>
             </div>
@@ -183,7 +185,7 @@ export default function DashboardPage() {
               {profile.streak_days > 0 && (
                 <div className="flex items-center gap-1.5 text-neon-red font-semibold text-sm">
                   <Flame className="w-5 h-5" />
-                  {profile.streak_days} kunlik streak
+                  {profile.streak_days} {t.cabinet.dash.streakDays}
                 </div>
               )}
               <div className="coin-badge">
@@ -235,18 +237,18 @@ export default function DashboardPage() {
           transition={{ delay: 0.3 }}
         >
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-display font-semibold text-lg">Davom etayotgan kurslar</h2>
+            <h2 className="font-display font-semibold text-lg">{t.cabinet.dash.inProgress}</h2>
             <Link href="/courses" className="text-sm text-neon-purple hover:underline flex items-center gap-1">
-              Barchasi <ChevronRight className="w-4 h-4" />
+              {t.common.all} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
           {enrollments.length === 0 ? (
             <div className="text-center py-12">
               <BookOpen className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-muted-foreground mb-4">Hali kursga yozilmagansiz</p>
+              <p className="text-muted-foreground mb-4">{t.cabinet.dash.noEnrollments}</p>
               <Link href="/courses" className="btn-primary text-sm py-2 px-6">
-                Kurslarni ko'rish
+                {t.cabinet.dash.actionCourses}
               </Link>
             </div>
           ) : (
@@ -272,7 +274,7 @@ export default function DashboardPage() {
                       </p>
                       {point && !point.courseDone && (
                         <p className="text-xs text-muted-foreground truncate mt-0.5">
-                          Davom: {point.title}
+                          {t.cabinet.dash.resume}: {point.title}
                         </p>
                       )}
                       <div className="flex items-center gap-3 mt-1">
@@ -302,7 +304,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h2 className="font-display font-semibold text-lg mb-5">Tezkor harakatlar</h2>
+          <h2 className="font-display font-semibold text-lg mb-5">{t.cabinet.dash.quickActions}</h2>
           <div className="grid grid-cols-2 gap-3">
             {quickActions.map((action) => (
               <Link
@@ -327,10 +329,10 @@ export default function DashboardPage() {
           <div className="mt-5 p-4 rounded-xl bg-neon-purple/5 border border-neon-purple/10">
             <div className="flex items-center gap-2 mb-2">
               <Star className="w-4 h-4 text-neon-yellow" />
-              <span className="text-xs font-semibold text-neon-purple">Kunlik maslahat</span>
+              <span className="text-xs font-semibold text-neon-purple">{t.cabinet.dash.tipTitle}</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Har kuni kamida 1 ta topshiriq bajarib, streak yig'ing. 7 kunlik streak uchun 30 ta qo'shimcha coin olasiz!
+              {t.cabinet.dash.tipText}
             </p>
           </div>
         </motion.div>
@@ -341,15 +343,15 @@ export default function DashboardPage() {
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display font-semibold text-lg flex items-center gap-2">
-              🏆 Tugatilgan kurslar
+              🏆 {t.cabinet.dash.finished}
             </h2>
             <Link href="/my-results" className="text-sm text-neon-purple hover:underline flex items-center gap-1">
-              Natijalarim <ChevronRight className="w-4 h-4" />
+              {t.cabinet.myResults} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
           {completedEnrollments.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">Hali kurs tugatilmagan</p>
+            <p className="text-sm text-muted-foreground text-center py-4">{t.cabinet.dash.noFinished}</p>
           ) : (
             <div className="grid md:grid-cols-2 gap-3">
               {completedEnrollments.map(e => {
@@ -361,12 +363,12 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm truncate">{e.course?.title}</p>
-                      <p className="text-xs text-muted-foreground">100% tugatildi</p>
+                      <p className="text-xs text-muted-foreground">{t.cabinet.dash.finishedPercent}</p>
                     </div>
                     {cert && (
                       <Link href={`/certificate/${cert.id}`}
                         className="text-xs text-neon-yellow hover:underline flex items-center gap-1 flex-shrink-0">
-                        📜 Sertifikat
+                        📜 {t.cabinet.dash.certificate}
                       </Link>
                     )}
                   </div>

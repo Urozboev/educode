@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import { completeTopic } from "@/lib/course-completion";
 import dynamic from "next/dynamic";
 import type { TopicTask, SubmissionTestResult } from "@/types";
@@ -30,6 +32,7 @@ export default function TaskPage() {
   const [topicId, setTopicId] = useState("");
   const [courseId, setCourseId] = useState("");
   const [userId, setUserId] = useState("");
+  const { locale } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -41,7 +44,10 @@ export default function TaskPage() {
       if (!topic) return;
       setTopicId(topic.id);
       const { data } = await supabase.from("topic_tasks").select("*").eq("topic_id", topic.id).order("order_index");
-      if (data && data.length > 0) { setTasks(data as TopicTask[]); setCurrentTask(data[0] as TopicTask); }
+      if (data && data.length > 0) {
+        const tr = await withTranslations(supabase, "topic_tasks", data as TopicTask[], locale);
+        setTasks(tr); setCurrentTask(tr[0]);
+      }
       setLoading(false);
     })();
   }, []);

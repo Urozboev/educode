@@ -88,6 +88,8 @@ export async function middleware(request: NextRequest) {
   // ochgan mehmon 404 o'rniga login formasini ko'radi.
   const protectedPrefixes = [
     '/dashboard',
+    // AI agent — obuna tekshiruvi sahifa ichida, lekin login shu yerda
+    '/agent',
     '/courses',
     '/challenges',
     // Kabinet ichidagi olimpiada. Ommaviy nusxasi /explore/contests da.
@@ -119,7 +121,12 @@ export async function middleware(request: NextRequest) {
   );
 
   if (!isProtected) {
-    return NextResponse.next();
+    // Ro'yxatga kirmagan manzil — Next.js not-found sahifasiga tushadi.
+    // Sarlavha shu yerda ham qo'yiladi, aks holda 404 sahifa tanlangan
+    // tilni bilmay, doim o'zbekcha chiqardi.
+    const res = NextResponse.next();
+    res.headers.set('x-locale', activeLocale);
+    return res;
   }
 
   // ============================================

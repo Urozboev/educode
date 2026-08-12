@@ -26,12 +26,20 @@ export const LOCALE_META: Record<Locale, {
   native: string;
   /** <html lang> va hreflang uchun */
   htmlLang: string;
-  flag: string;
+  /**
+   * Qisqa kod — tanlagichdagi belgi.
+   *
+   * Bayroq emoji ISHLATILMAYDI: Windows'dagi Chrome bayroq emojilarini
+   * chizmaydi va ular o'rniga ikki harfli quti ko'rinadi ("UZ", "GB").
+   * Bundan tashqari qoraqalpoq tili davlat emas — unga bayroq qo'yish
+   * noto'g'ri bo'lardi va o'zbekchaniki bilan bir xil chiqardi.
+   */
+  code: string;
 }> = {
-  uz:  { label: "O'zbekcha",   native: "O'zbekcha",    htmlLang: "uz",  flag: "🇺🇿" },
-  ru:  { label: "Ruscha",      native: "Русский",      htmlLang: "ru",  flag: "🇷🇺" },
-  en:  { label: "Inglizcha",   native: "English",      htmlLang: "en",  flag: "🇬🇧" },
-  kaa: { label: "Qoraqalpoqcha", native: "Qaraqalpaqsha", htmlLang: "kaa", flag: "🇺🇿" },
+  uz:  { label: "O'zbekcha",     native: "O'zbekcha",     htmlLang: "uz",  code: "UZ" },
+  ru:  { label: "Ruscha",        native: "Русский",       htmlLang: "ru",  code: "RU" },
+  en:  { label: "Inglizcha",     native: "English",       htmlLang: "en",  code: "EN" },
+  kaa: { label: "Qoraqalpoqcha", native: "Qaraqalpaqsha", htmlLang: "kaa", code: "QQ" },
 };
 
 /**

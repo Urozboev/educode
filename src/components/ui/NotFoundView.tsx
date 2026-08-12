@@ -1,11 +1,14 @@
 "use client";
 
-import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
+
+import Link from "@/components/i18n/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, BookOpen, Home } from "lucide-react";
 import { ErrorTerminal } from "@/components/ui/ErrorTerminal";
 
 export function NotFoundView() {
+  const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -16,12 +19,12 @@ export function NotFoundView() {
       command={`educode open "${pathname || "/"}"`}
       steps={["manzil qidirilmoqda", "router jadvalida mos yozuv yo'q"]}
       tone="amber"
-      title="Bu manzilda sahifa yo'q"
-      description="Havola eskirgan yoki manzilda xatolik bor. Quyidagidan boshlang."
+      title={t.errors.notFoundTitle}
+      description={t.errors.notFoundText}
     >
       <Link href="/" className="btn-primary inline-flex items-center gap-2">
         <Home className="w-4 h-4" />
-        Bosh sahifa
+        {t.errors.goHome}
       </Link>
       <Link
         href="/explore/courses"

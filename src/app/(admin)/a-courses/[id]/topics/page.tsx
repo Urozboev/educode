@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import type { Course, Topic, Quiz, TopicTask, CourseSection, VideoProvider } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";

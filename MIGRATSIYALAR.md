@@ -32,6 +32,8 @@ oldingisiga tayanadi.
 | 39 | `39_topshiriqlar_30ta.sql` | 30 ta mustaqil topshiriq (14 oson / 11 o'rta / 5 qiyin) |
 | 40 | `40_paste_belgisi.sql` | Yechimda nusxa ko'chirish belgisi + admin hisoboti |
 | 41 | `41_kurs_izohlari.sql` | Kurs baholari va izohlari (yulduzcha + matn) |
+| 42 | `42_kontent_tarjimalari.sql` | Baza kontenti uchun tarjima jadvallari + admin paneli |
+| 43 | `43_ai_agent.sql` | AI agent ("Ustoz"): obuna, suhbat, xotira, reja, dars keshi, ovoz keshi |
 
 ## Har biridan keyin nima tekshirish kerak
 
@@ -209,6 +211,90 @@ to'ldirilmagan. Endi trigger uni har o'zgarishda qayta hisoblaydi.
 > Admin nomaqbul izohni **yashiradi**, o'chirmaydi (`is_hidden`): baho
 > reytingda qoladi, faqat matn ko'rinmaydi. Shunda o'chirish orqali
 > reytingni tozalab yuborish imkoni bo'lmaydi.
+
+**42** — Baza kontentini (mavzular, testlar, topshiriqlar, terminlar,
+kitoblar, metodlar, o'yinlar, olimpiadalar) boshqa tillarga o'girish uchun.
+
+Har jadvalga alohida `*_i18n` yaratish o'nta yangi jadval va o'nta RLS
+to'plami degani edi. Buning o'rniga **bitta umumiy jadval**:
+`content_translations(resource, row_id, locale, field, value | value_json)`.
+Yangi jadvalni tarjimaga ochish uchun `translatable_fields` reyestriga
+bir necha qator qo'shiladi — migratsiya kerak emas.
+
+Reyestr shunchaki ma'lumotnoma emas: `save_translation` undan tashqari
+hech nimani yozdirmaydi va admin interfeysi qaysi tahrirlagichni
+ko'rsatishni (matn / HTML / JSON) shundan biladi.
+
+Admin `/a-translations` sahifasida ishlaydi: chapda o'zbekcha asl matn,
+o'ngda tarjima — yonma-yon. Har bo'lim uchun tarjima foizi ko'rinadi.
+
+> Tarjima yo'q maydon **o'zbekcha qoladi** — yarim tarjima qilingan kurs
+> ham ishlashda davom etadi, bo'sh matn chiqmaydi.
+
+`withTranslations()` **17 ta sahifa/komponentga** ulangan: kurslar ro'yxati
+(kabinet + explore), kurs sahifasi (kurs + mundarija), mavzu, test, amaliy
+topshiriq, topshiriqlar ro'yxati va masala sahifasi, terminlar, kitoblar,
+metodlar, dars o'yinlari (ro'yxat + ijrochi), olimpiadalar (ro'yxat,
+sahifa, masala). Til almashganda kontent avtomatik qayta yuklanadi.
+
+Ichki havolalar tilni saqlaydi: `next/link` o'rniga
+`@/components/i18n/Link` ishlatiladi (58 ta faylda), server
+komponentlarda esa `serverHref()`. Yangi sahifa yozganda shu wrapperni
+import qiling — aks holda havola til prefiksini yo'qotadi.
+
+Migratsiyaning oxirida `contest_overview` qayta e'lon qilinadi: unga
+`challenge_id` qo'shildi. Funksiya 38-migratsiyada yaratilgan va u
+allaqachon qo'llangan, shuning uchun eski fayl tahrirlanmadi — tarjima
+esa qator id si bo'yicha izlanadi va idsiz masala nomini o'girib
+bo'lmasdi.
+
+**43** — AI agent ("Ustoz") uchun asos. `/agent` sahifasi ochiladi va
+suhbat ishlaydi; obunasiz foydalanuvchiga 15 ta bepul xabar beriladi,
+undan keyin paywall chiqadi.
+
+Agent **mustaqil modul**: uning jadvallari `courses`/`topics`/`lessons`
+ga majburiy bog'lanmaydi. Bog'lanish faqat `agent_modules.suggested_course_id`
+(nullable) orqali — agent kerak bo'lsa mavjud kursga havola beradi,
+lekin usiz ham to'liq ishlaydi. Shu sababli agentni o'chirib qo'yish
+platformaning qolgan qismiga ta'sir qilmaydi.
+
+Migratsiya `agent-audio` storage bucket'ini ham yaratadi — TTS natijalari
+shu yerda saqlanadi.
+
+**Kerakli `.env.local` o'zgaruvchilari:**
+
+| O'zgaruvchi | Nima uchun |
+|---|---|
+| `GEMINI_API_KEY` | Agent "miyasi" (allaqachon bor) |
+| `AGENT_MODEL` | Ixtiyoriy. Sukut: `gemini-flash-latest` |
+| `AGENT_PLANNER_MODEL` | Ixtiyoriy. Reja va kirish testi uchun alohida model |
+| `SUPABASE_SERVICE_ROLE_KEY` | Ovoz keshini yozish (allaqachon bor) |
+| `AISHA_API_KEY` | **O'zbekcha ovoz.** Kalitsiz agent brauzer sintezidan foydalanadi |
+| `AISHA_TTS_MODEL` / `AISHA_TTS_MOOD` | Ixtiyoriy. Sukut: `Gulnoza` / `Neutral` |
+| `AGENT_TTS_PROVIDER` | Ixtiyoriy: `aisha` \| `gemini` \| `browser` — avtomatik tanlovni bekor qiladi |
+
+> **Gemini o'zbekcha GAPIRMAYDI.** Gemini TTS 84 tilni qo'llaydi, o'zbek
+> tili ular ro'yxatida yo'q (Google Cloud TTS da ham `uz-UZ` yo'q).
+> Shuning uchun matn Gemini'dan, o'zbekcha ovoz esa Aisha'dan olinadi.
+> Rus va ingliz tillari uchun Gemini TTS ishlatiladi.
+
+Sozlanishni tekshirish: `GET /api/agent/voice` qaysi til uchun qaysi
+provayder tanlanganini qaytaradi.
+
+**Planner** (`/agent/reja`): yo'nalish tanlash → 8 savolli kirish testi →
+reja. Test **majburiy emas** — uni majburiy qilsak, odam birinchi
+qadamdayoq to'xtaydi; tashlab ketganga "noldan" darajasi beriladi.
+
+Har savolda "Bilmayman" varianti bor: 4 ta variantdan tavakkaliga
+tanlagan odam 25% to'g'ri javob to'plab, o'zi uchun juda qiyin
+darajaga tushib qolmasin.
+
+Test javoblari (`correct` maydoni) mijozga **hech qachon yuborilmaydi** —
+ular `agent_assessments.payload` da serverda qoladi.
+
+Modullardagi `topic_key` (masalan `css.basics.selectors`) — dars
+keshining kaliti. `normalizeTopicKey()` uni majburan bir ko'rinishga
+soladi: aks holda bir mavzu ikki xil kalit olib, kesh ishlamay qolardi.
 
 ## Muhim eslatmalar
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { serverHref } from "@/lib/i18n/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ItemListJsonLd } from "@/components/seo/JsonLd";
 import { Clock, Eye, ArrowRight, Newspaper } from "lucide-react";
@@ -11,6 +12,7 @@ function fmtDate(d: string | null) {
 }
 
 export default async function BlogListPage() {
+  const href = await serverHref();
   let posts: any[] = [];
   try {
     const supabase = createAdminClient();
@@ -59,7 +61,7 @@ export default async function BlogListPage() {
         <>
           {/* Featured (birinchi post — katta) */}
           {featured && (
-            <Link href={`/blog/${featured.slug}`}
+            <Link href={href(`/blog/${featured.slug}`)}
               className="group grid md:grid-cols-2 gap-0 rounded-3xl border border-border/50 bg-card/40 overflow-hidden hover:border-neon-purple/40 hover:shadow-2xl transition-all">
               <div className="relative h-52 md:h-full min-h-[220px] overflow-hidden bg-gradient-to-br from-neon-purple/20 to-neon-blue/10">
                 {featured.cover_url && (
@@ -83,7 +85,7 @@ export default async function BlogListPage() {
           {rest.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {rest.map(p => (
-                <Link key={p.slug} href={`/blog/${p.slug}`}
+                <Link key={p.slug} href={href(`/blog/${p.slug}`)}
                   className="group flex flex-col rounded-[10px] border border-border/50 bg-card/40 overflow-hidden hover:border-neon-purple/40 hover:-translate-y-1 hover:shadow-xl transition-all">
                   <div className="relative h-40 overflow-hidden bg-gradient-to-br from-neon-purple/15 to-neon-blue/10">
                     {p.cover_url && (

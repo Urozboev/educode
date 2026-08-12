@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslation, withTranslations } from "@/lib/i18n/content";
 import type { Challenge, ContestOverview } from "@/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -31,6 +33,7 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => Date.now());
+  const { locale } = useI18n();
 
   const load = useCallback(async () => {
     const [{ data: overview }, { data: { user } }] = await Promise.all([
@@ -40,17 +43,22 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
     if (user) setUserId(user.id);
     if (!overview) { setLoading(false); return; }
 
-    const ov = overview as ContestOverview;
+    const raw = overview as ContestOverview;
+    const [contest, problems] = await Promise.all([
+      withTranslation(supabase, "contests", raw.contest, locale),
+      withTranslations(supabase, "challenges", raw.problems, locale),
+    ]);
+    const ov: ContestOverview = { ...raw, contest: contest ?? raw.contest, problems };
     setData(ov);
 
     const problem = ov.problems.find(p => p.letter.toUpperCase() === letter.toUpperCase());
     if (problem) {
       const { data: ch } = await supabase
         .from("challenges").select("*").eq("slug", problem.slug).maybeSingle();
-      if (ch) setChallenge(ch as Challenge);
+      if (ch) setChallenge(await withTranslation(supabase, "challenges", ch as Challenge, locale));
     }
     setLoading(false);
-  }, [supabase, slug, letter]);
+  }, [supabase, slug, letter, locale]);
 
   useEffect(() => { load(); }, [load]);
 

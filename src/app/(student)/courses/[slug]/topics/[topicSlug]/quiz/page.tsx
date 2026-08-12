@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { completeTopic } from "@/lib/course-completion";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import type { Quiz, QuizOption } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -43,6 +45,7 @@ export default function QuizPage() {
   const [topicId, setTopicId] = useState("");
   const [courseId, setCourseId] = useState("");
   const [userId, setUserId] = useState("");
+  const { locale } = useI18n();
 
   const quizzes = useMemo(() => {
     return shuffle(rawQuizzes).map((q) => ({
@@ -67,7 +70,7 @@ export default function QuizPage() {
         .select("*")
         .eq("topic_id", topic.id)
         .order("order_index");
-      if (data) setRawQuizzes(data as Quiz[]);
+      if (data) setRawQuizzes(await withTranslations(supabase, "quizzes", data as Quiz[], locale));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

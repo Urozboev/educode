@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import { cn, getDifficultyConfig, getCategoryLabel } from "@/lib/utils";
 import type { Challenge } from "@/types";
 import { motion } from "framer-motion";
@@ -26,6 +28,7 @@ export default function ExploreChallenges() {
   const [category, setCategory] = useState("all");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -38,10 +41,11 @@ export default function ExploreChallenges() {
         .select("*")
         .eq("is_published", true)
         .order("difficulty");
-      if (data) setChallenges(data as Challenge[]);
+      if (data) setChallenges(await withTranslations(supabase, "challenges", data as Challenge[], locale));
       setLoading(false);
     })();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
 
   function handleClick(slug: string) {
     router.push(isLoggedIn ? `/challenges/${slug}` : `/login?redirect=/challenges/${slug}`);
@@ -62,10 +66,10 @@ export default function ExploreChallenges() {
         className="max-w-2xl"
       >
         <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight mb-3">
-          Topshiriqlar
+          {t.explore.challengesTitle}
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed">
-          Algoritmik masalalar, matematik jumboqlar va amaliy muammolarni yechib, coin va XP yig'ing.
+          {t.explore.challengesSubtitle}
         </p>
       </motion.div>
 
@@ -77,7 +81,7 @@ export default function ExploreChallenges() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Topshiriq nomi bo'yicha qidirish..."
+            placeholder={t.explore.challengesSearch}
             className="w-full bg-surface/60 border border-border rounded-2xl pl-12 pr-4 py-3.5 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
           />
         </div>
@@ -113,7 +117,7 @@ export default function ExploreChallenges() {
       ) : filtered.length === 0 ? (
         <div className="py-20 text-center">
           <Swords className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-base text-muted-foreground">Natija topilmadi</p>
+          <p className="text-base text-muted-foreground">{t.explore.noResults}</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-5">
@@ -171,16 +175,16 @@ export default function ExploreChallenges() {
             <Lock className="w-6 h-6 text-neon-purple" />
           </div>
           <h3 className="font-display font-bold text-xl mb-2">
-            Topshiriqlarni yechish uchun ro'yxatdan o'ting
+            {t.explore.guestCtaTitle}
           </h3>
           <p className="text-muted-foreground text-base mb-5 max-w-md mx-auto">
-            Masalalarni bajaring va coin yig'ing. AI yordamchi kodingizni tahlil qiladi.
+            {t.explore.guestCtaText}
           </p>
           <Link
             href="/register"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-display font-semibold text-sm hover:opacity-90 transition-all"
           >
-            Bepul boshlash <ArrowRight className="w-4 h-4" />
+            {t.explore.guestCtaButton} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       )}

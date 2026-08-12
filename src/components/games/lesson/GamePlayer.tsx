@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslation } from "@/lib/i18n/content";
 import type {
   LessonGame, QuizRaceContent, JeopardyContent, MatchPairsContent, CrosswordContent,
 } from "@/types";
@@ -31,6 +33,7 @@ export function GamePlayer({ slug }: { slug: string }) {
   /** Mukofot berilmasa sababi — o'quvchi jimlikda qolmasligi uchun */
   const [outcome, setOutcome] = useState<string | null>(null);
   const [runKey, setRunKey] = useState(0);
+  const { locale } = useI18n();
   /** Qoidalar ko'rsatilgach o'yin boshlanadi — taymer avval ishlab ketmasin */
   const [playing, setPlaying] = useState(false);
 
@@ -41,12 +44,12 @@ export function GamePlayer({ slug }: { slug: string }) {
         .select("*")
         .eq("slug", slug)
         .maybeSingle();
-      if (data) setGame(data as LessonGame);
+      if (data) setGame(await withTranslation(supabase, "lesson_games", data as LessonGame, locale));
       setLoading(false);
       setStartedAt(Date.now());
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [slug, locale]);
 
   async function finish(r: Finished) {
     setResult(r);

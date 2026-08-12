@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import type { LessonGame, QuizRaceContent } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
@@ -144,7 +144,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
               {!user && (
                 <div className="flex gap-2 pt-2 border-t border-border mt-2">
                   <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-ghost text-sm py-2 px-4 flex-1 text-center">{t.nav.login}</Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary text-sm py-2 px-4 flex-1 text-center">Boshlash</Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary text-sm py-2 px-4 flex-1 text-center">{t.nav.getStarted}</Link>
                 </div>
               )}
             </motion.div>

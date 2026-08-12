@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import { cn, getDifficultyConfig, getCategoryLabel } from "@/lib/utils";
 import type { Challenge } from "@/types";
 import { motion } from "framer-motion";
@@ -40,12 +42,13 @@ export default function ChallengesPage() {
   const [category, setCategory] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
   const [loading, setLoading] = useState(true);
+  const { locale } = useI18n();
 
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       const { data } = await supabase.from("challenges").select("*").eq("is_published", true).order("difficulty");
-      if (data) setChallenges(data as Challenge[]);
+      if (data) setChallenges(await withTranslations(supabase, "challenges", data as Challenge[], locale));
       if (user) {
         const { data: subs } = await supabase.from("submissions").select("task_id")
           .eq("user_id", user.id).eq("task_type", "challenge").eq("status", "accepted");
@@ -54,7 +57,7 @@ export default function ChallengesPage() {
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [locale]);
 
   const filtered = challenges.filter(c => {
     return (c.title.toLowerCase().includes(search.toLowerCase())) &&

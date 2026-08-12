@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import type { TeachingMethod, MethodStage } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -15,6 +17,7 @@ export function MethodsView() {
   const supabase = createClient();
   const [methods, setMethods] = useState<TeachingMethod[]>([]);
   const [loading, setLoading] = useState(true);
+  const { locale, t } = useI18n();
   const [search, setSearch] = useState("");
   const [stage, setStage] = useState<MethodStage | "all">("all");
   const [openId, setOpenId] = useState<string | null>(null);
@@ -27,11 +30,12 @@ export function MethodsView() {
         .eq("is_published", true)
         .order("order_index")
         .order("title");
-      if (data) setMethods(data as TeachingMethod[]);
+      if (data) setMethods(await withTranslations(supabase, "teaching_methods", data as TeachingMethod[], locale));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
 
   const filtered = useMemo(() => methods.filter(m =>
     (stage === "all" || m.stage === stage) &&
@@ -42,7 +46,7 @@ export function MethodsView() {
   return (
     <div className="space-y-8 md:space-y-10">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
-        <p className="eyebrow mb-3">O&apos;qituvchiga</p>
+        <p className="eyebrow mb-3">{t.explore.methodsEyebrow}</p>
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight mb-3">
           Dars metodlari
         </h1>
@@ -60,7 +64,7 @@ export function MethodsView() {
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Metod nomi bo'yicha qidirish..."
+            placeholder={t.explore.methodsSearch}
             className="w-full bg-surface/60 border border-border rounded-2xl pl-12 pr-4 py-3.5 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
           />
         </div>
@@ -211,7 +215,7 @@ export function MethodsView() {
                         {/* Yo'riqnoma */}
                         {m.guide_html && (
                           <div>
-                            <h3 className="text-sm font-semibold mb-2">Qanday o&apos;tkaziladi</h3>
+                            <h3 className="text-sm font-semibold mb-2">{t.explore.howToRun}</h3>
                             <div
                               className="prose prose-sm dark:prose-invert max-w-none"
                               dangerouslySetInnerHTML={{ __html: m.guide_html }}

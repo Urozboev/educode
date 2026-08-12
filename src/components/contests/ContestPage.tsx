@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslation, withTranslations } from "@/lib/i18n/content";
 import type { ContestOverview, ContestStanding } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -47,6 +49,7 @@ export function ContestPage({
   );
   const [now, setNow] = useState(() => Date.now());
   const [me, setMe] = useState<string | null>(null);
+  const { locale } = useI18n();
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -55,9 +58,18 @@ export function ContestPage({
 
   const loadOverview = useCallback(async () => {
     const { data: res } = await supabase.rpc("contest_overview", { p_slug: slug });
-    if (res) setData(res as ContestOverview);
+    if (res) {
+      // Olimpiada va masala nomlari alohida resurslarda yotadi:
+      // musobaqaning o'zi `contests`, masalalar esa `challenges` da
+      const ov = res as ContestOverview;
+      const [contest, problems] = await Promise.all([
+        withTranslation(supabase, "contests", ov.contest, locale),
+        withTranslations(supabase, "challenges", ov.problems, locale),
+      ]);
+      setData({ ...ov, contest: contest ?? ov.contest, problems });
+    }
     setLoading(false);
-  }, [supabase, slug]);
+  }, [supabase, slug, locale]);
 
   const loadStandings = useCallback(async () => {
     const { data: res } = await supabase.rpc("contest_standings", { p_slug: slug });

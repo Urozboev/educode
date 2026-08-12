@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getOrCreateProfile } from "@/lib/profile";
@@ -18,25 +18,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import AutoLogout from "@/components/AutoLogout";
 import { allGuestLinks } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
-const studentLinks = [
-  { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
-  { href: "/courses", label: "Kurslar", icon: BookOpen },
-  { href: "/challenges", label: "Topshiriqlar", icon: Swords },
-  { href: "/contests", label: "Olimpiada", icon: Medal },
-  { href: "/playground", label: "Playground", icon: Code2 },
-  { href: "/games", label: "O'yinlar", icon: Gamepad2 },
-  { href: "/chat", label: "AI Yordamchi", icon: MessageCircle },
-  { href: "/my-results", label: "Natijalarim", icon: BarChart3 },
-  { href: "/leaderboard", label: "Reyting", icon: Trophy },
-  { href: "/lesson-games", label: "Dars o'yinlari", icon: Puzzle },
-  { href: "/join", label: "Guruhga qo'shilish", icon: School },
-  { href: "/books", label: "Kitoblar", icon: Library },
-  { href: "/glossary", label: "Terminlar", icon: BookMarked },
-  { href: "/store", label: "Do'kon", icon: Store },
-  { href: "/portfolio", label: "Portfolio", icon: Briefcase },
-  { href: "/profile", label: "Profil", icon: User },
+/**
+ * Yorliqlar lug'atdan olinadi, shuning uchun bu massiv — funksiya.
+ * Bir qismi `nav` bo'limi bilan bir xil (kurslar, kitoblar...), qolgani
+ * faqat kabinetda uchraydi va `cabinet` bo'limida.
+ */
+const studentLinks = (t: Dictionary) => [
+  { href: "/dashboard", label: t.cabinet.dashboard, icon: LayoutDashboard },
+  { href: "/courses", label: t.nav.courses, icon: BookOpen },
+  { href: "/challenges", label: t.nav.challenges, icon: Swords },
+  { href: "/contests", label: t.nav.contests, icon: Medal },
+  { href: "/playground", label: t.cabinet.playground, icon: Code2 },
+  { href: "/games", label: t.cabinet.games, icon: Gamepad2 },
+  { href: "/chat", label: t.cabinet.aiHelper, icon: MessageCircle },
+  { href: "/my-results", label: t.cabinet.myResults, icon: BarChart3 },
+  { href: "/leaderboard", label: t.cabinet.leaderboard, icon: Trophy },
+  { href: "/lesson-games", label: t.nav.lessonGames, icon: Puzzle },
+  { href: "/join", label: t.cabinet.joinGroup, icon: School },
+  { href: "/books", label: t.nav.books, icon: Library },
+  { href: "/glossary", label: t.nav.glossary, icon: BookMarked },
+  { href: "/store", label: t.cabinet.store, icon: Store },
+  { href: "/portfolio", label: t.cabinet.portfolio, icon: Briefcase },
+  { href: "/profile", label: t.cabinet.profile, icon: User },
 ];
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
@@ -188,7 +194,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
       {/* Navigation Links */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {studentLinks.map((link) => {
+        {studentLinks(t).map((link) => {
           const active = isActive(link.href);
           return (
             <Link
@@ -222,14 +228,14 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all w-full", collapsed && "justify-center px-3")}
         >
           {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          {!collapsed && <span>{theme === "dark" ? "Yorug'" : "Qorong'u"} rejim</span>}
+          {!collapsed && <span>{theme === "dark" ? t.cabinet.lightMode : t.cabinet.darkMode}</span>}
         </button>
         <button
           onClick={handleLogout}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-neon-red/70 hover:bg-neon-red/10 hover:text-neon-red transition-all w-full", collapsed && "justify-center px-3")}
         >
           <LogOut className="w-5 h-5" />
-          {!collapsed && <span>Chiqish</span>}
+          {!collapsed && <span>{t.nav.logout}</span>}
         </button>
       </div>
     </div>
@@ -251,26 +257,26 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               </span>
             </Link>
             <div className="hidden md:flex items-center gap-1">
-              <Link href="/explore/courses" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kurslar</Link>
-              <Link href="/explore/challenges" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Topshiriqlar</Link>
-              <Link href="/playground" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Playground</Link>
-              <Link href="/explore/games" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">O'yinlar</Link>
-              <Link href="/blog" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Blog</Link>
-              <Link href="/explore/about" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Platforma haqida</Link>
+              <Link href="/explore/courses" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.courses}</Link>
+              <Link href="/explore/challenges" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.challenges}</Link>
+              <Link href="/playground" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.cabinet.playground}</Link>
+              <Link href="/explore/games" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.cabinet.games}</Link>
+              <Link href="/blog" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.blog}</Link>
+              <Link href="/explore/about" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.about}</Link>
             </div>
             <div className="flex items-center gap-2">
               <LanguageSwitcher compact />
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors"
-                title="Mavzu o'zgartirish"
+                title={t.cabinet.themeToggle}
               >
                 {theme === "dark" ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
               </button>
-              <Link href="/login" className="hidden md:block px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">Kirish</Link>
-              <Link href="/register" className="hidden md:block px-4 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+              <Link href="/login" className="hidden md:block px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.login}</Link>
+              <Link href="/register" className="hidden md:block px-4 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.getStarted}</Link>
               {/* Mobil menyu tugmasi */}
-              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 hover:bg-accent rounded-lg" aria-label="Menyu">
+              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 hover:bg-accent rounded-lg" aria-label={t.nav.menu}>
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
@@ -288,8 +294,8 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                   </Link>
                 ))}
                 <div className="flex gap-2 pt-2 border-t border-border mt-2">
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-medium border border-border hover:bg-accent transition-all">Kirish</Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">Boshlash</Link>
+                  <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-medium border border-border hover:bg-accent transition-all">{t.nav.login}</Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.getStarted}</Link>
                 </div>
               </motion.div>
             )}
@@ -404,7 +410,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 </Link>
                 <button onClick={handleLogout}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-neon-red hover:bg-neon-red/10 transition-colors w-full">
-                  <LogOut className="w-4 h-4" /> Chiqish
+                  <LogOut className="w-4 h-4" /> {t.nav.logout}
                 </button>
               </motion.div>
             )}

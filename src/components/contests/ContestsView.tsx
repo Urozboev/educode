@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslations } from "@/lib/i18n/content";
 import type { Contest } from "@/types";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -24,6 +26,7 @@ export function ContestsView({ basePath = "/explore/contests" }: { basePath?: st
   const [contests, setContests] = useState<Contest[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const { locale } = useI18n();
   // Sanoq real vaqtda yurishi uchun har soniyada yangilanadi
   const [now, setNow] = useState(() => Date.now());
 
@@ -40,7 +43,7 @@ export function ContestsView({ basePath = "/explore/contests" }: { basePath?: st
         .eq("is_published", true)
         .order("starts_at", { ascending: false });
       if (data) {
-        setContests(data as Contest[]);
+        setContests(await withTranslations(supabase, "contests", data as Contest[], locale));
         const { data: parts } = await supabase
           .from("contest_participants")
           .select("contest_id");
@@ -55,7 +58,7 @@ export function ContestsView({ basePath = "/explore/contests" }: { basePath?: st
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [locale]);
 
   const groups = useMemo(() => {
     const g: Record<ContestStatus, Contest[]> = { running: [], upcoming: [], ended: [] };

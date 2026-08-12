@@ -702,6 +702,8 @@ export interface Contest {
 }
 
 export interface ContestProblem {
+  /** `challenges.id` — tarjima shu id bo'yicha izlanadi */
+  id: string;
   letter: string;
   slug: string;
   title: string;

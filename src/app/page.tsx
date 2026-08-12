@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials, formatNumber } from "@/lib/utils";
 import { useTheme } from "next-themes";
@@ -336,32 +336,31 @@ function HeroMosaic() {
 }
 
 /* ============ Hero'da aylanuvchi so'z ============ */
-const ROTATING_WORDS = [
-  { text: "zamonaviy usulda", color: "gradient-text" },
-  { text: "AI mentor bilan", color: "text-neon-blue" },
-  { text: "o'ynab-o'ynab", color: "text-neon-green" },
-  { text: "amaliyot orqali", color: "text-neon-yellow" },
-];
+/** Ranglar kodda, matn lug'atda — tarjimon rang bilan ishlamaydi */
+const ROTATING_COLORS = ["gradient-text", "text-neon-blue", "text-neon-green", "text-neon-yellow"] as const;
+const ROTATING_KEYS = ["modern", "withAi", "playful", "practice"] as const;
 
 function RotatingWord() {
+  const { t } = useI18n();
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setIdx(i => (i + 1) % ROTATING_WORDS.length), 2600);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setIdx(i => (i + 1) % ROTATING_KEYS.length), 2600);
+    return () => clearInterval(timer);
   }, []);
-  const w = ROTATING_WORDS[idx];
+  const color = ROTATING_COLORS[idx];
+  const text = t.home.rotating[ROTATING_KEYS[idx]];
   return (
     <span className="relative inline-block min-w-[280px] md:min-w-[420px]">
       <AnimatePresence mode="wait">
         <motion.span
           key={idx}
-          className={`inline-block ${w.color === "gradient-text" ? "gradient-text" : w.color}`}
+          className={`inline-block ${color}`}
           initial={{ opacity: 0, y: 18, rotateX: 45 }}
           animate={{ opacity: 1, y: 0, rotateX: 0 }}
           exit={{ opacity: 0, y: -18, rotateX: -45 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          {w.text}
+          {text}
         </motion.span>
       </AnimatePresence>
     </span>
@@ -419,20 +418,21 @@ function LangMarquee() {
 /* ============ FAQ (JSON-LD savollariga mos ko'rinadigan qism) ============ */
 const FAQ_ITEMS = [
   { q: "EduCode platformasi nima?", a: "EduCode (malla.uz) — interaktiv dasturlash kurslari, AI Sokratik mentor va gamifikatsiya bilan o'zbek tilidagi onlayn ta'lim platformasi. Python, JavaScript, HTML/CSS, algoritmlar va prompt engineering bo'yicha kurslar mavjud." },
-  { q: "EduCode bepulmi?", a: "Ha, asosiy kurslar va topshiriqlar bepul. Ba'zi premium kurslar coin yoki to'g'ridan-to'g'ri sotib olish orqali ochiladi. Ro'yxatdan o'tganda 100 coin sovg'a qilinadi." },
+  { q: "EduCode bepulmi?", a: "Ha, asosiy kurslar va topshiriqlar bepul. Ba'zi premium kurslar coin yoki to'g'ridan-to'g'ri sotib olish orqali ochiladi. Ro'yxatdan o'tganda boshlang'ich coin sovg'a qilinadi." },
   { q: "AI mentor qanday ishlaydi?", a: "AI mentor Sokratik usulda ishlaydi: tayyor kod yechimini bermaydi, savollar orqali sizni mustaqil yechishga yo'naltiradi. Bu chuqur o'rganish va mustaqil fikrlashni rivojlantiradi." },
   { q: "Qaysi dasturlash tillarini o'rganish mumkin?", a: "Hozircha Python, JavaScript, HTML/CSS, algoritmlar va ma'lumot tuzilmalari bo'yicha kurslar mavjud. Playground'da esa 7 ta tilda kod yozib sinash mumkin." },
   { q: "Sertifikat olish mumkinmi?", a: "Ha, kursni 100% tugatgan talabalarga avtomatik raqamli sertifikat beriladi. Uni profilingizdan PDF sifatida yuklab olishingiz mumkin." },
 ];
 
 function FaqSection() {
+  const { t } = useI18n();
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section className="py-20 px-5 border-t border-border/30">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Savol-javob</p>
-          <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">Ko'p so'raladigan savollar</h2>
+          <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">{t.home.faqEyebrow}</p>
+          <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">{t.home.faqTitle}</h2>
         </div>
         <div className="space-y-3">
           {FAQ_ITEMS.map((item, i) => (
@@ -693,32 +693,32 @@ export default function LandingPage() {
             {/* Left — Text */}
             <motion.div initial="hidden" animate="visible" variants={stagger}>
               <motion.div variants={fadeUp(0)} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-purple/8 border border-neon-purple/15 text-neon-purple text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" /> Raqamli intellektual ta'lim platformasi
+                <Sparkles className="w-4 h-4" /> {t.home.badge}
               </motion.div>
 
               <motion.h1 variants={fadeUp(0.05)} className="font-display font-extrabold text-4xl md:text-[3.5rem] leading-[1.1] tracking-tight mb-5">
-                Dasturlashni<br />
-                <RotatingWord /><br className="md:hidden" /> o'rganing
+                {t.home.heroTitle}<br />
+                <RotatingWord /><br className="md:hidden" /> {t.home.heroTitleEnd}
               </motion.h1>
 
               <motion.p variants={fadeUp(0.1)} className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg mb-8">
-                Interaktiv kurslar, AI feedback, gamifikatsiya va professional kod muharriri — barchasi bitta platformada.
+                {t.home.heroText}
               </motion.p>
 
               <motion.div variants={fadeUp(0.15)} className="flex flex-wrap items-center gap-3">
                 <Link href={user ? dUrl : "/register"} className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-[0.95rem] hover:opacity-90 transition-all shadow-lg shadow-foreground/10">
-                  {user ? "Dashboard" : "Bepul boshlash"} <ArrowRight className="w-5 h-5" />
+                  {user ? t.nav.dashboard : t.home.ctaStart} <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="/explore/courses" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-border bg-surface/50 hover:bg-surface font-medium text-[0.95rem] transition-all">
-                  <Play className="w-4 h-4" /> Kurslarni ko'rish
+                  <Play className="w-4 h-4" /> {t.home.ctaCourses}
                 </Link>
               </motion.div>
 
               <motion.div variants={fadeUp(0.2)} className="flex items-center gap-6 mt-10 pt-8 border-t border-border/40">
                 {[
-                  { val: stats.users, label: "Foydalanuvchi" },
-                  { val: stats.courses, label: "Kurs" },
-                  { val: stats.submissions, label: "Yuborish" },
+                  { val: stats.users, label: t.home.statUsers },
+                  { val: stats.courses, label: t.home.statCourses },
+                  { val: stats.submissions, label: t.home.statSubmissions },
                 ].map(s => (
                   <div key={s.label}>
                     <div className="font-display font-bold text-2xl md:text-3xl">
@@ -766,7 +766,7 @@ export default function LandingPage() {
               variants={fadeUp(0.05)}
               className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-4"
             >
-              Nima uchun <span className="gradient-text">EduCode</span>?
+              {t.home.whyTitle} <span className="gradient-text">EduCode</span>?
             </motion.h2>
             <motion.p variants={fadeUp(0.1)} className="text-[15px] md:text-base text-muted-foreground">
               Har bir blok — aniq bir imkoniyat. Yig&apos;ilganda u butun boshli o&apos;qitish tizimini beradi.
@@ -790,7 +790,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h3 className="font-display font-extrabold text-2xl md:text-[28px] tracking-tight mb-2">
-                    AI kod tahlili
+                    {t.home.aiReview}
                   </h3>
                   <p className="text-[15px] text-muted-foreground leading-relaxed max-w-md">
                     Claude AI kodingizni satr-satr tekshirib, xatolaringizni, yaxshilanish joylarini va
@@ -834,7 +834,7 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
-              <h3 className="font-display font-extrabold text-xl tracking-tight mb-1.5">Playground</h3>
+              <h3 className="font-display font-extrabold text-xl tracking-tight mb-1.5">{t.home.playgroundTitle}</h3>
               <p className="text-[14px] text-muted-foreground leading-snug">
                 7 ta tilda kod yozing — Judge0 + Piston orqali real bajarish, stdin qo&apos;llab-quvvatlash.
               </p>
@@ -851,8 +851,8 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-lg bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mb-3">
                 <Code2 className="w-5 h-5 text-neon-purple" />
               </div>
-              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">VS Code muharrir</h3>
-              <p className="text-[12px] text-muted-foreground leading-snug">Monaco engine — syntax, IntelliSense.</p>
+              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">{t.home.editorTitle}</h3>
+              <p className="text-[12px] text-muted-foreground leading-snug">{t.home.editorText}</p>
             </motion.div>
 
             {/* 4. Gamification (col-span 1) */}
@@ -869,8 +869,8 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-lg bg-neon-yellow/10 border border-neon-yellow/20 flex items-center justify-center mb-3">
                 <Trophy className="w-5 h-5 text-neon-yellow" />
               </div>
-              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">Coin &amp; XP</h3>
-              <p className="text-[12px] text-muted-foreground leading-snug">Reyting, sovg&apos;alar.</p>
+              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">{t.home.coinsTitle}</h3>
+              <p className="text-[12px] text-muted-foreground leading-snug">{t.home.coinsText}</p>
             </motion.div>
 
             {/* 5. Games (col-span 2) */}
@@ -887,7 +887,7 @@ export default function LandingPage() {
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-display font-bold text-[15px] tracking-tight truncate">
-                    6 ta interaktiv o&apos;yin
+                    {t.home.sixGames}
                   </h3>
                   <p className="text-[12px] text-muted-foreground leading-snug truncate">
                     Puzzle, BugFix, Maze, Bird…
@@ -924,7 +924,7 @@ export default function LandingPage() {
                 <div className="w-10 h-10 rounded-lg bg-neon-pink/10 border border-neon-pink/20 flex items-center justify-center mb-3">
                   <GraduationCap className="w-5 h-5 text-neon-pink" />
                 </div>
-                <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">Sertifikat</h3>
+                <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">{t.home.certificateTitle}</h3>
                 <p className="text-[12px] text-muted-foreground leading-snug max-w-[200px]">
                   Kursni tugating va PNG sertifikatni oling.
                 </p>
@@ -944,7 +944,7 @@ export default function LandingPage() {
                   <Globe className="w-5 h-5 text-neon-red" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-[15px] tracking-tight">7 ta dasturlash tili</h3>
+                  <h3 className="font-display font-bold text-[15px] tracking-tight">{t.home.sevenLangs}</h3>
                   <p className="text-[12px] text-muted-foreground leading-tight">
                     Bir platformada — bir interfeysda
                   </p>
@@ -983,7 +983,7 @@ export default function LandingPage() {
             <div className="flex items-end justify-between mb-10">
               <div>
                 <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Kurslar</p>
-                <h2 className="font-display font-bold text-3xl tracking-tight">Mashhur kurslar</h2>
+                <h2 className="font-display font-bold text-3xl tracking-tight">{t.home.popularCourses}</h2>
               </div>
               <Link href="/explore/courses" className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Barcha kurslar <ArrowUpRight className="w-4 h-4" />
@@ -1069,7 +1069,7 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-6 md:hidden text-center">
-              <Link href="/explore/courses" className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground">Barcha kurslar <ArrowUpRight className="w-4 h-4" /></Link>
+              <Link href="/explore/courses" className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground">{t.home.allCourses} <ArrowUpRight className="w-4 h-4" /></Link>
             </div>
           </div>
         </section>
@@ -1080,16 +1080,16 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Jarayon</p>
-            <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">Qanday ishlaydi?</h2>
+            <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">{t.home.howItWorks}</h2>
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
             {[
               // Ranglar brend tokenlaridan olinadi — temaga qarab o'zi moslashadi
-              { step: "01", title: "Ro'yxatdan o'ting", desc: "Email yoki Google orqali. Bepul 100 coin beriladi.", icon: Users, color: "hsl(var(--brand-purple))" },
-              { step: "02", title: "Darajangizni bilin", desc: "AI testi bilim darajangizni aniqlaydi va mos kurs tavsiya etadi.", icon: Brain, color: "hsl(var(--brand-blue))" },
-              { step: "03", title: "O'rganing va bajarin", desc: "Ma'ruzalar, testlar, amaliy topshiriqlar va o'yinlar orqali.", icon: Code2, color: "hsl(var(--brand-green))" },
-              { step: "04", title: "Sertifikat oling", desc: "Kursni tugatib, professional sertifikat va sovg'alar oling.", icon: GraduationCap, color: "hsl(var(--brand-amber))" },
+              { step: "01", title: t.home.steps.signupTitle, desc: t.home.steps.signupText, icon: Users, color: "hsl(var(--brand-purple))" },
+              { step: "02", title: t.home.steps.levelTitle, desc: t.home.steps.levelText, icon: Brain, color: "hsl(var(--brand-blue))" },
+              { step: "03", title: t.home.steps.learnTitle, desc: t.home.steps.learnText, icon: Code2, color: "hsl(var(--brand-green))" },
+              { step: "04", title: t.home.steps.certTitle, desc: t.home.steps.certText, icon: GraduationCap, color: "hsl(var(--brand-amber))" },
             ].map((s, i) => (
               <motion.div key={s.step} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp(i * 0.08)} className="relative">
                 {/* Ulovchi chiziq: ikonka markazidan (top-6) boshlanib, keyingi
@@ -1121,7 +1121,7 @@ export default function LandingPage() {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-10">
               <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Izohlar</p>
-              <h2 className="font-display font-bold text-3xl tracking-tight">Talabalar fikrlari</h2>
+              <h2 className="font-display font-bold text-3xl tracking-tight">{t.home.testimonials}</h2>
             </div>
 
             <div className="relative min-h-[180px]">
@@ -1167,12 +1167,12 @@ export default function LandingPage() {
             <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-neon-blue/10 blur-[90px] pointer-events-none" />
           <div className="relative grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Tayyor misiz?</p>
-              <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight mb-4">Dasturlash sayohatingizni hoziroq boshlang</h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-6">Ro'yxatdan o'ting va 100 ta bepul coin, AI yordamchi, professional kurslar va sertifikatlarga ega bo'ling.</p>
+              <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">{t.home.finalEyebrow}</p>
+              <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight mb-4">{t.home.finalTitle}</h2>
+              <p className="text-muted-foreground text-lg leading-relaxed mb-6">{t.home.finalText}</p>
               <div className="flex flex-wrap gap-3">
                 <Link href={user ? dUrl : "/register"} className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-[0.95rem] hover:opacity-90 transition-all shadow-lg shadow-foreground/10">
-                  {user ? "Dashboard" : "Bepul boshlash"} <ArrowRight className="w-5 h-5" />
+                  {user ? t.nav.dashboard : t.home.ctaStart} <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="/playground" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-border bg-surface/50 hover:bg-surface font-medium text-[0.95rem] transition-all">
                   <Terminal className="w-4 h-4" /> Playground sinab ko'rish
@@ -1181,8 +1181,8 @@ export default function LandingPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { icon: CheckCircle2, text: "7 ta dasturlash tili", color: "hsl(var(--brand-purple))" },
-                { icon: Brain, text: "AI kod tahlili", color: "hsl(var(--brand-blue))" },
+                { icon: CheckCircle2, text: t.home.sevenLangs, color: "hsl(var(--brand-purple))" },
+                { icon: Brain, text: t.home.aiReview, color: "hsl(var(--brand-blue))" },
                 { icon: Trophy, text: "Coin va sovg'alar", color: "hsl(var(--brand-amber))" },
                 { icon: GraduationCap, text: "Professional sertifikat", color: "hsl(var(--brand-green))" },
                 { icon: Gamepad2, text: "7 ta interaktiv o'yin (3D bilan)", color: "hsl(var(--brand-orchid))" },
@@ -1213,7 +1213,7 @@ export default function LandingPage() {
               </p>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-3">Platforma</h4>
+              <h4 className="font-semibold text-sm mb-3">{t.home.footerPlatform}</h4>
               <div className="space-y-2">
                 {navAll.map(l => <Link key={l.href} href={l.href} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{l.label}</Link>)}
               </div>
@@ -1222,12 +1222,12 @@ export default function LandingPage() {
               <h4 className="font-semibold text-sm mb-3">{t.footer.resources}</h4>
               <div className="space-y-2">
                 <Link href={user ? dUrl : "/register"} className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.register}</Link>
-                <Link href="/explore/about" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Loyiha haqida</Link>
+                <Link href="/explore/about" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{t.home.footerAbout}</Link>
               </div>
             </div>
           </div>
           <div className="pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">© 2026 EduCode. Barcha huquqlar himoyalangan.</p>
+            <p className="text-xs text-muted-foreground">© 2026 EduCode. {t.home.footerRights}.</p>
             <p className="text-xs text-muted-foreground">
               <a href="https://t.me/MirjalolUrozboev">MirjalolUrozboev</a>
             </p>

@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { withTranslation } from "@/lib/i18n/content";
 import type { Challenge } from "@/types";
 import { ArrowLeft } from "lucide-react";
 import { ChallengeSolver } from "@/components/challenges/ChallengeSolver";
@@ -15,6 +17,7 @@ export default function ChallengeDetailPage() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { locale } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -22,11 +25,11 @@ export default function ChallengeDetailPage() {
         supabase.from("challenges").select("*").eq("slug", slug).eq("is_published", true).maybeSingle(),
         supabase.auth.getUser(),
       ]);
-      if (ch) setChallenge(ch as Challenge);
+      if (ch) setChallenge(await withTranslation(supabase, "challenges", ch as Challenge, locale));
       if (user) setUserId(user.id);
       setLoading(false);
     })();
-  }, [slug, supabase]);
+  }, [slug, supabase, locale]);
 
   if (loading || !challenge) return <div className="glass-card h-96 animate-pulse" />;
 

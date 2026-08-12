@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/utils";
 import { School, Loader2, Check, LogIn, Users, ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type Membership = {
   group_id: string | null;
@@ -16,6 +17,7 @@ type Membership = {
 };
 
 export default function JoinPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [code, setCode] = useState("");
   const [joining, setJoining] = useState(false);
@@ -50,7 +52,7 @@ export default function JoinPage() {
     setMemberships((rows as any[]).map(r => ({
       group_id: r.group_id,
       teacher_id: r.teacher_id,
-      teacher_name: tMap.get(r.teacher_id) || "O'qituvchi",
+      teacher_name: tMap.get(r.teacher_id) || "-",
       group_name: r.group_id ? gMap.get(r.group_id) ?? null : null,
     })));
     setLoading(false);
@@ -61,7 +63,7 @@ export default function JoinPage() {
   async function join(e: React.FormEvent) {
     e.preventDefault();
     const clean = code.trim().toUpperCase();
-    if (clean.length < 4) { toast.error("Kodni to'liq kiriting"); return; }
+    if (clean.length < 4) { toast.error(t.cabinet.join.codeTooShort); return; }
 
     setJoining(true);
     const { data, error } = await supabase.rpc("join_group_by_code", { p_code: clean });
@@ -71,7 +73,7 @@ export default function JoinPage() {
 
     setJustJoined(data?.group_name || "Guruh");
     setCode("");
-    toast.success("Guruhga qo'shildingiz");
+    toast.success(t.cabinet.join.joined);
     load();
   }
 
@@ -79,17 +81,16 @@ export default function JoinPage() {
     <div className="max-w-lg space-y-8">
       <div>
         <h1 className="font-display font-bold text-2xl flex items-center gap-2">
-          <School className="w-6 h-6 text-neon-purple" /> Guruhga qo&apos;shilish
+          <School className="w-6 h-6 text-neon-purple" /> {t.cabinet.join.title}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          O&apos;qituvchingiz bergan kodni kiriting. Shundan keyin topshiriq va
-          o&apos;yin natijalaringiz uning jurnalida ko&apos;rinadi.
+          {t.cabinet.join.subtitle}
         </p>
       </div>
 
       <form onSubmit={join} className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-1.5 block">Guruh kodi</label>
+          <label className="text-sm font-medium mb-1.5 block">{t.cabinet.join.codeLabel}</label>
           <input
             value={code}
             onChange={e => setCode(e.target.value.toUpperCase())}
@@ -98,7 +99,7 @@ export default function JoinPage() {
             maxLength={8}
             autoComplete="off"
             inputMode="text"
-            aria-label="Guruh kodi"
+            aria-label={t.cabinet.join.codeLabel}
           />
         </div>
         <button
@@ -107,7 +108,7 @@ export default function JoinPage() {
           className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {joining ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
-          Qo&apos;shilish
+          {t.cabinet.join.submit}
         </button>
       </form>
 
@@ -120,7 +121,7 @@ export default function JoinPage() {
           >
             <Check className="w-5 h-5 text-neon-green flex-shrink-0" />
             <span className="text-sm">
-              <b>{justJoined}</b> guruhiga qo&apos;shildingiz
+              <b>{justJoined}</b> {t.cabinet.join.joinedNamed}
             </span>
           </motion.div>
         )}
@@ -128,12 +129,12 @@ export default function JoinPage() {
 
       {/* Mavjud guruhlar */}
       <section>
-        <h2 className="eyebrow mb-3">Mening guruhlarim</h2>
+        <h2 className="eyebrow mb-3">{t.cabinet.join.myGroups}</h2>
         {loading ? (
           <div className="h-20 rounded-xl border border-border/40 bg-card/30 animate-pulse" />
         ) : memberships.length === 0 ? (
           <p className="text-sm text-muted-foreground p-4 border border-dashed border-border rounded-xl text-center">
-            Hali guruhga qo&apos;shilmagansiz
+            {t.cabinet.join.noGroups}
           </p>
         ) : (
           <ul className="space-y-2">
@@ -144,10 +145,10 @@ export default function JoinPage() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm truncate">
-                    {m.group_name || "Guruhsiz"}
+                    {m.group_name || t.cabinet.join.noGroupName}
                   </p>
                   <p className="text-[11px] text-muted-foreground truncate">
-                    O&apos;qituvchi: {m.teacher_name}
+                    {t.cabinet.join.teacher}: {m.teacher_name}
                   </p>
                 </div>
                 <Users className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -161,7 +162,7 @@ export default function JoinPage() {
         href="/dashboard"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
-        Bosh sahifaga qaytish <ArrowRight className="w-4 h-4" />
+        {t.cabinet.join.backHome} <ArrowRight className="w-4 h-4" />
       </Link>
     </div>
   );
