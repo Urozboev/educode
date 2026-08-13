@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   Coins, Loader2, CheckCircle2, XCircle, Clock, User, CreditCard,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface Req {
   id: string;
@@ -22,6 +23,7 @@ interface Req {
 }
 
 export default function AdminPaymentsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [requests, setRequests] = useState<Req[]>([]);
   const [filter, setFilter] = useState<"pending" | "all">("pending");
@@ -73,8 +75,8 @@ export default function AdminPaymentsPage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl">Coin xarid so'rovlari</h1>
-          <p className="text-sm text-muted-foreground">Ota-onalar tomonidan yuborilgan coin xaridlarini tasdiqlang.</p>
+          <h1 className="font-display font-bold text-2xl">{t.admin.pay.title}</h1>
+          <p className="text-sm text-muted-foreground">{t.admin.pay.subtitle}</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setFilter("pending")}

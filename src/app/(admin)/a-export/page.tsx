@@ -5,20 +5,23 @@ import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Download, Loader2, Users, BookOpen, Swords, BarChart3, Coins, ClipboardList } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
-const exportTypes = [
-  { id: "users", label: "Foydalanuvchilar", desc: "Barcha foydalanuvchilar — ism, rol, XP, coin, daraja", icon: Users, color: "#6C5CE7", table: "profiles", columns: "full_name,role,level,xp,coins,streak_days,created_at" },
-  { id: "enrollments", label: "Kursga yozilishlar", desc: "Qaysi talaba qaysi kursga yozilgan, progress", icon: BookOpen, color: "#00D2FF", table: "enrollments", columns: "user_id,course_id,progress_percent,is_completed,enrolled_at" },
-  { id: "submissions", label: "Kod yuborishlar", desc: "Barcha submissions — talaba, topshiriq, natija", icon: Swords, color: "#00E676", table: "submissions", columns: "user_id,task_id,task_type,language,status,passed_tests,total_tests,created_at" },
-  { id: "quiz_results", label: "Test natijalari", desc: "Barcha test natijalari — talaba, mavzu, ball", icon: ClipboardList, color: "#FFD600", table: "quiz_results", columns: "user_id,topic_id,score,total,percentage,completed_at" },
-  { id: "coins", label: "Coin tranzaksiyalar", desc: "Barcha coin harakatlari tarixi", icon: Coins, color: "#FF6B9D", table: "coin_transactions", columns: "user_id,amount,type,description,balance_after,created_at" },
+const exportTypes = (t: Dictionary) => [
+  { id: "users", label: t.admin.users, desc: t.admin.exp.usersDesc, icon: Users, color: "#6C5CE7", table: "profiles", columns: "full_name,role,level,xp,coins,streak_days,created_at" },
+  { id: "enrollments", label: t.admin.exp.enrollments, desc: t.admin.exp.enrollmentsDesc, icon: BookOpen, color: "#00D2FF", table: "enrollments", columns: "user_id,course_id,progress_percent,is_completed,enrolled_at" },
+  { id: "submissions", label: t.admin.exp.submissions, desc: t.admin.exp.submissionsDesc, icon: Swords, color: "#00E676", table: "submissions", columns: "user_id,task_id,task_type,language,status,passed_tests,total_tests,created_at" },
+  { id: "quiz_results", label: t.admin.exp.quizResults, desc: t.admin.exp.quizResultsDesc, icon: ClipboardList, color: "#FFD600", table: "quiz_results", columns: "user_id,topic_id,score,total,percentage,completed_at" },
+  { id: "coins", label: t.admin.exp.coins, desc: t.admin.exp.coinsDesc, icon: Coins, color: "#FF6B9D", table: "coin_transactions", columns: "user_id,amount,type,description,balance_after,created_at" },
 ];
 
 export default function AdminExportPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [exporting, setExporting] = useState<string | null>(null);
 
-  async function handleExport(type: typeof exportTypes[0]) {
+  async function handleExport(type: ReturnType<typeof exportTypes>[0]) {
     setExporting(type.id);
     try {
       const { data, error } = await supabase.from(type.table).select(type.columns).csv();
@@ -41,12 +44,12 @@ export default function AdminExportPage() {
   return (
     <div className="space-y-8 max-w-3xl">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Ma'lumotlar eksporti</h1>
-        <p className="text-muted-foreground">Platforma ma'lumotlarini CSV formatida yuklab oling</p>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.admin.exp.title}</h1>
+        <p className="text-muted-foreground">{t.admin.exp.subtitle}</p>
       </motion.div>
 
       <div className="space-y-4">
-        {exportTypes.map((type, i) => (
+        {exportTypes(t).map((type, i) => (
           <motion.div key={type.id} className="glass-card p-6 flex items-center gap-5"
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
             <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"

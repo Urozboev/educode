@@ -16,7 +16,7 @@
 
 import { randomUUID } from 'crypto';
 import { NextRequest } from 'next/server';
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createAdminClient, hasServiceRole } from '@/lib/supabase/server';
 import { getAgentAccess, paywallMessage } from '@/lib/agent/access';
 import {
   generatePlacement,
@@ -37,6 +37,12 @@ export async function POST(req: NextRequest) {
   const access = await getAgentAccess(supabase, user.id);
   if (!access.allowed) {
     return Response.json({ error: paywallMessage(access), code: access.reason }, { status: 402 });
+  }
+
+  if (!hasServiceRole()) {
+    return Response.json({
+      error: "Server sozlamasi to'liq emas: SUPABASE_SERVICE_ROLE_KEY qo'shilmagan.",
+    }, { status: 500 });
   }
 
   const body = await req.json().catch(() => ({} as any));

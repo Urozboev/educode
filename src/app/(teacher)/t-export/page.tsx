@@ -5,8 +5,10 @@ import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Download, Loader2, Users, Target, ClipboardList } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function TeacherExportPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [studentIds, setStudentIds] = useState<string[]>([]);
   const [exporting, setExporting] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export default function TeacherExportPage() {
   }, []);
 
   async function exportData(type: string) {
-    if (studentIds.length === 0) { toast.error("Talaba yo'q"); return; }
+    if (studentIds.length === 0) { toast.error(t.teacher.exp.noStudents); return; }
     setExporting(type);
 
     try {
@@ -54,15 +56,15 @@ export default function TeacherExportPage() {
   }
 
   const exports = [
-    { id: "students", label: "Talabalar ma'lumotlari", desc: "Ism, daraja, XP, coin, streak", icon: Users, color: "#6C5CE7" },
-    { id: "submissions", label: "Kod yuborishlar", desc: "Topshiriq, til, natija, sana", icon: Target, color: "#00D2FF" },
+    { id: "students", label: t.teacher.exp.studentsFile, desc: t.teacher.exp.studentsCols, icon: Users, color: "#6C5CE7" },
+    { id: "submissions", label: t.teacher.exp.submissionsFile, desc: t.teacher.exp.submissionsCols, icon: Target, color: "#00D2FF" },
     { id: "quizzes", label: "Test natijalari", desc: "Ball, foiz, sana", icon: ClipboardList, color: "#FFD600" },
   ];
 
   return (
     <div className="space-y-8 max-w-3xl">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Eksport</h1>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.teacher.export}</h1>
         <p className="text-muted-foreground">{studentIds.length} ta talabaning ma'lumotlarini yuklab oling</p>
       </motion.div>
 
@@ -85,7 +87,7 @@ export default function TeacherExportPage() {
         ))}
       </div>
 
-      <p className="text-xs text-muted-foreground">CSV fayllarni Excel yoki Google Sheets da ochib tahlil qilishingiz mumkin.</p>
+      <p className="text-xs text-muted-foreground">{t.teacher.exp.hint}</p>
     </div>
   );
 }

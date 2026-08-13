@@ -10,23 +10,26 @@ import {
   Presentation, Check, X, Loader2, Clock, CheckCircle2, XCircle,
   Phone, MapPin, School, Briefcase, RotateCcw, ChevronDown,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
-const SUBJECT_LABEL: Record<string, string> = {
+const SUBJECT_LABEL = (t: Dictionary): Record<string, string> => ({
   informatika: "Informatika",
   matematika: "Matematika",
   fizika: "Fizika",
-  boshlangich: "Boshlang'ich sinf",
-  boshqa: "Boshqa",
-};
+  boshlangich: t.admin.tch.subjPrimary,
+  boshqa: t.admin.tch.subjOther,
+});
 
-const TABS: { value: TeacherApplicationStatus | "all"; label: string }[] = [
-  { value: "pending", label: "Kutilmoqda" },
-  { value: "approved", label: "Tasdiqlangan" },
-  { value: "rejected", label: "Rad etilgan" },
-  { value: "all", label: "Barchasi" },
+const TABS = (t: Dictionary): { value: TeacherApplicationStatus | "all"; label: string }[] => [
+  { value: "pending", label: t.admin.tch.pending },
+  { value: "approved", label: t.admin.tch.approved },
+  { value: "rejected", label: t.admin.tch.rejectedTab },
+  { value: "all", label: t.admin.common.all },
 ];
 
 export default function AdminTeachersPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [apps, setApps] = useState<TeacherApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +75,7 @@ export default function AdminTeachersPage() {
     });
     setBusyId(null);
     if (error) { toast.error(error.message); return; }
-    toast.success("Rad etildi");
+    toast.success(t.admin.tch.rejected);
     load();
   }
 
@@ -107,7 +110,7 @@ export default function AdminTeachersPage() {
 
       {/* Tablar */}
       <div className="flex gap-2 flex-wrap">
-        {TABS.map(t => {
+        {TABS(t).map(t => {
           const count = t.value === "all" ? apps.length : apps.filter(a => a.status === t.value).length;
           return (
             <button
@@ -151,7 +154,7 @@ export default function AdminTeachersPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">{a.full_name}</p>
                   <div className="flex flex-wrap items-center gap-x-2 text-[11px] text-muted-foreground mt-0.5">
-                    <span>{SUBJECT_LABEL[a.subject] || a.subject}</span>
+                    <span>{SUBJECT_LABEL(t)[a.subject] || a.subject}</span>
                     <span>· {a.school}</span>
                     <span>· {formatRelativeDate(a.created_at)}</span>
                   </div>
@@ -171,23 +174,23 @@ export default function AdminTeachersPage() {
                     <div className="px-4 pb-4 pt-1 border-t border-border/50 space-y-4">
                       <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-2 pt-4 text-sm">
                         <Row icon={<Phone className="w-3.5 h-3.5" />} label="Telefon" value={a.phone} />
-                        <Row icon={<MapPin className="w-3.5 h-3.5" />} label="Hudud"
+                        <Row icon={<MapPin className="w-3.5 h-3.5" />} label={t.admin.tch.region}
                           value={[a.region, a.district].filter(Boolean).join(", ") || "—"} />
-                        <Row icon={<School className="w-3.5 h-3.5" />} label="Ish joyi" value={a.school} />
-                        <Row icon={<Briefcase className="w-3.5 h-3.5" />} label="Tajriba"
+                        <Row icon={<School className="w-3.5 h-3.5" />} label={t.admin.tch.workplace} value={a.school} />
+                        <Row icon={<Briefcase className="w-3.5 h-3.5" />} label={t.admin.tch.experience}
                           value={a.experience_years ? `${a.experience_years} yil` : "—"} />
                       </dl>
 
                       {a.about && (
                         <div>
-                          <p className="eyebrow mb-1">Qo&apos;shimcha</p>
+                          <p className="eyebrow mb-1">{t.admin.tch.extra}</p>
                           <p className="text-sm text-muted-foreground leading-relaxed">{a.about}</p>
                         </div>
                       )}
 
                       {a.status === "rejected" && a.reject_reason && (
                         <div className="p-3 rounded-lg bg-neon-red/[0.06] border border-neon-red/20">
-                          <p className="text-xs font-semibold text-neon-red mb-0.5">Rad etish sababi</p>
+                          <p className="text-xs font-semibold text-neon-red mb-0.5">{t.admin.tch.rejectReason}</p>
                           <p className="text-sm text-muted-foreground">{a.reject_reason}</p>
                         </div>
                       )}

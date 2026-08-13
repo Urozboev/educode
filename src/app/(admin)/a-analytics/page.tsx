@@ -5,8 +5,10 @@ import { createClient } from "@/lib/supabase/client";
 import { formatNumber, cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { BarChart3, Users, TrendingUp, Target, BookOpen, Brain, Activity, Calendar } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function AdminAnalyticsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -72,9 +74,9 @@ export default function AdminAnalyticsPage() {
 
   const mainCards = [
     { label: "Foydalanuvchilar", value: stats.totalUsers, sub: `+${stats.newUsersThisWeek} shu hafta`, icon: Users, color: "#6C5CE7" },
-    { label: "Qabul darajasi", value: `${stats.acceptRate}%`, sub: `${stats.totalSubmissions} yuborish`, icon: Target, color: "#00E676" },
-    { label: "Kurs tugatish", value: stats.completedCourses, sub: `${stats.totalEnrollments} ro'yxat`, icon: BookOpen, color: "#00D2FF" },
-    { label: "O'rtacha test bali", value: `${stats.avgQuizScore}%`, sub: `${stats.totalQuizzes} ta test`, icon: Brain, color: "#FFD600" },
+    { label: t.admin.ana.acceptRate, value: `${stats.acceptRate}%`, sub: `${stats.totalSubmissions} yuborish`, icon: Target, color: "#00E676" },
+    { label: t.admin.ana.courseCompletion, value: stats.completedCourses, sub: `${stats.totalEnrollments} ro'yxat`, icon: BookOpen, color: "#00D2FF" },
+    { label: t.admin.ana.avgQuiz, value: `${stats.avgQuizScore}%`, sub: `${stats.totalQuizzes} ta test`, icon: Brain, color: "#FFD600" },
   ];
 
   const maxActivity = Math.max(...dailyActivity.map(d => d.count), 1);
@@ -82,8 +84,8 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Tahlillar</h1>
-        <p className="text-muted-foreground">Platforma faoliyati statistikasi</p>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.admin.ana.title}</h1>
+        <p className="text-muted-foreground">{t.admin.ana.subtitle}</p>
       </motion.div>
 
       {/* Main Cards */}
@@ -99,7 +101,7 @@ export default function AdminAnalyticsPage() {
 
       {/* Daily Activity Bar Chart */}
       <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><Activity className="w-5 h-5 text-neon-purple" /> Kunlik yuborishlar (oxirgi 7 kun)</h2>
+        <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><Activity className="w-5 h-5 text-neon-purple" /> {t.admin.ana.dailySubmissions}</h2>
         <div className="flex items-end gap-3 h-40">
           {dailyActivity.map((d, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-2">
@@ -116,7 +118,7 @@ export default function AdminAnalyticsPage() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Course Stats */}
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-          <h2 className="font-display font-semibold text-lg mb-4">Kurslar statistikasi</h2>
+          <h2 className="font-display font-semibold text-lg mb-4">{t.admin.ana.courseStats}</h2>
           <div className="space-y-3">
             {courseStats.map((c, i) => {
               const maxEnrolled = Math.max(...courseStats.map(x => x.total_enrolled), 1);
@@ -134,13 +136,13 @@ export default function AdminAnalyticsPage() {
                 </div>
               );
             })}
-            {courseStats.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Ma'lumot yo'q</p>}
+            {courseStats.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">{t.admin.common.noData}</p>}
           </div>
         </motion.div>
 
         {/* Challenge Stats */}
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
-          <h2 className="font-display font-semibold text-lg mb-4">Topshiriqlar statistikasi</h2>
+          <h2 className="font-display font-semibold text-lg mb-4">{t.admin.ana.challengeStats}</h2>
           <div className="space-y-2">
             {challengeStats.map(ch => (
               <div key={ch.id} className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0">
@@ -150,7 +152,7 @@ export default function AdminAnalyticsPage() {
                 <span className="text-xs text-muted-foreground font-mono">{ch.attempt_count} urinish</span>
               </div>
             ))}
-            {challengeStats.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Ma'lumot yo'q</p>}
+            {challengeStats.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">{t.admin.common.noData}</p>}
           </div>
         </motion.div>
       </div>

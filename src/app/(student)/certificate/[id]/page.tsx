@@ -9,6 +9,7 @@ import type { Certificate } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowLeft, Download, Printer, Loader2, Pencil, Check, FileText } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Sertifikat qat'iy o'lchamda chiziladi.
@@ -23,6 +24,7 @@ const CERT_W = 900;
 const CERT_H = Math.round(CERT_W / 1.414);
 
 export default function CertificatePage() {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const supabase = createClient();
   const [cert, setCert] = useState<Certificate | null>(null);
@@ -94,10 +96,10 @@ export default function CertificatePage() {
       .eq("id", cert.id);
     if (!error) {
       setCert({ ...cert, full_name: trimmed });
-      toast.success("Ism saqlandi");
+      toast.success(t.challenges.cert.nameSaved);
     } else {
       // DB'ga yozib bo'lmasa ham, yuklab olinadigan PNG'da to'g'ri ism ko'rinadi
-      toast.message("Ism shu tashrif uchun qo'llanildi");
+      toast.message(t.challenges.cert.nameLocalOnly);
     }
     setSavingName(false);
   }
@@ -207,14 +209,14 @@ export default function CertificatePage() {
   }
 
   if (loading) return <div className="max-w-4xl mx-auto"><div className="glass-card h-96 animate-pulse" /></div>;
-  if (!cert) return <div className="text-center py-20"><p className="text-muted-foreground">Sertifikat topilmadi</p></div>;
+  if (!cert) return <div className="text-center py-20"><p className="text-muted-foreground">{t.challenges.cert.notFound}</p></div>;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <motion.div className="flex items-center justify-between flex-wrap gap-3 print:hidden" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <Link href="/my-results" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" /> Natijalarimga qaytish
+          <ArrowLeft className="w-4 h-4" /> {t.challenges.cert.backToResults}
         </Link>
         <div className="flex gap-2">
           <button onClick={handleDownloadPdf} disabled={downloadingPdf || downloading}
@@ -254,11 +256,11 @@ export default function CertificatePage() {
             className="btn-ghost py-2.5 px-5 flex items-center gap-2 text-sm disabled:opacity-40"
           >
             {savingName ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-            Saqlash
+            {t.common.save}
           </button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Yozganingiz sertifikatda va yuklab olinadigan faylda darhol ko&apos;rinadi.
+          {t.challenges.cert.nameHint}
         </p>
       </motion.div>
 

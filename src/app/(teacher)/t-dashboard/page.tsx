@@ -13,6 +13,7 @@ import {
   Download, Flame, Brain, Activity, School, Gamepad2, Copy, Check,
   Lightbulb, ArrowRight, Trophy,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type Student = {
   id: string; full_name: string; avatar_url: string | null;
@@ -31,6 +32,7 @@ type Feed = {
 };
 
 export default function TeacherDashboardPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [teacherName, setTeacherName] = useState("");
   const [students, setStudents] = useState<Student[]>([]);
@@ -101,7 +103,7 @@ export default function TeacherDashboardPage() {
       ...((recentSubs.data as any[]) || []).map(s => ({
         key: `s-${s.id}`,
         kind: "submission" as const,
-        name: nameMap[s.user_id] || "Noma'lum",
+        name: nameMap[s.user_id] || t.teacher.unknown,
         ok: s.status === "accepted",
         detail: `${s.language} · ${s.task_type === "challenge" ? "Topshiriq" : "Amaliy"}`,
         at: s.created_at,
@@ -109,7 +111,7 @@ export default function TeacherDashboardPage() {
       ...((gameResults.data as any[]) || []).map(g => ({
         key: `g-${g.id}`,
         kind: "game" as const,
-        name: nameMap[g.user_id] || "Noma'lum",
+        name: nameMap[g.user_id] || t.teacher.unknown,
         ok: g.total_count > 0 && g.correct_count * 2 >= g.total_count,
         detail: `O'yin · ${g.correct_count}/${g.total_count} to'g'ri`,
         at: g.created_at,
@@ -129,19 +131,19 @@ export default function TeacherDashboardPage() {
   }
 
   const statCards = [
-    { label: "O'quvchilar", value: stats.totalStudents, Icon: Users, cls: "text-neon-purple" },
-    { label: "Yuborishlar", value: stats.totalSubmissions, Icon: Target, cls: "text-neon-blue" },
+    { label: t.teacher.students, value: stats.totalStudents, Icon: Users, cls: "text-neon-purple" },
+    { label: t.teacher.submissions, value: stats.totalSubmissions, Icon: Target, cls: "text-neon-blue" },
     { label: "Qabul qilingan", value: stats.accepted, Icon: TrendingUp, cls: "text-neon-green" },
-    { label: "O'rtacha test bali", value: `${stats.avgQuizScore}%`, Icon: Brain, cls: "text-neon-yellow" },
+    { label: t.teacher.avgQuiz, value: `${stats.avgQuizScore}%`, Icon: Brain, cls: "text-neon-yellow" },
   ];
 
   const quickLinks = [
-    { label: "Guruhlar", href: "/t-groups", Icon: School },
+    { label: t.teacher.groups, href: "/t-groups", Icon: School },
     { label: "Dars o'yinlari", href: "/t-lesson-games", Icon: Gamepad2 },
-    { label: "Topshiriqlar", href: "/t-assignments", Icon: ClipboardList },
-    { label: "Metodlar", href: "/t-methods", Icon: Lightbulb },
-    { label: "Tahlillar", href: "/t-analytics", Icon: BarChart3 },
-    { label: "Eksport", href: "/t-export", Icon: Download },
+    { label: t.nav.challenges, href: "/t-assignments", Icon: ClipboardList },
+    { label: t.nav.methods, href: "/t-methods", Icon: Lightbulb },
+    { label: t.teacher.analytics, href: "/t-analytics", Icon: BarChart3 },
+    { label: t.teacher.export, href: "/t-export", Icon: Download },
   ];
 
   /* ===== Hali o'quvchi yo'q — nima qilish kerakligini aytamiz ===== */
@@ -153,7 +155,7 @@ export default function TeacherDashboardPage() {
         <h1 className="font-display font-bold text-3xl mb-1">
           Salom{teacherName ? `, ${teacherName.split(" ")[0]}` : ""}
         </h1>
-        <p className="text-muted-foreground">O&apos;qituvchi paneli</p>
+        <p className="text-muted-foreground">{t.teacher.dash.title}</p>
       </motion.div>
 
       {isEmpty ? (
@@ -163,7 +165,7 @@ export default function TeacherDashboardPage() {
           className="glass-card p-8"
         >
           <School className="w-10 h-10 text-neon-purple mb-4" />
-          <h2 className="font-display font-bold text-xl mb-2">Ishni guruhdan boshlang</h2>
+          <h2 className="font-display font-bold text-xl mb-2">{t.teacher.dash.startWithGroup}</h2>
           <p className="text-muted-foreground leading-relaxed mb-6 max-w-lg">
             Hozircha sizga o&apos;quvchi biriktirilmagan. Guruh yarating — unga
             avtomatik kod beriladi. O&apos;quvchilar shu kodni <code className="px-1.5 py-0.5 rounded bg-surface border border-border text-xs">/join</code>{" "}
@@ -217,7 +219,7 @@ export default function TeacherDashboardPage() {
       {groups.length > 0 && (
         <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="eyebrow">Guruh kodlari</h2>
+            <h2 className="eyebrow">{t.teacher.dash.groupCodes}</h2>
             <Link href="/t-groups" className="text-sm text-neon-purple hover:underline inline-flex items-center gap-1">
               Boshqarish <ChevronRight className="w-4 h-4" />
             </Link>
@@ -281,14 +283,14 @@ export default function TeacherDashboardPage() {
           {/* O'quvchilar */}
           <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold text-lg">O&apos;quvchilar</h2>
+              <h2 className="font-display font-semibold text-lg">{t.teacher.students}</h2>
               <Link href="/t-students" className="text-sm text-neon-purple hover:underline flex items-center gap-1">
                 Barchasi <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
 
             {students.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">Hali o&apos;quvchi yo&apos;q</p>
+              <p className="text-sm text-muted-foreground text-center py-8">{t.teacher.dash.noStudents}</p>
             ) : (
               <div className="space-y-2">
                 {students.slice(0, 8).map((s, i) => (
@@ -331,7 +333,7 @@ export default function TeacherDashboardPage() {
             </h2>
 
             {feed.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">Hali faollik yo&apos;q</p>
+              <p className="text-sm text-muted-foreground text-center py-8">{t.teacher.dash.noActivity}</p>
             ) : (
               <div className="space-y-2">
                 {feed.map(f => (
@@ -363,7 +365,7 @@ export default function TeacherDashboardPage() {
       {stats.totalSubmissions > 0 && (
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-sm">Umumiy qabul darajasi</h2>
+            <h2 className="font-semibold text-sm">{t.teacher.dash.acceptRate}</h2>
             <span className="numeric text-lg text-neon-green">
               {Math.round((stats.accepted / stats.totalSubmissions) * 100)}%
             </span>

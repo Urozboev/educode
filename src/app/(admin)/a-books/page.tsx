@@ -11,21 +11,23 @@ import {
   Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Library,
   Upload, ImagePlus, FileText, Download, Link2,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
-const CATEGORIES = [
-  { value: "programming", label: "Dasturlash" },
+const CATEGORIES = (t: Dictionary) => [
+  { value: "programming", label: t.admin.set.catProgramming },
   { value: "python", label: "Python" },
   { value: "frontend", label: "Frontend" },
-  { value: "computer_literacy", label: "Kompyuter savodxonligi" },
-  { value: "algorithms", label: "Algoritmlar" },
-  { value: "prompt_engineering", label: "Sun'iy intellekt" },
-  { value: "other", label: "Boshqa" },
+  { value: "computer_literacy", label: t.admin.set.catLiteracy },
+  { value: "algorithms", label: t.admin.set.catAlgorithms },
+  { value: "prompt_engineering", label: t.admin.common.catAi },
+  { value: "other", label: t.admin.tch.subjOther },
 ];
 
-const LANGUAGES: { value: BookLanguage; label: string }[] = [
-  { value: "uz", label: "O'zbekcha" },
-  { value: "ru", label: "Ruscha" },
-  { value: "en", label: "Inglizcha" },
+const LANGUAGES = (t: Dictionary): { value: BookLanguage; label: string }[] => [
+  { value: "uz", label: t.admin.common.langUz },
+  { value: "ru", label: t.admin.common.langRu },
+  { value: "en", label: t.admin.common.langEn },
 ];
 
 const MAX_FILE_MB = 50;
@@ -48,6 +50,7 @@ const empty = {
 };
 
 export default function AdminBooksPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,7 +97,7 @@ export default function AdminBooksPage() {
   }
 
   async function uploadCover(file: File) {
-    if (!file.type.startsWith("image/")) { toast.error("Faqat rasm fayli"); return; }
+    if (!file.type.startsWith("image/")) { toast.error(t.admin.common.onlyImage); return; }
     setUploadingCover(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
@@ -178,7 +181,7 @@ export default function AdminBooksPage() {
   async function del(b: Book) {
     if (!confirm(`"${b.title}" o'chirilsinmi?`)) return;
     await supabase.from("books").delete().eq("id", b.id);
-    toast.success("O'chirildi");
+    toast.success(t.admin.common.deleted);
     load();
   }
 
@@ -212,57 +215,57 @@ export default function AdminBooksPage() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Kitob nomi *</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.bks.titleLabel} *</label>
                 <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Python asoslari" />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Muallif</label>
-                <input value={form.author} onChange={e => setForm({ ...form, author: e.target.value })} className="input-field" placeholder="Mark Lutz" />
+                <label className="text-sm font-medium mb-1 block">{t.admin.bks.author}</label>
+                <input value={form.author} onChange={e => setForm({ ...form, author: e.target.value })} className="input-field" placeholder={t.admin.bks.authorPh} />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Qisqa tavsif</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.shortDesc}</label>
               <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="input-field resize-none" rows={2} placeholder="Kitob nima haqida va kimga mo'ljallangan" maxLength={400} />
             </div>
 
             <div className="grid sm:grid-cols-4 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Kategoriya</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.common.category}</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="input-field">
-                  {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  {CATEGORIES(t).map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Til</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.common.language}</label>
                 <select value={form.language} onChange={e => setForm({ ...form, language: e.target.value as BookLanguage })} className="input-field">
-                  {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                  {LANGUAGES(t).map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Betlar soni</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.bks.pages}</label>
                 <input type="number" value={form.page_count || ""} onChange={e => setForm({ ...form, page_count: +e.target.value })} className="input-field" placeholder="320" />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Nashr yili</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.bks.year}</label>
                 <input type="number" value={form.published_year || ""} onChange={e => setForm({ ...form, published_year: +e.target.value })} className="input-field" placeholder="2024" />
               </div>
             </div>
 
             <div className="grid sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2">
-                <label className="text-sm font-medium mb-1 block">Teglar (vergul bilan)</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.common.tags}</label>
                 <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="input-field" placeholder="python, boshlang'ich, amaliyot" />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Nashriyot</label>
-                <input value={form.publisher} onChange={e => setForm({ ...form, publisher: e.target.value })} className="input-field" placeholder="O'qituvchi" />
+                <label className="text-sm font-medium mb-1 block">{t.admin.bks.publisher}</label>
+                <input value={form.publisher} onChange={e => setForm({ ...form, publisher: e.target.value })} className="input-field" placeholder={t.admin.common.publisherPh} />
               </div>
             </div>
 
             {/* Muqova */}
             <div>
-              <label className="text-sm font-medium mb-1 block">Muqova rasmi</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.coverImage}</label>
               <div className="flex items-center gap-3">
                 <div className="w-20 h-28 rounded-lg border border-border/60 bg-surface/40 overflow-hidden flex items-center justify-center flex-shrink-0">
                   {form.cover_url ? (
@@ -280,7 +283,7 @@ export default function AdminBooksPage() {
 
             {/* Kitob fayli */}
             <div>
-              <label className="text-sm font-medium mb-1 block">Kitob fayli *</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.bks.file} *</label>
               <div className="flex flex-wrap items-center gap-3">
                 <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-border hover:border-neon-purple/40 cursor-pointer text-sm text-muted-foreground">
                   {uploadingFile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
@@ -315,7 +318,7 @@ export default function AdminBooksPage() {
             </div>
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={() => save(false)} disabled={saving} className="btn-ghost py-2 px-5 text-sm border border-border flex items-center gap-2 disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama saqlash
               </button>
@@ -333,8 +336,8 @@ export default function AdminBooksPage() {
         books.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <Library className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="mb-4">Hali kitob qo'shilmagan</p>
-            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi kitob</button>
+            <p className="mb-4">{t.admin.bks.empty}</p>
+            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> {t.admin.bks.first}</button>
           </div>
         ) : books.map(b => (
           <div key={b.id} className="glass-card p-4 flex items-center gap-4">
@@ -352,8 +355,8 @@ export default function AdminBooksPage() {
                 {b.file_size_bytes ? <span>· {formatBytes(b.file_size_bytes)}</span> : null}
                 <span className="inline-flex items-center gap-1">· <Download className="w-3 h-3" />{b.downloads}</span>
                 {b.is_published
-                  ? <span className="text-neon-green">· Nashr qilingan</span>
-                  : <span className="text-neon-yellow">· Qoralama</span>}
+                  ? <span className="text-neon-green">· {t.admin.common.published}</span>
+                  : <span className="text-neon-yellow">· {t.admin.common.draft}</span>}
               </div>
             </div>
             <button onClick={() => togglePublish(b)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title={b.is_published ? "Yashirish" : "Nashr"}>

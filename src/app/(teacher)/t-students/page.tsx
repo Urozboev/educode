@@ -6,8 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 import { getInitials, getLevelLabel, getLevelColor, cn, formatDate } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Search, Users, Zap, Flame, BookOpen, Target, ChevronRight, BarChart3, Eye } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function TeacherStudentsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [students, setStudents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -54,19 +56,19 @@ export default function TeacherStudentsPage() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Talabalarim</h1>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.teacher.myStudents}</h1>
         <p className="text-muted-foreground text-sm">{students.length} ta talaba biriktirilgan</p>
       </motion.div>
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Talaba qidirish..." className="input-field pl-11" />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t.teacher.stu.search} className="input-field pl-11" />
         </div>
         <div className="flex gap-2">
           {([
-            { value: "xp", label: "XP bo'yicha" }, { value: "streak", label: "Streak" },
-            { value: "solved", label: "Yechimlar" }, { value: "name", label: "Ism" },
+            { value: "xp", label: t.teacher.stu.byXp }, { value: "streak", label: t.teacher.stu.byStreak },
+            { value: "solved", label: t.teacher.stu.bySolutions }, { value: "name", label: t.teacher.stu.byName },
           ] as const).map(s => (
             <button key={s.value} onClick={() => setSortBy(s.value)}
               className={cn("px-3 py-2 rounded-lg text-xs font-medium transition-all",
@@ -83,7 +85,7 @@ export default function TeacherStudentsPage() {
         <div className="text-center py-20">
           <Users className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
           <p className="text-muted-foreground mb-2">{students.length === 0 ? "Talaba biriktirilmagan" : "Topilmadi"}</p>
-          {students.length === 0 && <p className="text-xs text-muted-foreground">Admin paneldan talabalarni biriktiring</p>}
+          {students.length === 0 && <p className="text-xs text-muted-foreground">{t.teacher.stu.empty}</p>}
         </div>
       ) : (
         <div className="space-y-2">

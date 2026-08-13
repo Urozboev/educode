@@ -53,7 +53,10 @@ export async function getAgentAccess(
   userId: string | null,
 ): Promise<AgentAccess> {
   if (!userId) {
-    return { allowed: false, plan: 'free', reason: 'no_user', freeRemaining: 0, expiresAt: null, isTrial: false };
+    return {
+      allowed: false, plan: 'free', reason: 'no_user',
+      freeRemaining: 0, expiresAt: null, daysLeft: null, isTrial: false,
+    };
   }
 
   const { data: profile } = await supabase
@@ -64,7 +67,10 @@ export async function getAgentAccess(
 
   // O'qituvchi/admin kontentni tekshirishi kerak — ular uchun to'lov mantiqsiz
   if (profile?.role === 'teacher' || profile?.role === 'admin') {
-    return { allowed: true, plan: 'pro_plus', freeRemaining: null, expiresAt: null, isTrial: false };
+    return {
+      allowed: true, plan: 'pro_plus',
+      freeRemaining: null, expiresAt: null, daysLeft: null, isTrial: false,
+    };
   }
 
   const { data: sub } = await supabase
@@ -78,12 +84,18 @@ export async function getAgentAccess(
   const notExpired = !expiresAt || new Date(expiresAt) > new Date();
 
   if (plan !== 'free' && sub?.status === 'active' && notExpired) {
-    return { allowed: true, plan, freeRemaining: null, expiresAt, isTrial: false };
+    return {
+      allowed: true, plan, freeRemaining: null, expiresAt,
+      daysLeft: daysUntil(expiresAt), isTrial: false,
+    };
   }
 
   // Obuna muddati tugagan — demo qaytarilmaydi
   if (plan !== 'free' && !notExpired) {
-    return { allowed: false, plan, reason: 'expired', freeRemaining: 0, expiresAt, isTrial: false };
+    return {
+      allowed: false, plan, reason: 'expired',
+      freeRemaining: 0, expiresAt, daysLeft: 0, isTrial: false,
+    };
   }
 
   const used = sub?.free_messages_used ?? 0;
@@ -95,9 +107,20 @@ export async function getAgentAccess(
     reason: remaining > 0 ? undefined : 'free_limit_reached',
     freeRemaining: remaining,
     expiresAt: null,
+    daysLeft: null,
     isTrial: true,
   };
 }
+
+/** Obuna tugashiga qolgan to'liq kunlar. Bugun tugasa — 0. */
+function daysUntil(iso: string | null): number | null {
+  if (!iso) return null;
+  const diff = new Date(iso).getTime() - Date.now();
+  return Math.max(0, Math.floor(diff / 86400_000));
+}
+
+/** Necha kun qolganda ogohlantirish ko'rsatiladi */
+export const EXPIRY_WARNING_DAYS = 7;
 
 /**
  * Demo hisoblagichini oshiradi. Faqat obunasiz foydalanuvchi uchun

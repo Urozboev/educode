@@ -9,6 +9,7 @@ import {
   Users, Plus, Copy, Check, Trash2, X, Loader2, UserMinus,
   Lock, Unlock, School, Info,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type Group = {
   id: string;
@@ -30,6 +31,7 @@ type Student = {
 };
 
 export default function TeacherGroupsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [groups, setGroups] = useState<Group[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -63,7 +65,7 @@ export default function TeacherGroupsPage() {
         student_id: t.student_id,
         group_id: t.group_id,
         assigned_at: t.assigned_at,
-        full_name: byId.get(t.student_id)?.full_name || "Noma'lum",
+        full_name: byId.get(t.student_id)?.full_name || t.teacher.unknown,
         avatar_url: byId.get(t.student_id)?.avatar_url || null,
         level: byId.get(t.student_id)?.level || "beginner",
         xp: byId.get(t.student_id)?.xp || 0,
@@ -90,7 +92,7 @@ export default function TeacherGroupsPage() {
 
     setCreating(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Guruh yaratildi");
+    toast.success(t.teacher.grp.created);
     setName(""); setDescription(""); setShowForm(false);
     load();
   }
@@ -103,7 +105,7 @@ export default function TeacherGroupsPage() {
   async function delGroup(g: Group) {
     if (!confirm(`"${g.name}" guruhi o'chirilsinmi? O'quvchilar bog'lanishi ham uziladi.`)) return;
     await supabase.from("teacher_groups").delete().eq("id", g.id);
-    toast.success("O'chirildi");
+    toast.success(t.teacher.grp.deleted);
     load();
   }
 
@@ -113,7 +115,7 @@ export default function TeacherGroupsPage() {
     if (!user) return;
     await supabase.from("teacher_students").delete()
       .eq("teacher_id", user.id).eq("student_id", s.student_id);
-    toast.success("Chiqarildi");
+    toast.success(t.teacher.grp.removed);
     load();
   }
 
@@ -163,21 +165,21 @@ export default function TeacherGroupsPage() {
             exit={{ opacity: 0, height: 0 }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-display font-semibold">Yangi guruh</h2>
+              <h2 className="font-display font-semibold">{t.teacher.grp.newGroup}</h2>
               <button onClick={() => setShowForm(false)} className="p-1.5 hover:bg-accent rounded-lg">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Nomi *</label>
+              <label className="text-sm font-medium mb-1 block">{t.teacher.grp.nameLabel} *</label>
               <input value={name} onChange={e => setName(e.target.value)} className="input-field" placeholder="9-A sinf" />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Izoh</label>
+              <label className="text-sm font-medium mb-1 block">{t.teacher.grp.noteLabel}</label>
               <input value={description} onChange={e => setDescription(e.target.value)} className="input-field" placeholder="Informatika, 2026-yil" />
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={createGroup} disabled={creating} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
                 {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Yaratish
               </button>
@@ -192,7 +194,7 @@ export default function TeacherGroupsPage() {
       ) : groups.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="mb-4">Hali guruh yaratilmagan</p>
+          <p className="mb-4">{t.teacher.grp.empty}</p>
           <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-2 px-5">
             <Plus className="w-4 h-4 inline mr-1" /> Birinchi guruh
           </button>
@@ -235,7 +237,7 @@ export default function TeacherGroupsPage() {
                   g.is_open ? "bg-neon-purple/[0.06] border-neon-purple/20" : "bg-surface border-border"
                 )}>
                   <div>
-                    <p className="eyebrow mb-1">Qo&apos;shilish kodi</p>
+                    <p className="eyebrow mb-1">{t.teacher.grp.joinCode}</p>
                     <p className={cn(
                       "font-display font-extrabold text-3xl tracking-[0.2em]",
                       g.is_open ? "text-neon-purple" : "text-muted-foreground line-through"
@@ -253,7 +255,7 @@ export default function TeacherGroupsPage() {
                     </button>
                   )}
                   {!g.is_open && (
-                    <span className="text-sm text-muted-foreground">Qo&apos;shilish yopilgan</span>
+                    <span className="text-sm text-muted-foreground">{t.teacher.grp.joinClosed}</span>
                   )}
                 </div>
 
@@ -277,7 +279,7 @@ export default function TeacherGroupsPage() {
                         <button
                           onClick={() => removeStudent(s)}
                           className="p-1.5 rounded text-muted-foreground hover:text-neon-red hover:bg-neon-red/10"
-                          title="Chiqarish"
+                          title={t.teacher.grp.remove}
                         >
                           <UserMinus className="w-3.5 h-3.5" />
                         </button>
@@ -294,7 +296,7 @@ export default function TeacherGroupsPage() {
       {/* Guruhsiz o'quvchilar */}
       {ungrouped.length > 0 && (
         <div className="glass-card p-5">
-          <h3 className="font-display font-semibold mb-1">Guruhga biriktirilmagan</h3>
+          <h3 className="font-display font-semibold mb-1">{t.teacher.grp.unassigned}</h3>
           <p className="text-sm text-muted-foreground mb-3">
             Bu o&apos;quvchilar sizga bog&apos;langan, lekin guruhi yo&apos;q
           </p>

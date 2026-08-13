@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { formatNumber, cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { BarChart3, Users, Target, TrendingUp, Brain, Activity, ShieldAlert, BookOpen, ClipboardCheck } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface AiRow {
   id: string; full_name: string;
@@ -15,6 +16,7 @@ interface AiRow {
 }
 
 export default function TeacherAnalyticsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ students: 0, submissions: 0, accepted: 0, quizzes: 0, avgScore: 0 });
@@ -89,17 +91,17 @@ export default function TeacherAnalyticsPage() {
     : { c: "text-neon-red", b: "bg-neon-red" };
 
   const cards = [
-    { label: "Talabalar", value: stats.students, icon: Users, color: "#6C5CE7" },
-    { label: "Yuborishlar", value: stats.submissions, icon: Target, color: "#00D2FF" },
+    { label: t.teacher.students, value: stats.students, icon: Users, color: "#6C5CE7" },
+    { label: t.teacher.submissions, value: stats.submissions, icon: Target, color: "#00D2FF" },
     { label: "Qabul qilingan", value: stats.accepted, icon: TrendingUp, color: "#00E676" },
-    { label: "O'rtacha test bali", value: `${stats.avgScore}%`, icon: Brain, color: "#FFD600" },
+    { label: t.teacher.avgQuiz, value: `${stats.avgScore}%`, icon: Brain, color: "#FFD600" },
   ];
 
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Tahlillar</h1>
-        <p className="text-muted-foreground">Talabalaringiz faoliyati statistikasi</p>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.teacher.ana.title}</h1>
+        <p className="text-muted-foreground">{t.teacher.ana.subtitle}</p>
       </motion.div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -113,7 +115,7 @@ export default function TeacherAnalyticsPage() {
       </div>
 
       <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <h2 className="font-display font-semibold text-lg mb-4">TOP 5 talaba (XP bo'yicha)</h2>
+        <h2 className="font-display font-semibold text-lg mb-4">{t.teacher.ana.top5}</h2>
         <div className="space-y-3">
           {topStudents.map((s, i) => (
             <div key={s.id} className="flex items-center gap-4 p-3 rounded-xl bg-surface/50">
@@ -122,12 +124,12 @@ export default function TeacherAnalyticsPage() {
               <span className="font-mono text-neon-yellow font-bold">{s.xp} XP</span>
             </div>
           ))}
-          {topStudents.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Talaba yo'q</p>}
+          {topStudents.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">{t.teacher.ana.noStudent}</p>}
         </div>
 
         {stats.submissions > 0 && (
           <div className="mt-6 p-4 rounded-xl bg-surface/50">
-            <p className="text-sm text-muted-foreground mb-2">Qabul qilinish darajasi</p>
+            <p className="text-sm text-muted-foreground mb-2">{t.teacher.ana.acceptRate}</p>
             <div className="w-full h-4 bg-border rounded-full overflow-hidden">
               <div className="h-full progress-gradient rounded-full" style={{ width: `${Math.round((stats.accepted / stats.submissions) * 100)}%` }} />
             </div>
@@ -140,7 +142,7 @@ export default function TeacherAnalyticsPage() {
       <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
         <div className="flex items-center gap-2 mb-1">
           <Brain className="w-5 h-5 text-neon-purple" />
-          <h2 className="font-display font-semibold text-lg">AI foydalanish tahlili</h2>
+          <h2 className="font-display font-semibold text-lg">{t.teacher.ana.aiUsage}</h2>
         </div>
         <p className="text-xs text-muted-foreground mb-5">
           Talabalarning AI mentordan foydalanishi, mustaqil tafakkur va akademik halollik ko'rsatkichlari.
@@ -151,7 +153,7 @@ export default function TeacherAnalyticsPage() {
           <div className="p-4 rounded-xl bg-surface/50 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1"><Activity className="w-4 h-4 text-neon-purple" /></div>
             <div className={cn("font-display font-bold text-2xl", depZone(aiAgg.avgDep).c)}>{aiAgg.avgDep}%</div>
-            <div className="text-[11px] text-muted-foreground">o'rtacha AI bog'liqlik</div>
+            <div className="text-[11px] text-muted-foreground">{t.teacher.ana.avgAiDependence}</div>
           </div>
           <div className="p-4 rounded-xl bg-surface/50 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1"><BookOpen className="w-4 h-4 text-neon-green" /></div>
@@ -171,11 +173,11 @@ export default function TeacherAnalyticsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-[11px] text-muted-foreground uppercase tracking-wider border-b border-border/50">
-                  <th className="text-left font-medium py-2">Talaba</th>
-                  <th className="text-center font-medium py-2">AI bog'liqlik</th>
-                  <th className="text-center font-medium py-2">Bugun AI</th>
-                  <th className="text-center font-medium py-2">Refleksiya</th>
-                  <th className="text-center font-medium py-2">Paste</th>
+                  <th className="text-left font-medium py-2">{t.teacher.ana.colStudent}</th>
+                  <th className="text-center font-medium py-2">{t.teacher.ana.colAi}</th>
+                  <th className="text-center font-medium py-2">{t.teacher.ana.colToday}</th>
+                  <th className="text-center font-medium py-2">{t.teacher.ana.colReflection}</th>
+                  <th className="text-center font-medium py-2">{t.teacher.ana.colPaste}</th>
                 </tr>
               </thead>
               <tbody>
@@ -213,7 +215,7 @@ export default function TeacherAnalyticsPage() {
             </p>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-6">Ma'lumot yig'ilmoqda — talabalar darslarni boshlagach ko'rsatkichlar paydo bo'ladi.</p>
+          <p className="text-sm text-muted-foreground text-center py-6">{t.teacher.ana.collecting}</p>
         )}
       </motion.div>
     </div>

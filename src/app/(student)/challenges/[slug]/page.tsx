@@ -17,7 +17,7 @@ export default function ChallengeDetailPage() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -39,7 +39,7 @@ export default function ChallengeDetailPage() {
         href={userId ? "/challenges" : "/explore/challenges"}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="w-4 h-4" /> Topshiriqlar
+        <ArrowLeft className="w-4 h-4" /> {t.challenges.backToList}
       </Link>
 
       {/* Masala olimpiadaga tegishli bo'lsa — unga qaytish havolasi */}

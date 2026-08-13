@@ -12,6 +12,7 @@ import {
   Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Lightbulb,
   ThumbsUp, ThumbsDown, Clock, Users,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 const RichTextEditor = dynamic(() => import("@/components/editor/RichTextEditor"), { ssr: false });
 
@@ -33,6 +34,7 @@ const empty = {
 const toList = (s: string) => s.split("\n").map(x => x.trim()).filter(Boolean);
 
 export default function AdminMethodsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [methods, setMethods] = useState<TeachingMethod[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +116,7 @@ export default function AdminMethodsPage() {
   async function del(m: TeachingMethod) {
     if (!confirm(`"${m.title}" o'chirilsinmi?`)) return;
     await supabase.from("teaching_methods").delete().eq("id", m.id);
-    toast.success("O'chirildi");
+    toast.success(t.admin.common.deleted);
     load();
   }
 
@@ -147,30 +149,30 @@ export default function AdminMethodsPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Metod nomi *</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.mth.nameLabel} *</label>
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Aqliy hujum (Brainstorming)" />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Qisqa tavsif *</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.mth.shortDescLabel} *</label>
               <textarea value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} className="input-field resize-none" rows={2} placeholder="Bir jumlada: metod nima qiladi va nima uchun ishlatiladi" maxLength={300} />
             </div>
 
             <div className="grid sm:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Dars bosqichi</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.mth.stage}</label>
                 <select value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value as MethodStage })} className="input-field">
                   {STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Guruh hajmi</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.mth.groupSize}</label>
                 <select value={form.group_size} onChange={e => setForm({ ...form, group_size: e.target.value as MethodGroupSize })} className="input-field">
                   {GROUP_SIZES.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Davomiyligi (daqiqa)</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.mth.duration}</label>
                 <input type="number" value={form.duration_minutes || ""} onChange={e => setForm({ ...form, duration_minutes: +e.target.value })} className="input-field" placeholder="15" />
               </div>
             </div>
@@ -191,17 +193,17 @@ export default function AdminMethodsPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Kerakli materiallar</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.mth.materials}</label>
               <textarea value={form.materials} onChange={e => setForm({ ...form, materials: e.target.value })} className="input-field resize-none text-sm" rows={3} placeholder="Har qatorda bittadan:&#10;Doska va marker&#10;Stikerlar" />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Qadamma-qadam yo&apos;riqnoma</label>
-              <RichTextEditor value={form.guide_html} onChange={html => setForm(f => ({ ...f, guide_html: html }))} placeholder="1-qadam: ..." />
+              <label className="text-sm font-medium mb-1.5 block">{t.admin.mth.steps}</label>
+              <RichTextEditor value={form.guide_html} onChange={html => setForm(f => ({ ...f, guide_html: html }))} placeholder={t.admin.mth.stepsPh} />
             </div>
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={() => save(false)} disabled={saving} className="btn-ghost py-2 px-5 text-sm border border-border flex items-center gap-2 disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama
               </button>
@@ -219,8 +221,8 @@ export default function AdminMethodsPage() {
         methods.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="mb-4">Hali metod qo&apos;shilmagan</p>
-            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi metod</button>
+            <p className="mb-4">{t.admin.mth.empty}</p>
+            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> {t.admin.mth.first}</button>
           </div>
         ) : methods.map(m => (
           <div key={m.id} className="glass-card p-4 flex items-center gap-4">
@@ -232,8 +234,8 @@ export default function AdminMethodsPage() {
                 {m.duration_minutes ? <span className="inline-flex items-center gap-1">· <Clock className="w-3 h-3" />{m.duration_minutes} daq</span> : null}
                 <span className="inline-flex items-center gap-1">· <Users className="w-3 h-3" />{GROUP_SIZES.find(g => g.value === m.group_size)?.label}</span>
                 {m.is_published
-                  ? <span className="text-neon-green">· Nashr qilingan</span>
-                  : <span className="text-neon-yellow">· Qoralama</span>}
+                  ? <span className="text-neon-green">· {t.admin.common.published}</span>
+                  : <span className="text-neon-yellow">· {t.admin.common.draft}</span>}
               </div>
             </div>
             <button onClick={() => togglePublish(m)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title={m.is_published ? "Yashirish" : "Nashr"}>

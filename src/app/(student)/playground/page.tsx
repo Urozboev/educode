@@ -8,6 +8,7 @@ import {
   ChevronDown, Cpu, Clock, Keyboard, AlertCircle, X, CornerDownLeft,
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
+import { useI18n } from "@/lib/i18n";
 
 type Lang = {
   id: string;
@@ -178,6 +179,7 @@ function fixPyLineNumbers(stderr: string): string {
 }
 
 export default function PlaygroundPage() {
+  const { t } = useI18n();
   const [lang, setLang] = useState<Lang>(languages[0]);
   const [code, setCode] = useState(languages[0].starter);
   const [output, setOutput] = useState("");
@@ -257,7 +259,7 @@ export default function PlaygroundPage() {
       setMeta({ provider: data.provider, time: data.time, memory: data.memory, warning: data.warning });
 
       if (data.error) {
-        setOutput(`Server xatolik: ${data.error}`);
+        setOutput(`${t.cabinet.play.serverError}: ${data.error}`);
         setAwaitingInput(false);
         return;
       }
@@ -276,9 +278,9 @@ export default function PlaygroundPage() {
       if (err) {
         setOutput(`${out}${out ? "\n" : ""}${isPy ? fixPyLineNumbers(err) : err}`);
       } else if (data.status === "timeout") {
-        setOutput(out + "\n⏱ Vaqt limiti tugadi (timeout)");
+        setOutput(out + "\n⏱ " + t.cabinet.play.timeout);
       } else {
-        setOutput(out || "(natija bo'sh)");
+        setOutput(out || t.cabinet.play.emptyOutput);
       }
     },
     [code, execOnServer, lang],
@@ -290,7 +292,7 @@ export default function PlaygroundPage() {
     setMeta({ provider: data.provider, time: data.time, memory: data.memory, warning: data.warning });
 
     if (data.error) {
-      setOutput(`Server xatolik: ${data.error}`);
+      setOutput(`${t.cabinet.play.serverError}: ${data.error}`);
       return;
     }
     const out = data.stdout || "";
@@ -298,9 +300,9 @@ export default function PlaygroundPage() {
     if (err) {
       setOutput(`${err}${out ? "\n\n" + out : ""}`);
     } else if (data.status === "timeout") {
-      setOutput("Vaqt limiti tugadi (timeout)");
+      setOutput(t.cabinet.play.timeout);
     } else {
-      setOutput(out || "(natija bo'sh)");
+      setOutput(out || t.cabinet.play.emptyOutput);
     }
   }, [code, stdin, execOnServer]);
 
@@ -314,7 +316,7 @@ export default function PlaygroundPage() {
     try {
       if (lang.id === "html") {
         setShowHtml(true);
-        setOutput("HTML natijasi o'ng panelda ko'rsatilgan");
+        setOutput(t.cabinet.play.htmlInRightPanel);
       } else if (lang.interactive) {
         await runInteractive([]);
       } else {
@@ -374,7 +376,7 @@ export default function PlaygroundPage() {
           </div>
           <div>
             <h1 className="font-display font-bold text-lg leading-tight">Playground</h1>
-            <p className="text-[11px] text-muted-foreground leading-tight">Kod yozing, sinang, o'rganing</p>
+            <p className="text-[11px] text-muted-foreground leading-tight">{t.cabinet.play.subtitle}</p>
           </div>
         </div>
 
@@ -418,7 +420,7 @@ export default function PlaygroundPage() {
             className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-neon-green text-white font-semibold text-sm hover:bg-neon-green/90 disabled:opacity-50 transition-all shadow-lg shadow-neon-green/20"
           >
             {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-            {running ? "Bajarilmoqda..." : "Ishga tushirish"}
+            {running ? t.cabinet.play.running : t.cabinet.play.run}
           </button>
           <kbd className="hidden md:inline-flex items-center gap-1 text-[10px] text-muted-foreground px-2 py-1.5 rounded-lg border border-border/40 bg-surface/60 font-mono">
             Ctrl+Enter
@@ -457,7 +459,7 @@ export default function PlaygroundPage() {
                   setTimeout(() => setCopied(false), 2000);
                 }}
                 className="p-1.5 hover:bg-accent rounded-lg"
-                title="Nusxa olish"
+                title={t.cabinet.play.copy}
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-neon-green" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
               </button>
@@ -472,7 +474,7 @@ export default function PlaygroundPage() {
                   inputsRef.current = [];
                 }}
                 className="p-1.5 hover:bg-accent rounded-lg"
-                title="Qayta yuklash"
+                title={t.cabinet.play.reset}
               >
                 <RotateCcw className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
@@ -514,10 +516,10 @@ export default function PlaygroundPage() {
               >
                 <div className="flex items-center gap-2">
                   <Keyboard className={cn("w-3.5 h-3.5", needsStdin && !stdin.trim() ? "text-neon-yellow" : "text-muted-foreground")} />
-                  <span className="text-xs font-medium">Kirish qiymatlari (stdin)</span>
+                  <span className="text-xs font-medium">{t.cabinet.play.stdinLabel}</span>
                   {needsStdin && !stdin.trim() && (
                     <span className="inline-flex items-center gap-1 text-[10px] text-neon-yellow font-semibold px-2 py-0.5 rounded-full bg-neon-yellow/10 border border-neon-yellow/20">
-                      <AlertCircle className="w-3 h-3" /> kerak
+                      <AlertCircle className="w-3 h-3" /> {t.cabinet.play.stdinNeeded}
                     </span>
                   )}
                 </div>
@@ -529,7 +531,7 @@ export default function PlaygroundPage() {
                     value={stdin}
                     onChange={(e) => setStdin(e.target.value)}
                     className="w-full bg-surface/40 border border-border/50 rounded-lg px-3 py-2 text-sm font-mono resize-y min-h-[48px] max-h-32 placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-neon-purple/30 transition-colors"
-                    placeholder="Har bir qator — bitta kirish qiymati"
+                    placeholder={t.cabinet.play.stdinPlaceholder}
                     spellCheck={false}
                   />
                 </div>
@@ -548,11 +550,11 @@ export default function PlaygroundPage() {
                 <Terminal className="w-4 h-4 text-neon-green" />
               )}
               <span className="text-sm font-medium">
-                {lang.id === "html" && showHtml ? "Ko'rinish (Preview)" : "Terminal"}
+                {lang.id === "html" && showHtml ? t.cabinet.play.preview : t.cabinet.play.terminal}
               </span>
               {awaitingInput && (
                 <span className="inline-flex items-center gap-1.5 text-[10px] text-neon-blue font-semibold px-2 py-0.5 rounded-full bg-neon-blue/10 border border-neon-blue/20 animate-pulse">
-                  kiritish kutilmoqda
+                  {t.cabinet.play.awaitingInput}
                 </span>
               )}
             </div>
@@ -585,7 +587,7 @@ export default function PlaygroundPage() {
             ) : (
               <div className="p-4 font-mono text-sm leading-relaxed">
                 <pre className="whitespace-pre-wrap text-[#c9d1d9] inline">
-                  {output || (running ? "" : '"Ishga tushirish" tugmasini bosing yoki Ctrl+Enter...')}
+                  {output || (running ? "" : t.cabinet.play.hint)}
                 </pre>
 
                 {/* Inline input — dastur kiritish kutayotganda terminal ichida.
@@ -604,12 +606,12 @@ export default function PlaygroundPage() {
                       className="bg-transparent border-b border-neon-blue/60 outline-none text-neon-blue font-mono text-sm min-w-[120px] max-w-[300px] caret-neon-blue"
                       autoFocus
                       spellCheck={false}
-                      aria-label="Dastur kiritishi"
+                      aria-label={t.cabinet.play.programInput}
                     />
-                    <button type="submit" className="text-neon-blue/70 hover:text-neon-blue p-0.5" title="Yuborish (Enter)">
+                    <button type="submit" className="text-neon-blue/70 hover:text-neon-blue p-0.5" title={t.cabinet.play.submitEnter}>
                       <CornerDownLeft className="w-3.5 h-3.5" />
                     </button>
-                    <button type="button" onClick={cancelInteractive} className="text-muted-foreground/50 hover:text-neon-red p-0.5" title="Bekor qilish">
+                    <button type="button" onClick={cancelInteractive} className="text-muted-foreground/50 hover:text-neon-red p-0.5" title={t.cabinet.play.cancel}>
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </form>

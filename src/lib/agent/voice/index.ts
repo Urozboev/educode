@@ -13,7 +13,7 @@
  */
 
 import { createHash } from 'crypto';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient, hasServiceRole } from '@/lib/supabase/server';
 import type { TTSResult, TTSProviderName } from '../types';
 import { synthesizeAisha, type RawAudio } from './providers/aisha';
 import { synthesizeGemini, GEMINI_TTS_LANGS } from './providers/gemini';
@@ -65,6 +65,19 @@ export async function synthesize(text: string, lang = 'uz'): Promise<TTSResult> 
       cached: false,
       charCount: clean.length,
       fallbackReason: 'TTS provayder sozlanmagan',
+    };
+  }
+
+  // Kesh va storage service role talab qiladi. Kalit yo'q bo'lsa
+  // ovozni butunlay o'chirgandan ko'ra brauzer sintezi ma'qul —
+  // agent hech bo'lmasa gapiradi.
+  if (!hasServiceRole()) {
+    return {
+      provider: 'browser',
+      audioUrl: null,
+      cached: false,
+      charCount: clean.length,
+      fallbackReason: "SUPABASE_SERVICE_ROLE_KEY sozlanmagan",
     };
   }
 

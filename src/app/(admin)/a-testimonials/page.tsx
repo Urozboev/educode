@@ -6,8 +6,10 @@ import { cn, formatDate, getInitials } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { MessageSquare, CheckCircle2, XCircle, Trash2, Eye, EyeOff, Star } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function AdminTestimonialsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function AdminTestimonialsPage() {
   async function handleDelete(id: string) {
     if (!confirm("Izohni o'chirish?")) return;
     await supabase.from("testimonials").delete().eq("id", id);
-    toast.success("O'chirildi"); load();
+    toast.success(t.admin.common.deleted); load();
   }
 
   const pending = testimonials.filter(t => !t.is_approved);
@@ -38,7 +40,7 @@ export default function AdminTestimonialsPage() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl">Izohlar boshqaruvi</h1>
+        <h1 className="font-display font-bold text-3xl">{t.admin.tst.title}</h1>
         <p className="text-muted-foreground text-sm">{pending.length} ta tasdiqlanmagan · {approved.length} ta bosh sahifada</p>
       </motion.div>
 
@@ -62,8 +64,8 @@ export default function AdminTestimonialsPage() {
                     <p className="text-sm text-muted-foreground">{t.text}</p>
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
-                    <button onClick={() => toggleApprove(t.id, false)} className="p-2 hover:bg-neon-green/10 rounded-lg text-neon-green" title="Tasdiqlash"><CheckCircle2 className="w-5 h-5" /></button>
-                    <button onClick={() => handleDelete(t.id)} className="p-2 hover:bg-neon-red/10 rounded-lg text-neon-red" title="O'chirish"><Trash2 className="w-5 h-5" /></button>
+                    <button onClick={() => toggleApprove(t.id, false)} className="p-2 hover:bg-neon-green/10 rounded-lg text-neon-green" title={t.admin.common.approve}><CheckCircle2 className="w-5 h-5" /></button>
+                    <button onClick={() => handleDelete(t.id)} className="p-2 hover:bg-neon-red/10 rounded-lg text-neon-red" title={t.common.delete}><Trash2 className="w-5 h-5" /></button>
                   </div>
                 </div>
               </div>
@@ -75,7 +77,7 @@ export default function AdminTestimonialsPage() {
       {/* Approved */}
       <div>
         <h2 className="font-semibold text-sm text-neon-green mb-3 flex items-center gap-2">✅ Bosh sahifada ko'rinadi ({approved.length})</h2>
-        {approved.length === 0 ? <p className="text-sm text-muted-foreground py-4">Hali tasdiqlangan izoh yo'q</p> : (
+        {approved.length === 0 ? <p className="text-sm text-muted-foreground py-4">{t.admin.tst.empty}</p> : (
           <div className="grid md:grid-cols-2 gap-3">
             {approved.map(t => (
               <div key={t.id} className="glass-card p-4 border-l-4 border-l-neon-green">
@@ -86,7 +88,7 @@ export default function AdminTestimonialsPage() {
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-3">{t.text}</p>
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
-                    <button onClick={() => toggleApprove(t.id, true)} className="p-1 hover:bg-neon-yellow/10 rounded text-muted-foreground" title="Yashirish"><EyeOff className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => toggleApprove(t.id, true)} className="p-1 hover:bg-neon-yellow/10 rounded text-muted-foreground" title={t.admin.common.hide}><EyeOff className="w-3.5 h-3.5" /></button>
                     <button onClick={() => handleDelete(t.id)} className="p-1 hover:bg-neon-red/10 rounded text-muted-foreground hover:text-neon-red"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>

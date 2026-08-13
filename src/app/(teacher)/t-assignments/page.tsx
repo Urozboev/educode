@@ -9,8 +9,10 @@ import {
   Plus, Trash2, Save, X, Loader2, ClipboardList, Calendar, Users,
   ChevronDown, CheckCircle2, XCircle, Eye
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function TeacherAssignmentsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [assignments, setAssignments] = useState<any[]>([]);
   const [challenges, setChallenges] = useState<any[]>([]);
@@ -75,7 +77,7 @@ export default function TeacherAssignmentsPage() {
       deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
     });
     if (error) { toast.error(error.message); setSaving(false); return; }
-    toast.success("Topshiriq biriktirildi");
+    toast.success(t.teacher.asg.assigned);
     setShowForm(false); setSaving(false);
     setForm({ challenge_id: "", group_id: "", title: "", instructions: "", deadline: "" });
     load();
@@ -87,9 +89,9 @@ export default function TeacherAssignmentsPage() {
   }
 
   async function deleteAssignment(id: string) {
-    if (!confirm("O'chirish?")) return;
+    if (!confirm(t.teacher.asg.confirmDelete)) return;
     await supabase.from("teacher_assignments").delete().eq("id", id);
-    toast.success("O'chirildi"); load();
+    toast.success(t.teacher.asg.deleted); load();
   }
 
   // ===== GROUP CRUD =====
@@ -99,14 +101,14 @@ export default function TeacherAssignmentsPage() {
       teacher_id: userId, name: groupForm.name, description: groupForm.description || null,
     });
     if (error) { toast.error(error.message); return; }
-    toast.success("Guruh yaratildi");
+    toast.success(t.teacher.grp.created);
     setGroupForm({ name: "", description: "" }); setShowGroupForm(false); load();
   }
 
   async function deleteGroup(id: string) {
     if (!confirm("Guruhni o'chirish?")) return;
     await supabase.from("teacher_groups").delete().eq("id", id);
-    toast.success("O'chirildi"); load();
+    toast.success(t.teacher.asg.deleted); load();
   }
 
   // ===== VIEW SUBMISSIONS =====
@@ -123,7 +125,7 @@ export default function TeacherAssignmentsPage() {
       .in("user_id", studentIds).order("created_at", { ascending: false });
 
     const nameMap = Object.fromEntries(students.map(s => [s.id, s.full_name]));
-    const subs = (data || []).map(s => ({ ...s, name: nameMap[s.user_id] || "Noma'lum" }));
+    const subs = (data || []).map(s => ({ ...s, name: nameMap[s.user_id] || t.teacher.unknown }));
 
     // Har bir talaba uchun eng yaxshi natija
     const best: Record<string, any> = {};
@@ -139,7 +141,7 @@ export default function TeacherAssignmentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display font-bold text-3xl mb-1">Topshiriq biriktirish</h1>
+          <h1 className="font-display font-bold text-3xl mb-1">{t.teacher.asg.assignTitle}</h1>
           <p className="text-muted-foreground text-sm">{assignments.length} ta topshiriq · {groups.length} ta guruh</p>
         </motion.div>
         <div className="flex gap-2">
@@ -155,7 +157,7 @@ export default function TeacherAssignmentsPage() {
       {/* Groups */}
       {groups.length > 0 && (
         <motion.div className="glass-card p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <h3 className="text-sm font-semibold mb-2 flex items-center gap-2"><Users className="w-4 h-4 text-neon-blue" /> Guruhlar</h3>
+          <h3 className="text-sm font-semibold mb-2 flex items-center gap-2"><Users className="w-4 h-4 text-neon-blue" /> {t.teacher.groups}</h3>
           <div className="flex gap-2 flex-wrap">
             {groups.map(g => (
               <div key={g.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface text-sm">
@@ -172,11 +174,11 @@ export default function TeacherAssignmentsPage() {
       <AnimatePresence>
         {showGroupForm && (
           <motion.div className="glass-card p-4 flex gap-3 items-end" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-            <div className="flex-1"><label className="text-sm font-medium mb-1 block">Guruh nomi</label>
-              <input value={groupForm.name} onChange={e => setGroupForm({ ...groupForm, name: e.target.value })} className="input-field" placeholder="301-guruh" /></div>
-            <div className="flex-1"><label className="text-sm font-medium mb-1 block">Tavsif (ixtiyoriy)</label>
+            <div className="flex-1"><label className="text-sm font-medium mb-1 block">{t.teacher.asg.groupName}</label>
+              <input value={groupForm.name} onChange={e => setGroupForm({ ...groupForm, name: e.target.value })} className="input-field" placeholder={t.teacher.asg.groupNamePh} /></div>
+            <div className="flex-1"><label className="text-sm font-medium mb-1 block">{t.teacher.asg.descOptional}</label>
               <input value={groupForm.description} onChange={e => setGroupForm({ ...groupForm, description: e.target.value })} className="input-field" placeholder="Kompyuter fanlari fakulteti" /></div>
-            <button onClick={createGroup} className="btn-primary py-3 px-5 text-sm">Yaratish</button>
+            <button onClick={createGroup} className="btn-primary py-3 px-5 text-sm">{t.teacher.asg.create}</button>
             <button onClick={() => setShowGroupForm(false)} className="btn-ghost py-3 px-3"><X className="w-4 h-4" /></button>
           </motion.div>
         )}
@@ -187,29 +189,29 @@ export default function TeacherAssignmentsPage() {
         {showForm && (
           <motion.div className="glass-card p-6" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="font-display font-semibold">Topshiriq biriktirish</h2>
+              <h2 className="font-display font-semibold">{t.teacher.asg.assignTitle}</h2>
               <button onClick={() => setShowForm(false)} className="p-1.5 hover:bg-accent rounded-lg"><X className="w-5 h-5" /></button>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
-              <div><label className="text-sm font-medium mb-1 block">Topshiriq *</label>
+              <div><label className="text-sm font-medium mb-1 block">{t.teacher.asg.taskLabel} *</label>
                 <select value={form.challenge_id} onChange={e => setForm({ ...form, challenge_id: e.target.value })} className="input-field">
-                  <option value="">Tanlang...</option>
+                  <option value="">{t.teacher.asg.pick}</option>
                   {challenges.map(c => <option key={c.id} value={c.id}>{c.title} ({c.difficulty})</option>)}
                 </select></div>
-              <div><label className="text-sm font-medium mb-1 block">Guruh</label>
+              <div><label className="text-sm font-medium mb-1 block">{t.teacher.asg.group}</label>
                 <select value={form.group_id} onChange={e => setForm({ ...form, group_id: e.target.value })} className="input-field">
-                  <option value="">Barcha talabalar</option>
+                  <option value="">{t.teacher.asg.allStudents}</option>
                   {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
                 </select></div>
-              <div><label className="text-sm font-medium mb-1 block">Sarlavha</label>
-                <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Uy vazifasi #5" /></div>
-              <div><label className="text-sm font-medium mb-1 block">Muddat</label>
+              <div><label className="text-sm font-medium mb-1 block">{t.teacher.asg.titleLabel}</label>
+                <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder={t.teacher.asg.titlePh} /></div>
+              <div><label className="text-sm font-medium mb-1 block">{t.teacher.asg.deadline}</label>
                 <input type="datetime-local" value={form.deadline} onChange={e => setForm({ ...form, deadline: e.target.value })} className="input-field" /></div>
-              <div className="md:col-span-2"><label className="text-sm font-medium mb-1 block">Ko'rsatmalar</label>
+              <div className="md:col-span-2"><label className="text-sm font-medium mb-1 block">{t.teacher.asg.instructions}</label>
                 <textarea value={form.instructions} onChange={e => setForm({ ...form, instructions: e.target.value })} className="input-field min-h-[60px]" /></div>
             </div>
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={handleSave} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Biriktirish</button>
             </div>
@@ -223,7 +225,7 @@ export default function TeacherAssignmentsPage() {
         assignments.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="mb-2">Hali topshiriq biriktirilmagan</p>
+            <p className="mb-2">{t.teacher.asg.empty}</p>
             <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-2 px-5">
               <Plus className="w-4 h-4 inline mr-1" /> Birinchi topshiriqni biriktirish
             </button>
@@ -243,11 +245,11 @@ export default function TeacherAssignmentsPage() {
                     a.challenge?.difficulty === "medium" ? "bg-neon-yellow/10 text-neon-yellow" : "bg-neon-red/10 text-neon-red"
                   )}>{a.challenge?.difficulty}</span>
                   {a.deadline && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(a.deadline)}</span>}
-                  {a.instructions && <span>📝 Ko'rsatma bor</span>}
+                  {a.instructions && <span>📝 {t.teacher.asg.hasInstructions}</span>}
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => viewSubmissions(a.id, a.challenge_id)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-neon-blue" title="Natijalar">
+                <button onClick={() => viewSubmissions(a.id, a.challenge_id)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-neon-blue" title={t.teacher.asg.results}>
                   <Eye className="w-4 h-4" />
                 </button>
                 <button onClick={() => toggleActive(a.id, a.is_active)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground" title={a.is_active ? "O'chirish" : "Faollashtirish"}>
@@ -265,7 +267,7 @@ export default function TeacherAssignmentsPage() {
                 <motion.div className="ml-14 mt-2 mb-4 glass-card p-4" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
                   <h4 className="text-sm font-semibold mb-3">Talabalar natijalari ({assignmentSubmissions.length}/{students.length})</h4>
                   {assignmentSubmissions.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">Hali hech kim yubormagan</p>
+                    <p className="text-xs text-muted-foreground">{t.teacher.asg.noSubmissions}</p>
                   ) : (
                     <div className="space-y-1.5">
                       {assignmentSubmissions.map((s, i) => (

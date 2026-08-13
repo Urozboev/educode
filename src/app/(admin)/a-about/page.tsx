@@ -5,18 +5,21 @@ import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Save, Loader2, User, FileText } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
-const fields = [
-  { key: "author_name", label: "Muallif ismi", type: "text" },
-  { key: "author_title", label: "Lavozim / Unvon", type: "text" },
-  { key: "author_bio", label: "Biografiya", type: "textarea" },
-  { key: "author_image", label: "Rasm URL", type: "text" },
-  { key: "project_title", label: "Loyiha nomi", type: "text" },
-  { key: "project_description", label: "Loyiha tavsifi", type: "textarea" },
-  { key: "project_goals", label: "Maqsadlar", type: "textarea" },
+const fields = (t: Dictionary) => [
+  { key: "author_name", label: t.admin.abt.authorName, type: "text" },
+  { key: "author_title", label: t.admin.abt.authorTitle, type: "text" },
+  { key: "author_bio", label: t.admin.abt.bio, type: "textarea" },
+  { key: "author_image", label: t.admin.abt.imageUrl, type: "text" },
+  { key: "project_title", label: t.admin.abt.projectTitle, type: "text" },
+  { key: "project_description", label: t.admin.abt.projectDesc, type: "textarea" },
+  { key: "project_goals", label: t.admin.abt.goals, type: "textarea" },
 ];
 
 export default function AdminAboutPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [data, setData] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -36,7 +39,7 @@ export default function AdminAboutPage() {
 
   async function handleSave() {
     setSaving(true);
-    for (const field of fields) {
+    for (const field of fields(t)) {
       await supabase.from("about_page").upsert(
         { key: field.key, value: data[field.key] || "", updated_at: new Date().toISOString() },
         { onConflict: "key" }
@@ -51,12 +54,12 @@ export default function AdminAboutPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl">Platforma haqida</h1>
-        <p className="text-muted-foreground text-sm">Bosh sahifada va /explore/about da ko'rinadigan ma'lumotlar</p>
+        <h1 className="font-display font-bold text-3xl">{t.admin.abt.title}</h1>
+        <p className="text-muted-foreground text-sm">{t.admin.abt.subtitle}</p>
       </motion.div>
 
       <div className="space-y-4">
-        {fields.map(f => (
+        {fields(t).map(f => (
           <div key={f.key} className="glass-card p-5">
             <label className="text-sm font-medium mb-2 block">{f.label}</label>
             {f.type === "textarea" ? (

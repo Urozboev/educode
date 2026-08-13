@@ -16,6 +16,7 @@ import {
   type StoreItem, type StoreOrder, type StoreOrderStatus, type StoreDeliveryType,
   type StoreAudience,
 } from "@/lib/store";
+import { useI18n } from "@/lib/i18n";
 
 const DELIVERY_ICON: Record<StoreDeliveryType, typeof Truck> = {
   delivery: Truck, pickup: Hand, digital: Sparkles,
@@ -34,6 +35,7 @@ const DELIVERY_ICON: Record<StoreDeliveryType, typeof Truck> = {
  * xavfsizlik qatlami emas — u faqat interfeysni moslashtiradi.
  */
 export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [tab, setTab] = useState<"items" | "orders">("items");
   const [items, setItems] = useState<StoreItem[]>([]);
@@ -135,8 +137,8 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
   async function deleteItem(id: string) {
     if (!confirm("Sovg'ani o'chirasizmi? Berilgan buyurtmalar saqlanib qoladi.")) return;
     const { error } = await supabase.from("store_items").delete().eq("id", id);
-    if (error) { toast.error("O'chirilmadi: " + error.message); return; }
-    toast.success("O'chirildi");
+    if (error) { toast.error(t.store.manage.deleteFailed + ": " + error.message); return; }
+    toast.success(t.store.manage.deleted);
     load();
   }
 
@@ -244,7 +246,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
           {items.length === 0 && (
             <div className="col-span-full text-center py-16">
               <ShoppingBag className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
-              <p className="text-muted-foreground">Hali sovg'a qo'shilmagan</p>
+              <p className="text-muted-foreground">{t.store.manage.noGifts}</p>
             </div>
           )}
         </div>
@@ -274,38 +276,38 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nomi *</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.nameLabel} *</label>
                   <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                    className="input-field w-full text-sm" placeholder="EduCode futbolkasi" />
+                    className="input-field w-full text-sm" placeholder={t.store.manage.namePh} />
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tavsif</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.descLabel}</label>
                   <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
                     className="input-field w-full text-sm min-h-[70px] resize-y" placeholder="Nima ekani, o'lchami, ranggi..." />
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Rasm havolasi</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.imageLabel}</label>
                   <input value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })}
                     className="input-field w-full text-sm" placeholder="https://..." />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Narx (coin) *</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.priceLabel} *</label>
                     <input type="number" min={1} value={form.price_coins}
                       onChange={e => setForm({ ...form, price_coins: +e.target.value })}
                       className="input-field w-full text-sm" />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Zaxira</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.stockLabel}</label>
                     <input type="number" min={0} value={form.stock}
                       onChange={e => setForm({ ...form, stock: +e.target.value })}
                       className="input-field w-full text-sm" />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Turkum</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.categoryLabel}</label>
                     <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
                       className="input-field w-full text-sm">
                       {STORE_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -314,7 +316,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Qanday topshiriladi</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.deliveryLabel}</label>
                   <div className="grid grid-cols-3 gap-2">
                     {DELIVERY_TYPES.map(d => {
                       const Icon = DELIVERY_ICON[d.value];
@@ -340,10 +342,10 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
 
                 {scope === "admin" ? (
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Kimga ko'rinadi</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.audienceLabel}</label>
                     <select value={form.audience} onChange={e => setForm({ ...form, audience: e.target.value as StoreAudience })}
                       className="input-field w-full text-sm">
-                      <option value="everyone">Barcha o'quvchilarga</option>
+                      <option value="everyone">{t.store.manage.audienceAll}</option>
                     </select>
                   </div>
                 ) : (
@@ -356,7 +358,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-border/60">
-                <button onClick={() => setShowForm(false)} className="px-5 py-2.5 rounded-xl bg-surface text-sm font-medium">Bekor</button>
+                <button onClick={() => setShowForm(false)} className="px-5 py-2.5 rounded-xl bg-surface text-sm font-medium">{t.common.cancel}</button>
                 <button onClick={saveItem} disabled={saving}
                   className="btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-60">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -379,6 +381,7 @@ function OrderList({ orders, buyers, onChanged }: {
   buyers: Record<string, string>;
   onChanged: () => void;
 }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -389,7 +392,7 @@ function OrderList({ orders, buyers, onChanged }: {
 
   async function setStatus(order: StoreOrder, status: StoreOrderStatus) {
     if ((status === "rejected" || status === "cancelled") && !note.trim()) {
-      if (!confirm("Sababsiz rad etasizmi? O'quvchiga sabab ko'rsatilmaydi.")) return;
+      if (!confirm(t.store.manage.confirmRejectNoReason)) return;
     }
     setBusy(order.id);
     const { data, error } = await supabase.rpc("update_store_order", {
@@ -418,7 +421,7 @@ function OrderList({ orders, buyers, onChanged }: {
       {shown.length === 0 ? (
         <div className="text-center py-16">
           <Package className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
-          <p className="text-muted-foreground">Buyurtma yo'q</p>
+          <p className="text-muted-foreground">{t.store.manage.noOrders}</p>
         </div>
       ) : shown.map(o => {
         const sc = ORDER_STATUS[o.status] ?? ORDER_STATUS.pending;
@@ -453,10 +456,10 @@ function OrderList({ orders, buyers, onChanged }: {
                   <div className="p-4 space-y-4">
                     {/* Aloqa va manzil */}
                     <div className="grid sm:grid-cols-2 gap-3">
-                      <InfoRow icon={User} label="Qabul qiluvchi" value={o.full_name} />
-                      <InfoRow icon={Phone} label="Telefon" value={o.phone} href={o.phone ? `tel:${o.phone.replace(/\s/g, "")}` : undefined} />
-                      {o.email && <InfoRow icon={Mail} label="Pochta" value={o.email} href={`mailto:${o.email}`} />}
-                      <InfoRow icon={DIcon} label="Topshirish" value={deliveryLabel(o.delivery_type)} />
+                      <InfoRow icon={User} label={t.store.manage.recipient} value={o.full_name} />
+                      <InfoRow icon={Phone} label={t.store.formPhone} value={o.phone} href={o.phone ? `tel:${o.phone.replace(/\s/g, "")}` : undefined} />
+                      {o.email && <InfoRow icon={Mail} label={t.store.manage.email} value={o.email} href={`mailto:${o.email}`} />}
+                      <InfoRow icon={DIcon} label={t.store.manage.handOver} value={deliveryLabel(o.delivery_type, t)} />
                     </div>
 
                     {(o.region || o.address) && (
@@ -474,7 +477,7 @@ function OrderList({ orders, buyers, onChanged }: {
 
                     {o.note && (
                       <p className="text-sm bg-surface/60 border border-border/60 rounded-xl p-3">
-                        <span className="text-xs text-muted-foreground block mb-1">O'quvchi izohi</span>
+                        <span className="text-xs text-muted-foreground block mb-1">{t.store.manage.studentNote}</span>
                         {o.note}
                       </p>
                     )}

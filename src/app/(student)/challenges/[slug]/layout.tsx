@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl, SITE_NAME } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/server";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const revalidate = 1800;
 
@@ -26,10 +27,11 @@ async function fetchChallenge(slug: string) {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const ch = await fetchChallenge(params.slug);
+  const t = await getServerDictionary();
   if (!ch) {
     return {
-      title: "Topshiriq topilmadi",
-      description: "Bu topshiriq mavjud emas yoki olib tashlangan.",
+      title: t.challenges.missingTitle,
+      description: t.challenges.missingText,
       robots: { index: false, follow: false },
     };
   }
@@ -74,13 +76,14 @@ export default async function ChallengeLayout({
   children: React.ReactNode;
 }) {
   const ch = await fetchChallenge(params.slug);
+  const t = await getServerDictionary();
   return (
     <>
       {ch && (
         <BreadcrumbJsonLd
           items={[
-            { name: "Bosh sahifa", url: "/" },
-            { name: "Topshiriqlar", url: "/explore/challenges" },
+            { name: t.cabinet.dashboard, url: "/" },
+            { name: t.nav.challenges, url: "/explore/challenges" },
             { name: ch.title, url: `/challenges/${ch.slug}` },
           ]}
         />

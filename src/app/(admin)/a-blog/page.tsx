@@ -12,6 +12,8 @@ import {
   Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Newspaper,
   Upload, Sparkles, ImagePlus,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 const RichTextEditor = dynamic(() => import("@/components/editor/RichTextEditor"), { ssr: false });
 
@@ -23,6 +25,7 @@ const empty = {
 };
 
 export default function AdminBlogPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +55,7 @@ export default function AdminBlogPage() {
   }
 
   async function uploadCover(file: File) {
-    if (!file.type.startsWith("image/")) { toast.error("Faqat rasm"); return; }
+    if (!file.type.startsWith("image/")) { toast.error(t.admin.common.onlyImage); return; }
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
@@ -72,7 +75,7 @@ export default function AdminBlogPage() {
     try {
       const res = await fetch("/api/ai/generate", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "lecture", topic_title: form.title, course_title: "Blog maqolasi: " + form.category }),
+        body: JSON.stringify({ type: "lecture", topic_title: form.title, course_title: t.admin.blg.seoPrefix + form.category }),
       });
       const data = await res.json();
       if (data.data) {
@@ -127,14 +130,14 @@ export default function AdminBlogPage() {
   async function del(p: BlogPost) {
     if (!confirm(`"${p.title}" o'chirilsinmi?`)) return;
     await supabase.from("blog_posts").delete().eq("id", p.id);
-    toast.success("O'chirildi"); load();
+    toast.success(t.admin.common.deleted); load();
   }
 
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display font-bold text-2xl flex items-center gap-2"><Newspaper className="w-6 h-6 text-neon-purple" /> Blog</h1>
+          <h1 className="font-display font-bold text-2xl flex items-center gap-2"><Newspaper className="w-6 h-6 text-neon-purple" /> {t.nav.blog}</h1>
           <p className="text-sm text-muted-foreground">{posts.length} ta maqola</p>
         </div>
         <button onClick={openNew} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
@@ -152,35 +155,35 @@ export default function AdminBlogPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Sarlavha *</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.title2} *</label>
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Python'ni qaerdan boshlash kerak?" />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Qisqa tavsif (meta description)</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.blg.metaDesc}</label>
               <textarea value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} className="input-field resize-none" rows={2} placeholder="Google natijalarida va kartada ko'rinadi (150-160 belgi)" maxLength={200} />
             </div>
 
             <div className="grid sm:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Kategoriya</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.common.category}</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="input-field">
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Teglar (vergul bilan)</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.common.tags}</label>
                 <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="input-field" placeholder="python, boshlang'ich" />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">O'qish (daqiqa)</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.blg.readMinutes}</label>
                 <input type="number" value={form.reading_minutes} onChange={e => setForm({ ...form, reading_minutes: +e.target.value })} className="input-field" />
               </div>
             </div>
 
             {/* Cover */}
             <div>
-              <label className="text-sm font-medium mb-1 block">Cover rasm</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.coverImage}</label>
               <div className="flex items-center gap-3">
                 <div className="w-40 h-24 rounded-xl border border-border/60 bg-surface/40 overflow-hidden flex items-center justify-center flex-shrink-0">
                   {form.cover_url ? (
@@ -199,7 +202,7 @@ export default function AdminBlogPage() {
             {/* Content */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium">Maqola matni</label>
+                <label className="text-sm font-medium">{t.admin.blg.body}</label>
                 <button onClick={aiWrite} disabled={!form.title || aiGen}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 disabled:opacity-50">
                   {aiGen ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />} AI bilan yozish
@@ -209,7 +212,7 @@ export default function AdminBlogPage() {
             </div>
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={() => save(false)} disabled={saving} className="btn-ghost py-2 px-5 text-sm border border-border flex items-center gap-2 disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama saqlash
               </button>
@@ -227,8 +230,8 @@ export default function AdminBlogPage() {
         posts.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <Newspaper className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="mb-4">Hali maqola yo'q</p>
-            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi maqola</button>
+            <p className="mb-4">{t.admin.blg.empty}</p>
+            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> {t.admin.blg.first}</button>
           </div>
         ) : posts.map(p => (
           <div key={p.id} className="glass-card p-4 flex items-center gap-4">
@@ -244,8 +247,8 @@ export default function AdminBlogPage() {
                 <span className="capitalize">{p.category}</span>
                 <span>· {p.views} ko'rish</span>
                 {p.is_published
-                  ? <span className="text-neon-green">· Nashr qilingan</span>
-                  : <span className="text-neon-yellow">· Qoralama</span>}
+                  ? <span className="text-neon-green">· {t.admin.common.published}</span>
+                  : <span className="text-neon-yellow">· {t.admin.common.draft}</span>}
               </div>
             </div>
             <button onClick={() => togglePublish(p)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title={p.is_published ? "Yashirish" : "Nashr"}>

@@ -11,18 +11,20 @@ import { LevelBadge } from "@/components/ui/LevelBadge";
 import {
   Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, BookMarked, Search,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
-const CATEGORIES = [
-  { value: "programming", label: "Dasturlash" },
+const CATEGORIES = (t: Dictionary) => [
+  { value: "programming", label: t.admin.set.catProgramming },
   { value: "frontend", label: "Frontend" },
-  { value: "computer_literacy", label: "Kompyuter savodxonligi" },
-  { value: "algorithms", label: "Algoritmlar" },
+  { value: "computer_literacy", label: t.admin.set.catLiteracy },
+  { value: "algorithms", label: t.admin.set.catAlgorithms },
 ];
 
-const DIFFICULTIES: { value: CourseDifficulty; label: string }[] = [
-  { value: "beginner", label: "Boshlang'ich" },
-  { value: "intermediate", label: "O'rta" },
-  { value: "advanced", label: "Yuqori" },
+const DIFFICULTIES = (t: Dictionary): { value: CourseDifficulty; label: string }[] => [
+  { value: "beginner", label: t.difficulty.beginner },
+  { value: "intermediate", label: t.difficulty.intermediate },
+  { value: "advanced", label: t.difficulty.advanced },
 ];
 
 const empty = {
@@ -36,6 +38,7 @@ const empty = {
 };
 
 export default function AdminGlossaryPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [terms, setTerms] = useState<GlossaryTerm[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,15 +112,15 @@ export default function AdminGlossaryPage() {
     load();
   }
 
-  async function togglePublish(t: GlossaryTerm) {
-    await supabase.from("glossary_terms").update({ is_published: !t.is_published }).eq("id", t.id);
+  async function togglePublish(g: GlossaryTerm) {
+    await supabase.from("glossary_terms").update({ is_published: !g.is_published }).eq("id", g.id);
     load();
   }
 
-  async function del(t: GlossaryTerm) {
-    if (!confirm(`"${t.term}" o'chirilsinmi?`)) return;
-    await supabase.from("glossary_terms").delete().eq("id", t.id);
-    toast.success("O'chirildi");
+  async function del(g: GlossaryTerm) {
+    if (!confirm(`"${g.term}" o'chirilsinmi?`)) return;
+    await supabase.from("glossary_terms").delete().eq("id", g.id);
+    toast.success(t.admin.common.deleted);
     load();
   }
 
@@ -151,17 +154,17 @@ export default function AdminGlossaryPage() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Termin *</label>
-                <input value={form.term} onChange={e => setForm({ ...form, term: e.target.value })} className="input-field" placeholder="O'zgaruvchi" />
+                <label className="text-sm font-medium mb-1 block">{t.admin.gls.term} *</label>
+                <input value={form.term} onChange={e => setForm({ ...form, term: e.target.value })} className="input-field" placeholder={t.admin.gls.termPh} />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Inglizcha muqobili</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.gls.english}</label>
                 <input value={form.term_en} onChange={e => setForm({ ...form, term_en: e.target.value })} className="input-field" placeholder="Variable" />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Ta&apos;rif *</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.gls.definition} *</label>
               <textarea
                 value={form.definition}
                 onChange={e => setForm({ ...form, definition: e.target.value })}
@@ -174,31 +177,31 @@ export default function AdminGlossaryPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Misol</label>
-              <textarea value={form.example} onChange={e => setForm({ ...form, example: e.target.value })} className="input-field resize-none font-mono text-sm" rows={2} placeholder="yosh = 15" />
+              <label className="text-sm font-medium mb-1 block">{t.admin.gls.example}</label>
+              <textarea value={form.example} onChange={e => setForm({ ...form, example: e.target.value })} className="input-field resize-none font-mono text-sm" rows={2} placeholder={t.admin.gls.examplePh} />
             </div>
 
             <div className="grid sm:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Soha</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.gls.field}</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="input-field">
-                  {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  {CATEGORIES(t).map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Daraja</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.common.level}</label>
                 <select value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value as CourseDifficulty })} className="input-field">
-                  {DIFFICULTIES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                  {DIFFICULTIES(t).map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Sinonimlar (vergul bilan)</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.gls.synonyms}</label>
                 <input value={form.synonyms} onChange={e => setForm({ ...form, synonyms: e.target.value })} className="input-field" placeholder="peremennaya" />
               </div>
             </div>
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">Yopish</button>
+              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.admin.common.close}</button>
               <button onClick={() => save(true)} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {editId ? "Saqlash" : "Qo'shish va davom etish"}
@@ -215,8 +218,8 @@ export default function AdminGlossaryPage() {
           <input value={search} onChange={e => setSearch(e.target.value)} className="input-field pl-10" placeholder="Termin bo'yicha qidirish..." />
         </div>
         <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="input-field w-auto">
-          <option value="all">Barcha sohalar</option>
-          {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+          <option value="all">{t.admin.gls.allFields}</option>
+          {CATEGORIES(t).map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
       </div>
 
@@ -228,30 +231,30 @@ export default function AdminGlossaryPage() {
             <BookMarked className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p className="mb-4">{terms.length === 0 ? "Hali termin qo'shilmagan" : "Natija topilmadi"}</p>
             {terms.length === 0 && (
-              <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi termin</button>
+              <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> {t.admin.gls.first}</button>
             )}
           </div>
-        ) : filtered.map(t => (
-          <div key={t.id} className="glass-card p-4 flex items-center gap-4">
+        ) : filtered.map(g => (
+          <div key={g.id} className="glass-card p-4 flex items-center gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <p className="font-medium text-sm">{t.term}</p>
-                {t.term_en && <span className="font-mono text-[11px] text-muted-foreground">{t.term_en}</span>}
-                <LevelBadge difficulty={t.difficulty} />
+                <p className="font-medium text-sm">{g.term}</p>
+                {g.term_en && <span className="font-mono text-[11px] text-muted-foreground">{g.term_en}</span>}
+                <LevelBadge difficulty={g.difficulty} />
               </div>
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{t.definition}</p>
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{g.definition}</p>
               <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
-                <span>{getCategoryLabel(t.category)}</span>
-                {t.is_published
-                  ? <span className="text-neon-green">· Nashr qilingan</span>
-                  : <span className="text-neon-yellow">· Yashirilgan</span>}
+                <span>{getCategoryLabel(g.category)}</span>
+                {g.is_published
+                  ? <span className="text-neon-green">· {t.admin.common.published}</span>
+                  : <span className="text-neon-yellow">· {t.admin.common.hidden}</span>}
               </div>
             </div>
-            <button onClick={() => togglePublish(t)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title={t.is_published ? "Yashirish" : "Nashr"}>
-              {t.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            <button onClick={() => togglePublish(g)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground" title={g.is_published ? "Yashirish" : "Nashr"}>
+              {g.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
-            <button onClick={() => openEdit(t)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
-            <button onClick={() => del(t)} className="p-2 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
+            <button onClick={() => openEdit(g)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
+            <button onClick={() => del(g)} className="p-2 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
           </div>
         ))}
       </div>

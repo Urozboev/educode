@@ -10,7 +10,7 @@
  */
 
 import { NextRequest } from 'next/server';
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createAdminClient, hasServiceRole } from '@/lib/supabase/server';
 import {
   tokenCostUsd, ttsCostUsd, uzsToUsd, cacheSavingsUsd, pricingSnapshot,
 } from '@/lib/agent/costs';
@@ -28,6 +28,12 @@ export async function GET(req: NextRequest) {
 
   if (profile?.role !== 'admin') {
     return Response.json({ error: 'Faqat admin uchun' }, { status: 403 });
+  }
+
+  if (!hasServiceRole()) {
+    return Response.json({
+      error: "SUPABASE_SERVICE_ROLE_KEY sozlanmagan — hisobot yig'ib bo'lmaydi.",
+    }, { status: 500 });
   }
 
   const days = Math.min(365, Math.max(1, Number(req.nextUrl.searchParams.get('days')) || 30));

@@ -169,39 +169,58 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
 
   return (
     <article className="py-6">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <Link
-            href="/agent/reja"
-            className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Reja
-          </Link>
-          <h1 className="text-2xl font-bold leading-tight">{lesson.title}</h1>
-          {cached && (
-            <span className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
-              <Zap className="h-3 w-3" />
-              Tayyor darsdan
-            </span>
-          )}
-        </div>
+      <header className="mb-8">
+        <Link
+          href="/agent/reja"
+          className="mb-4 inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          yo'lga qaytish
+        </Link>
 
+        <h1 className="font-display text-[26px] font-bold leading-[1.15] tracking-tight sm:text-3xl">
+          {lesson.title}
+        </h1>
+
+        {/*
+          Ovoz — bu darsning ikkinchi ko'rinishi, ikkilamchi tugma emas.
+          Ko'p o'quvchi uchun o'qishdan ko'ra eshitish qulayroq, shuning
+          uchun u sarlavha ostida alohida turadi va nima bo'lishini aytadi.
+        */}
         {lesson.narration && (
           <button
             onClick={() => (speaking ? stop() : speak(lesson.narration, true))}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium",
+              "mt-5 flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors sm:w-auto",
               speaking
-                ? "bg-destructive text-destructive-foreground"
-                : "bg-primary text-primary-foreground",
+                ? "border-neon-purple bg-neon-purple/[0.06]"
+                : "border-border hover:border-neon-purple/40 hover:bg-neon-purple/[0.03]",
             )}
           >
-            {speaking ? <Square className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-            {speaking ? "To'xtatish" : "Eshitish"}
+            <span className={cn(
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+              speaking ? "bg-neon-purple text-white" : "bg-neon-purple/10 text-neon-purple",
+            )}>
+              {speaking ? <Square className="h-3.5 w-3.5" fill="currentColor" /> : <Volume2 className="h-4 w-4" />}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-medium">
+                {speaking ? "To'xtatish" : "Darsni eshitish"}
+              </span>
+              <span className="block font-mono text-[11px] text-muted-foreground">
+                {speaking ? "Ustoz gapiryapti" : "~2 daqiqa · Ustoz ovozida"}
+              </span>
+            </span>
           </button>
         )}
-      </div>
+
+        {cached && (
+          <div className="mt-4 flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+            <Zap className="h-3 w-3" />
+            tayyor darsdan olindi
+          </div>
+        )}
+      </header>
 
       {/* Dars matni. HTML serverda oq ro'yxat bo'yicha tozalangan. */}
       <div

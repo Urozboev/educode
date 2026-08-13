@@ -10,8 +10,10 @@ import {
   Search, Users, Shield, ShieldOff, Coins, ChevronDown, UserPlus,
   UserMinus, Link2, X, Loader2, GraduationCap
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function AdminUsersPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [users, setUsers] = useState<Profile[]>([]);
   const [search, setSearch] = useState("");
@@ -84,13 +86,13 @@ export default function AdminUsersPage() {
       await supabase.from("teacher_students").delete()
         .eq("teacher_id", selectedTeacher).eq("student_id", studentId);
       setTeacherStudents(prev => prev.filter(id => id !== studentId));
-      toast.success("Talaba ajratildi");
+      toast.success(t.admin.usr.detached);
     } else {
       await supabase.from("teacher_students").insert({
         teacher_id: selectedTeacher, student_id: studentId,
       });
       setTeacherStudents(prev => [...prev, studentId]);
-      toast.success("Talaba biriktirildi");
+      toast.success(t.admin.usr.attached);
     }
   }
 
@@ -130,14 +132,14 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display font-bold text-3xl">Foydalanuvchilar</h1>
+          <h1 className="font-display font-bold text-3xl">{t.admin.users}</h1>
           <p className="text-muted-foreground text-sm">{users.length} ta foydalanuvchi</p>
         </motion.div>
         {teachers.length > 0 && (
           <div className="flex gap-2">
             <select onChange={e => { if (e.target.value) openAssignPanel(e.target.value); }}
               className="input-field text-sm py-2" defaultValue="">
-              <option value="" disabled>👨‍🏫 Talaba biriktirish...</option>
+              <option value="" disabled>👨‍🏫 {t.admin.usr.attaching}</option>
               {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
             </select>
           </div>
@@ -170,7 +172,7 @@ export default function AdminUsersPage() {
             </div>
 
             {assignLoading ? (
-              <div className="flex items-center gap-2 text-muted-foreground py-4"><Loader2 className="w-4 h-4 animate-spin" /> Yuklanmoqda...</div>
+              <div className="flex items-center gap-2 text-muted-foreground py-4"><Loader2 className="w-4 h-4 animate-spin" /> {t.admin.common.loading}</div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-64 overflow-y-auto">
                 {students.map(s => {
@@ -194,7 +196,7 @@ export default function AdminUsersPage() {
             )}
 
             {students.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Hali "student" rolidagi foydalanuvchi yo'q</p>
+              <p className="text-sm text-muted-foreground text-center py-4">{t.admin.usr.noStudents}</p>
             )}
           </motion.div>
         )}
@@ -204,7 +206,7 @@ export default function AdminUsersPage() {
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Ism qidirish..." className="input-field pl-11" />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t.admin.usr.searchName} className="input-field pl-11" />
         </div>
         <div className="flex gap-2">
           {(["all", "student", "teacher", "admin"] as const).map(r => (
@@ -222,16 +224,16 @@ export default function AdminUsersPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead><tr className="border-b border-border/50 text-xs text-muted-foreground font-semibold">
-              <th className="text-left px-5 py-3">Foydalanuvchi</th>
-              <th className="text-center px-5 py-3">Rol</th>
-              <th className="text-center px-5 py-3">Daraja</th>
+              <th className="text-left px-5 py-3">{t.admin.common.user}</th>
+              <th className="text-center px-5 py-3">{t.admin.common.role}</th>
+              <th className="text-center px-5 py-3">{t.admin.common.level}</th>
               <th className="text-center px-5 py-3">XP</th>
               <th className="text-center px-5 py-3">Coin</th>
-              <th className="text-center px-5 py-3">Holat</th>
-              <th className="text-right px-5 py-3">Amallar</th>
+              <th className="text-center px-5 py-3">{t.admin.common.status}</th>
+              <th className="text-right px-5 py-3">{t.admin.common.actions}</th>
             </tr></thead>
             <tbody>
-              {loading ? <tr><td colSpan={7} className="text-center py-8 text-muted-foreground">Yuklanmoqda...</td></tr> :
+              {loading ? <tr><td colSpan={7} className="text-center py-8 text-muted-foreground">{t.admin.common.loading}</td></tr> :
               filtered.map(u => (
                 <tr key={u.id} className={cn("border-b border-border/30 hover:bg-surface/30", u.is_blocked && "opacity-50")}>
                   <td className="px-5 py-3">
@@ -249,7 +251,7 @@ export default function AdminUsersPage() {
                       <option value="teacher">teacher</option>
                       <option value="admin">admin</option>
                     </select></td>
-                  <td className={cn("px-5 py-3 text-center text-xs font-medium", getLevelColor(u.level))}>{getLevelLabel(u.level)}</td>
+                  <td className={cn("px-5 py-3 text-center text-xs font-medium", getLevelColor(u.level))}>{getLevelLabel(u.level, t)}</td>
                   <td className="px-5 py-3 text-center text-sm font-mono">{u.xp}</td>
                   <td className="px-5 py-3 text-center">
                     <button onClick={() => adjustCoins(u.id)} className="text-sm font-mono text-neon-yellow hover:underline cursor-pointer">{u.coins}</button>
@@ -261,7 +263,7 @@ export default function AdminUsersPage() {
                   <td className="px-5 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
                       {u.role === "teacher" && (
-                        <button onClick={() => openAssignPanel(u.id)} className="p-1.5 hover:bg-neon-blue/10 rounded-lg text-muted-foreground hover:text-neon-blue" title="Talaba biriktirish">
+                        <button onClick={() => openAssignPanel(u.id)} className="p-1.5 hover:bg-neon-blue/10 rounded-lg text-muted-foreground hover:text-neon-blue" title={t.admin.usr.attachStudent}>
                           <UserPlus className="w-4 h-4" />
                         </button>
                       )}
@@ -280,12 +282,12 @@ export default function AdminUsersPage() {
 
       {/* Quick guide */}
       <div className="glass-card p-5 bg-neon-blue/5 border-neon-blue/10">
-        <h3 className="font-semibold text-sm mb-2 flex items-center gap-2"><GraduationCap className="w-4 h-4 text-neon-blue" /> Teacher-Student biriktirish qanday ishlaydi?</h3>
+        <h3 className="font-semibold text-sm mb-2 flex items-center gap-2"><GraduationCap className="w-4 h-4 text-neon-blue" /> {t.admin.usr.helpTitle}</h3>
         <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-          <li>Foydalanuvchini <strong>"teacher"</strong> roliga o'zgartiring (Rol ustunidagi dropdown)</li>
-          <li>O'sha teacher qatoridagi <strong>👤+ ikonini</strong> bosing yoki yuqoridagi dropdown dan tanlang</li>
-          <li>Ochilgan panelda talabalar ustiga bosib <strong>biriktiring/ajrating</strong></li>
-          <li>Teacher o'z panelida (<code>/t-dashboard</code>) biriktirilgan talabalarni ko'radi</li>
+          <li>{t.admin.usr.help1a} <strong>"teacher"</strong> {t.admin.usr.help1b}</li>
+          <li>{t.admin.usr.help2a} <strong>{t.admin.usr.help2b}</strong> {t.admin.usr.help2c}</li>
+          <li>{t.admin.usr.help3a} <strong>{t.admin.usr.help3b}</strong></li>
+          <li>{t.admin.usr.help4a}<code>/t-dashboard</code>{t.admin.usr.help4b}</li>
         </ol>
       </div>
     </div>

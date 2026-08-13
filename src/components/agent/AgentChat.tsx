@@ -30,6 +30,17 @@ interface Props {
   startTopic?: string | null;
 }
 
+/**
+ * Bo'sh ekrandagi savollar — foydalanuvchi bosishi bilan yuboriladi.
+ * "Shunday deb so'rab ko'ring" degan yo'riqnoma emas, tayyor savol:
+ * birinchi qadamni yozib o'tirish shart emas.
+ */
+const STARTERS = [
+  "Dasturlashni noldan boshlamoqchiman, qayerdan boshlay?",
+  "Frontend va backend orasidagi farq nima?",
+  "Menda 3 oy vaqt bor — nimaga ulgura olaman?",
+];
+
 export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -181,16 +192,18 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
       {/* Sarlavha */}
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform",
-            speaking && "animate-pulse scale-110",
-          )}>
-            <Sparkles className="h-5 w-5" />
+          {/*
+            Holat ko'rsatkichi: gapirayotganda haqiqiy to'lqin, yozayotganda
+            uchta nuqta. Bitta universal "pulse" ikkalasini ham anglatmaydi,
+            shuning uchun har holatning o'z shakli bor.
+          */}
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neon-purple/10 text-neon-purple">
+            {speaking ? <Waveform /> : <Sparkles className="h-5 w-5" />}
           </div>
           <div>
-            <div className="font-semibold">Ustoz</div>
-            <div className="text-xs text-muted-foreground">
-              {streaming ? "yozmoqda..." : speaking ? "gapirmoqda..." : listening ? "eshitmoqda..." : "shaxsiy AI o'qituvchi"}
+            <div className="font-display font-semibold leading-tight">Ustoz</div>
+            <div className="font-mono text-[11px] text-muted-foreground">
+              {streaming ? "yozmoqda" : speaking ? "gapirmoqda" : listening ? "eshitmoqda" : "shaxsiy o'qituvchi"}
             </div>
           </div>
         </div>
@@ -218,51 +231,86 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
       {/* Suhbat */}
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 && (
-          <div className="mx-auto mt-16 max-w-md text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Sparkles className="h-7 w-7" />
+          <div className="mx-auto mt-12 max-w-lg px-2">
+            <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              Ustoz · shaxsiy o'qituvchi
             </div>
-            <h2 className="mb-2 text-xl font-semibold">Salom! Men Ustozman.</h2>
-            <p className="text-sm text-muted-foreground">
-              Qaysi IT yo'nalishini o'rganmoqchisiz? Noldan boshlaymizmi, yoki
-              bir narsalarni bilasizmi? Ayting — sizga mos reja tuzaman.
+
+            <h2 className="font-display text-2xl font-bold leading-[1.15] tracking-tight sm:text-3xl">
+              Nimani o'rganmoqchisiz?
+            </h2>
+
+            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+              Ayting — noldan boshlaymizmi yoki bir narsalarni bilasizmi.
+              Darajangizni aniqlab, sizga mos yo'l tuzaman va o'zim
+              dars o'taman.
             </p>
 
             {startTopic ? (
               <button
                 onClick={() => void send(`"${startTopic}" mavzusini boshlaymiz. Menga shu mavzuni tushuntiring.`)}
-                className="mt-5 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground"
+                className="mt-6 rounded-xl bg-neon-purple px-5 py-2.5 text-sm font-medium text-white"
               >
                 &quot;{startTopic}&quot; mavzusini boshlash
               </button>
             ) : (
-              <Link
-                href="/agent/reja"
-                className="mt-5 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-medium hover:bg-muted"
-              >
-                <ListChecks className="h-4 w-4" />
-                O'quv reja tuzish
-              </Link>
+              <>
+                {/* Haqiqiy savollar — "shunday deb so'rab ko'ring" emas */}
+                <div className="mt-6 flex flex-col gap-2">
+                  {STARTERS.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => void send(s)}
+                      className="group flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 text-left text-sm transition-colors hover:border-neon-purple/40 hover:bg-neon-purple/[0.04]"
+                    >
+                      {s}
+                      <span className="font-mono text-xs text-muted-foreground transition-transform group-hover:translate-x-0.5">
+                        →
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <Link
+                  href="/agent/reja"
+                  className="mt-4 inline-flex items-center gap-2 font-mono text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  <ListChecks className="h-3.5 w-3.5" />
+                  yoki to'g'ridan-to'g'ri reja tuzish
+                </Link>
+              </>
             )}
           </div>
         )}
 
+        {/*
+          O'qituvchining gapi — sahifaning matni, shuning uchun pufaksiz
+          va kengroq o'qiladi. O'quvchining gapi esa chetdagi izoh:
+          o'ngda, ixcham pufakda. Ikkalasini bir xil pufakka solish
+          suhbatni "ikki bot yozishmoqda"ga o'xshatib qo'yadi.
+        */}
         <AnimatePresence initial={false}>
           {messages.map((m, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
             >
-              <div className={cn(
-                "max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                m.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground",
-              )}>
-                {m.content || <Loader2 className="h-4 w-4 animate-spin" />}
-              </div>
+              {m.role === "user" ? (
+                <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-neon-purple px-4 py-2.5 text-sm leading-relaxed text-white">
+                  {m.content}
+                </div>
+              ) : (
+                <div className="max-w-[92%] whitespace-pre-wrap border-l-2 border-neon-purple/30 py-0.5 pl-4 text-[15px] leading-relaxed">
+                  {m.content || (
+                    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span className="font-mono text-xs">o'ylayapti</span>
+                    </span>
+                  )}
+                </div>
+              )}
             </motion.div>
           ))}
         </AnimatePresence>
@@ -311,5 +359,25 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Gapirayotgan paytdagi to'lqin. Uchta ustun turli tezlikda —
+ * bir xil tezlikda bo'lsa u nutqqa emas, yuklanish indikatoriga
+ * o'xshab qoladi. `motion-safe` tufayli animatsiyani o'chirgan
+ * foydalanuvchida tinch turadi.
+ */
+function Waveform() {
+  return (
+    <span className="flex items-end gap-[3px]" aria-hidden>
+      {[0, 0.15, 0.3].map((delay, i) => (
+        <span
+          key={i}
+          className="w-[3px] rounded-full bg-current motion-safe:animate-[wave_0.9s_ease-in-out_infinite]"
+          style={{ height: i === 1 ? 16 : 10, animationDelay: `${delay}s` }}
+        />
+      ))}
+    </span>
   );
 }

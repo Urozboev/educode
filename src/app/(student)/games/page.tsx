@@ -44,65 +44,67 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+import { useI18n } from "@/lib/i18n";
 
 type GameType = null | "puzzle" | "bugfix" | "typing" | "battle" | "maze" | "bird" | "quiz3d";
 
-const gameCards = [
+const gameCards = (t: Dictionary) => [
   {
     type: "quiz3d" as const,
     title: "Quiz Battle 3D",
-    desc: "3D arenada 45 soniya — kublardan to'g'ri javobni tanlang, combo yig'ing!",
+    desc: t.cabinet.gamesPage.descQuiz3d,
     Icon: Swords,
     color: "#B388FF",
-    diff: "3D · Yangi",
+    diff: `3D · ${t.cabinet.gamesPage.isNew}`,
   },
   {
     type: "puzzle" as const,
     title: "Code Puzzle",
-    desc: "Kod qatorlarini drag-and-drop bilan to'g'ri tartibga qo'ying.",
+    desc: t.cabinet.gamesPage.descPuzzle,
     Icon: Puzzle,
     color: "#6C5CE7",
-    diff: "Oson",
+    diff: t.difficulty.easy,
   },
   {
     type: "bugfix" as const,
     title: "Bug Fix",
-    desc: "Xatoli kodni toping va tuzating.",
+    desc: t.cabinet.gamesPage.descBugFix,
     Icon: Bug,
     color: "#FF5252",
-    diff: "O'rta",
+    diff: t.difficulty.medium,
   },
   {
     type: "typing" as const,
     title: "Type Racer",
-    desc: "Kod yozish tezligi va aniqligini sinang.",
+    desc: t.cabinet.gamesPage.descTypeRacer,
     Icon: Keyboard,
     color: "#00D2FF",
-    diff: "Oson",
+    diff: t.difficulty.easy,
   },
   {
     type: "battle" as const,
     title: "Code Battle",
-    desc: "30 soniya — tezkor javob va streak bonusi.",
+    desc: t.cabinet.gamesPage.descBattle,
     Icon: Swords,
     color: "#00E676",
-    diff: "Qiyin",
+    diff: t.difficulty.hard,
   },
   {
     type: "maze" as const,
     title: "Maze Runner",
-    desc: "Buyruq bloklari bilan labirintdan o'ting.",
+    desc: t.cabinet.gamesPage.descMaze,
     Icon: Map,
     color: "#FFD600",
-    diff: "O'rta",
+    diff: t.difficulty.medium,
   },
   {
     type: "bird" as const,
     title: "Code Bird",
-    desc: "Bloklarni joylashtirib qushni boshqaring.",
+    desc: t.cabinet.gamesPage.descBird,
     Icon: Bird,
     color: "#FF6B9D",
-    diff: "O'rta",
+    diff: t.difficulty.medium,
   },
 ];
 
@@ -116,6 +118,7 @@ function shuffle<T>(a: T[]): T[] {
 }
 
 export default function GamesPage() {
+  const { t } = useI18n();
   const [game, setGame] = useState<GameType>(null);
 
   return (
@@ -123,20 +126,19 @@ export default function GamesPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-semibold tracking-widest uppercase mb-4">
           <Sparkles className="w-3.5 h-3.5" />
-          Interaktiv o'yinlar
+          {t.cabinet.gamesPage.eyebrow}
         </div>
         <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight mb-3">
-          O'yin bilan o'rganing
+          {t.cabinet.gamesPage.title}
         </h1>
         <p className="text-[15px] md:text-base text-muted-foreground max-w-2xl">
-          Dasturlash ko'nikmalarini mustahkamlovchi 7 ta interaktiv o'yin — jumladan 3D arena.
-          Tartib, mantiq, tezlik va algoritmik fikrlashni rivojlantiring.
+          {t.cabinet.gamesPage.subtitle}
         </p>
       </motion.div>
 
       {!game ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {gameCards.map((g, i) => {
+          {gameCards(t).map((g, i) => {
             const Icon = g.Icon;
             return (
               <motion.button
@@ -240,6 +242,7 @@ const puzzles = [
 ];
 
 function PuzzleGame() {
+  const { t } = useI18n();
   const [idx, setIdx] = useState(0);
   const [lines, setLines] = useState(() => shuffle([...puzzles[0].lines]));
   const [checked, setChecked] = useState(false);
@@ -344,11 +347,11 @@ function PuzzleGame() {
         >
           {isCorrect ? (
             <p className="inline-flex items-center gap-2 text-neon-green font-semibold text-lg">
-              <CheckCircle2 className="w-5 h-5" /> To'g'ri tartib!
+              <CheckCircle2 className="w-5 h-5" /> {t.cabinet.gamesPage.correctOrder}
             </p>
           ) : (
             <p className="inline-flex items-center gap-2 text-neon-red font-semibold">
-              <XCircle className="w-5 h-5" /> Noto'g'ri. Qayta urinib ko'ring.
+              <XCircle className="w-5 h-5" /> {t.cabinet.gamesPage.wrongRetry}
             </p>
           )}
         </div>
@@ -372,6 +375,7 @@ const bugs = [
 ];
 
 function BugFixGame() {
+  const { t } = useI18n();
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
   const [showHint, setShowHint] = useState(false);
@@ -435,12 +439,12 @@ function BugFixGame() {
       </div>
 
       <div>
-        <label className="text-sm font-semibold mb-2 block">Tuzatilgan kod:</label>
+        <label className="text-sm font-semibold mb-2 block">{t.cabinet.gamesPage.fixedCode}</label>
         <input
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           className="w-full bg-surface/60 border border-border rounded-xl px-4 py-3 text-[15px] font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition"
-          placeholder="To'g'ri variantni yozing..."
+          placeholder={t.cabinet.gamesPage.writeCorrect}
           disabled={checked}
         />
       </div>
@@ -478,7 +482,7 @@ function BugFixGame() {
       {showAnswer && (
         <div className="p-4 rounded-2xl bg-neon-green/5 border border-neon-green/20">
           <p className="inline-flex items-center gap-2 font-semibold text-neon-green mb-2">
-            <CheckCircle2 className="w-4 h-4" /> To'g'ri javob
+            <CheckCircle2 className="w-4 h-4" /> {t.cabinet.gamesPage.correctAnswer}
           </p>
           <pre className="font-mono text-sm text-muted-foreground whitespace-pre">{bug.fixed}</pre>
         </div>
@@ -498,6 +502,7 @@ const codeSnippets = [
 ];
 
 function TypingGame() {
+  const { t } = useI18n();
   const [sIdx, setSIdx] = useState(0);
   const [input, setInput] = useState("");
   const [started, setStarted] = useState(false);
@@ -602,7 +607,7 @@ function TypingGame() {
         onChange={(e) => handleChange(e.target.value)}
         disabled={finished}
         className="w-full bg-surface/60 border border-border rounded-xl px-4 py-3 text-[15px] font-mono min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition"
-        placeholder="Bu yerda yozing..."
+        placeholder={t.cabinet.gamesPage.typeHere}
         autoFocus
         spellCheck={false}
       />
@@ -616,7 +621,7 @@ function TypingGame() {
           <div className="w-14 h-14 rounded-2xl bg-neon-yellow/10 border border-neon-yellow/20 flex items-center justify-center mx-auto mb-3">
             <Trophy className="w-7 h-7 text-neon-yellow" />
           </div>
-          <h3 className="font-display font-bold text-xl mb-4">Tugatildi</h3>
+          <h3 className="font-display font-bold text-xl mb-4">{t.cabinet.gamesPage.done}</h3>
           <div className="flex items-center justify-center gap-8 text-lg">
             <div>
               <span className="font-bold text-neon-blue text-2xl">{wpm}</span>
@@ -624,11 +629,11 @@ function TypingGame() {
             </div>
             <div>
               <span className="font-bold text-neon-green text-2xl">{accuracy}%</span>
-              <span className="text-muted-foreground text-sm ml-1">aniqlik</span>
+              <span className="text-muted-foreground text-sm ml-1">{t.cabinet.gamesPage.accuracy}</span>
             </div>
             <div>
               <span className="font-bold text-neon-yellow text-2xl">{elapsed}s</span>
-              <span className="text-muted-foreground text-sm ml-1">vaqt</span>
+              <span className="text-muted-foreground text-sm ml-1">{t.cabinet.gamesPage.time}</span>
             </div>
           </div>
         </motion.div>
@@ -639,7 +644,7 @@ function TypingGame() {
           onClick={restart}
           className="py-2.5 px-5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition inline-flex items-center gap-2"
         >
-          <RotateCcw className="w-4 h-4" /> Qayta
+          <RotateCcw className="w-4 h-4" /> {t.cabinet.gamesPage.retry}
         </button>
         <button
           onClick={() => {
@@ -670,6 +675,7 @@ const battleProblems = [
 ];
 
 function BattleGame() {
+  const { t } = useI18n();
   const [pIdx, setPIdx] = useState(0);
   const [answer, setAnswer] = useState("");
   const [timeLeft, setTimeLeft] = useState(30);
@@ -733,15 +739,15 @@ function BattleGame() {
           <div className="w-16 h-16 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-4">
             <Swords className="w-8 h-8 text-neon-green" />
           </div>
-          <h3 className="font-display font-bold text-2xl mb-2">30 soniya. Tezkor javob.</h3>
+          <h3 className="font-display font-bold text-2xl mb-2">{t.cabinet.gamesPage.battleTitle}</h3>
           <p className="text-muted-foreground mb-6">
-            Har bir to'g'ri javob streakni oshiradi. Tezkor fikrlang!
+            {t.cabinet.gamesPage.battleText}
           </p>
           <button
             onClick={start}
             className="py-3 px-10 rounded-xl bg-foreground text-background font-display font-bold text-base hover:opacity-90 transition"
           >
-            Boshlash
+            {t.cabinet.gamesPage.start}
           </button>
         </div>
       ) : (
@@ -791,7 +797,7 @@ function BattleGame() {
                 onChange={(e) => setAnswer(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && submit()}
                 className="flex-1 bg-surface/60 border border-border rounded-xl px-4 py-3 text-[15px] font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition"
-                placeholder="Javob..."
+                placeholder={t.cabinet.gamesPage.answerPh}
                 autoFocus
               />
               <button
@@ -818,7 +824,7 @@ function BattleGame() {
                   <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-3">
                     <CheckCircle2 className="w-7 h-7 text-neon-green" />
                   </div>
-                  <p className="font-display font-bold text-neon-green text-xl">To'g'ri!</p>
+                  <p className="font-display font-bold text-neon-green text-xl">{t.cabinet.gamesPage.correct}</p>
                 </>
               ) : (
                 <>
@@ -826,10 +832,10 @@ function BattleGame() {
                     <XCircle className="w-7 h-7 text-neon-red" />
                   </div>
                   <p className="font-display font-bold text-neon-red text-xl">
-                    {timeLeft <= 0 ? "Vaqt tugadi!" : "Noto'g'ri!"}
+                    {timeLeft <= 0 ? t.cabinet.gamesPage.timeUp : t.cabinet.gamesPage.wrong}
                   </p>
                   <p className="text-muted-foreground mt-1">
-                    Javob: <strong className="text-neon-green">{prob.expected}</strong>
+                    {t.cabinet.gamesPage.answerIs} <strong className="text-neon-green">{prob.expected}</strong>
                   </p>
                 </>
               )}
@@ -889,6 +895,7 @@ function RobotSprite({ x, y, size = 28 }: { x: number; y: number; size?: number 
 }
 
 function MazeGame() {
+  const { t } = useI18n();
   const [level, setLevel] = useState(0);
   const [commands, setCommands] = useState<string[]>([]);
   const [pos, setPos] = useState<[number, number]>([...mazes[0].start]);
@@ -943,7 +950,7 @@ function MazeGame() {
 
     if (r === maze.end[0] && c === maze.end[1]) {
       setWon(true);
-      toast.success("Labirint yechildi!");
+      toast.success(t.cabinet.gamesPage.mazeSolved);
     }
     setAnimating(false);
   }
@@ -1120,7 +1127,7 @@ function MazeGame() {
           </p>
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {commands.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic">Buyruq qo'shing...</p>
+              <p className="text-xs text-muted-foreground italic">{t.cabinet.gamesPage.addCommand}</p>
             ) : (
               commands.map((cmdId, i) => {
                 const d = DIR_BLOCKS.find((b) => b.id === cmdId);
@@ -1172,7 +1179,7 @@ function MazeGame() {
           <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-3">
             <Trophy className="w-7 h-7 text-neon-green" />
           </div>
-          <p className="font-display font-bold text-neon-green text-lg">Bosqich o'tdi!</p>
+          <p className="font-display font-bold text-neon-green text-lg">{t.cabinet.gamesPage.levelPassed}</p>
           <button
             onClick={nextLevel}
             className="py-2.5 px-8 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition mt-3 inline-flex items-center gap-2"
@@ -1282,6 +1289,7 @@ function StarSprite({ x, y, collected }: { x: number; y: number; collected: bool
 }
 
 function BirdGame() {
+  const { t } = useI18n();
   const [level, setLevel] = useState(0);
   const [commands, setCommands] = useState<string[]>([]);
   const [birdPos, setBirdPos] = useState<[number, number]>([40, 150]);
@@ -1363,7 +1371,7 @@ function BirdGame() {
 
     if (hits.size === lv.targets.length) {
       setWon(true);
-      toast.success("Bosqich o'tdi!");
+      toast.success(t.cabinet.gamesPage.levelPassed);
     }
     setAnimating(false);
   }
@@ -1503,7 +1511,7 @@ function BirdGame() {
           </p>
           <div className="space-y-1 max-h-36 overflow-y-auto">
             {commands.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic">Buyruq qo'shing...</p>
+              <p className="text-xs text-muted-foreground italic">{t.cabinet.gamesPage.addCommand}</p>
             ) : (
               commands.map((cmdId, i) => {
                 const m = BIRD_MOVES.find((b) => b.id === cmdId);
@@ -1534,7 +1542,7 @@ function BirdGame() {
               disabled={won || animating || commands.length === 0}
               className="flex-1 py-2 px-3 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
             >
-              <Play className="w-4 h-4" /> {animating ? "..." : "Boshlash"}
+              <Play className="w-4 h-4" /> {animating ? "..." : t.cabinet.gamesPage.start}
             </button>
             <button
               onClick={reset}
@@ -1555,7 +1563,7 @@ function BirdGame() {
           <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-3">
             <Trophy className="w-7 h-7 text-neon-green" />
           </div>
-          <p className="font-display font-bold text-neon-green text-lg">Bosqich o'tdi!</p>
+          <p className="font-display font-bold text-neon-green text-lg">{t.cabinet.gamesPage.levelPassed}</p>
           <button
             onClick={nextLevel}
             className="py-2.5 px-8 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition mt-3 inline-flex items-center gap-2"
@@ -1567,9 +1575,9 @@ function BirdGame() {
       {crashed && !won && (
         <div className="rounded-2xl border border-neon-red/30 bg-neon-red/5 p-4 text-center">
           <div className="inline-flex items-center gap-2 text-neon-red font-semibold">
-            <AlertTriangle className="w-5 h-5" /> To'siqqa urildi yoki chegaradan chiqdi
+            <AlertTriangle className="w-5 h-5" /> {t.cabinet.gamesPage.crashed}
           </div>
-          <p className="text-sm text-muted-foreground mt-1">Qayta urinib ko'ring.</p>
+          <p className="text-sm text-muted-foreground mt-1">{t.cabinet.gamesPage.tryAgain}</p>
         </div>
       )}
     </div>

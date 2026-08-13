@@ -13,6 +13,7 @@ import {
   Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Trophy,
   Search, GripVertical, ExternalLink, Users,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /** `datetime-local` input uchun: ISO → "YYYY-MM-DDTHH:mm" (mahalliy vaqtda) */
 function toLocalInput(iso: string): string {
@@ -37,6 +38,7 @@ const emptyForm = () => ({
 });
 
 export default function AdminContestsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [contests, setContests] = useState<Contest[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -110,7 +112,7 @@ export default function AdminContestsPage() {
 
   async function save(publish?: boolean) {
     if (!form.title.trim()) { toast.error("Nom kiriting"); return; }
-    if (!userId) { toast.error("Sessiya topilmadi"); return; }
+    if (!userId) { toast.error(t.admin.cnt.sessionNotFound); return; }
 
     const startsAt = new Date(form.starts_at);
     const endsAt = new Date(form.ends_at);
@@ -166,7 +168,7 @@ export default function AdminContestsPage() {
   async function del(c: Contest) {
     if (!confirm(`"${c.title}" o'chirilsinmi? Ishtirokchilar ro'yxati ham o'chadi.`)) return;
     await supabase.from("contests").delete().eq("id", c.id);
-    toast.success("O'chirildi");
+    toast.success(t.admin.common.deleted);
     load();
   }
 
@@ -198,25 +200,25 @@ export default function AdminContestsPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Nom *</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.cnt.nameLabel} *</label>
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                className="input-field" placeholder="Bahorgi dasturlash olimpiadasi" />
+                className="input-field" placeholder={t.admin.cnt.namePh} />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1 block">Tavsif</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.description}</label>
               <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
                 className="input-field resize-none" rows={2} placeholder="Kimlar uchun, qanday mavzular" maxLength={400} />
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Boshlanish *</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.cnt.startsAt} *</label>
                 <input type="datetime-local" value={form.starts_at}
                   onChange={e => setForm({ ...form, starts_at: e.target.value })} className="input-field" />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Tugash *</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.cnt.endsAt} *</label>
                 <input type="datetime-local" value={form.ends_at}
                   onChange={e => setForm({ ...form, ends_at: e.target.value })} className="input-field" />
               </div>
@@ -224,16 +226,16 @@ export default function AdminContestsPage() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Jarima (daqiqa)</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.cnt.penalty}</label>
                 <input type="number" min={0} value={form.penalty_minutes}
                   onChange={e => setForm({ ...form, penalty_minutes: +e.target.value })} className="input-field" />
-                <p className="text-xs text-muted-foreground mt-1">Har noto&apos;g&apos;ri urinish uchun</p>
+                <p className="text-xs text-muted-foreground mt-1">{t.admin.cnt.penaltyHint}</p>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Muzlatish (daqiqa)</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.cnt.freeze}</label>
                 <input type="number" min={0} value={form.freeze_minutes}
                   onChange={e => setForm({ ...form, freeze_minutes: +e.target.value })} className="input-field" />
-                <p className="text-xs text-muted-foreground mt-1">Oxirgi N daqiqada reyting yashiriladi. 0 — muzlatilmaydi</p>
+                <p className="text-xs text-muted-foreground mt-1">{t.admin.cnt.freezeHint}</p>
               </div>
             </div>
 
@@ -277,7 +279,7 @@ export default function AdminContestsPage() {
               <div className="relative mb-2">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input value={search} onChange={e => setSearch(e.target.value)}
-                  className="input-field pl-10 text-sm" placeholder="Topshiriq qidirish..." />
+                  className="input-field pl-10 text-sm" placeholder={t.admin.cnt.searchTask} />
               </div>
 
               <div className="max-h-56 overflow-y-auto space-y-1 rounded-lg border border-border p-2">
@@ -312,7 +314,7 @@ export default function AdminContestsPage() {
             </div>
 
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={() => save(false)} disabled={saving}
                 className="btn-ghost py-2 px-5 text-sm border border-border flex items-center gap-2 disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama
@@ -331,7 +333,7 @@ export default function AdminContestsPage() {
         contests.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="mb-4">Hali olimpiada yaratilmagan</p>
+            <p className="mb-4">{t.admin.cnt.empty}</p>
             <button onClick={openNew} className="btn-primary text-sm py-2 px-5">
               <Plus className="w-4 h-4 inline mr-1" /> Birinchi olimpiada
             </button>
@@ -352,13 +354,13 @@ export default function AdminContestsPage() {
                   <span>· {contestDuration(c.starts_at, c.ends_at)}</span>
                   <span className="inline-flex items-center gap-1">· <Users className="w-3 h-3" />{counts[c.id] || 0}</span>
                   {c.is_published
-                    ? <span className="text-neon-green">· E&apos;lon qilingan</span>
-                    : <span className="text-neon-yellow">· Qoralama</span>}
+                    ? <span className="text-neon-green">· {t.admin.cnt.announced}</span>
+                    : <span className="text-neon-yellow">· {t.admin.common.draft}</span>}
                 </div>
               </div>
               {c.is_published && (
                 <Link href={`/explore/contests/${c.slug}`} target="_blank"
-                  className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground" title="Ochish">
+                  className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground" title={t.admin.common.open}>
                   <ExternalLink className="w-4 h-4" />
                 </Link>
               )}

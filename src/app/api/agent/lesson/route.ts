@@ -10,9 +10,18 @@
  */
 
 import { NextRequest } from 'next/server';
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createAdminClient, hasServiceRole } from '@/lib/supabase/server';
 import { getAgentAccess, paywallMessage } from '@/lib/agent/access';
 import { getOrCreateLesson } from '@/lib/agent/lesson';
+
+/**
+ * Dars keshiga yozish RLS'ni chetlab o'tishni talab qiladi
+ * (`agent_lessons` da INSERT policy yo'q — kesh umumiy resurs).
+ * Kalit yo'q bo'lsa sabab aniq aytiladi.
+ */
+const SERVICE_ROLE_HINT =
+  "Server sozlamasi to'liq emas: SUPABASE_SERVICE_ROLE_KEY qo'shilmagan. " +
+  "Vercel > Settings > Environment Variables ga qo'shib, qayta deploy qiling.";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,6 +34,10 @@ export async function POST(req: NextRequest) {
   const access = await getAgentAccess(supabase, user.id);
   if (!access.allowed) {
     return Response.json({ error: paywallMessage(access), code: access.reason }, { status: 402 });
+  }
+
+  if (!hasServiceRole()) {
+    return Response.json({ error: SERVICE_ROLE_HINT }, { status: 500 });
   }
 
   const { moduleId } = await req.json().catch(() => ({} as any));

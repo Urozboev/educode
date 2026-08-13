@@ -9,8 +9,10 @@ import {
   Users, BookOpen, Swords, Activity, Brain, Coins, TrendingUp, Plus,
   ChevronRight, BarChart3, Target, Zap, Clock, CheckCircle2
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function AdminDashboardPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [stats, setStats] = useState({ users: 0, students: 0, teachers: 0, admins: 0, courses: 0, publishedCourses: 0, challenges: 0, submissions: 0, accepted: 0, enrollments: 0, quizResults: 0 });
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
@@ -60,23 +62,23 @@ export default function AdminDashboardPage() {
 
   const mainCards = [
     { label: "Foydalanuvchilar", value: stats.users, sub: `${stats.students} talaba · ${stats.teachers} o'qituvchi · ${stats.admins} admin`, icon: Users, color: "#6C5CE7", href: "/a-users" },
-    { label: "Kurslar", value: stats.courses, sub: `${stats.publishedCourses} nashr · ${stats.enrollments} ro'yxat`, icon: BookOpen, color: "#00D2FF", href: "/a-courses" },
-    { label: "Topshiriqlar", value: stats.challenges, sub: `${stats.submissions} yuborish · ${stats.accepted} qabul`, icon: Swords, color: "#00E676", href: "/a-challenges" },
-    { label: "Testlar", value: stats.quizResults, sub: `${stats.quizResults} ta o'tkazildi`, icon: Brain, color: "#FFD600", href: "#" },
+    { label: t.nav.courses, value: stats.courses, sub: `${stats.publishedCourses} nashr · ${stats.enrollments} ro'yxat`, icon: BookOpen, color: "#00D2FF", href: "/a-courses" },
+    { label: t.nav.challenges, value: stats.challenges, sub: `${stats.submissions} yuborish · ${stats.accepted} qabul`, icon: Swords, color: "#00E676", href: "/a-challenges" },
+    { label: t.admin.dash.quizzes, value: stats.quizResults, sub: `${stats.quizResults} ta o'tkazildi`, icon: Brain, color: "#FFD600", href: "#" },
   ];
 
   const quickLinks = [
     { label: "Yangi kurs", href: "/a-courses", icon: BookOpen, color: "#6C5CE7" },
     { label: "Yangi topshiriq", href: "/a-challenges", icon: Swords, color: "#00D2FF" },
     { label: "Foydalanuvchilar", href: "/a-users", icon: Users, color: "#00E676" },
-    { label: "Yutuqlar", href: "/a-achievements", icon: Target, color: "#FFD600" },
+    { label: t.admin.achievements, href: "/a-achievements", icon: Target, color: "#FFD600" },
   ];
 
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Admin Panel</h1>
-        <p className="text-muted-foreground">Platforma boshqaruvi va statistikasi</p>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.admin.panel}</h1>
+        <p className="text-muted-foreground">{t.admin.dash.subtitle}</p>
       </motion.div>
 
       {/* Main Stat Cards */}
@@ -97,7 +99,7 @@ export default function AdminDashboardPage() {
 
       {/* Quick Links */}
       <motion.div className="glass-card p-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-        <h2 className="font-display font-semibold text-sm mb-3 text-muted-foreground">Tezkor harakatlar</h2>
+        <h2 className="font-display font-semibold text-sm mb-3 text-muted-foreground">{t.admin.dash.quickActions}</h2>
         <div className="grid grid-cols-4 gap-3">
           {quickLinks.map(ql => (
             <Link key={ql.href} href={ql.href} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface/50 hover:bg-surface transition-all group text-center">
@@ -114,8 +116,8 @@ export default function AdminDashboardPage() {
         {/* Recent Users */}
         <motion.div className="glass-card p-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display font-semibold text-sm">So'nggi foydalanuvchilar</h2>
-            <Link href="/a-users" className="text-xs text-neon-purple hover:underline">Barchasi</Link>
+            <h2 className="font-display font-semibold text-sm">{t.admin.dash.recentUsers}</h2>
+            <Link href="/a-users" className="text-xs text-neon-purple hover:underline">{t.admin.common.all}</Link>
           </div>
           <div className="space-y-2">
             {recentUsers.map(u => (
@@ -134,7 +136,7 @@ export default function AdminDashboardPage() {
 
         {/* Recent Submissions */}
         <motion.div className="glass-card p-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-          <h2 className="font-display font-semibold text-sm mb-4">So'nggi yuborishlar</h2>
+          <h2 className="font-display font-semibold text-sm mb-4">{t.admin.dash.recentSubmissions}</h2>
           <div className="space-y-2">
             {recentSubs.map(s => (
               <div key={s.id} className="flex items-center gap-3 py-1.5">
@@ -148,15 +150,15 @@ export default function AdminDashboardPage() {
                 </span>
               </div>
             ))}
-            {recentSubs.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">Hali yuborish yo'q</p>}
+            {recentSubs.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">{t.admin.dash.noSubmissions}</p>}
           </div>
         </motion.div>
 
         {/* Top Courses */}
         <motion.div className="glass-card p-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display font-semibold text-sm">Mashhur kurslar</h2>
-            <Link href="/a-courses" className="text-xs text-neon-purple hover:underline">Barchasi</Link>
+            <h2 className="font-display font-semibold text-sm">{t.admin.dash.popularCourses}</h2>
+            <Link href="/a-courses" className="text-xs text-neon-purple hover:underline">{t.admin.common.all}</Link>
           </div>
           <div className="space-y-3">
             {topCourses.map((c, i) => (
@@ -169,30 +171,30 @@ export default function AdminDashboardPage() {
                 <span className="text-xs font-semibold text-neon-purple">{c.total_enrolled} talaba</span>
               </div>
             ))}
-            {topCourses.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">Kurs yo'q</p>}
+            {topCourses.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">{t.admin.dash.noCourses}</p>}
           </div>
         </motion.div>
       </div>
 
       {/* Acceptance Rate */}
       <motion.div className="glass-card p-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
-        <h2 className="font-display font-semibold text-sm mb-4">Umumiy ko'rsatkichlar</h2>
+        <h2 className="font-display font-semibold text-sm mb-4">{t.admin.dash.overall}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 rounded-xl bg-surface/50 text-center">
             <p className="text-2xl font-bold text-neon-green">{stats.submissions > 0 ? Math.round((stats.accepted / stats.submissions) * 100) : 0}%</p>
-            <p className="text-xs text-muted-foreground mt-1">Qabul qilinish darajasi</p>
+            <p className="text-xs text-muted-foreground mt-1">{t.admin.dash.acceptRate}</p>
           </div>
           <div className="p-4 rounded-xl bg-surface/50 text-center">
             <p className="text-2xl font-bold text-neon-blue">{stats.enrollments}</p>
-            <p className="text-xs text-muted-foreground mt-1">Kursga yozilishlar</p>
+            <p className="text-xs text-muted-foreground mt-1">{t.admin.dash.enrollments}</p>
           </div>
           <div className="p-4 rounded-xl bg-surface/50 text-center">
             <p className="text-2xl font-bold text-neon-yellow">{stats.submissions}</p>
-            <p className="text-xs text-muted-foreground mt-1">Jami yuborishlar</p>
+            <p className="text-xs text-muted-foreground mt-1">{t.admin.dash.totalSubmissions}</p>
           </div>
           <div className="p-4 rounded-xl bg-surface/50 text-center">
             <p className="text-2xl font-bold text-neon-purple">{stats.quizResults}</p>
-            <p className="text-xs text-muted-foreground mt-1">Test natijalari</p>
+            <p className="text-xs text-muted-foreground mt-1">{t.admin.dash.quizResults}</p>
           </div>
         </div>
       </motion.div>

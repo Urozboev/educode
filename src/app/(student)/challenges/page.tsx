@@ -42,7 +42,7 @@ export default function ChallengesPage() {
   const [category, setCategory] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
   const [loading, setLoading] = useState(true);
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -87,13 +87,13 @@ export default function ChallengesPage() {
         <div className="relative flex flex-col lg:flex-row lg:items-center gap-6">
           <div className="flex-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-xs font-semibold mb-3">
-              <Swords className="w-3.5 h-3.5" /> {totalCount} ta topshiriq
+              <Swords className="w-3.5 h-3.5" /> {totalCount} {t.challenges.countLabel}
             </div>
             <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
-              Kod <span className="gradient-text">maydonchasi</span>
+              {t.challenges.heroTitle} <span className="gradient-text">{t.challenges.heroTitleAccent}</span>
             </h1>
             <p className="text-muted-foreground max-w-md">
-              Algoritm va dasturlash topshiriqlarini yeching, coin yig'ing va reytingda ko'tariling.
+              {t.challenges.heroText}
             </p>
           </div>
 
@@ -139,7 +139,7 @@ export default function ChallengesPage() {
       <div className="space-y-3">
         <div className="relative max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Topshiriq qidirish..." className="input-field pl-11" />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t.challenges.searchPlaceholder} className="input-field pl-11" />
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {categories.map(c => (
@@ -170,8 +170,8 @@ export default function ChallengesPage() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-20">
           <Target className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
-          <h3 className="font-display font-semibold text-xl mb-2">Topshiriq topilmadi</h3>
-          <p className="text-muted-foreground">Filtrlarni o'zgartirib ko'ring</p>
+          <h3 className="font-display font-semibold text-xl mb-2">{t.challenges.notFound}</h3>
+          <p className="text-muted-foreground">{t.challenges.changeFilters}</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">

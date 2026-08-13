@@ -10,6 +10,8 @@ import {
   Filter, RefreshCw, Loader2,
 } from "lucide-react";
 import { pasteLevel } from "@/components/challenges/PasteBadge";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 /**
  * Halollik nazorati — nusxa ko'chirilgan yechimlar ro'yxati.
@@ -40,13 +42,14 @@ interface Row {
   contest_title: string | null;
 }
 
-const FILTERS = [
-  { value: 1, label: "Hammasi" },
-  { value: 40, label: "40% dan ko'p" },
-  { value: 80, label: "80% dan ko'p" },
+const FILTERS = (t: Dictionary) => [
+  { value: 1, label: t.admin.intg.allTab },
+  { value: 40, label: t.admin.intg.moreThan40 },
+  { value: 80, label: t.admin.intg.moreThan80 },
 ];
 
 export default function IntegrityPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,7 +84,7 @@ export default function IntegrityPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display font-bold text-3xl">Halollik nazorati</h1>
+          <h1 className="font-display font-bold text-3xl">{t.admin.integrity}</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Kod muharririga nusxa qo&apos;yilgan yechimlar
           </p>
@@ -108,12 +111,12 @@ export default function IntegrityPage() {
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Belgilangan yechim" value={rows.length} />
         <Stat label="80% dan ko'p" value={high} accent="text-neon-red" />
-        <Stat label="Olimpiadada" value={contest} accent="text-neon-yellow" />
+        <Stat label={t.admin.intg.inContest} value={contest} accent="text-neon-yellow" />
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
         <Filter className="w-4 h-4 text-muted-foreground" />
-        {FILTERS.map(f => (
+        {FILTERS(t).map(f => (
           <button
             key={f.value}
             onClick={() => setMinRatio(f.value)}
@@ -132,7 +135,7 @@ export default function IntegrityPage() {
       ) : rows.length === 0 ? (
         <div className="py-16 text-center border border-dashed border-border rounded-2xl">
           <ClipboardPaste className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-muted-foreground">Belgilangan yechim yo&apos;q</p>
+          <p className="text-muted-foreground">{t.admin.intg.noSolution}</p>
         </div>
       ) : (
         <div className="space-y-2">

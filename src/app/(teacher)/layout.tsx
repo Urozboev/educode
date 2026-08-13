@@ -15,22 +15,25 @@ import {
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+import { useI18n } from "@/lib/i18n";
 
-const teacherLinks = [
-  { href: "/t-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
-  { href: "/t-groups", label: "Guruhlar", icon: School },
-  { href: "/t-students", label: "Talabalarim", icon: Users },
-  { href: "/t-assignments", label: "Topshiriqlar", icon: ClipboardList },
-  { href: "/t-analytics", label: "Tahlillar", icon: BarChart3 },
-  { href: "/t-lesson-games", label: "Dars o'yinlari", icon: Gamepad2 },
-  { href: "/t-store", label: "Sovg'alarim", icon: Gift },
-  { href: "/t-methods", label: "Metodlar", icon: Lightbulb },
-  { href: "/t-books", label: "Kitoblar", icon: Library },
-  { href: "/t-glossary", label: "Terminlar", icon: BookMarked },
-  { href: "/t-export", label: "Eksport", icon: Download },
+const teacherLinks = (t: Dictionary) => [
+  { href: "/t-dashboard", label: t.cabinet.dashboard, icon: LayoutDashboard },
+  { href: "/t-groups", label: t.teacher.groups, icon: School },
+  { href: "/t-students", label: t.teacher.myStudents, icon: Users },
+  { href: "/t-assignments", label: t.nav.challenges, icon: ClipboardList },
+  { href: "/t-analytics", label: t.teacher.analytics, icon: BarChart3 },
+  { href: "/t-lesson-games", label: t.nav.lessonGames, icon: Gamepad2 },
+  { href: "/t-store", label: t.teacher.myGifts, icon: Gift },
+  { href: "/t-methods", label: t.nav.methods, icon: Lightbulb },
+  { href: "/t-books", label: t.nav.books, icon: Library },
+  { href: "/t-glossary", label: t.nav.glossary, icon: BookMarked },
+  { href: "/t-export", label: t.teacher.export, icon: Download },
 ];
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -66,7 +69,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
             <div className="w-10 h-10 rounded-full bg-neon-blue/20 flex items-center justify-center text-neon-blue font-bold text-sm">
               {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full rounded-full object-cover" /> : getInitials(profile.full_name)}
             </div>
-            <div><p className="font-semibold text-sm truncate">{profile.full_name}</p><p className="text-xs text-neon-blue font-medium">O'qituvchi</p></div>
+            <div><p className="font-semibold text-sm truncate">{profile.full_name}</p><p className="text-xs text-neon-blue font-medium">{t.teacher.role}</p></div>
           </div>
         </div>
       )}
@@ -76,7 +79,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
         O'quvchi va admin panellarida bu allaqachon bor edi.
       */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {teacherLinks.map(link => {
+        {teacherLinks(t).map(link => {
           const active = pathname.startsWith(link.href);
           return (
             <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
@@ -96,11 +99,11 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
         )}
         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-accent w-full", collapsed && "justify-center px-3")}>
-          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}{!collapsed && <span>{theme === "dark" ? "Yorug'" : "Qorong'u"}</span>}
+          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}{!collapsed && <span>{theme === "dark" ? t.cabinet.lightMode : t.cabinet.darkMode}</span>}
         </button>
         <button onClick={handleLogout}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-neon-red/70 hover:bg-neon-red/10 w-full", collapsed && "justify-center px-3")}>
-          <LogOut className="w-5 h-5" />{!collapsed && <span>Chiqish</span>}
+          <LogOut className="w-5 h-5" />{!collapsed && <span>{t.nav.logout}</span>}
         </button>
       </div>
     </div>
@@ -118,7 +121,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
       </aside>
       <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-card/80 backdrop-blur-xl border-b border-border/50 z-30 flex items-center justify-between px-4">
         <button onClick={() => setMobileOpen(true)} className="p-2 hover:bg-accent rounded-xl"><Menu className="w-5 h-5" /></button>
-        <span className="font-display font-bold text-sm">O'qituvchi</span>
+        <span className="font-display font-bold text-sm">{t.teacher.role}</span>
         <div className="w-9" />
       </header>
       <AnimatePresence>

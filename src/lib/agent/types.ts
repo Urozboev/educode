@@ -28,6 +28,8 @@ export interface AgentAccess {
   /** Bepul demo xabarlaridan nechtasi qolgan (pro uchun null) */
   freeRemaining: number | null;
   expiresAt: string | null;
+  /** Obuna tugashiga necha kun qolgani (obunasiz — null) */
+  daysLeft: number | null;
   /** Obuna emas, lekin demo doirasida ishlayapti */
   isTrial: boolean;
 }

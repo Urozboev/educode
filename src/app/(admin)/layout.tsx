@@ -18,36 +18,39 @@ import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import AutoLogout from "@/components/AutoLogout";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+import { useI18n } from "@/lib/i18n";
 
-const adminLinks = [
-  { href: "/a-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
-  { href: "/a-courses", label: "Kurslar", icon: BookOpen },
-  { href: "/a-challenges", label: "Topshiriqlar", icon: Swords },
-  { href: "/a-games", label: "Dars o'yinlari", icon: Gamepad2 },
-  { href: "/a-contests", label: "Olimpiadalar", icon: Trophy },
-  { href: "/a-translations", label: "Tarjimalar", icon: Languages },
-  { href: "/a-integrity", label: "Halollik nazorati", icon: ShieldCheck },
-  { href: "/a-users", label: "Foydalanuvchilar", icon: Users },
-  { href: "/a-teachers", label: "O'qituvchi arizalari", icon: Presentation },
-  { href: "/a-store", label: "Do'kon", icon: ShoppingBag },
-  { href: "/a-payments", label: "Coin so'rovlari", icon: Coins },
+const adminLinks = (t: Dictionary) => [
+  { href: "/a-dashboard", label: t.cabinet.dashboard, icon: LayoutDashboard },
+  { href: "/a-courses", label: t.nav.courses, icon: BookOpen },
+  { href: "/a-challenges", label: t.nav.challenges, icon: Swords },
+  { href: "/a-games", label: t.nav.lessonGames, icon: Gamepad2 },
+  { href: "/a-contests", label: t.contests.title, icon: Trophy },
+  { href: "/a-translations", label: t.admin.translations, icon: Languages },
+  { href: "/a-integrity", label: t.admin.integrity, icon: ShieldCheck },
+  { href: "/a-users", label: t.admin.users, icon: Users },
+  { href: "/a-teachers", label: t.admin.teacherApplications, icon: Presentation },
+  { href: "/a-store", label: t.cabinet.store, icon: ShoppingBag },
+  { href: "/a-payments", label: t.admin.coinRequests, icon: Coins },
   // Ustoz agentining tannarxi: obuna puli LLM va TTS xarajatini
   // qoplayaptimi degan savolga javob beradi
-  { href: "/a-agent", label: "Agent tannarxi", icon: Sparkles },
-  { href: "/a-achievements", label: "Yutuqlar", icon: Award },
-  { href: "/a-certificates", label: "Sertifikatlar", icon: GraduationCap },
-  { href: "/a-testimonials", label: "Izohlar", icon: MessageSquare },
-  { href: "/a-blog", label: "Blog", icon: Newspaper },
-  { href: "/a-books", label: "Kitoblar", icon: Library },
-  { href: "/a-glossary", label: "Terminlar", icon: BookMarked },
-  { href: "/a-methods", label: "Metodlar", icon: Lightbulb },
-  { href: "/a-analytics", label: "Tahlillar", icon: BarChart3 },
-  { href: "/a-about", label: "Platforma haqida", icon: Info },
-  { href: "/a-settings", label: "Sozlamalar", icon: Settings },
-  { href: "/a-export", label: "Eksport", icon: Download },
+  { href: "/a-agent", label: t.admin.agentCost, icon: Sparkles },
+  { href: "/a-achievements", label: t.admin.achievements, icon: Award },
+  { href: "/a-certificates", label: t.admin.certificates, icon: GraduationCap },
+  { href: "/a-testimonials", label: t.admin.testimonials, icon: MessageSquare },
+  { href: "/a-blog", label: t.nav.blog, icon: Newspaper },
+  { href: "/a-books", label: t.nav.books, icon: Library },
+  { href: "/a-glossary", label: t.nav.glossary, icon: BookMarked },
+  { href: "/a-methods", label: t.nav.methods, icon: Lightbulb },
+  { href: "/a-analytics", label: t.teacher.analytics, icon: BarChart3 },
+  { href: "/a-about", label: t.nav.about, icon: Info },
+  { href: "/a-settings", label: t.admin.settings, icon: Settings },
+  { href: "/a-export", label: t.teacher.export, icon: Download },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -76,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-neon-red to-neon-yellow flex items-center justify-center">
             <Code2 className="w-5 h-5 text-white" />
           </div>
-          {!collapsed && <span className="font-display font-bold text-lg">Admin</span>}
+          {!collapsed && <span className="font-display font-bold text-lg">{t.admin.short}</span>}
         </Link>
       </div>
       {profile && !collapsed && (
@@ -85,12 +88,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="w-10 h-10 rounded-full bg-neon-red/20 flex items-center justify-center text-neon-red font-bold text-sm">
               {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full rounded-full object-cover" /> : getInitials(profile.full_name)}
             </div>
-            <div><p className="font-semibold text-sm truncate">{profile.full_name}</p><p className="text-xs text-neon-red font-medium">Administrator</p></div>
+            <div><p className="font-semibold text-sm truncate">{profile.full_name}</p><p className="text-xs text-neon-red font-medium">{t.admin.role}</p></div>
           </div>
         </div>
       )}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {adminLinks.map(link => {
+        {adminLinks(t).map(link => {
           const active = pathname.startsWith(link.href);
           return (
             <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
@@ -114,7 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
         <button onClick={handleLogout}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-neon-red/70 hover:bg-neon-red/10 w-full", collapsed && "justify-center px-3")}>
-          <LogOut className="w-5 h-5" />{!collapsed && <span>Chiqish</span>}
+          <LogOut className="w-5 h-5" />{!collapsed && <span>{t.nav.logout}</span>}
         </button>
       </div>
     </div>
@@ -135,7 +138,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-card/80 backdrop-blur-xl border-b border-border/50 z-30 flex items-center justify-between px-4">
         <button onClick={() => setMobileOpen(true)} className="p-2 hover:bg-accent rounded-xl"><Menu className="w-5 h-5" /></button>
-        <span className="font-display font-bold text-sm">Admin Panel</span>
+        <span className="font-display font-bold text-sm">{t.admin.panel}</span>
         <div className="w-9" />
       </header>
 

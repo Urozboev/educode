@@ -12,8 +12,10 @@ import {
   ArrowLeft, Zap, Coins, Flame, BookOpen, Target, Brain,
   CheckCircle2, XCircle, Clock
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function StudentDetailPage() {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const supabase = createClient();
   const [student, setStudent] = useState<Profile | null>(null);
@@ -84,9 +86,9 @@ export default function StudentDetailPage() {
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: "Yechilgan", value: stats.solved, icon: Target, color: "#00E676" },
-          { label: "Jami yuborish", value: stats.totalSubs, icon: Brain, color: "#00D2FF" },
-          { label: "O'rtacha test", value: `${stats.avgQuiz}%`, icon: CheckCircle2, color: "#FFD600" },
-          { label: "Kurslar", value: enrollments.length, icon: BookOpen, color: "#6C5CE7" },
+          { label: t.teacher.detail.totalSubmissions, value: stats.totalSubs, icon: Brain, color: "#00D2FF" },
+          { label: t.teacher.detail.avgQuiz, value: `${stats.avgQuiz}%`, icon: CheckCircle2, color: "#FFD600" },
+          { label: t.nav.courses, value: enrollments.length, icon: BookOpen, color: "#6C5CE7" },
         ].map((c, i) => (
           <motion.div key={c.label} className="glass-card p-4 text-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
             <c.icon className="w-6 h-6 mx-auto mb-1" style={{ color: c.color }} />
@@ -99,8 +101,8 @@ export default function StudentDetailPage() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Enrollments */}
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <h2 className="font-display font-semibold text-lg mb-4">Kurslar progressi</h2>
-          {enrollments.length === 0 ? <p className="text-sm text-muted-foreground">Kursga yozilmagan</p> : (
+          <h2 className="font-display font-semibold text-lg mb-4">{t.teacher.detail.courseProgress}</h2>
+          {enrollments.length === 0 ? <p className="text-sm text-muted-foreground">{t.teacher.detail.notEnrolled}</p> : (
             <div className="space-y-3">
               {enrollments.map(e => (
                 <div key={e.id} className="space-y-1.5">
@@ -119,7 +121,7 @@ export default function StudentDetailPage() {
 
         {/* Recent submissions */}
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-          <h2 className="font-display font-semibold text-lg mb-4">So'nggi yuborishlar</h2>
+          <h2 className="font-display font-semibold text-lg mb-4">{t.teacher.detail.recentSubmissions}</h2>
           <div className="space-y-2 max-h-72 overflow-y-auto">
             {submissions.slice(0, 15).map(s => (
               <div key={s.id} className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0">
@@ -134,14 +136,14 @@ export default function StudentDetailPage() {
                 <span className="text-[10px] text-muted-foreground">{formatRelativeDate(s.created_at)}</span>
               </div>
             ))}
-            {submissions.length === 0 && <p className="text-sm text-muted-foreground">Yuborish yo'q</p>}
+            {submissions.length === 0 && <p className="text-sm text-muted-foreground">{t.teacher.detail.noSubmissions}</p>}
           </div>
         </motion.div>
 
         {/* Quiz results */}
         <motion.div className="glass-card p-6 lg:col-span-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-          <h2 className="font-display font-semibold text-lg mb-4">Test natijalari</h2>
-          {quizResults.length === 0 ? <p className="text-sm text-muted-foreground">Hali test topshirmagan</p> : (
+          <h2 className="font-display font-semibold text-lg mb-4">{t.teacher.detail.quizResults}</h2>
+          {quizResults.length === 0 ? <p className="text-sm text-muted-foreground">{t.teacher.detail.noQuiz}</p> : (
             <div className="grid md:grid-cols-2 gap-3">
               {quizResults.map(q => (
                 <div key={q.id} className="p-3 rounded-xl bg-surface/50 flex items-center gap-3">

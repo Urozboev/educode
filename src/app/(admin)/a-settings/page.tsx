@@ -9,6 +9,8 @@ import {
   Settings, Save, Loader2, Coins, Zap, RefreshCw, Plus, Trash2, X,
   Brain, Sparkles, ChevronDown, ChevronUp, ClipboardList, Code2, CreditCard, ShoppingCart
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 interface CoinPackage { coins: number; uzs: number; }
 interface CoinPriceSettings {
@@ -19,6 +21,7 @@ interface CoinPriceSettings {
 }
 
 export default function AdminSettingsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -114,7 +117,7 @@ export default function AdminSettingsPage() {
       options, correct_option: qForm.correct_option, order_index: placementQuestions.length, is_active: true,
     });
     if (error) { toast.error(error.message); return; }
-    toast.success("Savol qo'shildi");
+    toast.success(t.admin.set.questionAdded);
     setShowQuestionForm(false);
     setQForm({ question: "", category: "basic_programming", difficulty: "beginner", options: '[{"id":"a","text":""},{"id":"b","text":""},{"id":"c","text":""},{"id":"d","text":""}]', correct_option: "a" });
     loadPlacementQuestions();
@@ -123,7 +126,7 @@ export default function AdminSettingsPage() {
   async function deleteQuestion(id: string) {
     if (!confirm("Savolni o'chirish?")) return;
     await supabase.from("placement_tests").delete().eq("id", id);
-    toast.success("O'chirildi"); loadPlacementQuestions();
+    toast.success(t.admin.common.deleted); loadPlacementQuestions();
   }
 
   async function toggleActive(id: string, current: boolean) {
@@ -167,7 +170,7 @@ export default function AdminSettingsPage() {
 
       toast.success("9 ta daraja aniqlash savoli yaratildi! (3 ta har kategoriyadan)");
       loadPlacementQuestions();
-    } catch (e: any) { toast.error("AI xatolik: " + e.message); }
+    } catch (e: any) { toast.error(t.admin.set.aiError + ": " + e.message); }
     setAiGenerating(false);
   }
 
@@ -182,7 +185,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display font-bold text-3xl mb-1">Platforma sozlamalari</h1>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.admin.set.title}</h1>
       </motion.div>
 
       {/* Tabs */}
@@ -208,17 +211,17 @@ export default function AdminSettingsPage() {
             <h2 className="font-display font-semibold text-lg mb-1 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-neon-green" /> To'lov kartasi
             </h2>
-            <p className="text-xs text-muted-foreground mb-4">Ota-onalar coin sotib olganda shu karta ko'rsatiladi.</p>
+            <p className="text-xs text-muted-foreground mb-4">{t.admin.set.cardHint}</p>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Karta raqami</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{t.admin.set.cardNumber}</label>
                 <input value={pricing.card_number} onChange={e => setPricing({ ...pricing, card_number: e.target.value })}
                   className="input-field font-mono" placeholder="8600 0000 0000 0000" />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Karta egasi</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{t.admin.set.cardHolder}</label>
                 <input value={pricing.card_owner} onChange={e => setPricing({ ...pricing, card_owner: e.target.value })}
-                  className="input-field" placeholder="Ism Familiya" />
+                  className="input-field" placeholder={t.admin.set.cardHolderPh} />
               </div>
             </div>
           </motion.div>
@@ -236,11 +239,11 @@ export default function AdminSettingsPage() {
               {pricing.packages.map((pk, idx) => (
                 <div key={idx} className="flex items-end gap-3 p-3 rounded-xl bg-surface/50">
                   <div className="flex-1">
-                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Coin miqdori</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t.admin.set.coinAmount}</label>
                     <input type="number" value={pk.coins} onChange={e => updatePackage(idx, "coins", +e.target.value)} className="input-field" />
                   </div>
                   <div className="flex-1">
-                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Narxi (so'm)</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t.admin.set.price}</label>
                     <input type="number" value={pk.uzs} onChange={e => updatePackage(idx, "uzs", +e.target.value)} className="input-field" />
                   </div>
                   <div className="text-xs text-muted-foreground pb-3 whitespace-nowrap">
@@ -265,7 +268,7 @@ export default function AdminSettingsPage() {
       {activeTab === "coins" && (
         <div className="space-y-6">
           <motion.div className="glass-card p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><Coins className="w-5 h-5 text-neon-yellow" /> Coin sozlamalari</h2>
+            <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><Coins className="w-5 h-5 text-neon-yellow" /> {t.admin.set.coinSettings}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {Object.entries(coinSettings).map(([key, value]) => (
                 <div key={key}><label className="text-xs font-medium text-muted-foreground mb-1 block">{key.replace(/_/g, " ")}</label>
@@ -275,7 +278,7 @@ export default function AdminSettingsPage() {
           </motion.div>
 
           <motion.div className="glass-card p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-            <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><Zap className="w-5 h-5 text-neon-purple" /> XP sozlamalari</h2>
+            <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2"><Zap className="w-5 h-5 text-neon-purple" /> {t.admin.set.xpSettings}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {Object.entries(xpSettings).map(([key, value]) => (
                 <div key={key}><label className="text-xs font-medium text-muted-foreground mb-1 block">{key.replace(/_/g, " ")}</label>
@@ -296,7 +299,7 @@ export default function AdminSettingsPage() {
           <motion.div className="glass-card p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="font-display font-semibold text-lg">Daraja aniqlash savollari</h2>
+                <h2 className="font-display font-semibold text-lg">{t.admin.set.placementQuestions}</h2>
                 <p className="text-xs text-muted-foreground">{placementQuestions.length} ta savol · Foydalanuvchi register qilganda ko'rsatiladi</p>
               </div>
               <div className="flex gap-2">
@@ -326,32 +329,32 @@ export default function AdminSettingsPage() {
             {/* Add question form */}
             {showQuestionForm && (
               <motion.div className="p-4 rounded-xl bg-surface/50 border border-border mb-4 space-y-3" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
-                <div><label className="text-sm font-medium mb-1 block">Savol *</label>
+                <div><label className="text-sm font-medium mb-1 block">{t.admin.set.questionLabel} *</label>
                   <textarea value={qForm.question} onChange={e => setQForm({ ...qForm, question: e.target.value })} className="input-field min-h-[60px]" placeholder="Dasturlash tili nima vazifa bajaradi?" /></div>
                 <div className="grid grid-cols-3 gap-3">
-                  <div><label className="text-xs font-medium mb-1 block">Kategoriya</label>
+                  <div><label className="text-xs font-medium mb-1 block">{t.admin.common.category}</label>
                     <select value={qForm.category} onChange={e => setQForm({ ...qForm, category: e.target.value })} className="input-field text-sm">
-                      <option value="basic_programming">Dasturlash</option>
-                      <option value="computer_literacy">Kompyuter savodxonligi</option>
-                      <option value="prompt_engineering">Prompt Engineering</option>
-                      <option value="logic">Mantiq</option>
-                      <option value="algorithms">Algoritmlar</option>
+                      <option value="basic_programming">{t.admin.set.catProgramming}</option>
+                      <option value="computer_literacy">{t.admin.set.catLiteracy}</option>
+                      <option value="prompt_engineering">{t.admin.set.catPrompt}</option>
+                      <option value="logic">{t.admin.set.catLogic}</option>
+                      <option value="algorithms">{t.admin.set.catAlgorithms}</option>
                     </select></div>
-                  <div><label className="text-xs font-medium mb-1 block">Qiyinlik</label>
+                  <div><label className="text-xs font-medium mb-1 block">{t.admin.common.difficulty}</label>
                     <select value={qForm.difficulty} onChange={e => setQForm({ ...qForm, difficulty: e.target.value })} className="input-field text-sm">
-                      <option value="beginner">Boshlang'ich</option><option value="elementary">Elementar</option>
-                      <option value="intermediate">O'rta</option><option value="advanced">Yuqori</option>
+                      <option value="beginner">{t.difficulty.beginner}</option><option value="elementary">{t.difficulty.elementary}</option>
+                      <option value="intermediate">{t.difficulty.intermediate}</option><option value="advanced">{t.difficulty.advanced}</option>
                     </select></div>
-                  <div><label className="text-xs font-medium mb-1 block">To'g'ri javob</label>
+                  <div><label className="text-xs font-medium mb-1 block">{t.admin.set.correctAnswer}</label>
                     <select value={qForm.correct_option} onChange={e => setQForm({ ...qForm, correct_option: e.target.value })} className="input-field text-sm">
                       <option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option>
                     </select></div>
                 </div>
-                <div><label className="text-xs font-medium mb-1 block">Variantlar (JSON)</label>
+                <div><label className="text-xs font-medium mb-1 block">{t.admin.set.optionsJson}</label>
                   <textarea value={qForm.options} onChange={e => setQForm({ ...qForm, options: e.target.value })} className="input-field font-mono text-[10px] min-h-[60px]" /></div>
                 <div className="flex gap-2">
-                  <button onClick={saveQuestion} className="btn-primary py-1.5 px-4 text-sm">Qo'shish</button>
-                  <button onClick={() => setShowQuestionForm(false)} className="btn-ghost py-1.5 px-4 text-sm">Bekor</button>
+                  <button onClick={saveQuestion} className="btn-primary py-1.5 px-4 text-sm">{t.admin.common.add}</button>
+                  <button onClick={() => setShowQuestionForm(false)} className="btn-ghost py-1.5 px-4 text-sm">{t.common.cancel}</button>
                 </div>
               </motion.div>
             )}
@@ -379,7 +382,7 @@ export default function AdminSettingsPage() {
                 </div>
               ))}
               {placementQuestions.length === 0 && (
-                <p className="text-center text-muted-foreground py-8 text-sm">Hali savol qo'shilmagan. "AI: 9 ta savol yaratish" tugmasini bosing.</p>
+                <p className="text-center text-muted-foreground py-8 text-sm">{t.admin.set.noQuestions}</p>
               )}
             </div>
           </motion.div>
