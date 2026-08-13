@@ -60,7 +60,7 @@ export default function CoursesPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(true);
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     loadData();
@@ -116,13 +116,13 @@ export default function CoursesPage() {
         <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-neon-purple/15 blur-[80px] pointer-events-none" />
         <div className="relative">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-semibold mb-3">
-            <Sparkles className="w-3.5 h-3.5" /> {courses.length} ta kurs mavjud
+            <Sparkles className="w-3.5 h-3.5" /> {courses.length} {t.courses.catalogBadge}
           </div>
           <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
-            Kurslar <span className="gradient-text">katalogi</span>
+            {t.courses.catalogTitle} <span className="gradient-text">{t.courses.catalogTitleAccent}</span>
           </h1>
           <p className="text-muted-foreground max-w-lg">
-            O'zingizga mos kursni tanlang — interaktiv darslar, AI mentor va amaliy topshiriqlar bilan o'rganing.
+            {t.courses.catalogSubtitle}
           </p>
         </div>
       </motion.div>
@@ -175,7 +175,7 @@ export default function CoursesPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Kurs qidirish..."
+            placeholder={t.courses.searchPlaceholder}
             className="input-field pl-11"
           />
         </div>
@@ -207,8 +207,8 @@ export default function CoursesPage() {
       ) : filteredCourses.length === 0 ? (
         <div className="text-center py-20">
           <BookOpen className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
-          <h3 className="font-display font-semibold text-xl mb-2">Kurs topilmadi</h3>
-          <p className="text-muted-foreground">Qidiruv so'zini o'zgartiring yoki boshqa kategoriyani tanlang</p>
+          <h3 className="font-display font-semibold text-xl mb-2">{t.courses.notFoundTitle}</h3>
+          <p className="text-muted-foreground">{t.courses.notFoundText}</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -306,7 +306,7 @@ export default function CoursesPage() {
 
                     {/* Teglar — doim ko'rinadi (bo'sh bo'lsa kategoriyadan fallback) */}
                     <div className="flex flex-wrap gap-1.5 mb-4 min-h-[26px]">
-                      {(course.tags?.length ? course.tags : (fallbackTags[course.category] || ["KURS"])).slice(0, 3).map(tag => (
+                      {(course.tags?.length ? course.tags : (fallbackTags[course.category] || [t.courses.tagFallback])).slice(0, 3).map(tag => (
                         <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
                           {tag}
                         </span>
@@ -344,21 +344,21 @@ export default function CoursesPage() {
                       ) : enrollment?.is_completed ? (
                         <div className="flex items-center justify-between">
                           <span className="flex items-center gap-1.5 text-neon-green text-sm font-bold">
-                            <CheckCircle2 className="w-4 h-4" /> Tugatildi
+                            <CheckCircle2 className="w-4 h-4" /> {t.courses.finished}
                           </span>
                           <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-green">
-                            Ko'rish <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            {t.courses.view} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </span>
                         </div>
                       ) : (
                         <div className="flex items-center justify-between">
                           <span className={cn("font-display font-bold text-base", course.is_free ? "text-neon-green" : "text-neon-yellow")}>
-                            {course.is_free ? "Bepul" : (
-                              <span className="inline-flex items-center gap-1"><Coins className="w-4 h-4" />{course.price_coins} coin</span>
+                            {course.is_free ? t.courses.free : (
+                              <span className="inline-flex items-center gap-1"><Coins className="w-4 h-4" />{course.price_coins} {t.common.coins}</span>
                             )}
                           </span>
                           <span className="inline-flex items-center gap-1.5 text-sm font-bold transition-all group-hover:gap-2.5" style={{ color: style.accent }}>
-                            <Play className="w-3.5 h-3.5" /> Ko'rish <ChevronRight className="w-4 h-4" />
+                            <Play className="w-3.5 h-3.5" /> {t.courses.view} <ChevronRight className="w-4 h-4" />
                           </span>
                         </div>
                       )}

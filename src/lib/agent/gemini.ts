@@ -7,6 +7,52 @@
  * qo'lda tozalashga to'g'ri kelardi.
  */
 
+/**
+ * Model JSON satri ichida XOM qator ko'chirish qoldirsa tuzatadi.
+ *
+ * Bu nazariy muammo emas: `responseMimeType: application/json`
+ * bo'lsa ham, kod qaytaradigan javoblarda (dars misollari, amaliy
+ * topshiriqning `solution_code` maydoni) model ko'p marta
+ * "\n" o'rniga haqiqiy qator ko'chirish yozadi. JSON standarti
+ * satr ichida boshqaruv belgisini taqiqlaydi, natijada butun
+ * javob "Bad control character" bilan yo'qoladi.
+ *
+ * Satr ichidami yoki tashqarisidami — qo'shtirnoq va ekranlashni
+ * kuzatib borish orqali aniqlanadi.
+ */
+export function escapeControlCharsInStrings(raw: string): string {
+  let out = '';
+  let inString = false;
+  let escaped = false;
+
+  for (const ch of raw) {
+    if (escaped) { out += ch; escaped = false; continue; }
+    if (ch === '\\') { out += ch; escaped = true; continue; }
+    if (ch === '"') { inString = !inString; out += ch; continue; }
+
+    if (inString) {
+      const code = ch.charCodeAt(0);
+      if (ch === '\n') { out += '\\n'; continue; }
+      if (ch === '\r') { out += '\\r'; continue; }
+      if (ch === '\t') { out += '\\t'; continue; }
+      if (code < 0x20) { out += '\\u' + code.toString(16).padStart(4, '0'); continue; }
+    }
+
+    out += ch;
+  }
+
+  return out;
+}
+
+function parseModelJson<T>(text: string): T {
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    // Ikkinchi urinish — xom boshqaruv belgilarini ekranlab
+    return JSON.parse(escapeControlCharsInStrings(text)) as T;
+  }
+}
+
 export interface JsonCallResult<T> {
   data: T | null;
   error?: string;
@@ -87,7 +133,7 @@ export async function geminiJson<T>(
       };
     }
 
-    return { data: JSON.parse(text) as T, tokensIn, tokensOut, model };
+    return { data: parseModelJson<T>(text), tokensIn, tokensOut, model };
   } catch (e: any) {
     return { data: null, error: e?.message || 'JSON tahlil qilinmadi', tokensIn: 0, tokensOut: 0, model };
   }

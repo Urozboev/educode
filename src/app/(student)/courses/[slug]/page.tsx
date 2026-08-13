@@ -38,7 +38,7 @@ export default function CourseDetailPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userCoins, setUserCoins] = useState(0);
   const [resume, setResume] = useState<ResumePoint | null>(null);
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     loadCourse();
@@ -128,7 +128,7 @@ export default function CourseDetailPage() {
     await supabase.from("courses").update({ total_enrolled: (course.total_enrolled || 0) + 1 }).eq("id", course.id);
 
     setEnrollment(data as Enrollment);
-    toast.success("Kursga muvaffaqiyatli yozildingiz!");
+    toast.success(t.courses.enrolled);
     setEnrolling(false);
   }
 
@@ -152,7 +152,7 @@ export default function CourseDetailPage() {
     <div className="space-y-10 max-w-4xl">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <Link href="/courses" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-5 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Kurslar ro'yxati
+          <ArrowLeft className="w-4 h-4" /> {t.courses.backToList}
         </Link>
 
         <div className="rounded-[14px] border border-border/50 bg-card/40 overflow-hidden">
@@ -263,10 +263,10 @@ export default function CourseDetailPage() {
                     href={`/login?redirect=/courses/${slug}`}
                     className="w-full py-2.5 rounded-xl border border-border/60 text-sm font-medium hover:bg-surface/50 transition-all flex items-center justify-center"
                   >
-                    Hisobim bor
+                    {t.courses.haveAccount}
                   </Link>
                   <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-                    Ro'yxatdan o'tish bepul · boshlang'ich coin sovg'a
+                    {t.courses.freeSignupNote}
                   </p>
                 </>
               )}
@@ -285,9 +285,9 @@ export default function CourseDetailPage() {
       {/* Topics List */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
         <div className="flex items-end justify-between mb-5">
-          <h2 className="font-display font-bold text-2xl tracking-tight">Kurs mundarijasi</h2>
+          <h2 className="font-display font-bold text-2xl tracking-tight">{t.courses.toc}</h2>
           <span className="text-sm text-muted-foreground">
-            {sections.length > 0 && `${sections.length} bo'lim · `}{topics.length} dars
+            {sections.length > 0 && `${sections.length} ${t.courses.sections} · `}{topics.length} {t.courses.lessons}
           </span>
         </div>
 
@@ -346,7 +346,7 @@ export default function CourseDetailPage() {
                         <div className="px-3 pb-3 space-y-1.5 border-t border-border/40 pt-3">
                           {sectionTopics.map((topic, i) => renderTopicRow(topic, i))}
                           {sectionTopics.length === 0 && (
-                            <p className="text-xs text-muted-foreground px-3 py-2">Darslar tez orada qo'shiladi</p>
+                            <p className="text-xs text-muted-foreground px-3 py-2">{t.courses.lessonsSoon}</p>
                           )}
                         </div>
                       </motion.div>
@@ -393,7 +393,7 @@ export default function CourseDetailPage() {
         <Link
           key={topic.id}
           href={lockedForGuest ? `/register?redirect=/courses/${slug}` : "#enroll"}
-          onClick={lockedForGuest ? undefined : (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); toast.info("Avval kursga yoziling"); }}
+          onClick={lockedForGuest ? undefined : (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); toast.info(t.courses.enrollFirst); }}
           className="p-3.5 md:p-4 rounded-xl border border-border/40 bg-card/30 flex items-center gap-3.5 hover:bg-card/50 transition-colors group"
         >
           <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center text-muted-foreground flex-shrink-0 group-hover:text-neon-purple transition-colors">
@@ -430,7 +430,7 @@ export default function CourseDetailPage() {
             <p className="font-display font-semibold text-[14px] group-hover:text-neon-purple transition-colors line-clamp-1">{topic.title}</p>
             {isPreviewOpen && !enrollment && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neon-blue/10 text-neon-blue border border-neon-blue/20 flex-shrink-0">
-                <Eye className="w-3 h-3" /> Bepul ko'rish
+                <Eye className="w-3 h-3" /> {t.courses.freePreview}
               </span>
             )}
           </div>
@@ -443,9 +443,9 @@ export default function CourseDetailPage() {
         <div className="flex items-center gap-2.5 flex-shrink-0">
           {progress && !isCompleted && (
             <div className="flex gap-1">
-              {progress.content_read && <div className="w-2 h-2 rounded-full bg-neon-green" title="O'qildi" />}
-              {progress.quiz_passed && <div className="w-2 h-2 rounded-full bg-neon-blue" title="Test o'tdi" />}
-              {progress.tasks_completed && <div className="w-2 h-2 rounded-full bg-neon-purple" title="Topshiriq bajarildi" />}
+              {progress.content_read && <div className="w-2 h-2 rounded-full bg-neon-green" title={t.courses.read} />}
+              {progress.quiz_passed && <div className="w-2 h-2 rounded-full bg-neon-blue" title={t.courses.quizPassed} />}
+              {progress.tasks_completed && <div className="w-2 h-2 rounded-full bg-neon-purple" title={t.courses.taskDone} />}
             </div>
           )}
           <ChevronRight className="w-4.5 h-4.5 text-muted-foreground/60 group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
@@ -457,6 +457,7 @@ export default function CourseDetailPage() {
 
 // Sertifikat havola komponenti
 function CertificateLink({ courseId, userId }: { courseId: string; userId: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [certId, setCertId] = useState<string | null>(null);
 
@@ -480,7 +481,7 @@ function CertificateLink({ courseId, userId }: { courseId: string; userId: strin
   return (
     <Link href={`/certificate/${certId}`}
       className="btn-neon w-full text-center py-3 flex items-center justify-center gap-2">
-      <GraduationCap className="w-4 h-4" /> Sertifikatni ko'rish
+      <GraduationCap className="w-4 h-4" /> {t.courses.viewCertificate}
     </Link>
   );
 }

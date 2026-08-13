@@ -32,7 +32,7 @@ export default function TaskPage() {
   const [topicId, setTopicId] = useState("");
   const [courseId, setCourseId] = useState("");
   const [userId, setUserId] = useState("");
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -60,9 +60,9 @@ export default function TaskPage() {
       const { data: prog } = await supabase.from("topic_progress").select("*").eq("user_id", userId).eq("topic_id", topicId).single();
       if (prog && prog.content_read && prog.quiz_passed) {
         await completeTopic(supabase, userId, topicId, courseId);
-        toast.success("Mavzu tugatildi! 🎉");
+        toast.success(t.courses.topic.topicDoneToast + " 🎉");
       } else {
-        toast.success("Topshiriq bajarildi! ✅");
+        toast.success(t.courses.topic.taskDoneToast + " ✅");
       }
     }
   }
@@ -89,8 +89,8 @@ export default function TaskPage() {
   if (loading) return <div className="glass-card h-96 animate-pulse" />;
   if (!currentTask) return (
     <div className="text-center py-20">
-      <p className="text-muted-foreground mb-4">Amaliy topshiriq mavjud emas</p>
-      <Link href={`/courses/${slug}/topics/${topicSlug}`} className="btn-ghost">Mavzuga qaytish</Link>
+      <p className="text-muted-foreground mb-4">{t.courses.topic.noTask}</p>
+      <Link href={`/courses/${slug}/topics/${topicSlug}`} className="btn-ghost">{t.courses.topic.backToTopic}</Link>
     </div>
   );
 
@@ -171,9 +171,9 @@ export default function TaskPage() {
               <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center mb-3">
                 <Sparkles className="w-6 h-6 text-neon-purple" />
               </div>
-              <h3 className="font-semibold mb-1">Avval rejani tuzing</h3>
+              <h3 className="font-semibold mb-1">{t.courses.topic.planFirstTitle}</h3>
               <p className="text-xs text-muted-foreground max-w-xs">
-                Murakkab topshiriqlarda kod yozish bosqichi Plan-First yondashuvi tugagandan keyin ochiladi.
+                {t.courses.topic.planFirstText}
               </p>
             </div>
           ) : (
@@ -196,10 +196,10 @@ export default function TaskPage() {
         <motion.div className="glass-card p-5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="w-5 h-5 text-neon-blue" />
-            <h3 className="font-semibold">AI Tahlil</h3>
+            <h3 className="font-semibold">{t.courses.topic.aiReview}</h3>
           </div>
           {aiLoading ? (
-            <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Tahlil qilinmoqda...</div>
+            <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> {t.courses.topic.analysing}</div>
           ) : (
             <div className="space-y-3">
               <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{aiFeedback}</div>

@@ -11,8 +11,10 @@ import {
   Gamepad2, Zap, ExternalLink, Code2, UserX, Lock, Flame,
   Trophy, BookOpen, CheckCircle2, Activity,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export function PortfolioView({ username }: { username: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [data, setData] = useState<PublicPortfolio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,12 +36,12 @@ export function PortfolioView({ username }: { username: string }) {
     return (
       <div className="max-w-md mx-auto text-center py-20">
         <UserX className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-        <h1 className="font-display font-bold text-xl mb-2">Portfolio topilmadi</h1>
+        <h1 className="font-display font-bold text-xl mb-2">{t.cabinet.portfolioView.notFound}</h1>
         <p className="text-muted-foreground mb-6">
-          Bunday foydalanuvchi yo&apos;q yoki portfoliosi yopiq.
+          {t.cabinet.portfolioView.notFoundText}
         </p>
         <Link href="/explore/portfolios" className="btn-primary py-2.5 px-5 text-sm">
-          Boshqa portfoliolar
+          {t.cabinet.portfolioView.others}
         </Link>
       </div>
     );
@@ -66,9 +68,9 @@ export function PortfolioView({ username }: { username: string }) {
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-neon-yellow/[0.07] border border-neon-yellow/25 text-sm">
           <Lock className="w-4 h-4 flex-shrink-0 mt-0.5 text-neon-yellow" />
           <span className="leading-relaxed text-muted-foreground">
-            Portfolioyingiz hozir yopiq — buni faqat siz ko&apos;ryapsiz.
+            {t.cabinet.portfolioView.privateNotice}
             <Link href="/portfolio" className="text-neon-purple hover:underline ml-1">
-              Sozlamalardan oching
+              {t.cabinet.portfolioView.openInSettings}
             </Link>
           </span>
         </div>
@@ -190,7 +192,7 @@ export function PortfolioView({ username }: { username: string }) {
                     {pr.demo_url && (
                       <a href={pr.demo_url} target="_blank" rel="noopener noreferrer nofollow"
                         className="inline-flex items-center gap-1.5 font-semibold text-neon-purple hover:underline">
-                        <ExternalLink className="w-3.5 h-3.5" /> Ko&apos;rish
+                        <ExternalLink className="w-3.5 h-3.5" /> {t.cabinet.portfolioView.demo}
                       </a>
                     )}
                     {pr.repo_url && (
@@ -210,11 +212,11 @@ export function PortfolioView({ username }: { username: string }) {
       {/* Kurslar */}
       {(completed.length > 0 || active.length > 0) && (
         <section>
-          <h2 className="font-display font-bold text-xl mb-4">Kurslar</h2>
+          <h2 className="font-display font-bold text-xl mb-4">{t.nav.courses}</h2>
 
           {completed.length > 0 && (
             <div className="mb-5">
-              <p className="eyebrow mb-2">Tugatilgan</p>
+              <p className="eyebrow mb-2">{t.cabinet.portfolioView.finished}</p>
               <ul className="space-y-2">
                 {completed.map(c => (
                   <li key={c.id} className="flex items-center gap-4 p-4 rounded-xl border border-border/60 bg-card/40">
@@ -236,7 +238,7 @@ export function PortfolioView({ username }: { username: string }) {
 
           {active.length > 0 && (
             <div>
-              <p className="eyebrow mb-2">Davom etmoqda</p>
+              <p className="eyebrow mb-2">{t.cabinet.portfolioView.inProgress}</p>
               <ul className="space-y-2">
                 {active.map(c => (
                   <li key={c.id} className="p-4 rounded-xl border border-border/60 bg-card/40">
@@ -251,7 +253,7 @@ export function PortfolioView({ username }: { username: string }) {
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-1.5">
                       {getCategoryLabel(c.category)} · <span className="numeric">{c.completed_topics}</span>/
-                      <span className="numeric">{c.total_topics}</span> dars
+                      <span className="numeric">{c.total_topics}</span> {t.cabinet.portfolioView.lessons}
                     </p>
                   </li>
                 ))}
@@ -316,18 +318,18 @@ export function PortfolioView({ username }: { username: string }) {
        active.length === 0 && achievements.length === 0 && (
         <div className="py-14 text-center border border-dashed border-border rounded-2xl">
           <Code2 className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-muted-foreground">Bu portfolio hali to&apos;ldirilmagan</p>
+          <p className="text-muted-foreground">{t.cabinet.portfolioView.empty}</p>
         </div>
       )}
 
       <footer className="pt-8 border-t border-border/50 flex items-center justify-between gap-4 flex-wrap">
         <p className="text-sm text-muted-foreground">
-          Bu portfolio <Link href="/" className="text-neon-purple hover:underline">EduCode</Link> platformasida yig&apos;ilgan
+          {t.cabinet.portfolioView.builtOn} <Link href="/" className="text-neon-purple hover:underline">EduCode</Link> {t.cabinet.portfolioView.builtOnTail}
         </p>
         {p.longest_streak > 0 && (
           <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
             <Flame className="w-4 h-4 text-neon-red" />
-            Eng uzun seriya: <span className="numeric text-foreground">{p.longest_streak}</span> kun
+            {t.cabinet.portfolioView.longestStreak}: <span className="numeric text-foreground">{p.longest_streak}</span> {t.cabinet.portfolioView.days}
           </span>
         )}
       </footer>
@@ -341,6 +343,7 @@ export function PortfolioView({ username }: { username: string }) {
  * kam yechadigan o'quvchida ham farq ko'rinadi.
  */
 function ActivityStrip({ weeks }: { weeks: { week: string; count: number }[] }) {
+  const { t } = useI18n();
   const max = Math.max(1, ...weeks.map(w => w.count));
   const total = weeks.reduce((s, w) => s + w.count, 0);
 
@@ -366,7 +369,7 @@ function ActivityStrip({ weeks }: { weeks: { week: string; count: number }[] }) 
         })}
       </div>
       <p className="text-[11px] text-muted-foreground mt-2">
-        So&apos;nggi 12 haftada <span className="numeric text-foreground">{total}</span> ta topshiriq yechilgan
+        {t.cabinet.portfolioView.last12Weeks} <span className="numeric text-foreground">{total}</span> {t.cabinet.portfolioView.tasksSolved}
       </p>
     </div>
   );

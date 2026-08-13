@@ -71,7 +71,7 @@ export default function JoinPage() {
 
     if (error) { toast.error(error.message); return; }
 
-    setJustJoined(data?.group_name || "Guruh");
+    setJustJoined(data?.group_name || t.cabinet.join.noGroupName);
     setCode("");
     toast.success(t.cabinet.join.joined);
     load();

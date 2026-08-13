@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl, SITE_NAME } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/server";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const revalidate = 1800;
 
@@ -28,10 +29,11 @@ async function fetchCourse(slug: string) {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const course = await fetchCourse(params.slug);
+  const t = await getServerDictionary();
   if (!course) {
     return {
-      title: "Kurs topilmadi",
-      description: "Bu kurs mavjud emas yoki olib tashlangan.",
+      title: t.courses.missingTitle,
+      description: t.courses.missingText,
       robots: { index: false, follow: false },
     };
   }
@@ -43,7 +45,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const url = absUrl(`/courses/${course.slug}`);
   const og = course.thumbnail_url || ogImageUrl({
     title: course.title,
-    subtitle: course.description?.slice(0, 100) || "Interaktiv onlayn kurs",
+    subtitle: course.description?.slice(0, 100) || t.courses.seoKind,
     type: "course",
   });
 
@@ -75,6 +77,7 @@ export default async function CourseLayout({
   children: React.ReactNode;
 }) {
   const course = await fetchCourse(params.slug);
+  const t = await getServerDictionary();
 
   return (
     <>
@@ -82,8 +85,8 @@ export default async function CourseLayout({
         <>
           <BreadcrumbJsonLd
             items={[
-              { name: "Bosh sahifa", url: "/" },
-              { name: "Kurslar", url: "/explore/courses" },
+              { name: t.cabinet.dashboard, url: "/" },
+              { name: t.nav.courses, url: "/explore/courses" },
               { name: course.title, url: `/courses/${course.slug}` },
             ]}
           />

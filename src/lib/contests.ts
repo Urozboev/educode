@@ -1,3 +1,4 @@
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 export type ContestStatus = "upcoming" | "running" | "ended";
 
 export function contestStatus(startsAt: string, endsAt: string, now = Date.now()): ContestStatus {
@@ -15,7 +16,7 @@ export const STATUS_LABEL: Record<ContestStatus, string> = {
 };
 
 /** Musobaqagacha / tugashigacha qolgan vaqt: "2 kun 4 soat", "12:34:56" */
-export function countdown(target: string, now = Date.now()): string {
+export function countdown(target: string, now = Date.now(), t?: Dictionary): string {
   const diff = new Date(target).getTime() - now;
   if (diff <= 0) return "00:00:00";
 
@@ -25,7 +26,7 @@ export function countdown(target: string, now = Date.now()): string {
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
 
-  if (days > 0) return `${days} kun ${h} soat`;
+  if (days > 0) return `${days} ${t?.common.days ?? "kun"} ${h} ${t?.common.hours ?? "soat"}`;
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
@@ -38,16 +39,19 @@ export function formatPenalty(minutes: number): string {
 }
 
 /** Musobaqa davomiyligi: "3 soat", "1 kun 2 soat" */
-export function contestDuration(startsAt: string, endsAt: string): string {
+export function contestDuration(startsAt: string, endsAt: string, t?: Dictionary): string {
   const mins = Math.round(
     (new Date(endsAt).getTime() - new Date(startsAt).getTime()) / 60000
   );
   const days = Math.floor(mins / 1440);
   const hours = Math.floor((mins % 1440) / 60);
   const rest = mins % 60;
-  if (days > 0) return hours > 0 ? `${days} kun ${hours} soat` : `${days} kun`;
-  if (hours > 0) return rest > 0 ? `${hours} soat ${rest} daq` : `${hours} soat`;
-  return `${rest} daqiqa`;
+  const D = t?.common.days ?? "kun";
+  const H = t?.common.hours ?? "soat";
+  const M = t?.common.minutesShort ?? "daq";
+  if (days > 0) return hours > 0 ? `${days} ${D} ${hours} ${H}` : `${days} ${D}`;
+  if (hours > 0) return rest > 0 ? `${hours} ${H} ${rest} ${M}` : `${hours} ${H}`;
+  return `${rest} ${t?.common.minutes ?? "daqiqa"}`;
 }
 
 /** Sana va vaqt '@/lib/utils' dan qayta eksport qilinadi — uz-UZ lokali

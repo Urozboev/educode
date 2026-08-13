@@ -15,8 +15,15 @@ export const AGENT_PROMPT_VERSIONS = {
   tutor: 'agent_tutor_v1',
   planner: 'agent_planner_v1',
   placement: 'agent_placement_v1',
+  // DIQQAT: bu qiymat dars keshining kalitiga kiradi. Promptni
+  // o'zgartirsangiz versiyani ham ko'taring — aks holda eski
+  // prompt bilan yozilgan darslar keshda qolib ketadi.
   lesson: 'agent_lesson_v1',
-  grader: 'agent_grader_v1',
+  // Bu ham kesh kalitiga kiradi — o'zgartirsangiz versiyani ko'taring
+  quiz: 'agent_quiz_v1',
+  // Bu ham kesh kalitiga kiradi
+  task: 'agent_task_v1',
+  remedial: 'agent_remedial_v1',
 } as const;
 
 const LANG_NAMES: Record<string, string> = {
@@ -117,6 +124,175 @@ export function buildTutorPrompt(ctx: TutorPromptContext): string {
 
   return parts.join('\n');
 }
+
+/* =============================================================
+ * DARS
+ * ============================================================= */
+
+/**
+ * Dars kontenti KESHLANADI va boshqa o'quvchilarga ham beriladi.
+ *
+ * Shu sababli promptga foydalanuvchi ismi, maqsadi yoki xotirasi
+ * QO'SHILMAYDI — aks holda kesh buzilardi: bir odamga atalgan matn
+ * ("Sizning maqsadingiz frontend bo'lgani uchun...") boshqasiga
+ * ma'nosiz ko'rinadi. Shaxsiylashtirish suhbatda bo'ladi, darsda emas.
+ *
+ * Dars kirish parametrlari faqat: mavzu, daraja, til.
+ */
+export const AGENT_LESSON_PROMPT = `Sen IT bo'yicha dars matnini yozuvchi tajribali o'qituvchisan. Faqat JSON qaytar.
+
+FORMAT:
+{"title":"...","content_html":"...","narration":"...","examples":[{"title":"...","language":"python","code":"...","explanation":"..."}]}
+
+MAZMUN QOIDALARI:
+1. Mavzuni TO'LIQ tushuntir — bu birinchi tanishuv, javobni yashirma.
+2. Tuzilma MAJBURIY — aynan 4 ta <h3> bo'lim, shu tartibda:
+   - "Nima uchun kerak" — real hayotdan misol bilan, quruq ta'rif emas
+   - "Qanday ishlaydi" — mexanizmni bosqichma-bosqich ochib ber
+   - "Amalda" — kod bilan ko'rsat va har satrini izohla
+   - "Tez-tez qilinadigan xato" — kamida 2 ta xato va nima uchun bo'lishi
+   Har bo'limda kamida 2 ta to'liq abzats bo'lsin. Bir gaplik bo'lim yozma.
+3. Berilgan darajaga qat'iy mos bo'l. "zero" darajada atama ishlatsang, darrov sodda tilda izohla.
+4. Hajm: KAMIDA 450 so'z, ko'pi bilan 700 so'z. Qisqa dars mavzuni ochmaydi — o'quvchi tushunmay qoladi va savol berishga ham bilimi yetmaydi. Har bo'limni to'liq yoz, sanab o'tish bilan cheklanma.
+5. Faqat shu mavzu doirasida qol. Keyingi mavzularga o'tib ketma.
+
+content_html QOIDALARI:
+- Faqat quyidagi teglar: h3, h4, p, ul, ol, li, strong, em, code, pre, table, tr, td, th.
+- script, style, iframe, onclick va boshqa hodisa atributlari MUTLAQO ishlatilmasin.
+- Kod uchun <pre><code>...</code></pre>.
+
+narration QOIDALARI (bu matn ovozga aylantiriladi):
+- Sof matn: HTML teg, markdown belgi, emoji YO'Q.
+- Kodni o'qishga urinma — "kodni ekranda ko'rasiz" deb o't.
+- Og'zaki uslub: "Endi ko'ramiz...", "Diqqat qiling...".
+- KAMIDA 180 so'z, ko'pi bilan 260 so'z. Bu darsning og'zaki varianti: mavzuni tinglab tushunish uchun yetarli bo'lsin, shunchaki qisqa xulosa emas.
+
+examples QOIDALARI:
+- 2 tadan 4 tagacha misol.
+- code — ishlaydigan, to'liq kod. Qisqartma va "..." ishlatma.
+- explanation — bir-ikki gap.
+
+TAQIQ: o'quvchining ismi, maqsadi yoki shaxsiy holatiga murojaat qilma. Bu dars hammaga bir xil beriladi.`;
+
+export interface LessonPromptInput {
+  topicTitle: string;
+  topicKey: string;
+  level: string;
+  lang?: string;
+  /** Reja kontekstida qaysi mavzudan keyin kelayotgani — takrorni kamaytiradi */
+  previousTopic?: string | null;
+}
+
+export function buildLessonPrompt(input: LessonPromptInput): string {
+  const langName = LANG_NAMES[input.lang || 'uz'] || LANG_NAMES.uz;
+  const lines = [
+    `Mavzu: ${input.topicTitle}`,
+    `Mavzu kaliti: ${input.topicKey}`,
+    `Daraja: ${input.level}`,
+    `Til: butun dars ${langName} tilida (kod va texnik atamalardan tashqari).`,
+  ];
+
+  if (input.previousTopic) {
+    lines.push(`Oldingi mavzu: ${input.previousTopic}. Uni qaytadan tushuntirma, faqat kerak bo'lsa eslat.`);
+  }
+
+  return `${lines.join('\n')}\n\nShu mavzu bo'yicha dars yoz.`;
+}
+
+/* =============================================================
+ * DARSDAN KEYINGI TEST
+ * ============================================================= */
+
+/**
+ * Dars kabi keshlanadi — shuning uchun bu yerda ham shaxsiy
+ * ma'lumot ishlatilmaydi.
+ *
+ * "Bilmayman" varianti bu yerda ham bor. Kirish testidagidan ham
+ * muhimroq: tavakkal topilgan javob mavzuni "o'zlashtirilgan" deb
+ * belgilaydi va agent oldinga o'tib ketadi — o'quvchi esa asosni
+ * bilmay qoladi. Bilmaganini ayta olish keyingi darslarni saqlaydi.
+ */
+export const AGENT_QUIZ_PROMPT = `Sen dars materialini tekshiruvchi testni tuzuvchi metodistsan. Faqat JSON qaytar.
+
+FORMAT:
+{"questions":[{"id":1,"question":"...","difficulty":"easy|medium|hard","options":[{"id":"a","text":"..."},{"id":"b","text":"..."},{"id":"c","text":"..."},{"id":"d","text":"Bilmayman"}],"correct":"b","explanation":"nega shunday"}]}
+
+QOIDALAR:
+1. Aniq 5 ta savol: 2 ta easy, 2 ta medium, 1 ta hard.
+2. Har savolda 4 ta variant. OXIRGI variant aynan "Bilmayman" bo'lsin va hech qachon to'g'ri javob bo'lmasin.
+3. Savollar TUSHUNISHNI tekshirsin: ta'rifni yodlaganini emas, qo'llay olishini. "X nima?" o'rniga "Bu kod nima qaytaradi?" turidagi savol yaxshiroq.
+4. \`explanation\` — o'quvchi javobdan keyin o'qiydi. Nega to'g'ri javob to'g'ri ekanini tushuntir, bir-ikki gap.
+5. Savol matni 200 belgidan, variant 80 belgidan oshmasin.
+6. Faqat berilgan mavzu doirasida. Keyingi mavzular bilimini talab qilma.`;
+
+/* =============================================================
+ * KOD TOPSHIRIG'I
+ * ============================================================= */
+
+/**
+ * Amaliy topshiriq. Dars kabi keshlanadi.
+ *
+ * `input()` orqali stdin dan o'qish talab qilinadi, chunki yechim
+ * Judge0/Piston da stdin berib ishga tushiriladi va stdout
+ * kutilgan natija bilan solishtiriladi. Funksiya qaytaruvchi
+ * yechimlarni avtomatik tekshirish uchun har til uchun alohida
+ * "runner" yozish kerak bo'lardi.
+ */
+export const AGENT_TASK_PROMPT = `Sen dasturlash bo'yicha amaliy topshiriq tuzuvchi metodistsan. Faqat JSON qaytar.
+
+FORMAT:
+{"title":"...","description":"...","language":"python","starter_code":"...","solution_code":"...","test_cases":[{"input":"5","expected_output":"25","is_hidden":false}],"hints":["...","..."]}
+
+QOIDALAR:
+1. Topshiriq berilgan mavzu doirasida va berilgan darajaga mos bo'lsin. "zero" yoki "beginner" darajada 5-10 satrlik yechim yetarli.
+2. Dastur stdin dan \`input()\` bilan o'qisin va natijani \`print()\` bilan chiqarsin. Funksiya qaytaruvchi yechim EMAS — chiqish tekshiriladi.
+3. \`description\` da kirish formati va chiqish formati ANIQ yozilsin: nechta satr keladi, nima chiqishi kerak. Noaniq shart eng ko'p uchraydigan xato sababi.
+4. \`test_cases\`: aniq 5 ta. Birinchi 2 tasi \`is_hidden: false\` (o'quvchi ko'radi va misol sifatida ishlatadi), qolgan 3 tasi \`is_hidden: true\`.
+5. Yashirin testlar chegara holatlarni tekshirsin: nol, manfiy son, bo'sh satr, eng katta qiymat — mavzuga qarab.
+6. \`expected_output\` — aynan \`print()\` chiqaradigan matn. Ortiqcha bo'shliq yoki tinish belgisi qo'shma.
+7. \`starter_code\` — bo'sh qolip: input o'qish satri va izoh. To'liq yechim BERMA.
+8. \`solution_code\` — ishlaydigan to'liq yechim. U hamma testlardan o'tishi shart.
+9. \`hints\` — 3 ta maslahat, birinchisi eng umumiy, uchinchisi eng aniq. Uchinchisi ham to'liq yechim bo'lmasin.
+10. Matnlar berilgan tilda, kod va o'zgaruvchi nomlari inglizcha.`;
+
+export interface TaskPromptInput {
+  topicTitle: string;
+  topicKey: string;
+  level: string;
+  language: string;
+  lang?: string;
+}
+
+export function buildTaskPrompt(input: TaskPromptInput): string {
+  const langName = LANG_NAMES[input.lang || 'uz'] || LANG_NAMES.uz;
+  return [
+    `Mavzu: ${input.topicTitle}`,
+    `Mavzu kaliti: ${input.topicKey}`,
+    `Daraja: ${input.level}`,
+    `Dasturlash tili: ${input.language}`,
+    `Til: topshiriq matni ${langName} tilida.`,
+    '',
+    'Shu mavzu bo\'yicha amaliy topshiriq tuz.',
+  ].join('\n');
+}
+
+/**
+ * O'zlashtira olmagan mavzu uchun qo'shimcha modul.
+ *
+ * Bu — agentning "o'zi rejani kuzatadi" degan qismining eng
+ * ko'rinadigan joyi: reja o'zgarmas ro'yxat emas, natijaga javob
+ * beradi.
+ */
+export const AGENT_REMEDIAL_PROMPT = `Sen o'quvchiga qiyin kelgan mavzuni boshqacha yo'l bilan tushuntirishni rejalashtiruvchi metodistsan. Faqat JSON qaytar.
+
+FORMAT:
+{"title":"...","summary":"bir gap","topic_key":"...","estimated_minutes":25}
+
+QOIDALAR:
+1. Bu asl mavzuning TAKRORI emas — boshqa tomondan yondashuv bo'lsin: ko'proq amaliyot, soddaroq misollar, mayda qadamlar.
+2. Sarlavhada "takrorlash" so'zini ishlatma — o'quvchini tushkunlikka soladi. "Amaliyot", "Mustahkamlash" kabi so'zlar yaxshiroq.
+3. \`topic_key\` asl mavzu kalitiga yaqin bo'lsin, oxiriga ".practice" qo'sh. Masalan: "python.loops.for" → "python.loops.practice".
+4. \`estimated_minutes\` — 15 dan 40 gacha.`;
 
 /* =============================================================
  * KIRISH TESTI (placement)

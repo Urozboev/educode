@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Send, Loader2, Bot, User, Trash2, Sparkles, Brain, Clock } from "lucide-react";
 import { AILabel, AIDisclaimer } from "@/components/ai/AILabel";
 import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n";
 
 interface Message {
   role: "user" | "assistant";
@@ -13,12 +14,6 @@ interface Message {
   meta?: { model?: string; prompt_template?: string; generated_at?: string };
 }
 
-const suggestions = [
-  "Python da list comprehension nima?",
-  "HTML va CSS nima farqi bor?",
-  "Prompt engineering nima?",
-  "Algoritm murakkabligini qanday hisoblash mumkin?",
-];
 
 interface QuotaInfo {
   used: number;
@@ -30,6 +25,7 @@ interface QuotaInfo {
 }
 
 export default function ChatPage() {
+  const { t, locale } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -112,10 +108,10 @@ export default function ChatPage() {
         if (data.quota.warning) toast.warning(data.quota.warning);
       }
       if (data.cooldownTriggered) {
-        toast.warning("Bir oz dam oling — 30 daqiqalik cooldown ishga tushdi.");
+        toast.warning(t.cabinet.chat.cooldownToast);
       }
     } catch (_e) {
-      setMessages(prev => [...prev, { role: "assistant", content: "⚠️ Xatolik yuz berdi. Qayta urinib ko'ring." }]);
+      setMessages(prev => [...prev, { role: "assistant", content: "⚠️ " + t.cabinet.chat.failed }]);
     }
     setLoading(false);
   }
@@ -139,10 +135,10 @@ export default function ChatPage() {
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div>
           <h1 className="font-display font-bold text-2xl flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-neon-blue" /> AI Mentor
+            <Sparkles className="w-6 h-6 text-neon-blue" /> {t.cabinet.chat.title}
           </h1>
           <p className="text-xs text-muted-foreground">
-            Sokratik usulda yo'l-yo'riq beradi · tayyor yechim bermaydi
+            {t.cabinet.chat.subtitle}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -156,7 +152,7 @@ export default function ChatPage() {
                   ? "bg-neon-yellow/10 border-neon-yellow/20 text-neon-yellow"
                   : "bg-surface border-border text-muted-foreground",
               )}
-              title="Bugungi AI savollari"
+              title={t.cabinet.chat.quotaTitle}
             >
               {quota.cooldownUntil ? <Clock className="w-3.5 h-3.5" /> : <Brain className="w-3.5 h-3.5" />}
               <span>{quota.used}/{quota.limit}</span>
@@ -164,7 +160,7 @@ export default function ChatPage() {
           )}
           {messages.length > 0 && (
             <button onClick={() => setMessages([])} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1">
-              <Trash2 className="w-3.5 h-3.5" /> Tozalash
+              <Trash2 className="w-3.5 h-3.5" /> {t.cabinet.chat.clear}
             </button>
           )}
         </div>
@@ -174,11 +170,11 @@ export default function ChatPage() {
         <div className="mb-3 px-3 py-2 rounded-lg bg-neon-red/5 border border-neon-red/20 text-xs text-neon-red flex items-center gap-2">
           <Clock className="w-4 h-4 flex-shrink-0" />
           <span>
-            Cooldown faol — AI yordami{" "}
+            {t.cabinet.chat.cooldownBefore}{" "}
             <span className="font-semibold">
-              {new Date(quota.cooldownUntil).toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" })}
+              {new Date(quota.cooldownUntil).toLocaleTimeString(locale === "kaa" ? "uz" : locale, { hour: "2-digit", minute: "2-digit" })}
             </span>{" "}
-            dan keyin ochiladi. Shu vaqt ichida mustaqil urinib ko'ring.
+            {t.cabinet.chat.cooldownAfter}
           </span>
         </div>
       )}
@@ -188,15 +184,15 @@ export default function ChatPage() {
         {messages.length === 0 && (
           <div className="text-center py-12">
             <Bot className="w-16 h-16 text-neon-blue/20 mx-auto mb-4" />
-            <h2 className="font-semibold text-lg mb-2">Savol bering!</h2>
+            <h2 className="font-semibold text-lg mb-2">{t.cabinet.chat.emptyTitle}</h2>
             <p className="text-sm text-muted-foreground mb-2">
-              Dasturlash, IT va prompt engineering bo'yicha yo'l-yo'riq olasiz.
+              {t.cabinet.chat.emptyText}
             </p>
             <p className="text-xs text-neon-yellow/80 mb-6">
-              ⚠️ Men topshiriqning to'liq yechimini yozib bermayman — Sokratik savollar bilan o'zingiz yechishingizga yordam beraman.
+              ⚠️ {t.cabinet.chat.emptyWarn}
             </p>
             <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
-              {suggestions.map(s => (
+              {t.cabinet.chat.suggestions.map(s => (
                 <button key={s} onClick={() => handleSend(s)}
                   className="px-3 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border text-xs text-muted-foreground hover:text-foreground transition-all text-left">
                   {s}
@@ -257,14 +253,14 @@ export default function ChatPage() {
         <div className="flex gap-2">
           <input value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleSend()}
-            placeholder="Savol yozing..." className="input-field flex-1" disabled={loading} />
+            placeholder={t.cabinet.chat.placeholder} className="input-field flex-1" disabled={loading} />
           <button onClick={() => handleSend()} disabled={!input.trim() || loading}
             className="btn-primary py-3 px-4 disabled:opacity-50">
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
           </button>
         </div>
         <p className="text-[10px] text-muted-foreground mt-2 text-center">
-          Gemini AI · Faqat IT sohalari bo'yicha · Javoblar har doim to'g'ri bo'lmasligi mumkin
+          Gemini AI · {t.cabinet.chat.footer}
         </p>
       </div>
     </div>

@@ -11,7 +11,7 @@ import {
   Code2, LayoutDashboard, BookOpen, Swords, Gamepad2, Medal,
   BarChart3, Trophy, Store, User, LogOut, ChevronLeft,
   Menu, X, Moon, Sun, Flame, Coins, ChevronDown, MessageCircle,
-  Library, BookMarked, Puzzle, Briefcase, School
+  Library, BookMarked, Puzzle, Briefcase, School, Sparkles
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,6 +34,9 @@ const studentLinks = (t: Dictionary) => [
   { href: "/playground", label: t.cabinet.playground, icon: Code2 },
   { href: "/games", label: t.cabinet.games, icon: Gamepad2 },
   { href: "/chat", label: t.cabinet.aiHelper, icon: MessageCircle },
+  // Ustoz — pullik AI agent. `/chat` dan alohida turadi: u topshiriq
+  // ustida yordam beradi, bu esa noldan o'rgatadigan o'qituvchi.
+  { href: "/agent", label: t.cabinet.agent, icon: Sparkles },
   { href: "/my-results", label: t.cabinet.myResults, icon: BarChart3 },
   { href: "/leaderboard", label: t.cabinet.leaderboard, icon: Trophy },
   { href: "/lesson-games", label: t.nav.lessonGames, icon: Puzzle },
@@ -402,11 +405,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 )}
                 <Link href="/profile" onClick={() => setUserMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-accent transition-colors">
-                  <User className="w-4 h-4" /> Profil
+                  <User className="w-4 h-4" /> {t.cabinet.profile}
                 </Link>
                 <Link href="/my-results" onClick={() => setUserMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-accent transition-colors">
-                  <BarChart3 className="w-4 h-4" /> Natijalarim
+                  <BarChart3 className="w-4 h-4" /> {t.cabinet.myResults}
                 </Link>
                 <button onClick={handleLogout}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-neon-red hover:bg-neon-red/10 transition-colors w-full">

@@ -11,7 +11,8 @@ import {
   Code2, LayoutDashboard, BookOpen, Swords, Users, Award,
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
   ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins, Newspaper,
-  Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy, ShieldCheck, Languages
+  Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy, ShieldCheck, Languages,
+  Sparkles
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,6 +31,9 @@ const adminLinks = [
   { href: "/a-teachers", label: "O'qituvchi arizalari", icon: Presentation },
   { href: "/a-store", label: "Do'kon", icon: ShoppingBag },
   { href: "/a-payments", label: "Coin so'rovlari", icon: Coins },
+  // Ustoz agentining tannarxi: obuna puli LLM va TTS xarajatini
+  // qoplayaptimi degan savolga javob beradi
+  { href: "/a-agent", label: "Agent tannarxi", icon: Sparkles },
   { href: "/a-achievements", label: "Yutuqlar", icon: Award },
   { href: "/a-certificates", label: "Sertifikatlar", icon: GraduationCap },
   { href: "/a-testimonials", label: "Izohlar", icon: MessageSquare },

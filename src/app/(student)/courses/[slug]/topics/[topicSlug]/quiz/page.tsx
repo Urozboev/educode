@@ -45,7 +45,7 @@ export default function QuizPage() {
   const [topicId, setTopicId] = useState("");
   const [courseId, setCourseId] = useState("");
   const [userId, setUserId] = useState("");
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
 
   const quizzes = useMemo(() => {
     return shuffle(rawQuizzes).map((q) => ({
@@ -177,7 +177,7 @@ export default function QuizPage() {
   if (quizzes.length === 0)
     return (
       <div className="text-center py-20">
-        <p className="text-muted-foreground mb-4">Bu mavzu uchun test mavjud emas.</p>
+        <p className="text-muted-foreground mb-4">{t.courses.topic.noQuiz}</p>
         <Link
           href={`/courses/${slug}/topics/${topicSlug}`}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition"
@@ -221,19 +221,19 @@ export default function QuizPage() {
             )}
           </div>
           <h2 className="font-display font-extrabold text-2xl md:text-3xl tracking-tight mb-3">
-            {passed ? "Tabriklaymiz!" : "Qayta urinib ko'ring"}
+            {passed ? t.courses.topic.congrats : t.courses.topic.tryAgain}
           </h2>
           <div className="font-display font-extrabold text-5xl md:text-6xl mb-2 tracking-tight">
             <span className={passed ? "text-neon-green" : "text-neon-red"}>{score}</span>
             <span className="text-muted-foreground text-3xl">/{quizzes.length}</span>
           </div>
-          <p className="text-[15px] text-muted-foreground mb-7">{percentage}% to'g'ri javob</p>
+          <p className="text-[15px] text-muted-foreground mb-7">{percentage}% {t.courses.topic.correctAnswers}</p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <button
               onClick={handleRetry}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition"
             >
-              <RotateCcw className="w-4 h-4" /> Qayta
+              <RotateCcw className="w-4 h-4" /> {t.courses.topic.retry}
             </button>
             <button
               onClick={getAIFeedback}
@@ -349,7 +349,7 @@ export default function QuizPage() {
           exit={{ opacity: 0, x: -20 }}
         >
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-            {current.question_type === "multiple" ? "Bir nechtasini tanlang" : "Bitta javobni tanlang"}
+            {current.question_type === "multiple" ? t.courses.topic.pickMany : t.courses.topic.pickOne}
           </p>
           {/* Savol matnida kod namunalari ko'p qatorli bo'lishi mumkin —
               qator uzilishlari saqlanadi */}

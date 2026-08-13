@@ -29,6 +29,25 @@ export const PLAN_PRICES_UZS: Record<Exclude<AgentPlan, 'free'>, number> = {
   pro_plus: 99000,
 };
 
+/** Uzoqroq muddatga chegirma — obunani uzaytirish arzonroq bo'lsin */
+export const MONTH_OPTIONS = [1, 3, 12] as const;
+export const MONTH_DISCOUNT: Record<number, number> = { 1: 0, 3: 0.1, 12: 0.2 };
+
+/**
+ * To'lov summasi. Narx FAQAT shu yerda hisoblanadi — mijoz yuborgan
+ * summaga ishonmaymiz, aks holda 1 so'mga obuna sotib olish mumkin
+ * bo'lardi.
+ */
+export function subscriptionAmount(
+  plan: Exclude<AgentPlan, 'free'>,
+  months: number,
+): number {
+  const base = PLAN_PRICES_UZS[plan] * months;
+  const discounted = base * (1 - (MONTH_DISCOUNT[months] ?? 0));
+  // Provayderlar butun so'm bilan ishlaydi
+  return Math.round(discounted / 1000) * 1000;
+}
+
 export async function getAgentAccess(
   supabase: SupabaseClient,
   userId: string | null,

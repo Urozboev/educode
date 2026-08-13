@@ -12,6 +12,7 @@ import {
   Save, Loader2, Plus, Pencil, Trash2, X, ExternalLink, Eye, EyeOff,
   Github, Send, Linkedin, Globe, Briefcase, AlertCircle, Copy, Check,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type ProfileForm = {
   username: string;
@@ -31,6 +32,7 @@ const emptyProject = {
 };
 
 export function PortfolioEditor() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [userId, setUserId] = useState<string | null>(null);
   const [form, setForm] = useState<ProfileForm>({
@@ -80,8 +82,8 @@ export function PortfolioEditor() {
   async function saveProfile() {
     if (!userId) return;
     const uname = slugify(form.username, { lower: true, strict: true });
-    if (!uname) { toast.error("Foydalanuvchi nomini kiriting"); return; }
-    if (uname.length < 3) { toast.error("Nom kamida 3 ta belgidan iborat bo'lsin"); return; }
+    if (!uname) { toast.error(t.cabinet.portfolioEditor.usernameRequired); return; }
+    if (uname.length < 3) { toast.error(t.cabinet.portfolioEditor.usernameShort); return; }
 
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
@@ -101,13 +103,13 @@ export function PortfolioEditor() {
       // username UNIQUE — eng ko'p uchraydigan xato shu
       toast.error(
         error.code === "23505"
-          ? "Bu foydalanuvchi nomi band, boshqasini tanlang"
+          ? t.cabinet.portfolioEditor.usernameTaken
           : error.message
       );
       return;
     }
     setForm(f => ({ ...f, username: uname }));
-    toast.success("Saqlandi");
+    toast.success(t.cabinet.portfolioEditor.saved);
   }
 
   function openNewProject() { setPForm(emptyProject); setEditId(null); setShowForm(true); }
@@ -123,7 +125,7 @@ export function PortfolioEditor() {
 
   async function saveProject() {
     if (!userId) return;
-    if (!pForm.title.trim()) { toast.error("Loyiha nomini kiriting"); return; }
+    if (!pForm.title.trim()) { toast.error(t.cabinet.portfolioEditor.projectTitleRequired); return; }
     setSavingProject(true);
 
     const payload = {
@@ -143,7 +145,7 @@ export function PortfolioEditor() {
 
     setSavingProject(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(editId ? "Saqlandi" : "Qo'shildi");
+    toast.success(editId ? t.cabinet.portfolioEditor.saved : t.cabinet.portfolioEditor.added);
     setShowForm(false);
     load();
   }
@@ -151,7 +153,7 @@ export function PortfolioEditor() {
   async function delProject(p: PortfolioProject) {
     if (!confirm(`"${p.title}" o'chirilsinmi?`)) return;
     await supabase.from("portfolio_projects").delete().eq("id", p.id);
-    toast.success("O'chirildi");
+    toast.success(t.cabinet.portfolioEditor.deleted);
     load();
   }
 
@@ -173,8 +175,7 @@ export function PortfolioEditor() {
           <Briefcase className="w-6 h-6 text-neon-purple" /> Portfolio
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Kurslar, sertifikatlar va topshiriqlar avtomatik qo&apos;shiladi — siz
-          faqat o&apos;zingiz haqingizda yozasiz va loyihalaringizni qo&apos;shasiz.
+          {t.cabinet.portfolioEditor.subtitle}
         </p>
       </div>
 
@@ -190,12 +191,12 @@ export function PortfolioEditor() {
           : <EyeOff className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />}
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm">
-            {form.is_portfolio_public ? "Portfolio ochiq" : "Portfolio yopiq"}
+            {form.is_portfolio_public ? t.cabinet.portfolioEditor.publicOn : t.cabinet.portfolioEditor.publicOff}
           </p>
           <p className="text-sm text-muted-foreground mt-0.5">
             {form.is_portfolio_public
-              ? "Havolani bilgan har kim ko'ra oladi."
-              : "Hozircha faqat siz ko'rasiz. Ochish uchun tugmani bosing."}
+              ? t.cabinet.portfolioEditor.publicOnHint
+              : t.cabinet.portfolioEditor.publicOffHint}
           </p>
           {form.is_portfolio_public && form.username && (
             <div className="flex items-center gap-2 mt-3 flex-wrap">
@@ -204,10 +205,10 @@ export function PortfolioEditor() {
               </code>
               <button onClick={copyLink} className="inline-flex items-center gap-1.5 text-xs font-semibold text-neon-purple hover:underline">
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? "Nusxalandi" : "Havolani nusxalash"}
+                {copied ? t.cabinet.portfolioEditor.copied : t.cabinet.portfolioEditor.copyLink}
               </button>
               <Link href={`/u/${form.username}`} target="_blank" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-                <ExternalLink className="w-3.5 h-3.5" /> Ochish
+                <ExternalLink className="w-3.5 h-3.5" /> {t.cabinet.portfolioEditor.open}
               </Link>
             </div>
           )}
@@ -221,16 +222,16 @@ export function PortfolioEditor() {
               : "bg-foreground text-background hover:opacity-90"
           )}
         >
-          {form.is_portfolio_public ? "Yopish" : "Ochish"}
+          {form.is_portfolio_public ? t.cabinet.portfolioEditor.close : t.cabinet.portfolioEditor.open}
         </button>
       </div>
 
       {/* Profil */}
       <section className="space-y-4">
-        <h2 className="eyebrow">Asosiy ma&apos;lumot</h2>
+        <h2 className="eyebrow">{t.cabinet.portfolioEditor.basicInfo}</h2>
 
         <div>
-          <label className="text-sm font-medium mb-1 block">Foydalanuvchi nomi *</label>
+          <label className="text-sm font-medium mb-1 block">{t.cabinet.portfolioEditor.username} *</label>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-sm">/u/</span>
             <input
@@ -241,48 +242,48 @@ export function PortfolioEditor() {
             />
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Portfolio manzili shu nomdan tuziladi. Faqat lotin harflari, raqam va chiziqcha.
+            {t.cabinet.portfolioEditor.usernameHint}
           </p>
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-1 block">Qisqa tavsif</label>
+          <label className="text-sm font-medium mb-1 block">{t.cabinet.portfolioEditor.headline}</label>
           <input
             value={form.headline}
             onChange={e => setForm({ ...form, headline: e.target.value })}
             className="input-field"
-            placeholder="Python o'rganayotgan 9-sinf o'quvchisi"
+            placeholder={t.cabinet.portfolioEditor.headlinePh}
             maxLength={120}
           />
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-1 block">O&apos;zingiz haqingizda</label>
+          <label className="text-sm font-medium mb-1 block">{t.cabinet.portfolioEditor.about}</label>
           <textarea
             value={form.bio}
             onChange={e => setForm({ ...form, bio: e.target.value })}
             className="input-field resize-none"
             rows={4}
-            placeholder="Nimalarni o'rganyapsiz, nima qilishni yoqtirasiz, maqsadingiz nima"
+            placeholder={t.cabinet.portfolioEditor.aboutPh}
             maxLength={600}
           />
           <p className="text-xs text-muted-foreground mt-1">{form.bio.length}/600</p>
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-1 block">Ko&apos;nikmalar (vergul bilan)</label>
+          <label className="text-sm font-medium mb-1 block">{t.cabinet.portfolioEditor.skills}</label>
           <input
             value={form.skills}
             onChange={e => setForm({ ...form, skills: e.target.value })}
             className="input-field"
-            placeholder="Python, HTML, CSS, Git"
+            placeholder={t.cabinet.portfolioEditor.skillsPh}
           />
         </div>
       </section>
 
       {/* Havolalar */}
       <section className="space-y-4">
-        <h2 className="eyebrow">Havolalar</h2>
+        <h2 className="eyebrow">{t.cabinet.portfolioEditor.links}</h2>
         <div className="grid sm:grid-cols-2 gap-4">
           <LinkField Icon={Github} label="GitHub" value={form.github_url}
             onChange={v => setForm({ ...form, github_url: v })} placeholder="https://github.com/..." />
@@ -290,20 +291,19 @@ export function PortfolioEditor() {
             onChange={v => setForm({ ...form, telegram_username: v })} placeholder="@username" />
           <LinkField Icon={Linkedin} label="LinkedIn" value={form.linkedin_url}
             onChange={v => setForm({ ...form, linkedin_url: v })} placeholder="https://linkedin.com/in/..." />
-          <LinkField Icon={Globe} label="Shaxsiy sayt" value={form.website_url}
+          <LinkField Icon={Globe} label={t.cabinet.portfolioEditor.website} value={form.website_url}
             onChange={v => setForm({ ...form, website_url: v })} placeholder="https://..." />
         </div>
 
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-surface/60 border border-border text-xs text-muted-foreground">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span className="leading-relaxed">
-            Portfolio ochiq bo&apos;lsa bu havolalar hammaga ko&apos;rinadi. Shaxsiy
-            telefon raqami yoki manzilingizni yozmang.
+            {t.cabinet.portfolioEditor.linksWarning}
           </span>
         </div>
 
         <button onClick={saveProfile} disabled={saving} className="btn-primary py-2.5 px-6 text-sm inline-flex items-center gap-2 disabled:opacity-50">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlash
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {t.common.save}
         </button>
       </section>
 
@@ -311,11 +311,11 @@ export function PortfolioEditor() {
       <section className="space-y-4 pt-6 border-t border-border/60">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-display font-bold text-lg">Loyihalar</h2>
-            <p className="text-sm text-muted-foreground">O&apos;zingiz yaratgan ishlar</p>
+            <h2 className="font-display font-bold text-lg">{t.cabinet.portfolioEditor.projects}</h2>
+            <p className="text-sm text-muted-foreground">{t.cabinet.portfolioEditor.projectsHint}</p>
           </div>
           <button onClick={openNewProject} className="btn-ghost py-2 px-4 text-sm inline-flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Qo&apos;shish
+            <Plus className="w-4 h-4" /> {t.cabinet.portfolioEditor.add}
           </button>
         </div>
 
@@ -329,7 +329,7 @@ export function PortfolioEditor() {
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-display font-semibold text-sm">
-                  {editId ? "Loyihani tahrirlash" : "Yangi loyiha"}
+                  {editId ? t.cabinet.portfolioEditor.editProject : t.cabinet.portfolioEditor.newProject}
                 </h3>
                 <button onClick={() => setShowForm(false)} className="p-1.5 hover:bg-accent rounded-lg">
                   <X className="w-4 h-4" />
@@ -337,27 +337,27 @@ export function PortfolioEditor() {
               </div>
 
               <input value={pForm.title} onChange={e => setPForm({ ...pForm, title: e.target.value })}
-                className="input-field" placeholder="Loyiha nomi *" />
+                className="input-field" placeholder={t.cabinet.portfolioEditor.projectTitlePh} />
               <textarea value={pForm.description} onChange={e => setPForm({ ...pForm, description: e.target.value })}
-                className="input-field resize-none" rows={3} placeholder="Nima qiladi va nimadan foydalandingiz" maxLength={400} />
+                className="input-field resize-none" rows={3} placeholder={t.cabinet.portfolioEditor.projectDescPh} maxLength={400} />
 
               <div className="grid sm:grid-cols-2 gap-3">
                 <input value={pForm.demo_url} onChange={e => setPForm({ ...pForm, demo_url: e.target.value })}
-                  className="input-field text-sm" placeholder="Ishlayotgan havola" />
+                  className="input-field text-sm" placeholder={t.cabinet.portfolioEditor.demoPh} />
                 <input value={pForm.repo_url} onChange={e => setPForm({ ...pForm, repo_url: e.target.value })}
-                  className="input-field text-sm" placeholder="Kod havolasi (GitHub)" />
+                  className="input-field text-sm" placeholder={t.cabinet.portfolioEditor.repoPh} />
               </div>
 
               <input value={pForm.tech} onChange={e => setPForm({ ...pForm, tech: e.target.value })}
-                className="input-field text-sm" placeholder="Texnologiyalar: Python, Flask" />
+                className="input-field text-sm" placeholder={t.cabinet.portfolioEditor.techPh} />
               <input value={pForm.cover_url} onChange={e => setPForm({ ...pForm, cover_url: e.target.value })}
-                className="input-field text-sm" placeholder="Rasm havolasi (ixtiyoriy)" />
+                className="input-field text-sm" placeholder={t.cabinet.portfolioEditor.coverPh} />
 
               <div className="flex justify-end gap-2">
-                <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-4 text-sm">Bekor</button>
+                <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-4 text-sm">{t.common.cancel}</button>
                 <button onClick={saveProject} disabled={savingProject}
                   className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2 disabled:opacity-50">
-                  {savingProject ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlash
+                  {savingProject ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {t.common.save}
                 </button>
               </div>
             </motion.div>
@@ -367,7 +367,7 @@ export function PortfolioEditor() {
         {projects.length === 0 ? (
           <div className="py-10 text-center border border-dashed border-border rounded-xl">
             <Briefcase className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">Hali loyiha qo&apos;shilmagan</p>
+            <p className="text-sm text-muted-foreground">{t.cabinet.portfolioEditor.noProjects}</p>
           </div>
         ) : (
           <div className="space-y-2">

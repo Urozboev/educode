@@ -4,14 +4,19 @@
  * POST { action: "generate", direction }  → savollar
  * POST { action: "submit", assessmentId, answers } → daraja va zaif mavzular
  *
- * To'g'ri javoblar mijozga HECH QACHON yuborilmaydi: ular
- * `agent_assessments.payload` da serverda qoladi. Aks holda testni
- * DevTools'da ochib ko'rish yetarli bo'lardi va daraja aniqlash
- * ma'nosini yo'qotardi.
+ * To'g'ri javoblar mijozga HECH QACHON yuborilmaydi va
+ * `agent_assessments` ga ham yozilmaydi — ular `agent_quizzes` da
+ * saqlanadi, u jadvalda RLS yoqilgan lekin policy yo'q, ya'ni faqat
+ * service role o'qiy oladi.
+ *
+ * `agent_assessments` egasiga o'qishga ochiq: savollarni javoblari
+ * bilan o'sha yerga yozganimizda, foydalanuvchi o'z qatorini Supabase
+ * klienti orqali o'qib, javoblarni testdan oldin ko'ra olardi.
  */
 
+import { randomUUID } from 'crypto';
 import { NextRequest } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
 import { getAgentAccess, paywallMessage } from '@/lib/agent/access';
 import {
   generatePlacement,
@@ -49,12 +54,34 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: error || 'Test tuzilmadi' }, { status: 502 });
     }
 
+    // Savollar server-only jadvalga. Kirish testi keshlanmaydi —
+    // har foydalanuvchiga yangi savol tuziladi, shuning uchun
+    // kalit tasodifiy. Jadval bu yerda kesh emas, "sandiq" vazifasida.
+    const admin = createAdminClient();
+    const { data: quizRow, error: quizErr } = await admin
+      .from('agent_quizzes')
+      .insert({
+        cache_key: `placement|${randomUUID()}`,
+        topic_key: 'placement',
+        level: 'mixed',
+        lang,
+        questions,
+        prompt_version: AGENT_PROMPT_VERSIONS.placement,
+        model: process.env.AGENT_PLANNER_MODEL || process.env.AGENT_MODEL || 'gemini-flash-latest',
+      })
+      .select('id')
+      .single();
+
+    if (quizErr || !quizRow) {
+      return Response.json({ error: quizErr?.message || 'Saqlanmadi' }, { status: 500 });
+    }
+
     const { data: row, error: insErr } = await supabase
       .from('agent_assessments')
       .insert({
         user_id: user.id,
         kind: 'placement',
-        payload: { direction, lang, questions, prompt_version: AGENT_PROMPT_VERSIONS.placement },
+        payload: { direction, lang, quiz_id: quizRow.id, prompt_version: AGENT_PROMPT_VERSIONS.placement },
       })
       .select('id')
       .single();
@@ -98,7 +125,16 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Bu test allaqachon topshirilgan' }, { status: 409 });
     }
 
-    const questions = (row.payload?.questions || []) as PlacementQuestion[];
+    const admin = createAdminClient();
+    const { data: quiz } = await admin
+      .from('agent_quizzes')
+      .select('questions')
+      .eq('id', row.payload?.quiz_id)
+      .maybeSingle();
+
+    if (!quiz) return Response.json({ error: 'Test savollari topilmadi' }, { status: 500 });
+
+    const questions = (quiz.questions || []) as PlacementQuestion[];
     const result = gradePlacement(questions, answers);
 
     await supabase

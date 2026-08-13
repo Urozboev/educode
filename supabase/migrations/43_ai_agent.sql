@@ -512,7 +512,191 @@ CREATE TRIGGER agent_messages_touch AFTER INSERT ON agent_messages
 
 
 -- ============================================
--- 11. STORAGE — ovoz fayllari
+-- 11. TEST KESHI
+-- ============================================
+-- Dars kabi, test ham foydalanuvchiga bog'liq emas: bir mavzu +
+-- daraja + til uchun bitta test yetadi. Alohida jadval kerak,
+-- chunki `agent_assessments` shaxsiy (kim nima javob berdi), bu esa
+-- umumiy (savollarning o'zi).
+--
+-- MUHIM: bu jadvalda TO'G'RI JAVOBLAR turadi. Shuning uchun unga
+-- SELECT policy umuman berilmagan — faqat service role o'qiydi.
+-- Foydalanuvchiga savollar `correct` maydonisiz uzatiladi.
+CREATE TABLE IF NOT EXISTS agent_quizzes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cache_key TEXT NOT NULL UNIQUE,        -- topic_key|level|lang|prompt_version
+  topic_key TEXT NOT NULL,
+  level TEXT NOT NULL,
+  lang TEXT NOT NULL DEFAULT 'uz',
+  questions JSONB NOT NULL,
+  prompt_version TEXT NOT NULL DEFAULT 'agent_quiz_v1',
+  model TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  hit_count INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE agent_quizzes ENABLE ROW LEVEL SECURITY;
+-- Ataylab hech qanday policy yo'q: RLS yoqilgan, policy yo'q =
+-- oddiy foydalanuvchi hech narsa ko'rmaydi.
+
+
+-- ============================================
+-- 11b. KOD TOPSHIRIQLARI KESHI
+-- ============================================
+-- Dars va test kabi keshlanadi. `payload` ichida yashirin testlar
+-- va namunaviy yechim ham bor — shuning uchun bu jadval ham
+-- server-only: RLS yoqilgan, policy yo'q.
+CREATE TABLE IF NOT EXISTS agent_tasks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cache_key TEXT NOT NULL UNIQUE,       -- topic_key|level|lang|prompt_version
+  topic_key TEXT NOT NULL,
+  level TEXT NOT NULL,
+  lang TEXT NOT NULL DEFAULT 'uz',
+  language TEXT NOT NULL DEFAULT 'python',
+  payload JSONB NOT NULL,
+  prompt_version TEXT NOT NULL DEFAULT 'agent_task_v1',
+  model TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  hit_count INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE agent_tasks ENABLE ROW LEVEL SECURITY;
+-- Policy ataylab yo'q — faqat service role o'qiydi
+
+
+-- ============================================
+-- 12. TRACKER — rejani natijaga qarab o'zgartirish
+-- ============================================
+-- O'quvchi mavzuni o'zlashtira olmasa, agent rejaga qo'shimcha
+-- takrorlash moduli qo'shadi. Buning uchun keyingi modullarning
+-- tartib raqamini surish kerak.
+--
+-- `UNIQUE (track_id, order_index)` bir vaqtning o'zida surishga
+-- xalaqit beradi: bitta UPDATE bilan hammasini +1 qilsak, oraliq
+-- holatda ikki modulda bir xil raqam paydo bo'lib, cheklov buziladi.
+-- Shu sababli teskari tartibda, bittalab suriladi.
+CREATE OR REPLACE FUNCTION agent_insert_remedial_module(
+  p_track_id UUID,
+  p_after_index INT,
+  p_title TEXT,
+  p_summary TEXT,
+  p_topic_key TEXT,
+  p_level TEXT,
+  p_minutes INT DEFAULT 25
+) RETURNS UUID
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_row RECORD;
+  v_id UUID;
+BEGIN
+  -- Egalik tekshiruvi: SECURITY DEFINER RLS'ni chetlab o'tadi,
+  -- shuning uchun tekshiruvni o'zimiz qilamiz
+  IF NOT EXISTS (
+    SELECT 1 FROM agent_tracks
+     WHERE id = p_track_id AND user_id = auth.uid()
+  ) THEN
+    RAISE EXCEPTION 'Bu reja sizga tegishli emas';
+  END IF;
+
+  FOR v_row IN
+    SELECT id, order_index FROM agent_modules
+     WHERE track_id = p_track_id AND order_index > p_after_index
+     ORDER BY order_index DESC
+  LOOP
+    UPDATE agent_modules
+       SET order_index = v_row.order_index + 1
+     WHERE id = v_row.id;
+  END LOOP;
+
+  INSERT INTO agent_modules (
+    track_id, order_index, title, summary, topic_key, level,
+    estimated_minutes, status
+  ) VALUES (
+    p_track_id, p_after_index + 1, p_title, p_summary, p_topic_key, p_level,
+    p_minutes, 'active'
+  )
+  RETURNING id INTO v_id;
+
+  RETURN v_id;
+END $$;
+
+
+-- ============================================
+-- 13. OBUNA TO'LOVI
+-- ============================================
+-- Payme webhook'i tranzaksiya holatini buyurtma qatorida saqlaydi
+-- (`coin_purchase_requests` da xuddi shu ustunlar bor). Obuna
+-- to'lovi ham xuddi shu endpointdan o'tadi, shuning uchun bu
+-- jadvalga ham o'sha ustunlar kerak.
+--
+-- NEGA BITTA ENDPOINT: Payme'da bitta kassaga bitta endpoint URL
+-- beriladi. Obuna uchun alohida endpoint ochish alohida kassa
+-- ochishni talab qilardi. Webhook UUID bo'yicha ikkala jadvaldan
+-- qidiradi — bu ancha sodda.
+ALTER TABLE agent_subscription_events
+  ADD COLUMN IF NOT EXISTS payme_state INT,
+  ADD COLUMN IF NOT EXISTS payme_create_time BIGINT,
+  ADD COLUMN IF NOT EXISTS payme_perform_time BIGINT,
+  ADD COLUMN IF NOT EXISTS payme_cancel_time BIGINT;
+
+CREATE INDEX IF NOT EXISTS agent_subscription_events_txn_idx
+  ON agent_subscription_events(provider_txn_id);
+
+/**
+ * To'lov tasdiqlanganda obunani yoqadi.
+ *
+ * IDEMPOTENT: Payme `PerformTransaction` ni qayta yuborishi mumkin
+ * va Click ham `Complete` ni takrorlashi mumkin. Ikkinchi chaqiruv
+ * obunani ikki marta uzaytirib yubormasligi kerak — shuning uchun
+ * `status = 'paid'` bo'lsa funksiya hech narsa qilmaydi.
+ */
+CREATE OR REPLACE FUNCTION activate_agent_subscription(p_event_id UUID)
+RETURNS BOOLEAN
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_event agent_subscription_events%ROWTYPE;
+  v_current_expiry TIMESTAMPTZ;
+  v_base TIMESTAMPTZ;
+BEGIN
+  SELECT * INTO v_event FROM agent_subscription_events WHERE id = p_event_id;
+  IF NOT FOUND THEN RETURN false; END IF;
+  IF v_event.status = 'paid' THEN RETURN true; END IF;   -- takroriy chaqiruv
+
+  UPDATE agent_subscription_events SET status = 'paid' WHERE id = p_event_id;
+
+  SELECT expires_at INTO v_current_expiry
+    FROM agent_subscriptions WHERE user_id = v_event.user_id;
+
+  -- Muddati tugamagan obunani uzaytirsak, qolgan kunlar yonib
+  -- ketmasligi kerak: yangi muddat eski tugash sanasidan boshlanadi.
+  v_base := GREATEST(COALESCE(v_current_expiry, now()), now());
+
+  INSERT INTO agent_subscriptions (
+    user_id, plan, status, payment_provider, started_at, expires_at
+  ) VALUES (
+    v_event.user_id, v_event.plan, 'active', v_event.payment_provider,
+    now(), v_base + (v_event.months || ' months')::INTERVAL
+  )
+  ON CONFLICT (user_id) DO UPDATE SET
+    plan             = EXCLUDED.plan,
+    status           = 'active',
+    payment_provider = EXCLUDED.payment_provider,
+    started_at       = COALESCE(agent_subscriptions.started_at, now()),
+    expires_at       = EXCLUDED.expires_at,
+    updated_at       = now();
+
+  RETURN true;
+END $$;
+
+
+-- ============================================
+-- 14. STORAGE — ovoz fayllari
 -- ============================================
 -- TTS natijasi shu bucket'ga yoziladi. Public: audio elementi
 -- imzolangan URL bilan ishlashi mumkin, lekin har eshitishda yangi

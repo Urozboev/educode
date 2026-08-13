@@ -272,6 +272,10 @@ shu yerda saqlanadi.
 | `AISHA_API_KEY` | **O'zbekcha ovoz.** Kalitsiz agent brauzer sintezidan foydalanadi |
 | `AISHA_TTS_MODEL` / `AISHA_TTS_MOOD` | Ixtiyoriy. Sukut: `Gulnoza` / `Neutral` |
 | `AGENT_TTS_PROVIDER` | Ixtiyoriy: `aisha` \| `gemini` \| `browser` — avtomatik tanlovni bekor qiladi |
+| `AGENT_COST_INPUT_PER_M` | Tannarx hisobi: 1M kirish tokeni narxi (USD). Sukut: 0.3 |
+| `AGENT_COST_OUTPUT_PER_M` | 1M chiqish tokeni narxi. Sukut: 2.5 |
+| `AGENT_COST_TTS_PER_1K` | 1000 belgi TTS narxi. Sukut: 0.015 |
+| `USD_UZS_RATE` | Daromadni USD ga o'girish kursi. Sukut: 12800 |
 
 > **Gemini o'zbekcha GAPIRMAYDI.** Gemini TTS 84 tilni qo'llaydi, o'zbek
 > tili ular ro'yxatida yo'q (Google Cloud TTS da ham `uz-UZ` yo'q).
@@ -295,6 +299,122 @@ ular `agent_assessments.payload` da serverda qoladi.
 Modullardagi `topic_key` (masalan `css.basics.selectors`) — dars
 keshining kaliti. `normalizeTopicKey()` uni majburan bir ko'rinishga
 soladi: aks holda bir mavzu ikki xil kalit olib, kesh ishlamay qolardi.
+
+**Dars va kesh** (`/agent/dars/<moduleId>`): modul bosilganda dars
+matni `agent_lessons` dan olinadi, bo'lmasa generatsiya qilinib
+o'sha yerga yoziladi.
+
+Kesh kaliti: `topic_key|level|lang|prompt_version`. Dars kontenti
+foydalanuvchiga bog'liq emas — promptga ism, maqsad va xotira
+**qo'shilmaydi**. Shu tufayli bitta dars matni hamma o'quvchiga
+xizmat qiladi: 1000 talaba uchun keshsiz 1000 marta to'lardik.
+Shaxsiylashtirish suhbatda bo'ladi, darsda emas.
+
+`prompt_version` kalit ichida turadi: promptni yaxshilab versiyani
+ko'tarsangiz, eski darslar avtomatik chetlab o'tiladi — keshni qo'lda
+tozalash kerak emas.
+
+Dars HTML'i modeldan keladi va sahifaga `dangerouslySetInnerHTML`
+bilan qo'yiladi, shuning uchun `sanitizeLessonHtml()` uni oq ro'yxat
+bo'yicha tozalaydi (script, iframe, `on*` atributlari, barcha
+atributlar olib tashlanadi). Mavzu nomi foydalanuvchidan kelgani
+uchun bu nazariy emas, real yo'l.
+
+Keshdan kelgan dars uchun token hisobga **qo'shilmaydi** — aks holda
+tannarx hisoboti haqiqatdan ancha yuqori ko'rinardi.
+
+**Test va Tracker:** dars o'qilgach test beriladi (5 savol, keshlanadi).
+Natijaga qarab agent uch yo'ldan birini tanlaydi:
+
+| Ball | Nima bo'ladi |
+|---|---|
+| 70+ | Modul tugadi, keyingisi ochiladi |
+| 40-69 | Modul ochiq qoladi — darsni qayta o'qib, testni qayta topshirish |
+| 40 dan past | Rejaga **qo'shimcha amaliyot moduli qo'shiladi** |
+
+Uchinchi holat — reja o'zgarmas ro'yxat emasligining amaldagi
+ko'rinishi. Yangi modul `agent_insert_remedial_module()` RPC orqali
+qo'shiladi: `UNIQUE (track_id, order_index)` tufayli keyingi
+modullarning raqami bittalab, teskari tartibda suriladi (bitta
+UPDATE bilan qilinsa, oraliq holatda cheklov buziladi).
+
+Modul holati dars o'qilganda emas, **test natijasida** o'zgaradi —
+aks holda darsni ochib yopgan o'quvchida mavzu "o'zlashtirilgan"
+bo'lib qolardi.
+
+> **Xavfsizlik:** test savollari to'g'ri javoblari bilan
+> `agent_quizzes` da saqlanadi. Bu jadvalda RLS yoqilgan, lekin
+> birorta ham policy yo'q — ya'ni faqat service role o'qiy oladi.
+> `agent_assessments` (shaxsiy, egasiga o'qishga ochiq) da faqat
+> `quiz_id` turadi. Savollarni javoblari bilan o'sha yerga
+> yozganimizda, foydalanuvchi o'z qatorini Supabase klienti orqali
+> o'qib, javoblarni testdan oldin ko'ra olardi. Kirish testi ham
+> shu tartibda saqlanadi.
+
+**Amaliy kod topshiriqlari:** dars sahifasidagi "Amaliy topshiriq"
+tugmasi. Topshiriq keshlanadi (`agent_tasks`), yechim Judge0'da
+(ishlamasa Piston) ishga tushirilib, 5 ta test bilan tekshiriladi.
+
+Keshga faqat **o'z namunaviy yechimidan o'tgan** topshiriq yoziladi.
+Model ba'zan o'zi tuzgan testga mos kelmaydigan yechim yozadi yoki
+`expected_output` da ortiqcha bo'shliq qoldiradi — bunday topshiriq
+keshga tushsa, o'quvchi to'g'ri kod yozsa ham "test o'tmadi" degan
+javob oladi va sababini hech qachon topa olmaydi.
+
+Kod topshirig'i **Tracker'ga tegmaydi**: natija `agent_mastery` ga
+tushadi, lekin rejani o'zgartirmaydi. Modul holatini test (quiz) hal
+qiladi. Ikkalasi ham rejani o'zgartirsa, bitta modul uchun ikki marta
+"keyingisini och" yoki ikkita qo'shimcha modul paydo bo'lardi.
+
+Testni qayta-qayta topshirish mumkin (testdan farqli o'laroq) —
+kod yozishda urinib ko'rish jarayonning bir qismi.
+
+> Judge0 ijrochisi `/api/playground/execute` route ichidan
+> `@/lib/execute` ga ko'chirildi — endi playground ham, agent ham
+> bitta ijrochidan foydalanadi. Playground'ning tashqi shartnomasi
+> o'zgarmadi.
+
+**Obuna to'lovi:** `/agent/obuna` — tarif (Pro / Pro+) va muddat
+(1 / 3 / 12 oy, 10% va 20% chegirma bilan) tanlanadi, Payme yoki
+Click orqali to'lanadi.
+
+Summani **server hisoblaydi** (`subscriptionAmount()`) — mijozdan
+kelgan qiymat ishlatilmaydi, aks holda 1 so'mga obuna sotib olish
+mumkin bo'lardi. `/api/agent/subscribe` obunani **yoqmaydi**: u faqat
+`pending` yozuv yaratib, to'lov havolasini qaytaradi. Obuna webhook
+to'lovni tasdiqlagach `activate_agent_subscription()` orqali yoqiladi
+— aks holda "to'lov sahifasini ochdim" degan narsa obuna berardi.
+
+Muddati tugamagan obunani uzaytirsangiz qolgan kunlar yonmaydi: yangi
+muddat eski tugash sanasidan boshlanadi.
+
+> **Payme/Click webhook'lari o'zgardi.** Ilgari ular faqat
+> `coin_purchase_requests` jadvaliga qarardi. Payme'da bitta kassaga
+> bitta endpoint URL beriladi — obuna uchun alohida endpoint alohida
+> kassa ochishni talab qilardi. Shuning uchun webhook endi buyurtmani
+> `@/lib/payments/order` orqali ikkala jadvaldan qidiradi (ikkalasi
+> ham UUID kalitli, to'qnashuv yo'q) va turiga qarab kerakli RPC'ni
+> chaqiradi: `credit_coins_for_purchase` yoki
+> `activate_agent_subscription`. Coin xaridi oqimi o'zgarmadi.
+
+**Tannarx dashboard'i:** admin panelda `/a-agent`. Bitta savolga
+javob beradi — obuna puli LLM va TTS xarajatini qoplayaptimi.
+Asosiy raqam marja, qolgani uni tushuntiradi: kunlik xarajat
+grafigi, kesh tejami, eng ko'p xarajat qilgan 20 foydalanuvchi.
+
+Narxlar **env orqali sozlanadi** (yuqoridagi jadval): provayder
+tarifi o'zgarganda kodga tegish shart emas. Standart qiymatlar
+taxminiy — aniq raqamni provayder kabinetidan olib yozing, aks
+holda marja noto'g'ri ko'rinadi.
+
+Hisobot `/api/admin/agent-costs` orqali yig'iladi, to'g'ridan-to'g'ri
+Supabase'dan emas: `agent_quizzes` va `agent_tasks` server-only
+jadvallar, ularni mijozdan o'qib bo'lmaydi.
+
+**Menyu:** agent kabinet yon panelida "Ustoz" nomi bilan turadi,
+admin panelda esa "Agent tannarxi"
+(`/chat` — "AI Yordamchi" dan alohida: u topshiriq ustida yordam
+beradi, bu esa noldan o'rgatadigan o'qituvchi).
 
 ## Muhim eslatmalar
 

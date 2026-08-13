@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import {
+  findOrderById, findOrderByTxn, updateOrder, fulfillOrder, cancelledStatus,
+} from '@/lib/payments/order';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,8 +17,13 @@ export const dynamic = 'force-dynamic';
  *   PAYME_MERCHANT_ID  — kabinetdan (majburiy emas, tekshiruv uchun)
  *   PAYME_KEY          — kassa kaliti (Test yoki Prod)
  *
- * "account" parametri: { order_id: coin_purchase_requests.id }
+ * "account" parametri: { order_id: <buyurtma UUID> }
  * amount — tiyin (so'm * 100)
+ *
+ * Buyurtma ikki xil bo'lishi mumkin — coin xaridi yoki agent obunasi.
+ * Qaysi jadvaldan ekanini `@/lib/payments/order` hal qiladi: Payme'da
+ * bitta kassaga bitta endpoint URL beriladi, shuning uchun ikkalasi
+ * ham shu yerdan o'tadi.
  */
 
 const ERR = {
@@ -52,25 +60,18 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   const orderId = params?.account?.order_id;
 
-  async function getReq(byOrder = true) {
-    const col = byOrder ? 'id' : 'provider_txn_id';
-    const val = byOrder ? orderId : params?.id;
-    const { data } = await admin.from('coin_purchase_requests').select('*').eq(col, val).maybeSingle();
-    return data as any;
-  }
-
   try {
     switch (method) {
       case 'CheckPerformTransaction': {
-        const r = await getReq();
+        const r = await findOrderById(admin, orderId);
         if (!r) return rpc(id, undefined, ERR.order);
         if (Number(params.amount) !== r.amount_uzs * 100) return rpc(id, undefined, ERR.amount);
-        if (r.status === 'approved') return rpc(id, undefined, ERR.cannotPerform);
+        if (r.isPaid) return rpc(id, undefined, ERR.cannotPerform);
         return rpc(id, { allow: true });
       }
 
       case 'CreateTransaction': {
-        const r = await getReq();
+        const r = await findOrderById(admin, orderId);
         if (!r) return rpc(id, undefined, ERR.order);
         if (Number(params.amount) !== r.amount_uzs * 100) return rpc(id, undefined, ERR.amount);
 
@@ -83,15 +84,15 @@ export async function POST(req: NextRequest) {
         }
 
         const now = Date.now();
-        await admin.from('coin_purchase_requests').update({
+        await updateOrder(admin, r, {
           payment_provider: 'payme', provider_txn_id: params.id,
           payme_state: 1, payme_create_time: now,
-        }).eq('id', r.id);
+        });
         return rpc(id, { create_time: now, transaction: r.id, state: 1 });
       }
 
       case 'PerformTransaction': {
-        const r = await getReq(false);
+        const r = await findOrderByTxn(admin, params?.id);
         if (!r) return rpc(id, undefined, ERR.txnNotFound);
         if (r.payme_state === 2) {
           return rpc(id, { transaction: r.id, perform_time: r.payme_perform_time, state: 2 });
@@ -99,28 +100,26 @@ export async function POST(req: NextRequest) {
         if (r.payme_state !== 1) return rpc(id, undefined, ERR.cannotPerform);
 
         const now = Date.now();
-        await admin.from('coin_purchase_requests').update({
-          payme_state: 2, payme_perform_time: now,
-        }).eq('id', r.id);
-        // Coinlarni qo'shish (idempotent RPC)
-        await admin.rpc('credit_coins_for_purchase', { p_request_id: r.id });
+        await updateOrder(admin, r, { payme_state: 2, payme_perform_time: now });
+        // Coin qo'shish yoki obunani yoqish — ikkalasi ham idempotent
+        await fulfillOrder(admin, r);
         return rpc(id, { transaction: r.id, perform_time: now, state: 2 });
       }
 
       case 'CancelTransaction': {
-        const r = await getReq(false);
+        const r = await findOrderByTxn(admin, params?.id);
         if (!r) return rpc(id, undefined, ERR.txnNotFound);
         const now = Date.now();
         const newState = r.payme_state === 2 ? -2 : -1;
-        await admin.from('coin_purchase_requests').update({
+        await updateOrder(admin, r, {
           payme_state: newState, payme_cancel_time: now,
-          status: r.status === 'approved' ? 'approved' : 'rejected',
-        }).eq('id', r.id);
+          status: cancelledStatus(r),
+        });
         return rpc(id, { transaction: r.id, cancel_time: now, state: newState });
       }
 
       case 'CheckTransaction': {
-        const r = await getReq(false);
+        const r = await findOrderByTxn(admin, params?.id);
         if (!r) return rpc(id, undefined, ERR.txnNotFound);
         return rpc(id, {
           create_time: r.payme_create_time || 0,

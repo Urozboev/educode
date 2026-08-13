@@ -29,20 +29,38 @@ export const UZ_MONTHS = [
   'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr',
 ];
 
+/**
+ * Qoraqalpoqcha oy nomlari. Ruscha va inglizcha uchun `Intl` ishlatiladi —
+ * u bu ikki tilni to'g'ri beradi; `uz-UZ` va `kaa` ni esa bermaydi,
+ * shuning uchun ular qo'lda yozilgan.
+ */
+const KAA_MONTHS = [
+  "yanvar", "fevral", "mart", "aprel", "may", "iyun",
+  "iyul", "avgust", "sentyabr", "oktyabr", "noyabr", "dekabr",
+];
+
+/** Oy nomini tilga qarab beradi */
+function monthName(date: Date, locale?: string): string {
+  if (locale === "ru" || locale === "en") {
+    return new Intl.DateTimeFormat(locale, { month: "long" }).format(date);
+  }
+  return locale === "kaa" ? KAA_MONTHS[date.getMonth()] : UZ_MONTHS[date.getMonth()];
+}
+
 /** "15-yanvar, 2026" */
-export function formatDate(dateStr: string): string {
+export function formatDate(dateStr: string, locale?: string): string {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return '—';
-  return `${date.getDate()}-${UZ_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
+  return `${date.getDate()}-${monthName(date, locale)}, ${date.getFullYear()}`;
 }
 
 /** "15-yanvar, 14:30" — yil ko'rsatilmaydi (joriy yil nazarda tutiladi) */
-export function formatDateTime(dateStr: string): string {
+export function formatDateTime(dateStr: string, locale?: string): string {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return '—';
   const hh = String(date.getHours()).padStart(2, '0');
   const mm = String(date.getMinutes()).padStart(2, '0');
-  return `${date.getDate()}-${UZ_MONTHS[date.getMonth()]}, ${hh}:${mm}`;
+  return `${date.getDate()}-${monthName(date, locale)}, ${hh}:${mm}`;
 }
 
 export function formatRelativeDate(dateStr: string): string {

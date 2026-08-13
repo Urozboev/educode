@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { createAdminClient } from '@/lib/supabase/server';
+import { findOrderById, updateOrder, fulfillOrder } from '@/lib/payments/order';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,7 +16,8 @@ export const dynamic = 'force-dynamic';
  *   CLICK_SECRET_KEY
  *   CLICK_MERCHANT_ID
  *
- * merchant_trans_id = coin_purchase_requests.id
+ * merchant_trans_id = buyurtma UUID (coin xaridi yoki agent obunasi —
+ * qaysi jadvaldan ekanini `@/lib/payments/order` aniqlaydi).
  */
 
 const ERR = {
@@ -57,27 +59,23 @@ export async function POST(req: NextRequest) {
   if (p.error && Number(p.error) < 0) return reply(ERR.CANCELLED);
 
   const admin = createAdminClient();
-  const { data: r } = await admin
-    .from('coin_purchase_requests')
-    .select('*')
-    .eq('id', p.merchant_trans_id)
-    .maybeSingle();
+  const r = await findOrderById(admin, p.merchant_trans_id);
 
   if (!r) return reply(ERR.NOT_FOUND);
-  if (Number(p.amount) !== Number((r as any).amount_uzs)) return reply(ERR.AMOUNT);
-  if ((r as any).status === 'approved') return reply(ERR.ALREADY);
+  if (Number(p.amount) !== r.amount_uzs) return reply(ERR.AMOUNT);
+  if (r.isPaid) return reply(ERR.ALREADY);
 
   try {
     if (!isComplete) {
       // PREPARE — tranzaksiyani band qilish
-      await admin.from('coin_purchase_requests').update({
+      await updateOrder(admin, r, {
         payment_provider: 'click',
         provider_txn_id: p.click_trans_id,
-      }).eq('id', r.id);
+      });
       return reply(ERR.OK, { merchant_prepare_id: r.id });
     } else {
-      // COMPLETE — to'lov tasdiqlandi, coinlarni qo'shish
-      await admin.rpc('credit_coins_for_purchase', { p_request_id: r.id });
+      // COMPLETE — coin qo'shish yoki obunani yoqish (idempotent)
+      await fulfillOrder(admin, r);
       return reply(ERR.OK, { merchant_confirm_id: r.id });
     }
   } catch (e) {

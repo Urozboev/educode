@@ -150,14 +150,23 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
                 </div>
               </div>
 
+              {(isDone || isSkipped) && (
+                <Link
+                  href={`/agent/dars/${m.id}`}
+                  className="shrink-0 self-center rounded-xl border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  Qayta o'qish
+                </Link>
+              )}
+
               {isActive && (
                 <div className="flex shrink-0 flex-col gap-2">
                   <Link
-                    href={`/agent?modul=${m.id}`}
+                    href={`/agent/dars/${m.id}`}
                     className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
                   >
                     <Play className="h-3.5 w-3.5" />
-                    Boshlash
+                    Darsni ochish
                   </Link>
                   <button
                     onClick={() => setStatus(m.id, "done")}

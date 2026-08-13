@@ -38,7 +38,7 @@ export default function TopicPage() {
   const [progress, setProgress] = useState<TopicProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const [showReflection, setShowReflection] = useState(false);
   const [reflectionDone, setReflectionDone] = useState(false);
   const [watchFrac, setWatchFrac] = useState(0); // video ko'rish ulushi (0–1)
@@ -145,7 +145,7 @@ export default function TopicPage() {
     await supabase.from("topic_progress").update({ content_read: true }).eq("id", progress.id);
     const updated = { ...progress, content_read: true };
     setProgress(updated);
-    toast.success("Mavzu o'qildi");
+    toast.success(t.courses.topic.markedRead);
 
     if (updated.quiz_passed && updated.tasks_completed) {
       await completeTopic(supabase, userId, topic.id, course.id);
@@ -174,10 +174,10 @@ export default function TopicPage() {
 
   // Dars bosqichlari holati (progress tracker uchun)
   const steps = [
-    { key: "video", label: "Video", done: !!progress?.video_watched, has: hasVideo, icon: Video },
-    { key: "read", label: "O'qish", done: !!progress?.content_read, has: !!topic.content_html, icon: FileText },
-    { key: "quiz", label: "Test", done: !!progress?.quiz_passed, has: true, icon: ClipboardList },
-    { key: "task", label: "Topshiriq", done: !!progress?.tasks_completed, has: true, icon: Code2 },
+    { key: "video", label: t.courses.topic.stepVideo, done: !!progress?.video_watched, has: hasVideo, icon: Video },
+    { key: "read", label: t.courses.topic.stepRead, done: !!progress?.content_read, has: !!topic.content_html, icon: FileText },
+    { key: "quiz", label: t.courses.topic.stepQuiz, done: !!progress?.quiz_passed, has: true, icon: ClipboardList },
+    { key: "task", label: t.courses.topic.stepTask, done: !!progress?.tasks_completed, has: true, icon: Code2 },
   ].filter(s => s.has);
   const doneSteps = steps.filter(s => s.done).length;
 
@@ -234,7 +234,7 @@ export default function TopicPage() {
         >
           <div className="flex items-center justify-between px-5 py-3 border-b border-border/50">
             <span className="inline-flex items-center gap-2 text-sm font-semibold">
-              <Video className="w-4 h-4 text-neon-blue" /> Video dars
+              <Video className="w-4 h-4 text-neon-blue" /> {t.courses.topic.videoLesson}
             </span>
             {userId && (
               progress?.video_watched ? (
@@ -289,9 +289,9 @@ export default function TopicPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <p className="font-display font-bold text-lg mb-1">Bu — bepul namunaviy dars</p>
+          <p className="font-display font-bold text-lg mb-1">{t.courses.topic.previewTitle}</p>
           <p className="text-sm text-muted-foreground mb-4">
-            Kursning barcha darslari, testlari va amaliy topshiriqlariga kirish uchun ro'yxatdan o'ting.
+            {t.courses.topic.previewText}
           </p>
           <div className="flex gap-2 justify-center">
             <Link
@@ -363,8 +363,8 @@ export default function TopicPage() {
               <CheckCircle2 className="w-4.5 h-4.5 text-neon-green" />
             </div>
             <div>
-              <h3 className="font-display font-bold">Darsni yakunlash</h3>
-              <p className="text-xs text-muted-foreground">{doneSteps}/{steps.length} bosqich bajarildi</p>
+              <h3 className="font-display font-bold">{t.courses.topic.finishTitle}</h3>
+              <p className="text-xs text-muted-foreground">{doneSteps}/{steps.length} {t.courses.topic.stepsDone}</p>
             </div>
           </div>
 
@@ -384,7 +384,7 @@ export default function TopicPage() {
                 )}
               >
                 {progress?.content_read ? <CheckCircle2 className="w-4 h-4" /> : !videoWatched ? <Lock className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                {progress?.content_read ? "O'qildi" : "O'qidim"}
+                {progress?.content_read ? t.courses.topic.read : t.courses.topic.markRead}
               </button>
             )}
             <Link
@@ -408,7 +408,7 @@ export default function TopicPage() {
                   : "bg-neon-purple/10 text-neon-purple border-neon-purple/20 hover:bg-neon-purple/15"
               )}
             >
-              <Code2 className="w-4 h-4" /> {progress?.tasks_completed ? "Topshiriq bajarildi" : "Amaliy topshiriq"}
+              <Code2 className="w-4 h-4" /> {progress?.tasks_completed ? t.courses.topic.taskDone : t.courses.topic.practiceTask}
               {progress?.tasks_completed && <CheckCircle2 className="w-3.5 h-3.5" />}
             </Link>
           </div>
@@ -445,7 +445,7 @@ export default function TopicPage() {
             href={`/courses/${slug}`}
             className="inline-flex items-center gap-2 py-2.5 px-5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition"
           >
-            Kursga qaytish <CheckCircle2 className="w-4 h-4" />
+            {t.courses.topic.backToCourse} <CheckCircle2 className="w-4 h-4" />
           </Link>
         )}
       </div>

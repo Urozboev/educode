@@ -33,7 +33,7 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => Date.now());
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
 
   const load = useCallback(async () => {
     const [{ data: overview }, { data: { user } }] = await Promise.all([
@@ -68,7 +68,7 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
     (async () => {
       const { data: res } = await supabase.rpc("join_contest", { p_slug: slug });
       if (res?.ok) {
-        toast.success("Olimpiada ishtirokchisi sifatida qo'shildingiz");
+        toast.success(t.contests.page.joinedAsParticipant);
         load();
       }
     })();
@@ -89,8 +89,8 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
         <Trophy className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
         <p className="text-muted-foreground mb-6">
           {data?.phase === "upcoming"
-            ? "Masalalar musobaqa boshlanganda ochiladi"
-            : "Masala topilmadi"}
+            ? t.contests.page.locked
+            : t.contests.page.notFound}
         </p>
         <Link href={`${basePath}/${slug}`} className="btn-primary py-2.5 px-5 text-sm">
           Olimpiadaga qaytish
@@ -125,7 +125,7 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
               </span>
             ) : (
               <span className="text-xs px-2.5 py-1 rounded-full bg-surface border border-border text-muted-foreground">
-                Mashq rejimi — reytingga kirmaydi
+                {t.contests.practiceMode}
               </span>
             )}
             <Link

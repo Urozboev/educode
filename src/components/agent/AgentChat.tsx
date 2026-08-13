@@ -16,7 +16,8 @@ import Link from "next/link";
 import { Mic, MicOff, Send, Volume2, VolumeX, Loader2, Sparkles, ListChecks } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { stripForSpeech, takeCompleteSentences } from "@/lib/agent/speech-text";
+import { takeCompleteSentences } from "@/lib/agent/speech-text";
+import { useAgentVoice } from "./useAgentVoice";
 
 interface Msg {
   role: "user" | "assistant";
@@ -35,89 +36,18 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
   const [streaming, setStreaming] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
   const [listening, setListening] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const queueRef = useRef<string[]>([]);
-  const playingRef = useRef(false);
   const recognitionRef = useRef<any>(null);
+
+  // Ovoz navbati dars sahifasi bilan umumiy — `useAgentVoice` da
+  const { speak, stop: stopSpeaking, speaking } = useAgentVoice(lang);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streaming]);
-
-  /* ---------------- Ovoz o'ynatish navbati ---------------- */
-
-  const playNext = useCallback(() => {
-    const url = queueRef.current.shift();
-    if (!url) {
-      playingRef.current = false;
-      setSpeaking(false);
-      return;
-    }
-
-    playingRef.current = true;
-    setSpeaking(true);
-
-    if (!audioRef.current) audioRef.current = new Audio();
-    const audio = audioRef.current;
-    audio.src = url;
-    audio.onended = playNext;
-    // Bitta bo'lak o'ynamasa butun navbat to'xtamasin
-    audio.onerror = playNext;
-    audio.play().catch(() => playNext());
-  }, []);
-
-  const enqueue = useCallback((url: string) => {
-    queueRef.current.push(url);
-    if (!playingRef.current) playNext();
-  }, [playNext]);
-
-  /** Provayder yo'q bo'lsa brauzer sintezi — sifat pastroq, lekin jim qolmaydi */
-  const speakInBrowser = useCallback((text: string) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang === "uz" ? "uz-UZ" : lang === "ru" ? "ru-RU" : "en-US";
-    u.rate = 1.0;
-    u.onstart = () => setSpeaking(true);
-    u.onend = () => setSpeaking(false);
-    window.speechSynthesis.speak(u);
-  }, [lang]);
-
-  const speak = useCallback(async (text: string) => {
-    const clean = stripForSpeech(text);
-    if (!clean) return;
-
-    try {
-      const res = await fetch("/api/agent/voice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: clean, lang, raw: true }),
-      });
-
-      if (!res.ok) return speakInBrowser(clean);
-
-      const data = await res.json();
-      if (data.provider === "browser" || !data.clips?.length) return speakInBrowser(clean);
-
-      for (const clip of data.clips) {
-        if (clip.audioUrl) enqueue(clip.audioUrl);
-      }
-    } catch {
-      speakInBrowser(clean);
-    }
-  }, [lang, enqueue, speakInBrowser]);
-
-  const stopSpeaking = useCallback(() => {
-    queueRef.current = [];
-    playingRef.current = false;
-    audioRef.current?.pause();
-    if (typeof window !== "undefined") window.speechSynthesis?.cancel();
-    setSpeaking(false);
-  }, []);
 
   /* ---------------- Xabar yuborish ---------------- */
 
