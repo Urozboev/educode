@@ -171,52 +171,88 @@ export async function middleware(request: NextRequest) {
     response.cookies.set(cookie.name, cookie.value, cookie.options);
   }
 
+  // Redirect ham yangilangan cookie larni olib ketishi kerak. Aks holda
+  // Supabase yangilagan sessiya tokeni yo'qoladi va foydalanuvchi
+  // keyingi so'rovda tizimdan chiqib qolishi mumkin.
+  const redirectTo = (target: string) => {
+    const res = NextResponse.redirect(new URL(target, request.url));
+    for (const cookie of cookiesToSet) {
+      res.cookies.set(cookie.name, cookie.value, cookie.options);
+    }
+    return res;
+  };
+
   // Login qilmagan → login ga redirect
   if (!session) {
     const url = new URL('/login', request.url);
     url.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(url);
+    const res = NextResponse.redirect(url);
+    for (const cookie of cookiesToSet) {
+      res.cookies.set(cookie.name, cookie.value, cookie.options);
+    }
+    return res;
   }
 
   // ============================================
-  // ROL TEKSHIRISH (admin / teacher / parent)
+  // ROL TEKSHIRISH
+  //
+  // Har bir rol faqat o'z hududida ishlaydi: teacher → /t-*,
+  // parent → /p-*, student → qolgan kabinet sahifalari. Ilgari tekshiruv
+  // faqat /a- /t- /p- prefikslariga qo'llanardi, shuning uchun ota-ona
+  // yoki o'qituvchi /dashboard ni qo'lda yozib o'quvchi kabinetiga
+  // kirib ketardi.
+  //
+  // Admin bundan mustasno — u barcha kabinetlarni ko'ra oladi.
   // ============================================
   const isAdminPath = pathname.startsWith('/a-');
   const isTeacherPath = pathname.startsWith('/t-');
   const isParentPath = pathname.startsWith('/p-');
+  const isStudentPath = !isAdminPath && !isTeacherPath && !isParentPath;
 
-  if (isAdminPath || isTeacherPath || isParentPath) {
-    // Cookie dan rolni o'qish
-    let role = request.cookies.get('user-role')?.value;
+  // Cookie dan rolni o'qish, bo'lmasa DB dan.
+  //
+  // Cookie qiymati "<user_id>:<role>" ko'rinishida saqlanadi va faqat
+  // joriy sessiya egasiga tegishli bo'lsa ishlatiladi. Cookie httpOnly
+  // bo'lgani uchun chiqishdagi document.cookie orqali o'chirish ishlamaydi
+  // — ID ga bog'lash esa bitta brauzerda boshqa hisobga kirgan odam eski
+  // rolni meros qilib olishining oldini oladi.
+  const cached = request.cookies.get('user-role')?.value;
+  const [cachedUid, cachedRole] = cached?.includes(':')
+    ? cached.split(':') : [null, null];
+  let role = cachedUid === session.user.id ? cachedRole : undefined;
 
-    if (!role) {
-      // DB dan olish
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
+  if (!role) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
 
-      role = profile?.role || 'student';
-      const roleValue = role ?? "student";
+    role = profile?.role || 'student';
 
-      // Cookie ga saqlash
-      response.cookies.set('user-role', roleValue, {
-        httpOnly: true,
-        sameSite: 'lax' as const,
-        maxAge: 3600,
-        path: '/',
-      });
-    }
+    const cookieOpts = {
+      httpOnly: true,
+      sameSite: 'lax' as const,
+      maxAge: 3600,
+      path: '/',
+    };
+    const cookieValue = `${session.user.id}:${role}`;
+    response.cookies.set('user-role', cookieValue, cookieOpts);
+    cookiesToSet.push({ name: 'user-role', value: cookieValue, options: cookieOpts });
+  }
 
-    if (isAdminPath && role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
-    if (isTeacherPath && role !== 'teacher' && role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
-    if (isParentPath && role !== 'parent' && role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (role !== 'admin') {
+    const allowed =
+      role === 'teacher' ? isTeacherPath
+        : role === 'parent' ? isParentPath
+          : isStudentPath;
+
+    if (!allowed) {
+      const home =
+        role === 'teacher' ? '/t-dashboard'
+          : role === 'parent' ? '/p-dashboard'
+            : '/dashboard';
+      return redirectTo(home);
     }
   }
 

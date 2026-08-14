@@ -11,6 +11,7 @@ import {
   ArrowLeft, Coins, Zap, Flame, BookOpen, CheckCircle2, Brain, Gift,
   Loader2, TrendingUp, Award, Clock, Activity,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface ChildProfile {
   id: string; full_name: string; avatar_url: string | null;
@@ -20,6 +21,7 @@ interface ChildProfile {
 interface Enroll { id: string; progress_percent: number; is_completed: boolean; course: { title: string; slug: string } | null; }
 
 export default function ChildDetailPage() {
+  const { t } = useI18n();
   const { id: childId } = useParams<{ id: string }>();
   const supabase = createClient();
   const [child, setChild] = useState<ChildProfile | null>(null);
@@ -95,8 +97,8 @@ export default function ChildDetailPage() {
   useEffect(() => { load(); }, [load]);
 
   async function sendGift() {
-    if (giftAmount <= 0) { toast.error("Miqdorni kiriting"); return; }
-    if (giftAmount > myCoins) { toast.error("Sizda yetarli coin yo'q"); return; }
+    if (giftAmount <= 0) { toast.error(t.parent.enterAmount); return; }
+    if (giftAmount > myCoins) { toast.error(t.parent.notEnoughCoins); return; }
     setGifting(true);
     const { data, error } = await supabase.rpc("gift_coins", {
       p_child_id: childId, p_amount: giftAmount, p_message: giftMsg || null,
@@ -112,23 +114,23 @@ export default function ChildDetailPage() {
   if (loading) return <div className="glass-card h-96 animate-pulse" />;
   if (!linked) return (
     <div className="text-center py-20">
-      <p className="text-muted-foreground mb-4">Bu farzand siz bilan bog'lanmagan.</p>
-      <Link href="/p-dashboard" className="btn-ghost">Panelga qaytish</Link>
+      <p className="text-muted-foreground mb-4">{t.parent.notLinked}</p>
+      <Link href="/p-dashboard" className="btn-ghost">{t.parent.backToPanel}</Link>
     </div>
   );
   if (!child) return null;
 
   const depScore = child.ai_dependency_score ?? 0;
-  const depZone = depScore <= 30 ? { label: "Sog'lom", cls: "text-neon-green", emoji: "🟢" }
-    : depScore <= 60 ? { label: "O'rtacha", cls: "text-neon-yellow", emoji: "🟡" }
-    : depScore <= 80 ? { label: "Yuqori", cls: "text-orange-400", emoji: "🟠" }
-    : { label: "Juda yuqori", cls: "text-neon-red", emoji: "🔴" };
+  const depZone = depScore <= 30 ? { label: t.parent.depHealthy, cls: "text-neon-green", emoji: "🟢" }
+    : depScore <= 60 ? { label: t.parent.depMedium, cls: "text-neon-yellow", emoji: "🟡" }
+    : depScore <= 80 ? { label: t.parent.depHigh, cls: "text-orange-400", emoji: "🟠" }
+    : { label: t.parent.depVeryHigh, cls: "text-neon-red", emoji: "🔴" };
 
   const statCards = [
-    { label: "Tugatilgan kurslar", value: stats.coursesCompleted, icon: BookOpen, color: "#6C5CE7" },
+    { label: t.cabinet.dash.statCourses, value: stats.coursesCompleted, icon: BookOpen, color: "#6C5CE7" },
     { label: "O'tilgan testlar", value: stats.quizzesPassed, icon: CheckCircle2, color: "#00E676" },
-    { label: "Yechilgan topshiriqlar", value: stats.challengesSolved, icon: Award, color: "#00D2FF" },
-    { label: "Refleksiyalar", value: stats.reflections, icon: Brain, color: "#FFD600" },
+    { label: t.cabinet.dash.statChallenges, value: stats.challengesSolved, icon: Award, color: "#00D2FF" },
+    { label: t.parent.reflections, value: stats.reflections, icon: Brain, color: "#FFD600" },
   ];
 
   return (
@@ -152,7 +154,7 @@ export default function ChildDetailPage() {
               <Coins className="w-4 h-4 text-neon-yellow" /><span className="font-bold text-sm">{formatNumber(child.coins)}</span>
             </div>
             <button onClick={() => setGiftOpen(true)} className="btn-primary py-2 px-4 text-sm flex items-center gap-2">
-              <Gift className="w-4 h-4" /> Coin sovg'a
+              <Gift className="w-4 h-4" /> {t.parent.giftCoins}
             </button>
           </div>
         </div>
@@ -179,7 +181,7 @@ export default function ChildDetailPage() {
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-sm text-muted-foreground">AI bog'liqlik indeksi</span>
+              <span className="text-sm text-muted-foreground">{t.parent.aiDependency}</span>
               <span className={cn("text-sm font-bold", depZone.cls)}>{depZone.emoji} {depScore}% · {depZone.label}</span>
             </div>
             <div className="w-full h-2.5 bg-surface rounded-full overflow-hidden">
@@ -208,10 +210,10 @@ export default function ChildDetailPage() {
       {/* Kurslar */}
       <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-neon-blue" /> Kurslar progressi
+          <TrendingUp className="w-5 h-5 text-neon-blue" /> {t.parent.courseProgress}
         </h2>
         {enrollments.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">Hali kursga yozilmagan</p>
+          <p className="text-sm text-muted-foreground text-center py-6">{t.parent.notEnrolled}</p>
         ) : (
           <div className="space-y-3">
             {enrollments.map(e => (
@@ -221,7 +223,7 @@ export default function ChildDetailPage() {
                   {e.is_completed ? <CheckCircle2 className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{e.course?.title || "Kurs"}</p>
+                  <p className="font-medium text-sm truncate">{e.course?.title || t.admin.common.course}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex-1 h-2 bg-border rounded-full overflow-hidden">
                       <div className="h-full progress-gradient rounded-full" style={{ width: `${e.progress_percent}%` }} />
@@ -242,12 +244,12 @@ export default function ChildDetailPage() {
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-neon-yellow/10 flex items-center justify-center"><Gift className="w-5 h-5 text-neon-yellow" /></div>
               <div>
-                <h3 className="font-display font-bold">Coin sovg'a qilish</h3>
+                <h3 className="font-display font-bold">{t.parent.giftCoinsTitle}</h3>
                 <p className="text-xs text-muted-foreground">{child.full_name} uchun</p>
               </div>
             </div>
             <div className="mb-3 flex items-center justify-between text-sm px-3 py-2 rounded-lg bg-surface/50">
-              <span className="text-muted-foreground">Sizning balansingiz:</span>
+              <span className="text-muted-foreground">{t.parent.yourBalance}:</span>
               <span className="font-bold flex items-center gap-1"><Coins className="w-3.5 h-3.5 text-neon-yellow" />{myCoins}</span>
             </div>
             <div className="grid grid-cols-4 gap-2 mb-3">
@@ -260,11 +262,11 @@ export default function ChildDetailPage() {
               ))}
             </div>
             <input type="number" value={giftAmount} onChange={e => setGiftAmount(Math.max(0, +e.target.value))}
-              className="input-field mb-3" placeholder="Miqdor" />
+              className="input-field mb-3" placeholder={t.parent.amount} />
             <textarea value={giftMsg} onChange={e => setGiftMsg(e.target.value)} rows={2}
               className="input-field resize-none mb-4 text-sm" placeholder="Xabar (ixtiyoriy): Zo'r ishlayapsan!" />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setGiftOpen(false)} className="btn-ghost py-2 px-4 text-sm">Bekor</button>
+              <button onClick={() => setGiftOpen(false)} className="btn-ghost py-2 px-4 text-sm">{t.common.cancel}</button>
               <button onClick={sendGift} disabled={gifting || giftAmount > myCoins} className="btn-primary py-2 px-4 text-sm flex items-center gap-2 disabled:opacity-50">
                 {gifting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />} Sovg'a qilish
               </button>

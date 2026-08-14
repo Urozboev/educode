@@ -11,6 +11,7 @@ import {
   Presentation, Loader2, Send, Clock, CheckCircle2, XCircle,
   ArrowRight, AlertCircle,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 const REGIONS = [
   "Toshkent shahri", "Toshkent viloyati", "Andijon", "Buxoro", "Farg'ona",
@@ -32,6 +33,7 @@ const empty = {
 };
 
 export default function TeacherApplyPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -74,7 +76,7 @@ export default function TeacherApplyPage() {
     e.preventDefault();
     if (!userId) return;
     if (!form.full_name.trim() || !form.phone.trim() || !form.school.trim()) {
-      toast.error("Yulduzcha bilan belgilangan maydonlarni to'ldiring");
+      toast.error(t.auth.fillRequired);
       return;
     }
     setSaving(true);
@@ -99,7 +101,7 @@ export default function TeacherApplyPage() {
     setSaving(false);
     if (error) { toast.error(error.message); return; }
 
-    toast.success("Ariza yuborildi");
+    toast.success(t.auth.applySent);
     const { data } = await supabase.from("teacher_applications").select("*").eq("user_id", userId).maybeSingle();
     if (data) setApplication(data as TeacherApplication);
   }
@@ -118,11 +120,11 @@ export default function TeacherApplyPage() {
       <StatusCard
         tone="pending"
         icon={<Clock className="w-8 h-8 text-neon-yellow" />}
-        title="Ariza ko'rib chiqilmoqda"
-        body="Arizangiz qabul qilindi. Admin tekshirgach, o'qituvchi kabineti ochiladi va sizga xabar beriladi. Shu vaqtgacha platformadan o'quvchi sifatida foydalanishingiz mumkin."
+        title={t.auth.applyPending}
+        body={t.auth.applyAccepted}
       >
         <Link href="/dashboard" className="btn-primary inline-flex items-center gap-2 text-sm py-2.5 px-5">
-          O&apos;quvchi kabinetiga o&apos;tish <ArrowRight className="w-4 h-4" />
+          {t.auth.toStudentCabinet} <ArrowRight className="w-4 h-4" />
         </Link>
       </StatusCard>
     );
@@ -134,11 +136,11 @@ export default function TeacherApplyPage() {
       <StatusCard
         tone="approved"
         icon={<CheckCircle2 className="w-8 h-8 text-neon-green" />}
-        title="Ariza tasdiqlandi"
-        body="O'qituvchi kabineti ochildi. O'zgarish ko'rinmasa, tizimdan chiqib qayta kiring."
+        title={t.auth.applyApproved}
+        body={t.auth.teacherOpened}
       >
         <Link href="/t-dashboard" className="btn-primary inline-flex items-center gap-2 text-sm py-2.5 px-5">
-          O&apos;qituvchi kabineti <ArrowRight className="w-4 h-4" />
+          {t.auth.toTeacherCabinet} <ArrowRight className="w-4 h-4" />
         </Link>
       </StatusCard>
     );
@@ -158,11 +160,10 @@ export default function TeacherApplyPage() {
         </div>
 
         <h1 className="font-display font-extrabold text-2xl md:text-3xl tracking-tight mb-2">
-          O&apos;qituvchi arizasi
+          {t.auth.applyTitle}
         </h1>
         <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
-          Ma&apos;lumotlaringizni to&apos;ldiring. Admin tekshirgach o&apos;qituvchi
-          kabineti ochiladi: guruhlar, topshiriqlar, tahlillar va metodlar.
+          {t.auth.applySubtitle}
         </p>
 
         {application?.status === "rejected" && (
@@ -197,7 +198,7 @@ export default function TeacherApplyPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Tuman</label>
+              <label className="text-sm font-medium mb-1 block">{t.auth.district}</label>
               <input value={form.district} onChange={e => setForm({ ...form, district: e.target.value })} className="input-field" placeholder="Yunusobod" />
             </div>
           </div>
@@ -222,20 +223,19 @@ export default function TeacherApplyPage() {
 
           <div>
             <label className="text-sm font-medium mb-1 block">Qo&apos;shimcha</label>
-            <textarea value={form.about} onChange={e => setForm({ ...form, about: e.target.value })} className="input-field resize-none" rows={3} placeholder="Platformadan qanday foydalanmoqchisiz, nechta o'quvchi bilan ishlaysiz" maxLength={500} />
+            <textarea value={form.about} onChange={e => setForm({ ...form, about: e.target.value })} className="input-field resize-none" rows={3} placeholder={t.auth.motivationPh} maxLength={500} />
           </div>
 
           <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-surface/60 border border-border text-xs text-muted-foreground">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span className="leading-relaxed">
-              Ma&apos;lumotlar faqat arizani tekshirish uchun ishlatiladi va uchinchi
-              shaxsga berilmaydi.
+              {t.auth.applyPrivacy}
             </span>
           </div>
 
           <button type="submit" disabled={saving} className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            {application ? "Qayta yuborish" : "Ariza yuborish"}
+            {application ? t.auth.resend : t.auth.sendApplication}
           </button>
         </form>
 

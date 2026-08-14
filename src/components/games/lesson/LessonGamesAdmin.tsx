@@ -18,6 +18,7 @@ import {
   Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Gamepad2,
   Trophy, Play, Timer, Grid3x3, Link2, Users, Table2, Radio,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 const TYPE_ICON: Record<LessonGameType, React.ElementType> = {
   quiz_race: Timer,
@@ -64,6 +65,7 @@ const emptyForm = (): Form => ({
  * cheklaydi, lekin so'rovni ham cheklab qo'ygan ma'qul.
  */
 export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [games, setGames] = useState<LessonGame[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,17 +111,17 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
 
   function changeType(type: LessonGameType) {
     // Kontent shakli butunlay boshqacha — turni almashtirsak qaytadan boshlaymiz
-    if (!confirm("Turni almashtirsangiz kiritilgan savollar o'chadi. Davom etamizmi?")) return;
+    if (!confirm(t.lg.changeTypeWarn)) return;
     setForm(f => ({ ...f, type, content: emptyContent(type) }));
   }
 
   async function save(publish?: boolean) {
-    if (!form.title.trim()) { toast.error("Nom kiriting"); return; }
+    if (!form.title.trim()) { toast.error(t.lg.enterName); return; }
 
     const err = validateContent(form.type, form.content);
     if (err) { toast.error(err); return; }
 
-    if (!userId) { toast.error("Sessiya topilmadi, sahifani yangilang"); return; }
+    if (!userId) { toast.error(t.lg.sessionGone); return; }
 
     setSaving(true);
     const payload = {
@@ -142,7 +144,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
 
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(editId ? "Saqlandi" : "Yaratildi");
+    toast.success(editId ? t.admin.common.saved : t.admin.common.created);
     setShowForm(false);
     load();
   }
@@ -180,7 +182,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-display font-bold text-2xl flex items-center gap-2">
-            <Gamepad2 className="w-6 h-6 text-neon-purple" /> Dars o&apos;yinlari
+            <Gamepad2 className="w-6 h-6 text-neon-purple" /> {t.lg.title}
           </h1>
           <p className="text-sm text-muted-foreground">
             {`${games.length} ta o'yin`}{scope === "teacher" && " · hamkasblarnikini ham ko'rishingiz mumkin"}
@@ -249,7 +251,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Daraja</label>
+                <label className="text-sm font-medium mb-1 block">{t.admin.common.level}</label>
                 <select value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value as CourseDifficulty })} className="input-field">
                   {DIFFICULTIES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
@@ -307,8 +309,8 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
         games.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="mb-4">Hali o&apos;yin yaratilmagan</p>
-            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi o&apos;yin</button>
+            <p className="mb-4">{t.lg.empty}</p>
+            <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> {t.lg.first}</button>
           </div>
         ) : games.map(g => {
           const Icon = TYPE_ICON[g.type];
@@ -323,12 +325,12 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
                   <span>{gameTypeLabel(g.type)}</span>
                   <span className="inline-flex items-center gap-1">· <Users className="w-3 h-3" />{g.plays}</span>
                   {g.is_published
-                    ? <span className="text-neon-green">· Nashr qilingan</span>
+                    ? <span className="text-neon-green">· {t.admin.common.published}</span>
                     : <span className="text-neon-yellow">· Qoralama</span>}
                 </div>
               </div>
               {g.is_published && (
-                <Link href={`/play/${g.slug}`} target="_blank" className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground" title="O'ynab ko'rish">
+                <Link href={`/play/${g.slug}`} target="_blank" className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground" title={t.lg.playIt}>
                   <Play className="w-4 h-4" />
                 </Link>
               )}
@@ -337,7 +339,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
                   onClick={() => startLive(g)}
                   disabled={busyLive === g.id}
                   className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-neon-purple/30 text-neon-purple bg-neon-purple/[0.06] hover:bg-neon-purple/[0.12] disabled:opacity-50 transition-colors"
-                  title="Sinf bilan jonli o'ynash"
+                  title={t.lg.playLive}
                 >
                   {busyLive === g.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Radio className="w-3.5 h-3.5" />}
                   Jonli
@@ -376,6 +378,7 @@ function hasContent(f: Form): boolean {
    TEZLIK VIKTORINASI MUHARRIRI
    ============================================================ */
 function QuizEditor({ content, onChange }: { content: QuizRaceContent; onChange: (c: QuizRaceContent) => void }) {
+  const { t } = useI18n();
   const qs = content.questions || [];
 
   const set = (i: number, patch: Partial<QuizRaceContent["questions"][0]>) =>
@@ -385,7 +388,7 @@ function QuizEditor({ content, onChange }: { content: QuizRaceContent; onChange:
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-display font-semibold text-sm">
-          Savollar <span className="numeric text-muted-foreground">({qs.length})</span>
+          {t.lg.questions} <span className="numeric text-muted-foreground">({qs.length})</span>
         </h3>
         <button
           type="button"
@@ -395,7 +398,7 @@ function QuizEditor({ content, onChange }: { content: QuizRaceContent; onChange:
           ] }] })}
           className="text-xs font-semibold text-neon-purple hover:underline inline-flex items-center gap-1"
         >
-          <Plus className="w-3.5 h-3.5" /> Savol qo&apos;shish
+          <Plus className="w-3.5 h-3.5" /> {t.lg.addQuestion}
         </button>
       </div>
 
@@ -407,7 +410,7 @@ function QuizEditor({ content, onChange }: { content: QuizRaceContent; onChange:
               value={q.text}
               onChange={e => set(i, { text: e.target.value })}
               className="input-field flex-1"
-              placeholder="Savol matni"
+              placeholder={t.lg.questionText}
             />
             <input
               type="number"
@@ -455,7 +458,7 @@ function QuizEditor({ content, onChange }: { content: QuizRaceContent; onChange:
             ))}
           </div>
           <p className="text-[11px] text-muted-foreground pl-8">
-            To&apos;g&apos;ri javobni radio tugma bilan belgilang
+            {t.lg.markCorrect}
           </p>
         </div>
       ))}
@@ -467,6 +470,7 @@ function QuizEditor({ content, onChange }: { content: QuizRaceContent; onChange:
    JEOPARDY MUHARRIRI
    ============================================================ */
 function JeopardyEditor({ content, onChange }: { content: JeopardyContent; onChange: (c: JeopardyContent) => void }) {
+  const { t } = useI18n();
   const cats = content.categories || [];
 
   const setCat = (ci: number, patch: Partial<JeopardyContent["categories"][0]>) =>
@@ -494,7 +498,7 @@ function JeopardyEditor({ content, onChange }: { content: JeopardyContent; onCha
               value={cat.name}
               onChange={e => setCat(ci, { name: e.target.value })}
               className="input-field flex-1 font-semibold"
-              placeholder="Kategoriya nomi (masalan: Sikllar)"
+              placeholder={t.lg.categoryPh}
             />
             {cats.length > 1 && (
               <button
@@ -520,13 +524,13 @@ function JeopardyEditor({ content, onChange }: { content: JeopardyContent; onCha
                 value={cell.question}
                 onChange={e => setCat(ci, { cells: cat.cells.map((x, i) => i === ri ? { ...x, question: e.target.value } : x) })}
                 className="input-field text-sm"
-                placeholder="Savol"
+                placeholder={t.lg.question}
               />
               <input
                 value={cell.answer}
                 onChange={e => setCat(ci, { cells: cat.cells.map((x, i) => i === ri ? { ...x, answer: e.target.value } : x) })}
                 className="input-field text-sm"
-                placeholder="Javob"
+                placeholder={t.lg.answer}
               />
               {cat.cells.length > 1 && (
                 <button

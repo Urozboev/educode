@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { cn, getInitials, getLevelLabel, getLevelColor } from "@/lib/utils";
 import { Users, GraduationCap, Zap, ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type Row = {
   username: string;
@@ -18,6 +19,7 @@ type Row = {
 };
 
 export default function PortfoliosPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,8 +41,8 @@ export default function PortfoliosPage() {
           Talabalar portfoliosi
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Platformada o&apos;qiyotgan talabalarning ishlari, sertifikatlari va
-          loyihalari. O&apos;zingiznikini <Link href="/portfolio" className="text-neon-purple hover:underline">shu yerdan</Link> oching.
+          {t.explore.portfoliosSubtitle}{" "}
+          <Link href="/portfolio" className="text-neon-purple hover:underline">{t.explore.portfoliosLink}</Link> oching.
         </p>
       </motion.div>
 
@@ -54,10 +56,10 @@ export default function PortfoliosPage() {
         <div className="py-20 text-center">
           <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground mb-6">
-            Hali hech kim portfoliosini ochmagan
+            {t.explore.portfoliosEmpty}
           </p>
           <Link href="/portfolio" className="btn-primary py-2.5 px-5 text-sm">
-            Birinchi bo&apos;ling
+            {t.explore.portfoliosFirst}
           </Link>
         </div>
       ) : (

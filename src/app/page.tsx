@@ -18,6 +18,7 @@ import { OrganizationJsonLd, WebsiteJsonLd, FaqJsonLd } from "@/components/seo/J
 import { primaryLinks, resourceLinks, tailLinks, allGuestLinks } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -416,12 +417,13 @@ function LangMarquee() {
 }
 
 /* ============ FAQ (JSON-LD savollariga mos ko'rinadigan qism) ============ */
-const FAQ_ITEMS = [
-  { q: "EduCode platformasi nima?", a: "EduCode (malla.uz) — interaktiv dasturlash kurslari, AI Sokratik mentor va gamifikatsiya bilan o'zbek tilidagi onlayn ta'lim platformasi. Python, JavaScript, HTML/CSS, algoritmlar va prompt engineering bo'yicha kurslar mavjud." },
-  { q: "EduCode bepulmi?", a: "Ha, asosiy kurslar va topshiriqlar bepul. Ba'zi premium kurslar coin yoki to'g'ridan-to'g'ri sotib olish orqali ochiladi. Ro'yxatdan o'tganda boshlang'ich coin sovg'a qilinadi." },
-  { q: "AI mentor qanday ishlaydi?", a: "AI mentor Sokratik usulda ishlaydi: tayyor kod yechimini bermaydi, savollar orqali sizni mustaqil yechishga yo'naltiradi. Bu chuqur o'rganish va mustaqil fikrlashni rivojlantiradi." },
-  { q: "Qaysi dasturlash tillarini o'rganish mumkin?", a: "Hozircha Python, JavaScript, HTML/CSS, algoritmlar va ma'lumot tuzilmalari bo'yicha kurslar mavjud. Playground'da esa 7 ta tilda kod yozib sinash mumkin." },
-  { q: "Sertifikat olish mumkinmi?", a: "Ha, kursni 100% tugatgan talabalarga avtomatik raqamli sertifikat beriladi. Uni profilingizdan PDF sifatida yuklab olishingiz mumkin." },
+/** Savol-javob matni lug'atda — JSON-LD ham shu manbadan oziqlanadi */
+const FAQ_ITEMS = (t: Dictionary) => [
+  { q: t.home.faq1q, a: t.home.faq1a },
+  { q: t.home.faq2q, a: t.home.faq2a },
+  { q: t.home.faq3q, a: t.home.faq3a },
+  { q: t.home.faq4q, a: t.home.faq4a },
+  { q: t.home.faq5q, a: t.home.faq5a },
 ];
 
 function FaqSection() {
@@ -435,7 +437,7 @@ function FaqSection() {
           <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">{t.home.faqTitle}</h2>
         </div>
         <div className="space-y-3">
-          {FAQ_ITEMS.map((item, i) => (
+          {FAQ_ITEMS(t).map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 12 }}
@@ -540,29 +542,24 @@ export default function LandingPage() {
       <FaqJsonLd
         items={[
           {
-            question: "EduCode platformasi nima?",
-            answer:
-              "EduCode (malla.uz) — interaktiv dasturlash kurslari, AI Sokratik mentor va gamifikatsiya bilan o'zbek tilidagi onlayn ta'lim platformasi. Python, JavaScript, HTML/CSS, algoritmlar va prompt engineering bo'yicha kurslar mavjud.",
+            question: t.home.faq1q,
+            answer: t.home.faq1a,
           },
           {
-            question: "EduCode bepulmi?",
-            answer:
-              "Ha, EduCode'ning asosiy kurslari va topshiriqlari bepul. Ba'zi premium kurslar coin yoki to'g'ridan-to'g'ri sotib olish orqali ochiladi.",
+            question: t.home.faq2q,
+            answer: t.home.faq2a,
           },
           {
-            question: "AI mentor qanday ishlaydi?",
-            answer:
-              "AI mentor Sokratik usulda ishlaydi: tayyor kod yechimini bermaydi, savollar orqali talabani mustaqil yechishga yo'naltiradi. Bu yondashuv Code.org 2024 va UNESCO 2024 tavsiyalariga muvofiq.",
+            question: t.home.faq3q,
+            answer: t.home.faq3a,
           },
           {
-            question: "Qaysi dasturlash tillarini o'rganish mumkin?",
-            answer:
-              "Hozircha Python, JavaScript, HTML/CSS, algoritmlar va ma'lumot tuzilmalari bo'yicha kurslar mavjud. Yaqin orada C++ va boshqa tillar qo'shiladi.",
+            question: t.home.faq4q,
+            answer: t.home.faq4a,
           },
           {
-            question: "Sertifikat olish mumkinmi?",
-            answer:
-              "Ha, kursni 100% tugatgan talabalarga avtomatik raqamli sertifikat beriladi. Sertifikat profilingizda saqlanadi va PDF sifatida yuklab olish mumkin.",
+            question: t.home.faq5q,
+            answer: t.home.faq5a,
           },
         ]}
       />
@@ -793,8 +790,7 @@ export default function LandingPage() {
                     {t.home.aiReview}
                   </h3>
                   <p className="text-[15px] text-muted-foreground leading-relaxed max-w-md">
-                    Claude AI kodingizni satr-satr tekshirib, xatolaringizni, yaxshilanish joylarini va
-                    tushunchalarni o&apos;zbek tilida tushuntiradi. Gemini 24/7 savollarga javob beradi.
+                    {t.home.aiReviewText}
                   </p>
                   {/* Demo snippet */}
                   <div className="mt-4 rounded-xl border border-border/60 bg-background/60 p-3 font-mono text-[12px] leading-relaxed max-w-sm">
@@ -926,7 +922,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">{t.home.certificateTitle}</h3>
                 <p className="text-[12px] text-muted-foreground leading-snug max-w-[200px]">
-                  Kursni tugating va PNG sertifikatni oling.
+                  {t.home.certificateText}
                 </p>
               </div>
             </motion.div>
@@ -982,11 +978,11 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-end justify-between mb-10">
               <div>
-                <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Kurslar</p>
+                <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">{t.nav.courses}</p>
                 <h2 className="font-display font-bold text-3xl tracking-tight">{t.home.popularCourses}</h2>
               </div>
               <Link href="/explore/courses" className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Barcha kurslar <ArrowUpRight className="w-4 h-4" />
+                {t.home.allCourses} <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
 
@@ -1032,7 +1028,7 @@ export default function LandingPage() {
 
                       {/* Teglar — doim ko'rinadi */}
                       <div className="flex flex-wrap gap-1.5 mb-4 min-h-[26px]">
-                        {(c.tags?.length ? c.tags : ["KURS", "AMALIYOT"]).slice(0, 3).map((tag: string) => (
+                        {(c.tags?.length ? c.tags : [t.explore.tagFallback, t.explore.tagFallback2]).slice(0, 3).map((tag: string) => (
                           <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
                             {tag}
                           </span>
@@ -1059,7 +1055,7 @@ export default function LandingPage() {
                           {c.is_free ? "Bepul" : `${c.price_coins} coin`}
                         </span>
                         <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple transition-all group-hover:gap-2.5">
-                          <Play className="w-3.5 h-3.5" /> Ko'rish <ArrowUpRight className="w-4 h-4" />
+                          <Play className="w-3.5 h-3.5" /> {t.home.view} <ArrowUpRight className="w-4 h-4" />
                         </span>
                       </div>
                     </div>
@@ -1175,7 +1171,7 @@ export default function LandingPage() {
                   {user ? t.nav.dashboard : t.home.ctaStart} <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="/playground" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-border bg-surface/50 hover:bg-surface font-medium text-[0.95rem] transition-all">
-                  <Terminal className="w-4 h-4" /> Playground sinab ko'rish
+                  <Terminal className="w-4 h-4" /> {t.home.tryPlayground}
                 </Link>
               </div>
             </div>
@@ -1183,10 +1179,10 @@ export default function LandingPage() {
               {[
                 { icon: CheckCircle2, text: t.home.sevenLangs, color: "hsl(var(--brand-purple))" },
                 { icon: Brain, text: t.home.aiReview, color: "hsl(var(--brand-blue))" },
-                { icon: Trophy, text: "Coin va sovg'alar", color: "hsl(var(--brand-amber))" },
-                { icon: GraduationCap, text: "Professional sertifikat", color: "hsl(var(--brand-green))" },
-                { icon: Gamepad2, text: "7 ta interaktiv o'yin (3D bilan)", color: "hsl(var(--brand-orchid))" },
-                { icon: Globe, text: "To'liq o'zbek tilida", color: "hsl(var(--brand-coral))" },
+                { icon: Trophy, text: t.home.coinsGifts, color: "hsl(var(--brand-amber))" },
+                { icon: GraduationCap, text: t.home.proCertificate, color: "hsl(var(--brand-green))" },
+                { icon: Gamepad2, text: t.home.sevenGames3d, color: "hsl(var(--brand-orchid))" },
+                { icon: Globe, text: t.home.fourLanguages, color: "hsl(var(--brand-coral))" },
               ].map(f => (
                 <div key={f.text} className="flex items-center gap-3 p-3.5 rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm hover:border-border transition-colors">
                   <f.icon className="w-5 h-5 flex-shrink-0" style={{ color: f.color }} />
@@ -1209,7 +1205,7 @@ export default function LandingPage() {
                 <span className="font-display font-bold text-lg">EduCode</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                Raqamli intellektual ta'lim platformasi. Dasturlash tillarini interaktiv kurslar, AI yordamchi va gamifikatsiya orqali o'rganing.
+                {t.home.footerAbout2}
               </p>
             </div>
             <div>

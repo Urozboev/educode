@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotebookPen, Check, Loader2, ChevronDown, Trash2 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Mavzu bo'yicha shaxsiy qayd.
@@ -20,6 +21,7 @@ import { NotebookPen, Check, Loader2, ChevronDown, Trash2 } from "lucide-react";
 const AUTOSAVE_MS = 1200;
 
 export function TopicNotes({ topicId }: { topicId: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
@@ -99,11 +101,11 @@ export function TopicNotes({ topicId }: { topicId: string }) {
           <NotebookPen className="w-4.5 h-4.5 text-neon-yellow" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm">Mening qaydlarim</p>
+          <p className="font-semibold text-sm">{t.courses.myNotes}</p>
           <p className="text-xs text-muted-foreground truncate">
             {value
               ? value.replace(/\s+/g, " ").slice(0, 70) + (value.length > 70 ? "…" : "")
-              : "Mavzu bo'yicha o'zingiz uchun eslatma yozing"}
+              : t.courses.notePlaceholder}
           </p>
         </div>
 
@@ -111,13 +113,13 @@ export function TopicNotes({ topicId }: { topicId: string }) {
           {state === "saving" && (
             <motion.span key="s" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="text-xs text-muted-foreground inline-flex items-center gap-1.5 flex-shrink-0">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" /> saqlanmoqda
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t.courses.saving}
             </motion.span>
           )}
           {state === "saved" && (
             <motion.span key="d" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="text-xs text-neon-green inline-flex items-center gap-1.5 flex-shrink-0">
-              <Check className="w-3.5 h-3.5" /> saqlandi
+              <Check className="w-3.5 h-3.5" /> {t.courses.savedShort}
             </motion.span>
           )}
         </AnimatePresence>
@@ -138,7 +140,7 @@ export function TopicNotes({ topicId }: { topicId: string }) {
           />
           <div className="flex items-center justify-between gap-3">
             <p className="text-[11px] text-muted-foreground">
-              Qaydni faqat siz ko&apos;rasiz. <span className="numeric">{value.length}</span>/20000
+              {t.courses.notePrivate} <span className="numeric">{value.length}</span>/20000
             </p>
             {value && (
               <button

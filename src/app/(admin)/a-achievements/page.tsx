@@ -35,7 +35,7 @@ export default function AdminAchievementsPage() {
   }
 
   async function handleSave() {
-    if (!form.title.trim()) { toast.error("Nomini kiriting"); return; }
+    if (!form.title.trim()) { toast.error(t.admin.common.enterName); return; }
     setSaving(true);
     const payload = { ...form, order_index: editId ? undefined : achievements.length };
 
@@ -73,7 +73,7 @@ export default function AdminAchievementsPage() {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div><label className="text-sm font-medium mb-1 block">{t.admin.common.nameRequired} *</label>
-              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Birinchi qadam" /></div>
+              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder={t.admin.ach.firstStep} /></div>
             <div><label className="text-sm font-medium mb-1 block">{t.admin.common.category}</label>
               <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="input-field">
                 <option value="learning">{t.admin.ach.catLearning}</option><option value="challenge">{t.admin.ach.catTask}</option>

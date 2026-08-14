@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { Trophy, ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * "Bu masala olimpiadaga tegishli" belgisi.
@@ -23,6 +24,7 @@ export function ContestBanner({
   challengeId: string;
   isLoggedIn: boolean;
 }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [items, setItems] = useState<{ letter: string; slug: string; title: string }[]>([]);
 
@@ -61,8 +63,8 @@ export function ContestBanner({
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold truncate">{c.title}</p>
             <p className="text-xs text-muted-foreground">
-              Bu masala shu olimpiadaning <span className="font-semibold">{c.letter}</span> masalasi —
-              musobaqa ichida yechish uchun bosing
+              {t.store.contestBannerA} <span className="font-semibold">{c.letter}</span>{" "}
+              {t.store.contestBannerB}
             </p>
           </div>
           <ArrowRight className="w-4 h-4 text-neon-yellow group-hover:translate-x-0.5 transition-transform flex-shrink-0" />

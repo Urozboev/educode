@@ -9,12 +9,14 @@ import {
   Coins, Loader2, CreditCard, CheckCircle2, Clock, XCircle,
   Copy, Check, Gift, ShoppingCart,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface Pkg { coins: number; uzs: number; }
 interface Settings { price_per_coin: number; packages: Pkg[]; card_number: string; card_owner: string; }
 interface Request { id: string; amount_coins: number; amount_uzs: number; status: string; created_at: string; review_note: string | null; }
 
 export default function ParentCoinsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [coins, setCoins] = useState(0);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -37,13 +39,25 @@ export default function ParentCoinsPage() {
       supabase.from("profiles").select("coins").eq("id", user.id).single(),
       supabase.from("platform_settings").select("value").eq("key", "coin_price_uzs").maybeSingle(),
       supabase.from("coin_purchase_requests").select("*").eq("parent_id", user.id).order("created_at", { ascending: false }).limit(10),
-      supabase.from("coin_gifts").select("*, child:profiles!coin_gifts_child_id_fkey(full_name)").eq("parent_id", user.id).order("created_at", { ascending: false }).limit(10),
+      supabase.from("coin_gifts").select("*").eq("parent_id", user.id).order("created_at", { ascending: false }).limit(10),
     ]);
 
     if (profile) setCoins(profile.coins);
     if (setting?.value) setSettings(setting.value as Settings);
     if (reqs) setRequests(reqs as Request[]);
-    if (g) setGifts(g);
+
+    // Farzand ismlari (coin_gifts FK auth.users ga qaraydi — embed ishlamaydi)
+    if (g && g.length > 0) {
+      const childIds = [...new Set(g.map((row: any) => row.child_id))];
+      const { data: childProfiles } = await supabase
+        .from("profiles").select("id, full_name").in("id", childIds);
+      setGifts(g.map((row: any) => ({
+        ...row,
+        child: childProfiles?.find(p => p.id === row.child_id) || null,
+      })));
+    } else {
+      setGifts([]);
+    }
     setLoading(false);
   }, [supabase]);
 
@@ -57,7 +71,7 @@ export default function ParentCoinsPage() {
   }
 
   async function submitRequest() {
-    if (!selectedPkg) { toast.error("Paketni tanlang"); return; }
+    if (!selectedPkg) { toast.error(t.parent.pickPackage); return; }
     setSubmitting(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSubmitting(false); return; }
@@ -70,7 +84,7 @@ export default function ParentCoinsPage() {
     });
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("So'rov yuborildi! Admin tasdiqlagach coinlar hisobingizga tushadi.");
+    toast.success(t.parent.requestSent);
     setSelectedPkg(null); setNote("");
     load();
   }
@@ -98,9 +112,9 @@ export default function ParentCoinsPage() {
   }
 
   const statusBadge = (s: string) => {
-    if (s === "approved") return <span className="inline-flex items-center gap-1 text-neon-green text-xs"><CheckCircle2 className="w-3.5 h-3.5" /> Tasdiqlandi</span>;
-    if (s === "rejected") return <span className="inline-flex items-center gap-1 text-neon-red text-xs"><XCircle className="w-3.5 h-3.5" /> Rad etildi</span>;
-    return <span className="inline-flex items-center gap-1 text-neon-yellow text-xs"><Clock className="w-3.5 h-3.5" /> Kutilmoqda</span>;
+    if (s === "approved") return <span className="inline-flex items-center gap-1 text-neon-green text-xs"><CheckCircle2 className="w-3.5 h-3.5" /> {t.parent.approved}</span>;
+    if (s === "rejected") return <span className="inline-flex items-center gap-1 text-neon-red text-xs"><XCircle className="w-3.5 h-3.5" /> {t.parent.rejected}</span>;
+    return <span className="inline-flex items-center gap-1 text-neon-yellow text-xs"><Clock className="w-3.5 h-3.5" /> {t.parent.pending}</span>;
   };
 
   if (loading) return <div className="glass-card h-96 animate-pulse" />;
@@ -108,8 +122,8 @@ export default function ParentCoinsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="font-display font-bold text-3xl mb-1">Coinlar</h1>
-        <p className="text-muted-foreground">Coin sotib oling va farzandingizga sovg'a qiling.</p>
+        <h1 className="font-display font-bold text-3xl mb-1">{t.parent.coins}</h1>
+        <p className="text-muted-foreground">{t.parent.coinsSubtitle}</p>
       </div>
 
       {/* Balans */}
@@ -119,7 +133,7 @@ export default function ParentCoinsPage() {
             <Coins className="w-7 h-7 text-neon-yellow" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Sizning balansingiz</p>
+            <p className="text-sm text-muted-foreground">{t.parent.yourBalance}</p>
             <p className="font-display font-extrabold text-3xl">{formatNumber(coins)} <span className="text-lg text-muted-foreground">coin</span></p>
           </div>
         </div>
@@ -128,7 +142,7 @@ export default function ParentCoinsPage() {
       {/* Paketlar */}
       <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5 text-neon-purple" /> Coin sotib olish
+          <ShoppingCart className="w-5 h-5 text-neon-purple" /> {t.parent.buyCoins}
         </h2>
 
         <div className="grid sm:grid-cols-3 gap-3 mb-5">
@@ -150,7 +164,7 @@ export default function ParentCoinsPage() {
 
             {/* Onlayn to'lov — Payme / Click */}
             <div>
-              <p className="text-sm font-semibold mb-2 flex items-center gap-2"><CreditCard className="w-4 h-4 text-neon-green" /> Onlayn to'lov (darhol)</p>
+              <p className="text-sm font-semibold mb-2 flex items-center gap-2"><CreditCard className="w-4 h-4 text-neon-green" /> {t.parent.onlinePay}</p>
               <div className="grid grid-cols-2 gap-2.5">
                 <button onClick={() => payOnline("payme")} disabled={payingProvider !== null}
                   className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-[#33b0b9]/40 bg-[#33b0b9]/10 hover:bg-[#33b0b9]/20 font-bold text-sm transition-all disabled:opacity-50" style={{ color: "#33b0b9" }}>
@@ -161,12 +175,12 @@ export default function ParentCoinsPage() {
                   {payingProvider === "click" ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Click
                 </button>
               </div>
-              <p className="text-[11px] text-muted-foreground mt-2">To'langach coinlar avtomatik hisobingizga tushadi.</p>
+              <p className="text-[11px] text-muted-foreground mt-2">{t.parent.onlinePayHint}</p>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-border" />
-              <span className="text-[11px] text-muted-foreground">yoki karta orqali (qo'lda)</span>
+              <span className="text-[11px] text-muted-foreground">{t.parent.orByCard}</span>
               <div className="flex-1 h-px bg-border" />
             </div>
 
@@ -174,7 +188,7 @@ export default function ParentCoinsPage() {
             <div className="flex items-start gap-3 p-3 rounded-xl bg-neon-blue/5 border border-neon-blue/20">
               <CreditCard className="w-5 h-5 text-neon-blue flex-shrink-0 mt-0.5" />
               <div className="flex-1 text-sm">
-                <p className="text-muted-foreground mb-1">Quyidagi kartaga <strong className="text-foreground">{formatNumber(selectedPkg.uzs)} so'm</strong> o'tkazing:</p>
+                <p className="text-muted-foreground mb-1">{t.parent.transferToA} <strong className="text-foreground">{formatNumber(selectedPkg.uzs)} so'm</strong> {t.parent.transferToB}</p>
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold text-base">{settings?.card_number}</span>
                   <button onClick={copyCard} className="p-1 hover:bg-accent rounded">
@@ -186,14 +200,14 @@ export default function ParentCoinsPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1.5 block">To'lov izohi (ixtiyoriy)</label>
+              <label className="text-sm font-medium mb-1.5 block">{t.parent.payNote}</label>
               <input value={note} onChange={e => setNote(e.target.value)}
-                placeholder="Masalan: 14:30 da o'tkazdim, ismim Aliyev A." className="input-field text-sm" />
+                placeholder={t.parent.payNotePh} className="input-field text-sm" />
             </div>
 
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground max-w-xs">
-                O'tkazmani amalga oshirgach, "So'rov yuborish" bosing. Admin tekshirib tasdiqlaydi.
+                {t.parent.afterTransfer}
               </p>
               <button onClick={submitRequest} disabled={submitting} className="btn-primary py-2.5 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} So'rov yuborish
@@ -206,7 +220,7 @@ export default function ParentCoinsPage() {
       {/* So'rovlar tarixi */}
       {requests.length > 0 && (
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h3 className="font-semibold text-sm mb-3">Xarid so'rovlari</h3>
+          <h3 className="font-semibold text-sm mb-3">{t.parent.purchaseRequests}</h3>
           <div className="space-y-2">
             {requests.map(r => (
               <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-surface/50 text-sm">
@@ -222,10 +236,10 @@ export default function ParentCoinsPage() {
         </motion.div>
       )}
 
-      {/* Sovg'alar tarixi */}
+      {/* {t.parent.giftHistory} */}
       {gifts.length > 0 && (
         <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h3 className="font-semibold text-sm mb-3 flex items-center gap-2"><Gift className="w-4 h-4 text-neon-yellow" /> Sovg'alar tarixi</h3>
+          <h3 className="font-semibold text-sm mb-3 flex items-center gap-2"><Gift className="w-4 h-4 text-neon-yellow" /> {t.parent.giftHistory}</h3>
           <div className="space-y-2">
             {gifts.map(g => (
               <div key={g.id} className="flex items-center justify-between p-3 rounded-xl bg-surface/50 text-sm">

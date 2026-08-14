@@ -4,20 +4,26 @@ import { Sparkles, Check } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAgentAccess, PLAN_PRICES_UZS, FREE_TRIAL_MESSAGES } from "@/lib/agent/access";
 import AgentChat from "@/components/agent/AgentChat";
+import type { Metadata } from "next";
+import { getServerDictionary } from "@/lib/i18n/server";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Ustoz — shaxsiy AI o'qituvchi | EduCode",
-  description:
-    "Noldan advanced darajagacha IT o'rgatadigan AI agent: o'zi reja tuzadi, dars o'tadi, baholaydi va progressni kuzatadi.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.agent.seoTitle,
+    description: t.agent.seoDesc,
+    };
+}
 
 export default async function AgentPage({
   searchParams,
 }: {
   searchParams: { modul?: string };
 }) {
+  const t = await getServerDictionary();
   const supabase = createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -29,7 +35,7 @@ export default async function AgentPage({
 
   // Demo tugagan yoki obuna muddati o'tgan — paywall
   if (!access.allowed) {
-    return <Paywall reason={access.reason} />;
+    return <Paywall reason={access.reason} t={t} />;
   }
 
   // Rejadagi "Boshlash" tugmasidan kelingan bo'lsa — mavzu nomi.
@@ -48,7 +54,7 @@ export default async function AgentPage({
     <div className="mx-auto max-w-3xl">
       {access.isTrial && (
         <div className="border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-muted-foreground">
-          Bepul sinov: yana {access.freeRemaining} ta xabar.{" "}
+          {t.agent.freeTrialLeft} {access.freeRemaining} {t.agent.messagesLeft}{" "}
           <Link href="/agent/obuna" className="font-medium text-primary hover:underline">
             Pro obunaga o'tish
           </Link>
@@ -59,9 +65,9 @@ export default async function AgentPage({
   );
 }
 
-function Paywall({ reason }: { reason?: string }) {
+function Paywall({ reason, t }: { reason?: string; t: Dictionary }) {
   const title =
-    reason === "expired" ? "Obuna muddati tugadi" : "Bepul sinov tugadi";
+    reason === "expired" ? t.agent.subExpired : t.agent.trialOver;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 text-center">
@@ -72,22 +78,22 @@ function Paywall({ reason }: { reason?: string }) {
       <h1 className="mb-2 text-2xl font-bold">{title}</h1>
       <p className="mx-auto mb-8 max-w-md text-sm text-muted-foreground">
         {reason === "expired"
-          ? "Ustoz bilan ishlashni davom ettirish uchun obunani yangilang. Rejangiz va progressingiz saqlanib turibdi."
-          : `Ustoz bilan ${FREE_TRIAL_MESSAGES} ta bepul xabar almashdingiz. Davom etish uchun obunani tanlang.`}
+          ? t.agent.renewHint
+          : `${t.agent.usedWith} ${FREE_TRIAL_MESSAGES} ${t.agent.trialUsed}`}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <PlanCard
+        <PlanCard t={t}
           name="Pro"
           price={PLAN_PRICES_UZS.pro}
           features={[
-            "Cheksiz suhbat va darslar",
-            "2 ta o'quv yo'nalishi",
-            "Ovozli dars",
-            "Sertifikat",
+            t.agent.perkChat,
+            t.agent.perkTwoTracks,
+            t.agent.perkVoiceShort,
+            t.agent.certificate,
           ]}
         />
-        <PlanCard
+        <PlanCard t={t}
           name="Pro+"
           price={PLAN_PRICES_UZS.pro_plus}
           highlighted
@@ -104,8 +110,10 @@ function Paywall({ reason }: { reason?: string }) {
 }
 
 function PlanCard({
+  t,
   name, price, features, highlighted,
 }: {
+  t: Dictionary;
   name: string;
   price: number;
   features: string[];
@@ -121,7 +129,7 @@ function PlanCard({
       <div className="mb-1 font-semibold">{name}</div>
       <div className="mb-4 text-2xl font-bold">
         {price.toLocaleString("uz-UZ")}{" "}
-        <span className="text-sm font-normal text-muted-foreground">so'm / oy</span>
+        <span className="text-sm font-normal text-muted-foreground">{t.agent.perMonth}</span>
       </div>
 
       <ul className="mb-6 space-y-2 text-sm text-muted-foreground">
@@ -142,7 +150,7 @@ function PlanCard({
             : "border border-border hover:bg-muted")
         }
       >
-        Tanlash
+        {t.agent.pick}
       </Link>
     </div>
   );

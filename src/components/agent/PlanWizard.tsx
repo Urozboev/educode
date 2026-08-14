@@ -15,6 +15,8 @@ import {
   Loader2, ArrowRight, Check, Sparkles, Clock, Target, RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 interface Option { id: string; text: string }
 interface Question {
@@ -33,13 +35,17 @@ interface PlacementResult {
   weakTopics: string[];
 }
 
-const DIRECTIONS = [
-  { key: "Frontend dasturchi", desc: "HTML, CSS, JavaScript, React" },
-  { key: "Backend dasturchi", desc: "Python, ma'lumotlar bazasi, API" },
-  { key: "Mobil dasturchi", desc: "Flutter yoki React Native" },
-  { key: "Data Analitik", desc: "Python, SQL, statistika, vizualizatsiya" },
-  { key: "DevOps muhandis", desc: "Linux, Docker, CI/CD, bulut" },
-  { key: "Kompyuter savodxonligi", desc: "Windows, Office, internet, xavfsizlik" },
+/**
+ * `key` — BAZAGA va AI promptiga boradigan barqaror identifikator,
+ * u tarjima QILINMAYDI. Ekranga `label` chiqadi.
+ */
+const DIRECTIONS = (t: Dictionary) => [
+  { key: "Frontend dasturchi", label: t.agent.dirFrontend, desc: t.agent.dirFrontendDesc },
+  { key: "Backend dasturchi", label: t.agent.dirBackend, desc: t.agent.dirBackendDesc },
+  { key: "Mobil dasturchi", label: t.agent.dirMobile, desc: t.agent.dirMobileDesc },
+  { key: "Data Analitik", label: t.agent.dirData, desc: t.agent.dirDataDesc },
+  { key: "DevOps muhandis", label: t.agent.dirDevops, desc: t.agent.dirDevopsDesc },
+  { key: "Kompyuter savodxonligi", label: t.agent.dirLiteracy, desc: t.agent.dirLiteracyDesc },
 ];
 
 const LEVEL_LABELS: Record<string, string> = {
@@ -52,6 +58,7 @@ const LEVEL_LABELS: Record<string, string> = {
 type Step = "direction" | "placement" | "building";
 
 export default function PlanWizard() {
+  const { t } = useI18n();
   const router = useRouter();
 
   const [step, setStep] = useState<Step>("direction");
@@ -242,12 +249,12 @@ export default function PlanWizard() {
         </div>
         <h1 className="text-2xl font-bold">Qaysi yo'nalishni o'rganmoqchisiz?</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Tanlaganingizga qarab Ustoz shaxsiy reja tuzadi.
+          {t.agent.wizardHint}
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {DIRECTIONS.map((d) => (
+        {DIRECTIONS(t).map((d) => (
           <button
             key={d.key}
             onClick={() => { setDirection(d.key); setCustomDirection(""); }}
@@ -258,18 +265,18 @@ export default function PlanWizard() {
                 : "border-border hover:bg-muted",
             )}
           >
-            <div className="font-medium">{d.key}</div>
+            <div className="font-medium">{d.label}</div>
             <div className="mt-1 text-xs text-muted-foreground">{d.desc}</div>
           </button>
         ))}
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium">Yoki o'zingiz yozing</label>
+        <label className="mb-2 block text-sm font-medium">{t.agent.orWriteYourself}</label>
         <input
           value={customDirection}
           onChange={(e) => setCustomDirection(e.target.value)}
-          placeholder="Masalan: Kibxavfsizlik, o'yin dasturlash..."
+          placeholder={t.agent.ownTopicPh}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
         />
       </div>

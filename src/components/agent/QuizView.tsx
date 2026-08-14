@@ -16,6 +16,7 @@ import {
   Loader2, Check, X, ArrowRight, RotateCcw, BookOpen, PartyPopper, ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 interface Option { id: string; text: string }
 interface Question {
@@ -55,6 +56,7 @@ export default function QuizView({
   moduleId: string;
   onBackToLesson: () => void;
 }) {
+  const { t } = useI18n();
   const router = useRouter();
 
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
@@ -132,7 +134,7 @@ export default function QuizView({
       <div className="py-16 text-center">
         <p className="mb-4 text-sm text-destructive">{error}</p>
         <button onClick={() => void start()} className="text-sm text-primary hover:underline">
-          Qayta urinish
+          {t.agent.retry}
         </button>
       </div>
     );
@@ -218,14 +220,14 @@ export default function QuizView({
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
               >
                 <BookOpen className="h-4 w-4" />
-                Darsni qayta o'qish
+                {t.agent.rereadLesson}
               </button>
               <button
                 onClick={() => void start()}
                 className="flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-medium hover:bg-muted"
               >
                 <RotateCcw className="h-4 w-4" />
-                Testni qayta topshirish
+                {t.agent.retakeQuiz}
               </button>
             </>
           ) : (
@@ -235,7 +237,7 @@ export default function QuizView({
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
             >
               <ListChecks className="h-4 w-4" />
-              {decision.trackCompleted ? "Rejani ko'rish" : "Rejaga o'tish"}
+              {decision.trackCompleted ? t.agent.viewPlan : "Rejaga o'tish"}
               <ArrowRight className="h-4 w-4" />
             </Link>
           )}
@@ -300,7 +302,7 @@ export default function QuizView({
 
       <div className="sticky bottom-4 flex items-center gap-3 rounded-2xl border border-border bg-background/95 p-4 backdrop-blur">
         <button onClick={onBackToLesson} className="text-sm text-muted-foreground hover:text-foreground">
-          Darsga qaytish
+          {t.agent.backToLesson}
         </button>
         <span className="ml-auto text-sm text-muted-foreground">
           {answered}/{questions.length}

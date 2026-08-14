@@ -1,37 +1,39 @@
 import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl } from "@/lib/seo";
+import { getServerDictionary } from "@/lib/i18n/server";
 
-const PAGE_TITLE = "Platforma haqida — EduCode (malla.uz)";
-const PAGE_DESC =
-  "EduCode — Sokratik AI mentor, akademik halollik va gamifikatsiya bilan dasturlashni o'zbek tilida o'rgatuvchi platforma. Pedagogik missiya va texnik arxitektura.";
 
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-  description: PAGE_DESC,
-  alternates: { canonical: absUrl("/explore/about") },
-  openGraph: {
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    url: absUrl("/explore/about"),
-    type: "article",
-    images: [ogImageUrl({ title: "Platforma haqida", subtitle: "EduCode — pedagogik missiya", type: "default" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    images: [ogImageUrl({ title: "Platforma haqida", subtitle: "EduCode — pedagogik missiya", type: "default" })],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.seo.aboutTitle,
+    description: t.seo.aboutDesc,
+    alternates: { canonical: absUrl("/explore/about") },
+    openGraph: {
+      title: t.seo.aboutTitle,
+      description: t.seo.aboutDesc,
+      url: absUrl("/explore/about"),
+      type: "article",
+      images: [ogImageUrl({ title: t.seo.aboutOg, subtitle: t.seo.aboutOgSub, type: "default" })],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.seo.aboutTitle,
+      description: t.seo.aboutDesc,
+      images: [ogImageUrl({ title: t.seo.aboutOg, subtitle: t.seo.aboutOgSub, type: "default" })],
+    },
+  };
+}
 
-export default function ExploreAboutLayout({ children }: { children: React.ReactNode }) {
+export default async function ExploreAboutLayout({ children }: { children: React.ReactNode }) {
+  const t = await getServerDictionary();
   return (
     <>
       <BreadcrumbJsonLd
         items={[
-          { name: "Bosh sahifa", url: "/" },
-          { name: "Platforma haqida", url: "/explore/about" },
+          { name: t.seo.homeCrumb, url: "/" },
+          { name: t.seo.aboutCrumb, url: "/explore/about" },
         ]}
       />
       {children}

@@ -13,6 +13,7 @@ import {
   RESOURCE_LABEL, RESOURCE_TITLE_FIELD,
   type TranslatableResource, type TranslatableField,
 } from "@/lib/i18n/content";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Kontent tarjimasi paneli.
@@ -36,6 +37,7 @@ interface ProgressRow {
 }
 
 export default function TranslationsPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [fields, setFields] = useState<TranslatableField[]>([]);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
@@ -136,7 +138,7 @@ export default function TranslationsPage() {
     });
     setSavingField(null);
 
-    if (error || !data?.ok) { toast.error(data?.message || error?.message || "Saqlanmadi"); return; }
+    if (error || !data?.ok) { toast.error(data?.message || error?.message || t.admin.common.saveFailed); return; }
     setSaved(s => ({ ...s, [f.field]: true }));
     setTimeout(() => setSaved(s => ({ ...s, [f.field]: false })), 1800);
     loadMeta();
@@ -154,9 +156,9 @@ export default function TranslationsPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display font-bold text-3xl">Kontent tarjimasi</h1>
+          <h1 className="font-display font-bold text-3xl">{t.admin.trn.title}</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Mavzular, testlar, topshiriqlar va boshqa kontentni boshqa tillarga o&apos;girish
+            {t.admin.trn.subtitle}
           </p>
         </div>
         <button onClick={loadMeta} className="btn-ghost px-4 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
@@ -248,7 +250,7 @@ export default function TranslationsPage() {
                       {savingField === f.field ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         : saved[f.field] ? <Check className="w-3.5 h-3.5" />
                         : <Save className="w-3.5 h-3.5" />}
-                      {saved[f.field] ? "Saqlandi" : "Saqlash"}
+                      {saved[f.field] ? t.admin.common.saved : t.admin.common.save}
                     </button>
                   </div>
                 </div>
@@ -271,7 +273,7 @@ export default function TranslationsPage() {
                     <textarea
                       value={values[f.field] ?? ""}
                       onChange={e => setValues(v => ({ ...v, [f.field]: e.target.value }))}
-                      placeholder={f.kind === "json" ? "JSON ko'rinishida" : "Tarjimani shu yerga yozing"}
+                      placeholder={f.kind === "json" ? "JSON ko'rinishida" : t.admin.trn.placeholder}
                       className="input-field w-full text-xs font-mono min-h-[140px] resize-y"
                     />
                   </div>
@@ -302,7 +304,7 @@ export default function TranslationsPage() {
           {loading ? (
             <div className="space-y-2">{[1, 2, 3, 4].map(i => <div key={i} className="glass-card h-12 animate-pulse" />)}</div>
           ) : shown.length === 0 ? (
-            <p className="py-12 text-center text-muted-foreground text-sm">Yozuv topilmadi</p>
+            <p className="py-12 text-center text-muted-foreground text-sm">{t.admin.common.notFound}</p>
           ) : (
             <div className="space-y-1.5">
               {shown.map(r => (

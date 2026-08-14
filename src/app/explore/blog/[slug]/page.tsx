@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { serverHref } from "@/lib/i18n/server";
+import { serverHref, getServerDictionary } from "@/lib/i18n/server";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
@@ -27,7 +27,8 @@ async function fetchPost(slug: string) {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const post = await fetchPost(params.slug);
-  if (!post) return { title: "Maqola topilmadi", robots: { index: false, follow: false } };
+  const t = await getServerDictionary();
+  if (!post) return { title: t.explore.blogNotFound, robots: { index: false, follow: false } };
 
   const desc = post.excerpt || `${post.title} — ${SITE_NAME} blog.`;
   const url = absUrl(`/blog/${post.slug}`);
@@ -53,6 +54,7 @@ function fmtDate(d: string | null) {
 }
 
 export default async function BlogPostPage({ params }: Params) {
+  const t = await getServerDictionary();
   const href = await serverHref();
   const post = await fetchPost(params.slug);
   if (!post) notFound();
@@ -127,7 +129,7 @@ export default async function BlogPostPage({ params }: Params) {
       {/* CTA */}
       <div className="mt-10 rounded-2xl border border-neon-purple/20 bg-gradient-to-br from-neon-purple/[0.08] to-neon-blue/[0.05] p-6 text-center">
         <p className="font-display font-bold text-lg mb-1">Dasturlashni o'rganishni boshlang</p>
-        <p className="text-sm text-muted-foreground mb-4">Interaktiv kurslar, AI mentor va amaliy topshiriqlar bilan.</p>
+        <p className="text-sm text-muted-foreground mb-4">{t.explore.blogCta}</p>
         <Link href="/register" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition">
           Bepul boshlash
         </Link>

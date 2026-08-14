@@ -49,7 +49,7 @@ export default function TeacherExportPage() {
         a.download = `teacher_${type}_${new Date().toISOString().split("T")[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success("Eksport qilindi");
+        toast.success(t.teacher.exp.done);
       }
     } catch (e: any) { toast.error(e.message); }
     setExporting(null);
@@ -58,7 +58,7 @@ export default function TeacherExportPage() {
   const exports = [
     { id: "students", label: t.teacher.exp.studentsFile, desc: t.teacher.exp.studentsCols, icon: Users, color: "#6C5CE7" },
     { id: "submissions", label: t.teacher.exp.submissionsFile, desc: t.teacher.exp.submissionsCols, icon: Target, color: "#00D2FF" },
-    { id: "quizzes", label: "Test natijalari", desc: "Ball, foiz, sana", icon: ClipboardList, color: "#FFD600" },
+    { id: "quizzes", label: t.teacher.exp.quizResults, desc: "Ball, foiz, sana", icon: ClipboardList, color: "#FFD600" },
   ];
 
   return (

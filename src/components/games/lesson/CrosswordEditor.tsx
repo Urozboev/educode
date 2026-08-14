@@ -5,6 +5,7 @@ import type { CrosswordContent } from "@/types";
 import { buildCrossword, buildGrid, cellKey, normalizeAnswer } from "@/lib/crossword";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2, Wand2, AlertTriangle } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type Entry = { answer: string; clue: string };
 
@@ -22,6 +23,7 @@ export function CrosswordEditor({
   content: CrosswordContent;
   onChange: (c: CrosswordContent) => void;
 }) {
+  const { t } = useI18n();
   // Mavjud to'rdan so'zlar ro'yxatini tiklaymiz (tahrirlash uchun)
   const [entries, setEntries] = useState<Entry[]>(() =>
     content.words?.length
@@ -65,7 +67,7 @@ export function CrosswordEditor({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Javobdagi apostrof va bo&apos;shliqlar olib tashlanadi:
+        {t.lg.apostropheNote}
         <span className="font-mono"> o&apos;zgaruvchi → OZGARUVCHI</span>
       </p>
 
@@ -76,13 +78,13 @@ export function CrosswordEditor({
             value={e.answer}
             onChange={ev => set(i, { answer: ev.target.value })}
             className="input-field text-sm uppercase"
-            placeholder="Javob (so'z)"
+            placeholder={t.lg.answerWord}
           />
           <input
             value={e.clue}
             onChange={ev => set(i, { clue: ev.target.value })}
             className="input-field text-sm"
-            placeholder="Ta'rif / savol"
+            placeholder={t.lg.clue}
           />
           {entries.length > 2 && (
             <button
@@ -111,8 +113,7 @@ export function CrosswordEditor({
           <div className="leading-relaxed">
             <p className="font-semibold mb-0.5">To&apos;rga sig&apos;madi: {skipped.join(", ")}</p>
             <p className="text-muted-foreground text-xs">
-              Bu so&apos;zlarning boshqalar bilan umumiy harfi topilmadi. Ularni
-              o&apos;zgartiring yoki umumiy harfi bor so&apos;z qo&apos;shing.
+              {t.lg.noCommonLetter}
             </p>
           </div>
         </div>
@@ -122,7 +123,7 @@ export function CrosswordEditor({
       {grid && content.rows > 0 && (
         <div>
           <p className="eyebrow mb-2">
-            Natija: <span className="numeric">{content.words.length}</span> so&apos;z,{" "}
+            {t.lg.result} <span className="numeric">{content.words.length}</span> so&apos;z,{" "}
             <span className="numeric">{content.rows}</span>×<span className="numeric">{content.cols}</span>
           </p>
           <div className="overflow-x-auto p-3 rounded-xl bg-surface/40 border border-border">
@@ -158,7 +159,7 @@ export function CrosswordEditor({
 
       {!built && usableCount >= 2 && (
         <p className="text-xs text-neon-yellow">
-          So&apos;zlar o&apos;zgardi — saqlashdan oldin &laquo;To&apos;rni yaratish&raquo;ni bosing
+          {t.lg.rebuildGrid}
         </p>
       )}
     </div>

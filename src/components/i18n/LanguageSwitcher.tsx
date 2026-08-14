@@ -23,6 +23,7 @@ import {
  * saqlanib qoladi.
  */
 export function LanguageSwitcher({ compact }: { compact?: boolean }) {
+  const { t } = useI18n();
   const { locale } = useI18n();
   const router = useRouter();
   const pathname = usePathname() || "/";
@@ -83,7 +84,7 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
     <div className="relative" ref={box}>
       <button
         onClick={toggle}
-        aria-label="Til tanlash"
+        aria-label={t.nav.language}
         aria-expanded={open}
         className={cn(
           "inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface/60 hover:bg-surface transition font-medium",

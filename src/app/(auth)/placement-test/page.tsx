@@ -10,6 +10,7 @@ import {
   ArrowRight, ArrowLeft, CheckCircle2, Brain, Sparkles, Loader2,
   BookOpen, Target, XCircle, ChevronRight
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface PlacementQuestion {
   id: string; question: string; category: string; difficulty: string;
@@ -25,6 +26,7 @@ interface CategoryResult {
 }
 
 export default function PlacementTestPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const router = useRouter();
   const [questions, setQuestions] = useState<PlacementQuestion[]>([]);
@@ -182,7 +184,7 @@ export default function PlacementTestPage() {
         <div className="glass-card p-8">
           <Brain className="w-14 h-14 text-neon-purple mx-auto mb-4" />
           <h1 className="font-display font-bold text-2xl mb-2">Xush kelibsiz!</h1>
-          <p className="text-muted-foreground mb-6">Daraja aniqlash testi hozircha mavjud emas. Boshlang'ich darajadan boshlaymiz.</p>
+          <p className="text-muted-foreground mb-6">{t.auth.placementEmpty}</p>
           <button onClick={handleSkip} className="btn-primary py-3 px-8">Dashboard ga o'tish</button>
         </div>
       </motion.div>
@@ -196,7 +198,7 @@ export default function PlacementTestPage() {
         {/* Daraja */}
         <div className="glass-card p-8 text-center">
           <Sparkles className="w-14 h-14 text-neon-purple mx-auto mb-4" />
-          <h1 className="font-display font-bold text-2xl mb-2">Daraja aniqlandi!</h1>
+          <h1 className="font-display font-bold text-2xl mb-2">{t.auth.levelFound}</h1>
           <div className={cn("font-display font-bold text-5xl my-4", getLevelColor(result.level))}>
             {getLevelLabel(result.level)}
           </div>
@@ -208,7 +210,7 @@ export default function PlacementTestPage() {
 
         {/* Kategoriyalar bo'yicha natija */}
         <div className="glass-card p-6">
-          <h2 className="font-display font-semibold text-lg mb-4">Sohalar bo'yicha natija</h2>
+          <h2 className="font-display font-semibold text-lg mb-4">{t.auth.byCategory}</h2>
           <div className="space-y-4">
             {result.categoryResults.map(cr => (
               <div key={cr.category}>
@@ -240,12 +242,12 @@ export default function PlacementTestPage() {
               <Target className="w-5 h-5 text-neon-yellow" />
               <h3 className="font-semibold">Zaif sohangiz: <span className="text-neon-yellow">{result.weakCategory}</span></h3>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">Bu soha bo'yicha ko'proq mashq qilish tavsiya etiladi.</p>
+            <p className="text-sm text-muted-foreground mb-4">{t.auth.practiceMore}</p>
             {result.recommendedCourse && (
               <div className="p-3 rounded-xl bg-neon-purple/5 border border-neon-purple/10 flex items-center gap-3">
                 <BookOpen className="w-5 h-5 text-neon-purple flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold">Tavsiya etilgan kurs:</p>
+                  <p className="text-sm font-semibold">{t.auth.recommendedCourse}</p>
                   <p className="text-sm text-neon-purple">{result.recommendedCourse.title}</p>
                 </div>
               </div>
@@ -262,7 +264,7 @@ export default function PlacementTestPage() {
             </div>
             {aiLoading ? (
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Loader2 className="w-4 h-4 animate-spin" /> Tahlil qilinmoqda...
+                <Loader2 className="w-4 h-4 animate-spin" /> {t.auth.analysing}
               </div>
             ) : (
               <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
@@ -277,7 +279,7 @@ export default function PlacementTestPage() {
           {result.recommendedCourse && (
             <button onClick={() => router.push(`/courses/${result.recommendedCourse!.slug}`)}
               className="btn-neon py-3 px-6 flex items-center gap-2">
-              <BookOpen className="w-4 h-4" /> Tavsiya etilgan kursga o'tish
+              <BookOpen className="w-4 h-4" /> {t.auth.goToCourse}
             </button>
           )}
           <button onClick={() => router.push("/dashboard")}
@@ -303,11 +305,11 @@ export default function PlacementTestPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="font-display font-bold text-xl">Daraja aniqlash testi</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Bilim darajangizni aniqlash uchun savollarga javob bering</p>
+            <h1 className="font-display font-bold text-xl">{t.auth.placementTitle}</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">{t.auth.placementSubtitle}</p>
           </div>
           <button onClick={handleSkip} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            O'tkazib yuborish →
+            {t.auth.placementSkip}
           </button>
         </div>
 

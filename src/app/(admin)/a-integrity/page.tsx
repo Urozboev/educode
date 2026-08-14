@@ -102,7 +102,7 @@ export default function IntegrityPage() {
       <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-neon-blue/[0.06] border border-neon-blue/20 text-sm">
         <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-neon-blue" />
         <span className="leading-relaxed text-muted-foreground">
-          Bu ro&apos;yxat — ko&apos;rsatkich, ayblov emas. Talaba o&apos;z kodini boshqa
+          {t.admin.intg.notice}
           muharrirdan yoki telefonidan ko&apos;chirgan bo&apos;lishi mumkin. Xulosa
           chiqarishdan oldin yechim matnini ochib ko&apos;ring.
         </span>
@@ -168,7 +168,7 @@ export default function IntegrityPage() {
                       <span className="inline-flex items-center gap-1">
                         {r.contest_title
                           ? <><Trophy className="w-3 h-3 text-neon-yellow" /> {r.contest_title}</>
-                          : <><Code2 className="w-3 h-3" /> {r.task_type === "challenge" ? "Topshiriq" : "Mavzu topshirig'i"}</>}
+                          : <><Code2 className="w-3 h-3" /> {r.task_type === "challenge" ? t.admin.common.task : "Mavzu topshirig'i"}</>}
                       </span>
                       <span>{formatDateTime(r.created_at)}</span>
                       <span className={r.status === "accepted" ? "text-neon-green" : "text-neon-red"}>

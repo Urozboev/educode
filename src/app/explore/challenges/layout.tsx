@@ -2,31 +2,32 @@ import type { Metadata } from "next";
 import { ItemListJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl, SITE_NAME } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/server";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const revalidate = 1800;
 
-const PAGE_TITLE = "Dasturlash topshiriqlari — algoritm va kod amaliyoti";
-const PAGE_DESC =
-  "Algoritm va dasturlash topshiriqlari to'plami. Python, JavaScript va boshqa tillarda yeching. Avtomatik test, AI Sokratik mentor va coin mukofotlari.";
 
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-  description: PAGE_DESC,
-  alternates: { canonical: absUrl("/explore/challenges") },
-  openGraph: {
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    url: absUrl("/explore/challenges"),
-    type: "website",
-    images: [ogImageUrl({ title: "Dasturlash topshiriqlari", subtitle: "Algoritm · kod amaliyoti", type: "challenge" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    images: [ogImageUrl({ title: "Dasturlash topshiriqlari", subtitle: "Algoritm · kod amaliyoti", type: "challenge" })],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.seo.challengesTitle,
+    description: t.seo.challengesDesc,
+    alternates: { canonical: absUrl("/explore/challenges") },
+    openGraph: {
+      title: t.seo.challengesTitle,
+      description: t.seo.challengesDesc,
+      url: absUrl("/explore/challenges"),
+      type: "website",
+      images: [ogImageUrl({ title: t.seo.challengesOg, subtitle: t.seo.challengesOgSub, type: "challenge" })],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.seo.challengesTitle,
+      description: t.seo.challengesDesc,
+      images: [ogImageUrl({ title: t.seo.challengesOg, subtitle: t.seo.challengesOgSub, type: "challenge" })],
+    },
+  };
+}
 
 async function fetchChallenges() {
   try {
@@ -44,18 +45,19 @@ async function fetchChallenges() {
 }
 
 export default async function ExploreChallengesLayout({ children }: { children: React.ReactNode }) {
+  const t = await getServerDictionary();
   const challenges = await fetchChallenges();
   return (
     <>
       <BreadcrumbJsonLd
         items={[
-          { name: "Bosh sahifa", url: "/" },
-          { name: "Topshiriqlar", url: "/explore/challenges" },
+          { name: t.seo.homeCrumb, url: "/" },
+          { name: t.seo.challengesCrumb, url: "/explore/challenges" },
         ]}
       />
       <ItemListJsonLd
         name={`${SITE_NAME} topshiriqlari`}
-        description={PAGE_DESC}
+        description={t.seo.challengesDesc}
         items={challenges.map((c: any) => ({
           name: c.title,
           url: `/challenges/${c.slug}`,

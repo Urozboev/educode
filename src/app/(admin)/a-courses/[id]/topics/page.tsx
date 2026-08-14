@@ -16,6 +16,7 @@ import {
   FolderPlus, Eye, Wand2, Square
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 const EMPTY_TOPIC_FORM = {
   title: "", content_html: "", video_url: "", presentation_url: "",
@@ -25,6 +26,7 @@ const EMPTY_TOPIC_FORM = {
 };
 
 export default function AdminTopicsPage() {
+  const { t } = useI18n();
   const { id: courseId } = useParams<{ id: string }>();
   const supabase = createClient();
   const [course, setCourse] = useState<Course | null>(null);
@@ -56,7 +58,7 @@ export default function AdminTopicsPage() {
       const data = await res.json();
       if (data.error) { toast.error(data.error); setBunnyLoading(false); return; }
       setBunnyVideos(data.videos || []);
-      if ((data.videos || []).length === 0) toast.info("Kutubxonada video topilmadi");
+      if ((data.videos || []).length === 0) toast.info(t.admin.tpc.noBunnyVideo);
     } catch (e: any) {
       toast.error(e.message);
     }
@@ -113,14 +115,14 @@ export default function AdminTopicsPage() {
   }
 
   async function saveSection() {
-    if (!sectionForm.title.trim()) { toast.error("Bo'lim nomini kiriting"); return; }
+    if (!sectionForm.title.trim()) { toast.error(t.admin.tpc.enterSectionName); return; }
     setSavingSection(true);
     if (editSectionId) {
       const { error } = await supabase.from("course_sections")
         .update({ title: sectionForm.title, description: sectionForm.description || null })
         .eq("id", editSectionId);
       if (error) { toast.error(error.message); setSavingSection(false); return; }
-      toast.success("Bo'lim yangilandi");
+      toast.success(t.admin.tpc.sectionUpdated);
     } else {
       const { error } = await supabase.from("course_sections").insert({
         course_id: courseId,
@@ -129,7 +131,7 @@ export default function AdminTopicsPage() {
         order_index: sections.length,
       });
       if (error) { toast.error(error.message); setSavingSection(false); return; }
-      toast.success("Bo'lim qo'shildi");
+      toast.success(t.admin.tpc.sectionAdded);
     }
     setShowSectionForm(false);
     setSavingSection(false);
@@ -140,7 +142,7 @@ export default function AdminTopicsPage() {
     const topicCount = topics.filter(t => t.section_id === s.id).length;
     if (!confirm(`"${s.title}" bo'limini o'chirish?${topicCount > 0 ? ` Ichidagi ${topicCount} ta dars bo'limsiz qoladi (o'chirilmaydi).` : ""}`)) return;
     await supabase.from("course_sections").delete().eq("id", s.id);
-    toast.success("Bo'lim o'chirildi");
+    toast.success(t.admin.tpc.sectionDeleted);
     loadData();
   }
 
@@ -183,7 +185,7 @@ export default function AdminTopicsPage() {
   }
 
   async function saveTopic() {
-    if (!topicForm.title.trim()) { toast.error("Mavzu nomini kiriting"); return; }
+    if (!topicForm.title.trim()) { toast.error(t.admin.tpc.enterTopicName); return; }
     setSavingTopic(true);
     const slug = slugify(topicForm.title, { lower: true, strict: true });
     const payload = {
@@ -207,11 +209,11 @@ export default function AdminTopicsPage() {
     setShowTopicForm(false); setSavingTopic(false); loadData();
   }
 
-  async function deleteTopic(t: Topic) {
-    if (!confirm(`"${t.title}" mavzusini o'chirish?`)) return;
-    await supabase.from("topics").delete().eq("id", t.id);
+  async function deleteTopic(topic: Topic) {
+    if (!confirm(`"${topic.title}" mavzusini o'chirish?`)) return;
+    await supabase.from("topics").delete().eq("id", topic.id);
     await supabase.from("courses").update({ total_topics: Math.max(0, topics.length - 1) }).eq("id", courseId);
-    toast.success("O'chirildi"); loadData();
+    toast.success(t.admin.common.deleted); loadData();
   }
 
   async function moveOrder(idx: number, dir: -1 | 1) {
@@ -259,10 +261,10 @@ export default function AdminTopicsPage() {
           coin_reward: task.coin_reward || 5, xp_reward: task.xp_reward || 15,
           order_index: topicTasks.length,
         });
-        toast.success("Amaliy topshiriq yaratildi!");
+        toast.success(t.admin.tpc.taskCreated);
         if (expandedTopic) loadTopicDetails(expandedTopic);
       }
-    } catch (e: any) { toast.error("AI xatolik: " + e.message); }
+    } catch (e: any) { toast.error(t.admin.set.aiError + ": " + e.message); }
     setAiGenerating(null);
   }
 
@@ -316,9 +318,9 @@ export default function AdminTopicsPage() {
   }
 
   async function runBatch() {
-    if (!batchDoQuiz && !batchDoTask) { toast.error("Kamida bittasini tanlang (test yoki topshiriq)"); return; }
+    if (!batchDoQuiz && !batchDoTask) { toast.error(t.admin.tpc.pickAtLeastOne); return; }
     const targets = batchScope === "all" ? topics : topics.filter(t => t.section_id === batchScope);
-    if (targets.length === 0) { toast.error("Mavzu topilmadi"); return; }
+    if (targets.length === 0) { toast.error(t.admin.tpc.topicNotFound); return; }
 
     batchStop.current = false;
     setBatchRunning(true);
@@ -326,12 +328,12 @@ export default function AdminTopicsPage() {
 
     let ok = 0, fail = 0;
     for (let i = 0; i < targets.length; i++) {
-      if (batchStop.current) { toast.info("To'xtatildi"); break; }
-      const t = targets[i];
-      setBatchProgress({ done: i, total: targets.length, label: t.title, ok, fail });
-      const r = await genForTopic(t, batchDoQuiz, batchDoTask);
+      if (batchStop.current) { toast.info(t.admin.tpc.stopped); break; }
+      const target = targets[i];
+      setBatchProgress({ done: i, total: targets.length, label: target.title, ok, fail });
+      const r = await genForTopic(target, batchDoQuiz, batchDoTask);
       if (r.ok) ok++; else fail++;
-      setBatchProgress({ done: i + 1, total: targets.length, label: t.title, ok, fail });
+      setBatchProgress({ done: i + 1, total: targets.length, label: target.title, ok, fail });
     }
 
     setBatchRunning(false);
@@ -341,7 +343,7 @@ export default function AdminTopicsPage() {
 
   // ==================== QUIZ CRUD ====================
   async function saveQuiz() {
-    if (!expandedTopic || !quizForm.question.trim()) { toast.error("Savolni kiriting"); return; }
+    if (!expandedTopic || !quizForm.question.trim()) { toast.error(t.admin.set.enterQuestion); return; }
     let options;
     try { options = JSON.parse(quizForm.options); } catch (_e) { toast.error("Options JSON noto'g'ri"); return; }
 
@@ -349,22 +351,22 @@ export default function AdminTopicsPage() {
       topic_id: expandedTopic, question: quizForm.question, question_type: "single",
       options, explanation: quizForm.explanation, points: 1, order_index: topicQuizzes.length,
     });
-    toast.success("Test savoli qo'shildi");
+    toast.success(t.admin.tpc.quizAdded);
     setShowQuizForm(false);
     setQuizForm({ question: "", options: '[{"id":"a","text":"","is_correct":false},{"id":"b","text":"","is_correct":true},{"id":"c","text":"","is_correct":false},{"id":"d","text":"","is_correct":false}]', explanation: "" });
     loadTopicDetails(expandedTopic);
   }
 
   async function deleteQuiz(id: string) {
-    if (!confirm("Savolni o'chirish?")) return;
+    if (!confirm(t.admin.set.deleteQuestion)) return;
     await supabase.from("quizzes").delete().eq("id", id);
-    toast.success("O'chirildi");
+    toast.success(t.admin.common.deleted);
     if (expandedTopic) loadTopicDetails(expandedTopic);
   }
 
   // ==================== TASK CRUD ====================
   async function saveTask() {
-    if (!expandedTopic || !taskForm.title.trim()) { toast.error("Nomini kiriting"); return; }
+    if (!expandedTopic || !taskForm.title.trim()) { toast.error(t.admin.common.enterName); return; }
     let testCases;
     try { testCases = JSON.parse(taskForm.test_cases); } catch (_e) { toast.error("Test cases JSON noto'g'ri"); return; }
 
@@ -374,16 +376,16 @@ export default function AdminTopicsPage() {
       test_cases: testCases, difficulty: taskForm.difficulty,
       coin_reward: 5, xp_reward: 15, order_index: topicTasks.length,
     });
-    toast.success("Topshiriq qo'shildi");
+    toast.success(t.admin.tpc.taskAdded);
     setShowTaskForm(false);
     setTaskForm({ title: "", description: "", starter_code: "# Kodingizni yozing\n", language: "python", test_cases: '[{"input":"","expected_output":"","is_hidden":false}]', difficulty: "easy" });
     loadTopicDetails(expandedTopic);
   }
 
   async function deleteTask(id: string) {
-    if (!confirm("Topshiriqni o'chirish?")) return;
+    if (!confirm(t.admin.tpc.deleteTaskQ)) return;
     await supabase.from("topic_tasks").delete().eq("id", id);
-    toast.success("O'chirildi");
+    toast.success(t.admin.common.deleted);
     if (expandedTopic) loadTopicDetails(expandedTopic);
   }
 
@@ -393,7 +395,7 @@ export default function AdminTopicsPage() {
       <div className="flex items-center justify-between">
         <div>
           <Link href="/a-courses" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-2">
-            <ArrowLeft className="w-4 h-4" /> Kurslar
+            <ArrowLeft className="w-4 h-4" /> {t.nav.courses}
           </Link>
           <h1 className="font-display font-bold text-2xl">{course?.title || "..."} — Mavzular</h1>
           <p className="text-sm text-muted-foreground">{sections.length} ta bo'lim · {topics.length} ta mavzu</p>
@@ -403,7 +405,7 @@ export default function AdminTopicsPage() {
             <Wand2 className="w-4 h-4" /> AI to'plu
           </button>
           <button onClick={openNewSection} className="btn-ghost py-2.5 px-4 flex items-center gap-2 text-sm border border-border">
-            <FolderPlus className="w-4 h-4" /> Yangi bo'lim
+            <FolderPlus className="w-4 h-4" /> {t.admin.tpc.newSection}
           </button>
           <button onClick={() => openNewTopic()} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
             <Plus className="w-4 h-4" /> Yangi mavzu
@@ -416,7 +418,7 @@ export default function AdminTopicsPage() {
         {batchOpen && (
           <motion.div className="glass-card p-6 border border-neon-blue/20" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold flex items-center gap-2"><Wand2 className="w-5 h-5 text-neon-blue" /> AI bilan to'plu generatsiya</h2>
+              <h2 className="font-display font-semibold flex items-center gap-2"><Wand2 className="w-5 h-5 text-neon-blue" /> {t.admin.tpc.bulkTitle}</h2>
               {!batchRunning && <button onClick={() => setBatchOpen(false)} className="p-1.5 hover:bg-accent rounded-lg"><X className="w-5 h-5" /></button>}
             </div>
 
@@ -445,12 +447,12 @@ export default function AdminTopicsPage() {
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Har mavzu uchun AI test va topshiriq yaratadi. <strong>Allaqachon kontenti bor mavzular o'tkazib yuboriladi.</strong> Har mavzu ~5-10 soniya oladi.
+                  {t.admin.tpc.bulkHint1} <strong>{t.admin.tpc.bulkHint2}</strong> {t.admin.tpc.bulkPerTopic}
                 </p>
 
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nima yaratilsin?</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.admin.tpc.whatToCreate}</label>
                     <div className="space-y-2">
                       <label className="flex items-center gap-2 text-sm cursor-pointer">
                         <input type="checkbox" checked={batchDoQuiz} onChange={e => setBatchDoQuiz(e.target.checked)} className="accent-neon-blue" />
@@ -458,12 +460,12 @@ export default function AdminTopicsPage() {
                       </label>
                       <label className="flex items-center gap-2 text-sm cursor-pointer">
                         <input type="checkbox" checked={batchDoTask} onChange={e => setBatchDoTask(e.target.checked)} className="accent-neon-purple" />
-                        <Code2 className="w-4 h-4 text-neon-purple" /> Topshiriqlar (1 ta/mavzu)
+                        <Code2 className="w-4 h-4 text-neon-purple" /> {t.admin.tpc.tasksPerTopic}
                       </label>
                     </div>
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Qamrov</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.admin.tpc.scope}</label>
                     <select value={batchScope} onChange={e => setBatchScope(e.target.value)} className="input-field text-sm">
                       <option value="all">Barcha mavzular ({topics.length} ta)</option>
                       {sections.map(s => (
@@ -471,7 +473,7 @@ export default function AdminTopicsPage() {
                       ))}
                     </select>
                     <p className="text-[11px] text-muted-foreground mt-2">
-                      💡 Katta kurs uchun bo'lim-bo'lim generatsiya qilish tavsiya etiladi (API limit va byudjet uchun).
+                      {t.admin.tpc.bulkAdvice2}
                     </p>
                   </div>
                 </div>
@@ -490,24 +492,24 @@ export default function AdminTopicsPage() {
         {showSectionForm && (
           <motion.div className="glass-card p-6" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold">{editSectionId ? "Bo'limni tahrirlash" : "Yangi bo'lim"}</h2>
+              <h2 className="font-display font-semibold">{editSectionId ? t.admin.tpc.editSection : t.admin.tpc.newSection}</h2>
               <button onClick={() => setShowSectionForm(false)} className="p-1.5 hover:bg-accent rounded-lg"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-medium mb-1 block">Bo'lim nomi *</label>
-                <input value={sectionForm.title} onChange={e => setSectionForm({ ...sectionForm, title: e.target.value })} className="input-field" placeholder="Kompyuter bilan tanishuv" />
+                <label className="text-sm font-medium mb-1 block">{t.admin.tpc.sectionName} *</label>
+                <input value={sectionForm.title} onChange={e => setSectionForm({ ...sectionForm, title: e.target.value })} className="input-field" placeholder={t.admin.tpc.sectionNamePh} />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Tavsif (ixtiyoriy)</label>
-                <input value={sectionForm.description} onChange={e => setSectionForm({ ...sectionForm, description: e.target.value })} className="input-field" placeholder="Bo'lim haqida qisqa..." />
+                <label className="text-sm font-medium mb-1 block">{t.admin.tpc.sectionDesc}</label>
+                <input value={sectionForm.description} onChange={e => setSectionForm({ ...sectionForm, description: e.target.value })} className="input-field" placeholder={t.admin.tpc.sectionDescPh} />
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setShowSectionForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowSectionForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={saveSection} disabled={savingSection} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
                 {savingSection ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {editSectionId ? "Saqlash" : "Qo'shish"}
+                {editSectionId ? t.admin.common.save : "Qo'shish"}
               </button>
             </div>
           </motion.div>
@@ -517,7 +519,7 @@ export default function AdminTopicsPage() {
       {/* ===== SECTIONS LIST ===== */}
       {sections.length > 0 && (
         <div className="glass-card p-4">
-          <h3 className="font-semibold text-sm mb-3 text-muted-foreground">Bo'limlar tartibi</h3>
+          <h3 className="font-semibold text-sm mb-3 text-muted-foreground">{t.admin.tpc.sectionOrder}</h3>
           <div className="space-y-1.5">
             {sections.map((s, i) => (
               <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-surface/50">
@@ -530,7 +532,7 @@ export default function AdminTopicsPage() {
                   <p className="font-medium text-sm truncate">{s.title}</p>
                   <p className="text-[10px] text-muted-foreground">{topics.filter(t => t.section_id === s.id).length} ta dars</p>
                 </div>
-                <button onClick={() => openNewTopic(s.id)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-neon-green" title="Bo'limga dars qo'shish"><Plus className="w-4 h-4" /></button>
+                <button onClick={() => openNewTopic(s.id)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-neon-green" title={t.admin.tpc.addLessonToSection}><Plus className="w-4 h-4" /></button>
                 <button onClick={() => openEditSection(s)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
                 <button onClick={() => deleteSection(s)} className="p-1.5 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
               </div>
@@ -549,12 +551,12 @@ export default function AdminTopicsPage() {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Mavzu nomi *</label>
-                <input value={topicForm.title} onChange={e => setTopicForm({ ...topicForm, title: e.target.value })} className="input-field" placeholder="O'zgaruvchilar va ma'lumot turlari" />
+                <label className="text-sm font-medium mb-1 block">{t.admin.tpc.topicName} *</label>
+                <input value={topicForm.title} onChange={e => setTopicForm({ ...topicForm, title: e.target.value })} className="input-field" placeholder={t.admin.tpc.topicNamePh} />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-medium">Dars matni</label>
+                  <label className="text-sm font-medium">{t.admin.tpc.lessonBody}</label>
                   <button onClick={() => aiGenerate('lecture')} disabled={!topicForm.title || aiGenerating === 'lecture'}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 disabled:opacity-50 transition-all">
                     {aiGenerating === 'lecture' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
@@ -564,15 +566,15 @@ export default function AdminTopicsPage() {
                 <RichTextEditor
                   value={topicForm.content_html}
                   onChange={(html) => setTopicForm(f => ({ ...f, content_html: html }))}
-                  placeholder="Matnni yozing — qalin, kursiv, sarlavha, ro'yxat, havola va rasm qo'shishingiz mumkin..."
+                  placeholder={t.admin.tpc.editorPh}
                 />
               </div>
               {/* Bo'lim va free preview */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Bo'lim</label>
+                  <label className="text-sm font-medium mb-1 block">{t.admin.tpc.section}</label>
                   <select value={topicForm.section_id} onChange={e => setTopicForm({ ...topicForm, section_id: e.target.value })} className="input-field">
-                    <option value="">— Bo'limsiz —</option>
+                    <option value="">{t.admin.tpc.noSection}</option>
                     {sections.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
                   </select>
                 </div>
@@ -585,23 +587,23 @@ export default function AdminTopicsPage() {
                       onChange={e => setTopicForm({ ...topicForm, is_free_preview: e.target.checked })}
                       className="accent-neon-blue" />
                     <Eye className="w-4 h-4 text-neon-blue" />
-                    <span className="text-sm">Bepul ko'rish (namunaviy dars)</span>
+                    <span className="text-sm">{t.admin.tpc.freePreview}</span>
                   </label>
                 </div>
               </div>
 
               {/* Video sozlamalari */}
               <div className="p-4 rounded-xl bg-surface/40 border border-border/50 space-y-3">
-                <p className="text-sm font-medium flex items-center gap-2"><Video className="w-4 h-4 text-neon-blue" /> Video sozlamalari</p>
+                <p className="text-sm font-medium flex items-center gap-2"><Video className="w-4 h-4 text-neon-blue" /> {t.admin.tpc.videoSettings}</p>
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-medium mb-1 block text-muted-foreground">Provider</label>
+                    <label className="text-xs font-medium mb-1 block text-muted-foreground">{t.admin.tpc.provider}</label>
                     <select value={topicForm.video_provider} onChange={e => setTopicForm({ ...topicForm, video_provider: e.target.value as VideoProvider })} className="input-field text-sm">
-                      <option value="bunny">Bunny Stream (himoyalangan — tavsiya)</option>
-                      <option value="youtube">YouTube (himoyasiz — bepul kontent)</option>
+                      <option value="bunny">{t.admin.tpc.provBunny}</option>
+                      <option value="youtube">{t.admin.tpc.provYoutube}</option>
                       <option value="cloudflare">Cloudflare Stream</option>
                       <option value="vimeo">Vimeo</option>
-                      <option value="direct">To'g'ridan-to'g'ri URL (eski)</option>
+                      <option value="direct">{t.admin.tpc.provDirect}</option>
                     </select>
                   </div>
                   <div>
@@ -616,7 +618,7 @@ export default function AdminTopicsPage() {
                       {topicForm.video_provider === "bunny" && (
                         <button type="button" onClick={loadBunnyVideos} disabled={bunnyLoading}
                           className="px-3 py-2 rounded-xl text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 disabled:opacity-50 whitespace-nowrap">
-                          {bunnyLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin inline" /> : "Ro'yxatdan tanlash"}
+                          {bunnyLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin inline" /> : t.admin.tpc.pickFromList}
                         </button>
                       )}
                     </div>
@@ -641,19 +643,19 @@ export default function AdminTopicsPage() {
 
                 {(topicForm.video_provider === "youtube" || topicForm.video_provider === "direct") && (
                   <div>
-                    <label className="text-xs font-medium mb-1 block text-muted-foreground">Video URL (eski usul)</label>
+                    <label className="text-xs font-medium mb-1 block text-muted-foreground">{t.admin.tpc.videoUrlOld}</label>
                     <input value={topicForm.video_url} onChange={e => setTopicForm({ ...topicForm, video_url: e.target.value })} className="input-field text-sm" placeholder="https://youtube.com/watch?v=..." />
                   </div>
                 )}
                 {topicForm.video_provider === "bunny" && (
                   <p className="text-[11px] text-muted-foreground">
-                    💡 Videoni Bunny Stream dashboard'ga yuklang, keyin "Ro'yxatdan tanlash" bosing yoki GUID'ni qo'lda kiriting.
+                    {t.admin.tpc.bunnyHint}
                   </p>
                 )}
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div><label className="text-sm font-medium mb-1 block">Taqdimot URL</label>
+                <div><label className="text-sm font-medium mb-1 block">{t.admin.tpc.slidesUrl}</label>
                   <input value={topicForm.presentation_url} onChange={e => setTopicForm({ ...topicForm, presentation_url: e.target.value })} className="input-field" /></div>
               </div>
               <div className="grid grid-cols-3 gap-4">
@@ -661,15 +663,15 @@ export default function AdminTopicsPage() {
                   <input type="number" value={topicForm.coin_reward} onChange={e => setTopicForm({ ...topicForm, coin_reward: +e.target.value })} className="input-field" /></div>
                 <div><label className="text-sm font-medium mb-1 block">XP</label>
                   <input type="number" value={topicForm.xp_reward} onChange={e => setTopicForm({ ...topicForm, xp_reward: +e.target.value })} className="input-field" /></div>
-                <div><label className="text-sm font-medium mb-1 block">Daqiqa</label>
+                <div><label className="text-sm font-medium mb-1 block">{t.admin.tpc.minutes}</label>
                   <input type="number" value={topicForm.estimated_minutes} onChange={e => setTopicForm({ ...topicForm, estimated_minutes: +e.target.value })} className="input-field" /></div>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => setShowTopicForm(false)} className="btn-ghost py-2 px-5 text-sm">Bekor</button>
+              <button onClick={() => setShowTopicForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={saveTopic} disabled={savingTopic} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
                 {savingTopic ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {editTopicId ? "Saqlash" : "Qo'shish"}
+                {editTopicId ? t.admin.common.save : "Qo'shish"}
               </button>
             </div>
           </motion.div>
@@ -681,45 +683,45 @@ export default function AdminTopicsPage() {
         {loading ? [1,2,3].map(i => <div key={i} className="glass-card p-4 h-16 animate-pulse" />) :
         topics.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
-            <p className="mb-4">Hali mavzu qo'shilmagan</p>
-            <button onClick={() => openNewTopic()} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> Birinchi mavzuni qo'shish</button>
+            <p className="mb-4">{t.admin.tpc.empty}</p>
+            <button onClick={() => openNewTopic()} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> {t.admin.tpc.first}</button>
           </div>
-        ) : topics.map((t, i) => (
-          <div key={t.id}>
+        ) : topics.map((topic, i) => (
+          <div key={topic.id}>
             <motion.div className="glass-card p-4 flex items-center gap-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
               <div className="flex flex-col gap-0.5">
                 <button onClick={() => moveOrder(i, -1)} disabled={i === 0} className="p-0.5 hover:bg-accent rounded disabled:opacity-20"><ChevronUp className="w-4 h-4" /></button>
                 <button onClick={() => moveOrder(i, 1)} disabled={i === topics.length - 1} className="p-0.5 hover:bg-accent rounded disabled:opacity-20"><ChevronDown className="w-4 h-4" /></button>
               </div>
               <div className="w-8 h-8 rounded-lg bg-neon-purple/10 flex items-center justify-center text-neon-purple font-bold text-sm flex-shrink-0">{i + 1}</div>
-              <button onClick={() => toggleExpand(t.id)} className="flex-1 min-w-0 text-left">
+              <button onClick={() => toggleExpand(topic.id)} className="flex-1 min-w-0 text-left">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm truncate">{t.title}</p>
-                  {t.is_free_preview && (
+                  <p className="font-medium text-sm truncate">{topic.title}</p>
+                  {topic.is_free_preview && (
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-neon-blue/10 text-neon-blue border border-neon-blue/20 flex-shrink-0">
                       <Eye className="w-2.5 h-2.5" /> Bepul
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-0.5">
-                  {t.section_id && (
-                    <span className="text-neon-blue/80">{sections.find(s => s.id === t.section_id)?.title || "?"}</span>
+                  {topic.section_id && (
+                    <span className="text-neon-blue/80">{sections.find(s => s.id === topic.section_id)?.title || "?"}</span>
                   )}
-                  {(t.video_url || t.video_id) && <span className="flex items-center gap-0.5"><Video className="w-3 h-3" /> {t.video_provider === "bunny" ? "Bunny" : "Video"}</span>}
-                  {t.content_html && <span className="flex items-center gap-0.5"><FileText className="w-3 h-3" /> Matn</span>}
-                  <span>+{t.coin_reward} coin</span>
+                  {(topic.video_url || topic.video_id) && <span className="flex items-center gap-0.5"><Video className="w-3 h-3" /> {topic.video_provider === "bunny" ? "Bunny" : "Video"}</span>}
+                  {topic.content_html && <span className="flex items-center gap-0.5"><FileText className="w-3 h-3" /> Matn</span>}
+                  <span>+{topic.coin_reward} coin</span>
                 </div>
               </button>
-              <ChevronRight className={cn("w-4 h-4 text-muted-foreground transition-transform", expandedTopic === t.id && "rotate-90")} />
+              <ChevronRight className={cn("w-4 h-4 text-muted-foreground transition-transform", expandedTopic === topic.id && "rotate-90")} />
               <div className="flex items-center gap-1">
-                <button onClick={() => openEditTopic(t)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
-                <button onClick={() => deleteTopic(t)} className="p-1.5 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => openEditTopic(topic)} className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
+                <button onClick={() => deleteTopic(topic)} className="p-1.5 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
               </div>
             </motion.div>
 
             {/* ===== EXPANDED: QUIZZES + TASKS ===== */}
             <AnimatePresence>
-              {expandedTopic === t.id && (
+              {expandedTopic === topic.id && (
                 <motion.div className="ml-12 mt-2 mb-4 space-y-4" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
 
                   {/* QUIZZES */}
@@ -727,7 +729,7 @@ export default function AdminTopicsPage() {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-sm flex items-center gap-2"><ClipboardList className="w-4 h-4 text-neon-blue" /> Test savollari ({topicQuizzes.length})</h3>
                       <div className="flex gap-2">
-                        <button onClick={() => aiGenerate('quiz', t.title)} disabled={aiGenerating === 'quiz'}
+                        <button onClick={() => aiGenerate('quiz', topic.title)} disabled={aiGenerating === 'quiz'}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-neon-blue/10 text-neon-blue hover:bg-neon-blue/20 disabled:opacity-50">
                           {aiGenerating === 'quiz' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />} AI yaratish
                         </button>
@@ -748,12 +750,12 @@ export default function AdminTopicsPage() {
 
                     {showQuizForm && (
                       <div className="mt-3 p-3 rounded-xl bg-surface/50 border border-border space-y-2">
-                        <input value={quizForm.question} onChange={e => setQuizForm({ ...quizForm, question: e.target.value })} className="input-field text-sm" placeholder="Savol matni..." />
+                        <input value={quizForm.question} onChange={e => setQuizForm({ ...quizForm, question: e.target.value })} className="input-field text-sm" placeholder={t.admin.tpc.questionPh} />
                         <textarea value={quizForm.options} onChange={e => setQuizForm({ ...quizForm, options: e.target.value })} className="input-field font-mono text-[10px] min-h-[60px]" />
                         <input value={quizForm.explanation} onChange={e => setQuizForm({ ...quizForm, explanation: e.target.value })} className="input-field text-sm" placeholder="Tushuntirish (ixtiyoriy)" />
                         <div className="flex gap-2">
-                          <button onClick={saveQuiz} className="btn-primary py-1.5 px-3 text-xs">Qo'shish</button>
-                          <button onClick={() => setShowQuizForm(false)} className="btn-ghost py-1.5 px-3 text-xs">Bekor</button>
+                          <button onClick={saveQuiz} className="btn-primary py-1.5 px-3 text-xs">{t.admin.common.add}</button>
+                          <button onClick={() => setShowQuizForm(false)} className="btn-ghost py-1.5 px-3 text-xs">{t.common.cancel}</button>
                         </div>
                       </div>
                     )}
@@ -764,7 +766,7 @@ export default function AdminTopicsPage() {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-sm flex items-center gap-2"><Code2 className="w-4 h-4 text-neon-purple" /> Amaliy topshiriqlar ({topicTasks.length})</h3>
                       <div className="flex gap-2">
-                        <button onClick={() => aiGenerate('task', t.title)} disabled={aiGenerating === 'task'}
+                        <button onClick={() => aiGenerate('task', topic.title)} disabled={aiGenerating === 'task'}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-neon-purple/10 text-neon-purple hover:bg-neon-purple/20 disabled:opacity-50">
                           {aiGenerating === 'task' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />} AI yaratish
                         </button>
@@ -786,21 +788,21 @@ export default function AdminTopicsPage() {
 
                     {showTaskForm && (
                       <div className="mt-3 p-3 rounded-xl bg-surface/50 border border-border space-y-2">
-                        <input value={taskForm.title} onChange={e => setTaskForm({ ...taskForm, title: e.target.value })} className="input-field text-sm" placeholder="Topshiriq nomi" />
-                        <textarea value={taskForm.description} onChange={e => setTaskForm({ ...taskForm, description: e.target.value })} className="input-field text-sm min-h-[50px]" placeholder="Tavsif" />
+                        <input value={taskForm.title} onChange={e => setTaskForm({ ...taskForm, title: e.target.value })} className="input-field text-sm" placeholder={t.admin.tpc.taskName} />
+                        <textarea value={taskForm.description} onChange={e => setTaskForm({ ...taskForm, description: e.target.value })} className="input-field text-sm min-h-[50px]" placeholder={t.admin.common.description} />
                         <div className="grid grid-cols-2 gap-2">
                           <select value={taskForm.language} onChange={e => setTaskForm({ ...taskForm, language: e.target.value })} className="input-field text-sm">
                             <option value="python">Python</option><option value="javascript">JavaScript</option>
                           </select>
                           <select value={taskForm.difficulty} onChange={e => setTaskForm({ ...taskForm, difficulty: e.target.value })} className="input-field text-sm">
-                            <option value="easy">Oson</option><option value="medium">O'rta</option><option value="hard">Qiyin</option>
+                            <option value="easy">{t.difficulty.easy}</option><option value="medium">{t.difficulty.medium}</option><option value="hard">{t.difficulty.hard}</option>
                           </select>
                         </div>
                         <textarea value={taskForm.starter_code} onChange={e => setTaskForm({ ...taskForm, starter_code: e.target.value })} className="input-field font-mono text-xs min-h-[50px]" placeholder="Boshlang'ich kod" />
                         <textarea value={taskForm.test_cases} onChange={e => setTaskForm({ ...taskForm, test_cases: e.target.value })} className="input-field font-mono text-[10px] min-h-[50px]" placeholder='[{"input":"5","expected_output":"10","is_hidden":false}]' />
                         <div className="flex gap-2">
-                          <button onClick={saveTask} className="btn-primary py-1.5 px-3 text-xs">Qo'shish</button>
-                          <button onClick={() => setShowTaskForm(false)} className="btn-ghost py-1.5 px-3 text-xs">Bekor</button>
+                          <button onClick={saveTask} className="btn-primary py-1.5 px-3 text-xs">{t.admin.common.add}</button>
+                          <button onClick={() => setShowTaskForm(false)} className="btn-ghost py-1.5 px-3 text-xs">{t.common.cancel}</button>
                         </div>
                       </div>
                     )}

@@ -18,6 +18,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { takeCompleteSentences } from "@/lib/agent/speech-text";
 import { useAgentVoice } from "./useAgentVoice";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 interface Msg {
   role: "user" | "assistant";
@@ -35,13 +37,16 @@ interface Props {
  * "Shunday deb so'rab ko'ring" degan yo'riqnoma emas, tayyor savol:
  * birinchi qadamni yozib o'tirish shart emas.
  */
-const STARTERS = [
-  "Dasturlashni noldan boshlamoqchiman, qayerdan boshlay?",
-  "Frontend va backend orasidagi farq nima?",
-  "Menda 3 oy vaqt bor — nimaga ulgura olaman?",
+const STARTERS = (t: Dictionary) => [
+  t.agent.suggest0,
+  t.agent.suggest1,
+  t.agent.suggest2,
 ];
 
-export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
+export default function AgentChat({ lang, startTopic = null }: Props) {
+  const { t, locale } = useI18n();
+  // Til berilmasa interfeys tilidan olinadi — AI ham shu tilda javob beradi
+  const replyLang = lang ?? locale;
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -54,7 +59,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
   const recognitionRef = useRef<any>(null);
 
   // Ovoz navbati dars sahifasi bilan umumiy — `useAgentVoice` da
-  const { speak, stop: stopSpeaking, speaking } = useAgentVoice(lang);
+  const { speak, stop: stopSpeaking, speaking } = useAgentVoice(replyLang);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -79,7 +84,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
       const res = await fetch("/api/agent/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, conversationId, lang }),
+        body: JSON.stringify({ message, conversationId, lang: replyLang }),
       });
 
       if (!res.ok || !res.body) {
@@ -141,14 +146,14 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
     } finally {
       setStreaming(false);
     }
-  }, [streaming, conversationId, lang, voiceOn, speak, stopSpeaking]);
+  }, [streaming, conversationId, replyLang, voiceOn, speak, stopSpeaking]);
 
   /* ---------------- Mikrofon (brauzer STT) ---------------- */
 
   const toggleMic = useCallback(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      setError("Brauzeringiz ovozli kiritishni qo'llab-quvvatlamaydi. Matn yozib yuboring.");
+      setError(t.agent.noVoiceInput);
       return;
     }
 
@@ -159,7 +164,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
     }
 
     const recognition = new SR();
-    recognition.lang = lang === "uz" ? "uz-UZ" : lang === "ru" ? "ru-RU" : "en-US";
+    recognition.lang = replyLang === "uz" ? "uz-UZ" : replyLang === "ru" ? "ru-RU" : "en-US";
     recognition.interimResults = true;
     recognition.continuous = false;
 
@@ -203,7 +208,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
           <div>
             <div className="font-display font-semibold leading-tight">Ustoz</div>
             <div className="font-mono text-[11px] text-muted-foreground">
-              {streaming ? "yozmoqda" : speaking ? "gapirmoqda" : listening ? "eshitmoqda" : "shaxsiy o'qituvchi"}
+              {streaming ? "yozmoqda" : speaking ? "gapirmoqda" : listening ? "eshitmoqda" : t.agent.subtitle}
             </div>
           </div>
         </div>
@@ -233,7 +238,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
         {messages.length === 0 && (
           <div className="mx-auto mt-12 max-w-lg px-2">
             <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              Ustoz · shaxsiy o'qituvchi
+              {t.agent.header}
             </div>
 
             <h2 className="font-display text-2xl font-bold leading-[1.15] tracking-tight sm:text-3xl">
@@ -241,9 +246,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
             </h2>
 
             <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-              Ayting — noldan boshlaymizmi yoki bir narsalarni bilasizmi.
-              Darajangizni aniqlab, sizga mos yo'l tuzaman va o'zim
-              dars o'taman.
+              {t.agent.intro}
             </p>
 
             {startTopic ? (
@@ -257,7 +260,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
               <>
                 {/* Haqiqiy savollar — "shunday deb so'rab ko'ring" emas */}
                 <div className="mt-6 flex flex-col gap-2">
-                  {STARTERS.map((s) => (
+                  {STARTERS(t).map((s) => (
                     <button
                       key={s}
                       onClick={() => void send(s)}
@@ -276,7 +279,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
                   className="mt-4 inline-flex items-center gap-2 font-mono text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                 >
                   <ListChecks className="h-3.5 w-3.5" />
-                  yoki to'g'ridan-to'g'ri reja tuzish
+                  {t.agent.orMakePlan}
                 </Link>
               </>
             )}
@@ -345,7 +348,7 @@ export default function AgentChat({ lang = "uz", startTopic = null }: Props) {
               if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(input); }
             }}
             rows={1}
-            placeholder="Savolingizni yozing yoki mikrofonni bosing..."
+            placeholder={t.agent.askPlaceholder}
             className="max-h-32 flex-1 resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
           />
 

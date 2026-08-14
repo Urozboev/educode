@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { Target, User, Layers } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function AboutPage() {
   const supabase = createClient();

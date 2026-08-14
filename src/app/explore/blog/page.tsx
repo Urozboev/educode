@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { serverHref } from "@/lib/i18n/server";
+import { serverHref, getServerDictionary } from "@/lib/i18n/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ItemListJsonLd } from "@/components/seo/JsonLd";
 import { Clock, Eye, ArrowRight, Newspaper } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export const revalidate = 300;
 
@@ -12,6 +13,7 @@ function fmtDate(d: string | null) {
 }
 
 export default async function BlogListPage() {
+  const t = await getServerDictionary();
   const href = await serverHref();
   let posts: any[] = [];
   try {
@@ -32,7 +34,7 @@ export default async function BlogListPage() {
     <div className="space-y-8">
       <ItemListJsonLd
         name="EduCode Blog"
-        description="Dasturlash va IT maqolalari"
+        description="{t.explore.blogEyebrow} maqolalari"
         items={posts.map(p => ({ name: p.title, url: `/blog/${p.slug}` }))}
       />
 
@@ -44,10 +46,10 @@ export default async function BlogListPage() {
             <Newspaper className="w-3.5 h-3.5" /> Blog
           </div>
           <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
-            Dasturlash va IT <span className="gradient-text">maqolalari</span>
+            {t.explore.blogEyebrow} <span className="gradient-text">{t.explore.blogTitleAccent}</span>
           </h1>
           <p className="text-muted-foreground max-w-lg">
-            Foydali qo'llanmalar, maslahatlar va karyera yo'l-yo'riqlari — o'zbek tilida.
+            {t.explore.blogSubtitle}
           </p>
         </div>
       </div>
@@ -55,7 +57,7 @@ export default async function BlogListPage() {
       {posts.length === 0 ? (
         <div className="text-center py-20">
           <Newspaper className="w-14 h-14 text-muted-foreground/20 mx-auto mb-4" />
-          <p className="text-muted-foreground">Hozircha maqola yo'q. Tez orada qo'shiladi.</p>
+          <p className="text-muted-foreground">{t.explore.blogEmpty}</p>
         </div>
       ) : (
         <>

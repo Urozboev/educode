@@ -20,6 +20,7 @@ import {
   Swords,
   Sparkles,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type FormType = {
   title: string;
@@ -52,6 +53,7 @@ const emptyForm: FormType = {
     '[{"input":"100 200","expected_output":"300","is_hidden":true}]',
 };
 export default function AdminChallengesPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [search, setSearch] = useState("");
@@ -77,7 +79,7 @@ export default function AdminChallengesPage() {
 
   async function aiGenerateChallenge() {
     if (!form.title.trim()) {
-      toast.error("Avval topshiriq nomini kiriting");
+      toast.error(t.admin.chl.nameFirst);
       return;
     }
     setAiGenerating(true);
@@ -108,12 +110,12 @@ export default function AdminChallengesPage() {
           ),
           coin_reward: ch.coin_reward || f.coin_reward,
         }));
-        toast.success("AI topshiriq yaratdi! Tekshirib saqlang.");
+        toast.success(t.admin.chl.aiCreated);
       } else {
         toast.error("AI generatsiya xatolik");
       }
     } catch (_e) {
-      toast.error("Xatolik");
+      toast.error(t.admin.common.error);
     }
     setAiGenerating(false);
   }
@@ -145,7 +147,7 @@ export default function AdminChallengesPage() {
 
   async function handleSave() {
     if (!form.title.trim()) {
-      toast.error("Nomini kiriting");
+      toast.error(t.admin.common.enterName);
       return;
     }
     setSaving(true);
@@ -155,7 +157,7 @@ export default function AdminChallengesPage() {
       testCases = JSON.parse(form.test_cases);
       hiddenCases = JSON.parse(form.hidden_test_cases);
     } catch (_e) {
-      toast.error("Test case'lar JSON formatda bo'lishi kerak");
+      toast.error(t.admin.chl.testsJson);
       setSaving(false);
       return;
     }
@@ -190,7 +192,7 @@ export default function AdminChallengesPage() {
         setSaving(false);
         return;
       }
-      toast.success("Topshiriq yangilandi");
+      toast.success(t.admin.chl.updated);
     } else {
       const { error } = await supabase
         .from("challenges")
@@ -200,7 +202,7 @@ export default function AdminChallengesPage() {
         setSaving(false);
         return;
       }
-      toast.success("Yangi topshiriq yaratildi");
+      toast.success(t.admin.chl.created);
     }
     setShowForm(false);
     setSaving(false);
@@ -212,14 +214,14 @@ export default function AdminChallengesPage() {
       .from("challenges")
       .update({ is_published: !c.is_published })
       .eq("id", c.id);
-    toast.success(c.is_published ? "Yashirildi" : "Nashr qilindi");
+    toast.success(c.is_published ? t.admin.blg.hiddenToast : t.admin.common.publishedToast);
     load();
   }
 
   async function handleDelete(c: Challenge) {
     if (!confirm(`"${c.title}" ni o'chirish?`)) return;
     await supabase.from("challenges").delete().eq("id", c.id);
-    toast.success("O'chirildi");
+    toast.success(t.admin.common.deleted);
     load();
   }
 
@@ -232,7 +234,7 @@ export default function AdminChallengesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-3xl">
-            Topshiriqlar boshqaruvi
+            {t.admin.chl.pageTitle}
           </h1>
           <p className="text-muted-foreground text-sm">
             {challenges.length} ta topshiriq
@@ -242,7 +244,7 @@ export default function AdminChallengesPage() {
           onClick={openNew}
           className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm"
         >
-          <Plus className="w-4 h-4" /> Yangi topshiriq
+          <Plus className="w-4 h-4" /> {t.admin.common.newChallenge}
         </button>
       </div>
 
@@ -252,7 +254,7 @@ export default function AdminChallengesPage() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Qidirish..."
+          placeholder={t.admin.common.search}
           className="input-field pl-11"
         />
       </div>
@@ -265,7 +267,7 @@ export default function AdminChallengesPage() {
         >
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display font-semibold text-lg">
-              {editId ? "Tahrirlash" : "Yangi topshiriq"}
+              {editId ? "Tahrirlash" : t.admin.common.newChallenge}
             </h2>
             <div className="flex items-center gap-2">
               <button
@@ -290,7 +292,7 @@ export default function AdminChallengesPage() {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium mb-1 block">Nomi *</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.nameRequired} *</label>
               <input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -306,15 +308,15 @@ export default function AdminChallengesPage() {
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="input-field"
               >
-                <option value="math">Matematika</option>
-                <option value="strings">Satrlar</option>
-                <option value="arrays">Massivlar</option>
-                <option value="algorithms">Algoritmlar</option>
-                <option value="data_structures">Tuzilmalar</option>
+                <option value="math">{t.admin.chl.catMath}</option>
+                <option value="strings">{t.admin.chl.catStrings}</option>
+                <option value="arrays">{t.admin.chl.catArrays}</option>
+                <option value="algorithms">{t.admin.chl.catAlgorithms}</option>
+                <option value="data_structures">{t.admin.chl.catStructures}</option>
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium mb-1 block">Tavsif</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.description}</label>
               <textarea
                 value={form.description}
                 onChange={(e) =>
@@ -324,7 +326,7 @@ export default function AdminChallengesPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Qiyinlik</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.difficulty}</label>
               <select
                 value={form.difficulty}
                 onChange={(e) =>
@@ -332,14 +334,14 @@ export default function AdminChallengesPage() {
                 }
                 className="input-field"
               >
-                <option value="easy">Oson</option>
-                <option value="medium">O'rta</option>
-                <option value="hard">Qiyin</option>
+                <option value="easy">{t.difficulty.easy}</option>
+                <option value="medium">{t.difficulty.medium}</option>
+                <option value="hard">{t.difficulty.hard}</option>
               </select>
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Tillar (vergul bilan)
+                {t.admin.chl.languages}
               </label>
               <input
                 value={form.languages}
@@ -351,7 +353,7 @@ export default function AdminChallengesPage() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Coin mukofot
+                {t.admin.common.coinReward}
               </label>
               <input
                 type="number"
@@ -452,12 +454,12 @@ export default function AdminChallengesPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border/50 text-xs text-muted-foreground font-semibold">
-              <th className="text-left px-5 py-3">Topshiriq</th>
-              <th className="text-center px-5 py-3">Kategoriya</th>
-              <th className="text-center px-5 py-3">Daraja</th>
-              <th className="text-center px-5 py-3">Yechganlar</th>
-              <th className="text-center px-5 py-3">Holat</th>
-              <th className="text-right px-5 py-3">Amallar</th>
+              <th className="text-left px-5 py-3">{t.admin.common.task}</th>
+              <th className="text-center px-5 py-3">{t.admin.common.category}</th>
+              <th className="text-center px-5 py-3">{t.admin.common.level}</th>
+              <th className="text-center px-5 py-3">{t.admin.common.solvedBy}</th>
+              <th className="text-center px-5 py-3">{t.admin.common.status}</th>
+              <th className="text-right px-5 py-3">{t.admin.common.actions}</th>
             </tr>
           </thead>
           <tbody>

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Loader2, FileText, Type } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Kurs ichida qidiruv.
@@ -29,6 +30,7 @@ interface Hit {
 const DEBOUNCE_MS = 300;
 
 export function CourseSearch({ courseId, courseSlug }: { courseId: string; courseSlug: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
@@ -79,9 +81,9 @@ export function CourseSearch({ courseId, courseSlug }: { courseId: string; cours
         <input
           value={q}
           onChange={e => setQ(e.target.value)}
-          placeholder="Kurs ichidan qidirish: mavzu nomi yoki matn..."
+          placeholder={t.courses.searchInCourse}
           className="input-field w-full text-sm pl-10 pr-10"
-          aria-label="Kurs ichida qidirish"
+          aria-label={t.courses.searchInCourseLabel}
         />
         {busy ? (
           <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
@@ -111,7 +113,7 @@ export function CourseSearch({ courseId, courseSlug }: { courseId: string; cours
             ) : (
               <>
                 <p className="text-xs text-muted-foreground px-1 mb-2">
-                  <span className="numeric">{hits.length}</span> ta natija
+                  <span className="numeric">{hits.length}</span> {t.courses.searchResults}
                 </p>
                 <ul className="space-y-1.5">
                   {hits.map(h => (

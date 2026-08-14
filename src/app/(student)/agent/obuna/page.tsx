@@ -5,13 +5,18 @@ import { ArrowLeft } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAgentAccess } from "@/lib/agent/access";
 import SubscribeView from "@/components/agent/SubscribeView";
+import type { Metadata } from "next";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Obuna | Ustoz — EduCode",
-  description: "Ustoz AI o'qituvchisi uchun obuna: Pro va Pro+ tariflari.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: "Obuna | Ustoz — EduCode",
+    description: t.agent.seoSubscribe,
+    };
+}
 
 export default async function AgentSubscribePage({
   searchParams,

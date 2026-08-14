@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { JeopardyContent } from "@/types";
 import { Check, X, Eye, Trophy, Users, Undo2, Plus, Minus } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Jeopardy taxtasi.
@@ -18,13 +19,13 @@ import { Check, X, Eye, Trophy, Users, Undo2, Plus, Minus } from "lucide-react";
  * Endi 1-4 jamoa bo'ladi va ball to'g'ridan-to'g'ri jamoaga yoziladi.
  * Bitta jamoa tanlansa — yakka tartibdagi o'yin, interfeys soddalashadi.
  *
- * "Bekor qilish" — o'qituvchi noto'g'ri tugmani bosib yuborsa, oxirgi
+ * "{t.lg.cancel}" — o'qituvchi noto'g'ri tugmani bosib yuborsa, oxirgi
  * harakatni qaytaradi. Darsda bu tez-tez kerak bo'ladi.
  */
 
 type OpenCell = { c: number; r: number } | null;
 
-/** Bekor qilish uchun oxirgi harakat */
+/** {t.lg.cancel} uchun oxirgi harakat */
 type LastMove = {
   key: string;
   teamIdx: number | null;
@@ -52,6 +53,7 @@ export function Jeopardy({
   content: JeopardyContent;
   onFinish: (r: JeopardyResult) => void;
 }) {
+  const { t } = useI18n();
   const categories = content.categories || [];
   const [open, setOpen] = useState<OpenCell>(null);
   const [revealed, setRevealed] = useState(false);
@@ -112,7 +114,7 @@ export function Jeopardy({
         <Users className="w-10 h-10 text-neon-purple mx-auto mb-4" />
         <h2 className="font-display font-bold text-xl mb-2">Nechta jamoa o&apos;ynaydi?</h2>
         <p className="text-sm text-muted-foreground mb-7">
-          Ball tanlangan jamoaga yoziladi. Yakka o&apos;ynash uchun 1 ni tanlang.
+          {t.lg.teamHint}
         </p>
 
         <div className="flex items-center justify-center gap-4 mb-8">
@@ -167,7 +169,7 @@ export function Jeopardy({
               onClick={undo}
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition"
             >
-              <Undo2 className="w-3.5 h-3.5" /> Bekor qilish
+              <Undo2 className="w-3.5 h-3.5" /> {t.lg.cancel}
             </button>
           )}
           {solo && (
@@ -230,7 +232,7 @@ export function Jeopardy({
       {/* Yakunlash */}
       <div className="mt-8 flex items-center justify-between gap-4 flex-wrap">
         <p className="text-sm text-muted-foreground">
-          {allDone ? "Barcha savollar ochildi" : "Katakni tanlang"}
+          {allDone ? t.lg.allOpened : t.lg.pickCell}
         </p>
         <button
           onClick={() => onFinish({ score: totalScore, maxScore, correct, total })}
@@ -282,12 +284,12 @@ export function Jeopardy({
                 {revealed ? (
                   <motion.div key="a" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                     <div className="p-4 rounded-xl bg-neon-green/[0.07] border border-neon-green/25 mb-6">
-                      <p className="eyebrow mb-1">Javob</p>
+                      <p className="eyebrow mb-1">{t.lg.answer}</p>
                       <p className="text-lg leading-relaxed">{cell.answer}</p>
                     </div>
 
                     <p className="text-sm text-muted-foreground mb-3">
-                      {solo ? "Javob to'g'ri bo'ldimi?" : "Kim to'g'ri javob berdi?"}
+                      {solo ? t.lg.wasCorrect : t.lg.whoAnswered}
                     </p>
 
                     <div className="flex flex-wrap gap-2">
@@ -316,7 +318,7 @@ export function Jeopardy({
                         onClick={() => mark(null)}
                         className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold border border-neon-red/30 text-neon-red bg-neon-red/[0.06] hover:bg-neon-red/[0.12] transition-colors"
                       >
-                        <X className="w-4 h-4" /> {solo ? "Noto'g'ri" : "Hech kim"}
+                        <X className="w-4 h-4" /> {solo ? "Noto'g'ri" : t.lg.nobody}
                       </button>
                     </div>
                   </motion.div>
@@ -328,7 +330,7 @@ export function Jeopardy({
                     onClick={() => setRevealed(true)}
                     className="btn-primary w-full flex items-center justify-center gap-2"
                   >
-                    <Eye className="w-4 h-4" /> Javobni ko&apos;rsatish
+                    <Eye className="w-4 h-4" /> {t.lg.answer}ni ko&apos;rsatish
                   </motion.button>
                 )}
               </AnimatePresence>

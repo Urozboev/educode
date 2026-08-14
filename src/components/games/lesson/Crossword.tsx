@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import type { CrosswordContent, CrosswordDir } from "@/types";
 import { buildGrid, cellKey } from "@/lib/crossword";
 import { Check, Eye, RotateCcw, Zap, Lightbulb } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Krossvord.
@@ -35,6 +36,7 @@ export function Crossword({
   content: CrosswordContent;
   onFinish: (r: CrosswordResult) => void;
 }) {
+  const { t } = useI18n();
   const words = content.words || [];
   const grid = useMemo(() => buildGrid(content), [content]);
 
@@ -180,7 +182,7 @@ export function Crossword({
       {/* Hisob */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <span className="eyebrow">
-          Topilgan <span className="numeric">{solvedCount}</span>/<span className="numeric">{total}</span>
+          {t.lg.found} <span className="numeric">{solvedCount}</span>/<span className="numeric">{total}</span>
         </span>
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-neon-yellow">
           <Zap className="w-4 h-4" /> <span className="numeric">{score}</span>

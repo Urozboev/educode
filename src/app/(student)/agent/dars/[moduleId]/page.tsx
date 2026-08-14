@@ -2,12 +2,17 @@ import { redirect, notFound } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAgentAccess } from "@/lib/agent/access";
 import LessonView from "@/components/agent/LessonView";
+import type { Metadata } from "next";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Dars | Ustoz — EduCode",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.agent.seoLesson,
+    };
+}
 
 export default async function AgentLessonPage({
   params,

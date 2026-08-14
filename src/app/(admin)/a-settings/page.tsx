@@ -78,7 +78,7 @@ export default function AdminSettingsPage() {
     setSaving(true);
     await supabase.from("platform_settings").upsert({ key: "coin_settings", value: coinSettings, updated_at: new Date().toISOString() });
     await supabase.from("platform_settings").upsert({ key: "xp_settings", value: xpSettings, updated_at: new Date().toISOString() });
-    toast.success("Sozlamalar saqlandi");
+    toast.success(t.admin.set.settingsSaved);
     setSaving(false);
   }
 
@@ -92,7 +92,7 @@ export default function AdminSettingsPage() {
     await supabase.from("platform_settings").upsert({
       key: "coin_price_uzs", value: pricing, updated_at: new Date().toISOString(),
     });
-    toast.success("Coin narxi saqlandi");
+    toast.success(t.admin.set.priceSaved);
     setSaving(false);
   }
 
@@ -108,7 +108,7 @@ export default function AdminSettingsPage() {
 
   // ===== PLACEMENT QUESTION CRUD =====
   async function saveQuestion() {
-    if (!qForm.question.trim()) { toast.error("Savolni kiriting"); return; }
+    if (!qForm.question.trim()) { toast.error(t.admin.set.enterQuestion); return; }
     let options;
     try { options = JSON.parse(qForm.options); } catch (_e) { toast.error("Options JSON noto'g'ri"); return; }
 
@@ -124,7 +124,7 @@ export default function AdminSettingsPage() {
   }
 
   async function deleteQuestion(id: string) {
-    if (!confirm("Savolni o'chirish?")) return;
+    if (!confirm(t.admin.set.deleteQuestion)) return;
     await supabase.from("placement_tests").delete().eq("id", id);
     toast.success(t.admin.common.deleted); loadPlacementQuestions();
   }
@@ -149,7 +149,7 @@ export default function AdminSettingsPage() {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: "placement_quiz", topic_title: title,
-            course_title: "Daraja aniqlash testi", difficulty: diff,
+            course_title: t.admin.set.tabPlacement, difficulty: diff,
           }),
         });
         const data = await res.json();
@@ -168,7 +168,7 @@ export default function AdminSettingsPage() {
         }
       }
 
-      toast.success("9 ta daraja aniqlash savoli yaratildi! (3 ta har kategoriyadan)");
+      toast.success(t.admin.set.aiGenerated);
       loadPlacementQuestions();
     } catch (e: any) { toast.error(t.admin.set.aiError + ": " + e.message); }
     setAiGenerating(false);
@@ -192,15 +192,15 @@ export default function AdminSettingsPage() {
       <div className="flex gap-2">
         <button onClick={() => setActiveTab("coins")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all",
           activeTab === "coins" ? "bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20" : "bg-surface text-muted-foreground")}>
-          <Coins className="w-4 h-4 inline mr-1.5" /> Coin / XP
+          <Coins className="w-4 h-4 inline mr-1.5" /> {t.admin.set.tabCoinXp}
         </button>
         <button onClick={() => setActiveTab("pricing")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all",
           activeTab === "pricing" ? "bg-neon-green/10 text-neon-green border border-neon-green/20" : "bg-surface text-muted-foreground")}>
-          <ShoppingCart className="w-4 h-4 inline mr-1.5" /> Coin narxi
+          <ShoppingCart className="w-4 h-4 inline mr-1.5" /> {t.admin.set.tabCoinPrice}
         </button>
         <button onClick={() => setActiveTab("placement")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all",
           activeTab === "placement" ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-surface text-muted-foreground")}>
-          <Brain className="w-4 h-4 inline mr-1.5" /> Daraja aniqlash testi
+          <Brain className="w-4 h-4 inline mr-1.5" /> {t.admin.set.tabPlacement}
         </button>
       </div>
 
@@ -229,7 +229,7 @@ export default function AdminSettingsPage() {
           <motion.div className="glass-card p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display font-semibold text-lg flex items-center gap-2">
-                <Coins className="w-5 h-5 text-neon-yellow" /> Coin paketlari
+                <Coins className="w-5 h-5 text-neon-yellow" /> {t.admin.set.coinPackages}
               </h2>
               <button onClick={addPackage} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1 border border-border">
                 <Plus className="w-3.5 h-3.5" /> Paket qo'shish

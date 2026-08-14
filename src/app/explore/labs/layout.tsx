@@ -1,38 +1,41 @@
 import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl } from "@/lib/seo";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const revalidate = 3600;
 
-const PAGE_TITLE = "Virtual laboratoriyalar — algoritm va kompyuter vizualizatorlari";
-const PAGE_DESC = "Saralash algoritmlari, sikl va shartlar, ikkilik sanoq sistemasi va kompyuter qurilmalari bo'yicha interaktiv laboratoriyalar. Qadamma-qadam kuzating va o'zingiz sinab ko'ring.";
 
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-  description: PAGE_DESC,
-  alternates: { canonical: absUrl("/explore/labs") },
-  openGraph: {
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    url: absUrl("/explore/labs"),
-    type: "website",
-    images: [ogImageUrl({ title: "Virtual laboratoriyalar", subtitle: "Interaktiv vizualizatorlar", type: "topic" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    images: [ogImageUrl({ title: "Virtual laboratoriyalar", subtitle: "Interaktiv vizualizatorlar", type: "topic" })],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.seo.labsTitle,
+    description: t.seo.labsDesc,
+    alternates: { canonical: absUrl("/explore/labs") },
+    openGraph: {
+      title: t.seo.labsTitle,
+      description: t.seo.labsDesc,
+      url: absUrl("/explore/labs"),
+      type: "website",
+      images: [ogImageUrl({ title: t.seo.labsOg, subtitle: t.seo.labsOgSub, type: "topic" })],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.seo.labsTitle,
+      description: t.seo.labsDesc,
+      images: [ogImageUrl({ title: t.seo.labsOg, subtitle: t.seo.labsOgSub, type: "topic" })],
+    },
+  };
+}
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const t = await getServerDictionary();
   return (
     <>
       <BreadcrumbJsonLd
         items={[
-          { name: "Bosh sahifa", url: "/" },
-          { name: "Laboratoriyalar", url: "/explore/labs" },
+          { name: t.seo.homeCrumb, url: "/" },
+          { name: t.seo.labsCrumb, url: "/explore/labs" },
         ]}
       />
       {children}

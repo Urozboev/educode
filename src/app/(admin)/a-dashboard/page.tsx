@@ -68,8 +68,8 @@ export default function AdminDashboardPage() {
   ];
 
   const quickLinks = [
-    { label: "Yangi kurs", href: "/a-courses", icon: BookOpen, color: "#6C5CE7" },
-    { label: "Yangi topshiriq", href: "/a-challenges", icon: Swords, color: "#00D2FF" },
+    { label: t.admin.common.newCourse, href: "/a-courses", icon: BookOpen, color: "#6C5CE7" },
+    { label: t.admin.common.newChallenge, href: "/a-challenges", icon: Swords, color: "#00D2FF" },
     { label: "Foydalanuvchilar", href: "/a-users", icon: Users, color: "#00E676" },
     { label: t.admin.achievements, href: "/a-achievements", icon: Target, color: "#FFD600" },
   ];

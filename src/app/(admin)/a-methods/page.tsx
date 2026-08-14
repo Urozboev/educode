@@ -75,8 +75,8 @@ export default function AdminMethodsPage() {
   }
 
   async function save(publish?: boolean) {
-    if (!form.title.trim()) { toast.error("Metod nomini kiriting"); return; }
-    if (!form.summary.trim()) { toast.error("Qisqa tavsif kiriting"); return; }
+    if (!form.title.trim()) { toast.error(t.admin.mth.enterName); return; }
+    if (!form.summary.trim()) { toast.error(t.admin.mth.enterDesc); return; }
     setSaving(true);
 
     const payload = {
@@ -103,7 +103,7 @@ export default function AdminMethodsPage() {
 
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(editId ? "Saqlandi" : "Qo'shildi");
+    toast.success(editId ? t.admin.common.saved : t.admin.common.added);
     setShowForm(false);
     load();
   }
@@ -155,7 +155,7 @@ export default function AdminMethodsPage() {
 
             <div>
               <label className="text-sm font-medium mb-1 block">{t.admin.mth.shortDescLabel} *</label>
-              <textarea value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} className="input-field resize-none" rows={2} placeholder="Bir jumlada: metod nima qiladi va nima uchun ishlatiladi" maxLength={300} />
+              <textarea value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} className="input-field resize-none" rows={2} placeholder={t.admin.mth.descPh} maxLength={300} />
             </div>
 
             <div className="grid sm:grid-cols-3 gap-4">
@@ -182,7 +182,7 @@ export default function AdminMethodsPage() {
                 <label className="text-sm font-medium mb-1 block flex items-center gap-1.5">
                   <ThumbsUp className="w-4 h-4 text-neon-green" /> Afzalliklari
                 </label>
-                <textarea value={form.advantages} onChange={e => setForm({ ...form, advantages: e.target.value })} className="input-field resize-none text-sm" rows={5} placeholder="Har qatorda bitta afzallik:&#10;Barcha o'quvchi jalb qilinadi&#10;Tayyorgarlik talab qilmaydi" />
+                <textarea value={form.advantages} onChange={e => setForm({ ...form, advantages: e.target.value })} className="input-field resize-none text-sm" rows={5} placeholder={t.admin.mth.benefitsPh} />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block flex items-center gap-1.5">
@@ -194,7 +194,7 @@ export default function AdminMethodsPage() {
 
             <div>
               <label className="text-sm font-medium mb-1 block">{t.admin.mth.materials}</label>
-              <textarea value={form.materials} onChange={e => setForm({ ...form, materials: e.target.value })} className="input-field resize-none text-sm" rows={3} placeholder="Har qatorda bittadan:&#10;Doska va marker&#10;Stikerlar" />
+              <textarea value={form.materials} onChange={e => setForm({ ...form, materials: e.target.value })} className="input-field resize-none text-sm" rows={3} placeholder={t.admin.mth.materialsPh} />
             </div>
 
             <div>

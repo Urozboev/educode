@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { MatchPairsContent } from "@/types";
 import { Check, RotateCcw, Zap } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Juftliklarni moslashtirish (Wordwall uslubi).
@@ -44,6 +45,7 @@ export function MatchPairs({
   content: MatchPairsContent;
   onFinish: (r: MatchPairsResult) => void;
 }) {
+  const { t } = useI18n();
   const pairs = useMemo(() => content.pairs || [], [content]);
   const total = pairs.length;
   const maxScore = total * POINTS_PER_PAIR;
@@ -178,7 +180,7 @@ export function MatchPairs({
       {!allMatched && (
         <p className="text-center text-sm text-muted-foreground mt-6">
           {selectedLeft === null
-            ? "Chapdan termin tanlang"
+            ? t.lg.pickTermLeft
             : `"${pairs[selectedLeft]?.left}" uchun o'ngdan mos ta'rifni bosing`}
         </p>
       )}
@@ -192,7 +194,7 @@ export function MatchPairs({
             className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-xl bg-neon-green/[0.06] border border-neon-green/25"
           >
             <p className="font-semibold text-neon-green">
-              Barcha juftliklar topildi — <span className="numeric">{score}</span> ball
+              {t.lg.allPairsFound} <span className="numeric">{score}</span> ball
             </p>
             <div className="flex gap-2">
               <button onClick={restart} className="btn-ghost py-2.5 px-5 text-sm inline-flex items-center gap-2">

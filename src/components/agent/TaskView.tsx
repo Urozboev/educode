@@ -17,6 +17,7 @@ import {
   Play, Send, Loader2, Check, X, Lock, Lightbulb, RotateCcw, ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 interface TaskExample { input: string; expected_output: string }
 
@@ -57,6 +58,7 @@ export default function TaskView({
   assessmentId: string;
   onBack: () => void;
 }) {
+  const { t } = useI18n();
   const { theme } = useTheme();
 
   const [code, setCode] = useState(task.starter_code || "");
@@ -118,7 +120,7 @@ export default function TaskView({
       <div className="flex items-start justify-between gap-4">
         <div>
           <button onClick={onBack} className="mb-2 text-sm text-muted-foreground hover:text-foreground">
-            ← Darsga qaytish
+            ← {t.agent.backToLesson}
           </button>
           <h1 className="text-xl font-bold">{task.title}</h1>
         </div>

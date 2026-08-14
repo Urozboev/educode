@@ -21,24 +21,26 @@ import {
   PLAN_PRICES_UZS, MONTH_OPTIONS, MONTH_DISCOUNT, subscriptionAmount,
 } from "@/lib/agent/access";
 import type { AgentAccess } from "@/lib/agent/types";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 type Plan = "pro" | "pro_plus";
 type Provider = "payme" | "click";
 
-const PLAN_FEATURES: Record<Plan, string[]> = {
+const PLAN_FEATURES = (t: Dictionary): Record<Plan, string[]> => ({
   pro: [
-    "Cheksiz suhbat va darslar",
-    "2 ta o'quv yo'nalishi",
-    "Ovozli dars va suhbat",
-    "Test va shaxsiy progress",
+    t.agent.perkChat,
+    t.agent.perkTwoTracks,
+    t.agent.perkVoice,
+    t.agent.perkQuiz,
   ],
   pro_plus: [
-    "Pro dagi hamma narsa",
-    "Cheksiz yo'nalish",
-    "Kod review",
-    "Ota-ona hisoboti",
+    t.agent.perkAllPro,
+    t.agent.perkUnlimitedTracks,
+    t.agent.perkCodeReview,
+    t.agent.perkParentReport,
   ],
-};
+});
 
 const PLAN_NAMES: Record<Plan, string> = { pro: "Pro", pro_plus: "Pro+" };
 
@@ -49,6 +51,7 @@ export default function SubscribeView({
   initialAccess: AgentAccess;
   initialPlan?: Plan;
 }) {
+  const { t } = useI18n();
   const router = useRouter();
   const params = useSearchParams();
   const justPaid = params.get("paid") === "1";
@@ -121,7 +124,7 @@ export default function SubscribeView({
         <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-primary" />
         <h2 className="mb-2 text-lg font-semibold">To'lov tekshirilmoqda...</h2>
         <p className="mx-auto max-w-sm text-sm text-muted-foreground">
-          Bu bir necha soniya olishi mumkin. Sahifani yopmang.
+          {t.agent.subWait}
         </p>
       </div>
     );
@@ -154,7 +157,7 @@ export default function SubscribeView({
             className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
           >
             <Sparkles className="h-4 w-4" />
-            Ustoz bilan ishlashni davom ettirish
+            {t.agent.subContinue}
             <ArrowRight className="h-4 w-4" />
           </Link>
 
@@ -178,8 +181,7 @@ export default function SubscribeView({
         </div>
         <h1 className="text-2xl font-bold">Ustoz obunasi</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Shaxsiy AI o'qituvchi: o'zi reja tuzadi, dars o'tadi, tekshiradi va
-          natijangizga qarab rejani o'zgartiradi.
+          {t.agent.subDesc}
         </p>
       </div>
 
@@ -209,7 +211,7 @@ export default function SubscribeView({
             </div>
 
             <ul className="space-y-2 text-sm text-muted-foreground">
-              {PLAN_FEATURES[p].map((f) => (
+              {PLAN_FEATURES(t)[p].map((f) => (
                 <li key={f} className="flex items-start gap-2">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   {f}

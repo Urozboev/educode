@@ -70,7 +70,7 @@ export default function AdminBlogPage() {
   }
 
   async function aiWrite() {
-    if (!form.title.trim()) { toast.error("Avval sarlavha kiriting"); return; }
+    if (!form.title.trim()) { toast.error(t.admin.blg.titleFirst); return; }
     setAiGen(true);
     try {
       const res = await fetch("/api/ai/generate", {
@@ -87,7 +87,7 @@ export default function AdminBlogPage() {
   }
 
   async function save(publish?: boolean) {
-    if (!form.title.trim()) { toast.error("Sarlavha kiriting"); return; }
+    if (!form.title.trim()) { toast.error(t.admin.common.enterTitle); return; }
     setSaving(true);
     const slug = slugify(form.title, { lower: true, strict: true });
     const payload: any = {
@@ -122,7 +122,7 @@ export default function AdminBlogPage() {
       is_published: !p.is_published,
       published_at: !p.is_published ? new Date().toISOString() : p.published_at,
     }).eq("id", p.id);
-    toast.success(p.is_published ? "Yashirildi" : "Nashr qilindi");
+    toast.success(p.is_published ? t.admin.blg.hiddenToast : t.admin.common.publishedToast);
     load();
     fetch("/api/revalidate", { method: "POST" }).catch(() => {});
   }
@@ -156,12 +156,12 @@ export default function AdminBlogPage() {
 
             <div>
               <label className="text-sm font-medium mb-1 block">{t.admin.common.title2} *</label>
-              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Python'ni qaerdan boshlash kerak?" />
+              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder={t.admin.blg.titlePh} />
             </div>
 
             <div>
               <label className="text-sm font-medium mb-1 block">{t.admin.blg.metaDesc}</label>
-              <textarea value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} className="input-field resize-none" rows={2} placeholder="Google natijalarida va kartada ko'rinadi (150-160 belgi)" maxLength={200} />
+              <textarea value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} className="input-field resize-none" rows={2} placeholder={t.admin.blg.metaHint} maxLength={200} />
             </div>
 
             <div className="grid sm:grid-cols-3 gap-4">

@@ -51,8 +51,8 @@ export default function RegisterPage() {
 
   const passwordChecks = [
     { label: "Kamida 8 ta belgi", valid: password.length >= 8 },
-    { label: "Katta harf mavjud", valid: /[A-Z]/.test(password) },
-    { label: "Raqam mavjud", valid: /[0-9]/.test(password) },
+    { label: t.auth.hasUppercase, valid: /[A-Z]/.test(password) },
+    { label: t.auth.hasDigit, valid: /[0-9]/.test(password) },
   ];
 
   const isPasswordValid = passwordChecks.every((c) => c.valid);
@@ -75,8 +75,8 @@ export default function RegisterPage() {
     if (error) {
       setErrorMsg(
         error.message === "User already registered"
-          ? "Bu email allaqachon ro'yxatdan o'tgan"
-          : "Xatolik yuz berdi. Qayta urinib ko'ring."
+          ? t.auth.emailTaken
+          : t.auth.genericError
       );
       setLoading(false);
       return;
@@ -99,7 +99,7 @@ export default function RegisterPage() {
         redirectTo: `${window.location.origin}/api/auth/callback?next=${nextPath}&role=${role}`,
       },
     });
-    if (error) setErrorMsg("Google bilan kirishda xatolik yuz berdi");
+    if (error) setErrorMsg(t.auth.googleError);
   }
 
   if (success) {
@@ -117,8 +117,7 @@ export default function RegisterPage() {
             Email tasdiqlang
           </h1>
           <p className="text-[15px] text-muted-foreground leading-relaxed mb-6">
-            <strong className="text-foreground">{email}</strong> manziliga tasdiqlash havolasi
-            yuborildi. Emailingizni tekshiring va havolani bosing.
+            <strong className="text-foreground">{email}</strong> {t.auth.confirmSentTail}
           </p>
           <Link
             href="/login"
@@ -147,7 +146,7 @@ export default function RegisterPage() {
             {role === "parent"
               ? "Farzandingiz o'quv jarayonini kuzating."
               : role === "teacher"
-              ? "Hisob yaratgach ariza to'ldirasiz — admin tasdiqlagach o'qituvchi kabineti ochiladi."
+              ? t.auth.teacherNoteShort
               : t.auth.registerSubtitle}
           </p>
         </div>
@@ -165,7 +164,7 @@ export default function RegisterPage() {
             }`}
           >
             <GraduationCap className={`w-6 h-6 ${role === "student" ? "text-neon-purple" : "text-muted-foreground"}`} />
-            <span className="text-sm font-semibold">Talaba</span>
+            <span className="text-sm font-semibold">{t.auth.roleStudent}</span>
             <span className="text-[11px] text-muted-foreground text-center leading-tight">O'rganaman</span>
           </button>
           <button
@@ -191,7 +190,7 @@ export default function RegisterPage() {
             }`}
           >
             <Presentation className={`w-6 h-6 ${role === "teacher" ? "text-neon-green" : "text-muted-foreground"}`} />
-            <span className="text-sm font-semibold">O&apos;qituvchi</span>
+            <span className="text-sm font-semibold">{t.auth.roleTeacher}</span>
             <span className="text-[11px] text-muted-foreground text-center leading-tight">O&apos;rgataman</span>
           </button>
         </div>
@@ -200,9 +199,7 @@ export default function RegisterPage() {
           <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-neon-blue/[0.07] border border-neon-blue/20 text-sm mb-6">
             <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-neon-blue" />
             <span className="leading-relaxed text-muted-foreground">
-              O&apos;qituvchi huquqi tekshiruvdan keyin beriladi. Hisob yaratilgach
-              qisqa ariza to&apos;ldirasiz; tasdiqlanguncha platformadan o&apos;quvchi
-              sifatida foydalanishingiz mumkin.
+              {t.auth.teacherNote}
             </span>
           </div>
         )}
@@ -236,7 +233,7 @@ export default function RegisterPage() {
               fill="#EA4335"
             />
           </svg>
-          Google bilan ro'yxatdan o'tish
+          {t.auth.googleRegister}
         </button>
 
         <div className="relative mb-6">
@@ -244,7 +241,7 @@ export default function RegisterPage() {
             <div className="w-full border-t border-border/60" />
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-card px-4 text-sm text-muted-foreground">yoki email bilan</span>
+            <span className="bg-card px-4 text-sm text-muted-foreground">{t.auth.orWithEmail}</span>
           </div>
         </div>
 
@@ -272,7 +269,7 @@ export default function RegisterPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="sizning@email.uz"
+                placeholder={t.auth.emailPh}
                 className="w-full bg-surface/60 border border-border rounded-xl pl-12 pr-4 py-3.5 text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
                 required
               />

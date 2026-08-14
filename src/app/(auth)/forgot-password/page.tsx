@@ -5,8 +5,10 @@ import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { Mail, Loader2, CheckCircle2, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useI18n } from "@/lib/i18n";
 
 export default function ForgotPasswordPage() {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -34,11 +36,10 @@ export default function ForgotPasswordPage() {
             <CheckCircle2 className="w-8 h-8 text-neon-green" />
           </div>
           <h1 className="font-display font-extrabold text-2xl md:text-3xl tracking-tight mb-3">
-            Havola yuborildi
+            {t.auth.linkSent}
           </h1>
           <p className="text-[15px] text-muted-foreground leading-relaxed mb-6">
-            <strong className="text-foreground">{email}</strong> manziliga parolni tiklash havolasi
-            yuborildi. Emailingizni tekshiring.
+            <strong className="text-foreground">{email}</strong> {t.auth.resetSentTail}
           </p>
           <Link
             href="/login"
@@ -68,7 +69,7 @@ export default function ForgotPasswordPage() {
           Parolni tiklash
         </h1>
         <p className="text-base text-muted-foreground mb-7">
-          Emailingizni kiriting — parolni tiklash uchun havola yuboramiz.
+          {t.auth.resetHint}
         </p>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -79,7 +80,7 @@ export default function ForgotPasswordPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="sizning@email.uz"
+                placeholder={t.auth.emailPh}
                 className="w-full bg-surface/60 border border-border rounded-xl pl-12 pr-4 py-3.5 text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
                 required
               />
@@ -92,11 +93,11 @@ export default function ForgotPasswordPage() {
           >
             {loading ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Yuborilmoqda...
+                <Loader2 className="w-5 h-5 animate-spin" /> {t.auth.sending}
               </>
             ) : (
               <>
-                Havola yuborish <ArrowRight className="w-4 h-4" />
+                {t.auth.sendLink} <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>

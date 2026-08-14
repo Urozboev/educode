@@ -6,6 +6,7 @@ import { cn, formatDate, getInitials } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Star, Loader2, Pencil, Trash2, MessageSquare, BadgeCheck, EyeOff } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Kurs baholari va izohlari.
@@ -35,6 +36,7 @@ export function CourseReviews({
   courseId: string;
   isEnrolled: boolean;
 }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [me, setMe] = useState<string | null>(null);
@@ -74,7 +76,7 @@ export function CourseReviews({
   }));
 
   async function save() {
-    if (rating < 1) { toast.error("Yulduzchani tanlang"); return; }
+    if (rating < 1) { toast.error(t.reviews.pickStar); return; }
     setSaving(true);
     const { data, error } = await supabase.rpc("upsert_course_review", {
       p_course_id: courseId,
@@ -82,7 +84,7 @@ export function CourseReviews({
       p_comment: comment || null,
     });
     setSaving(false);
-    if (error || !data?.ok) { toast.error(data?.message || error?.message || "Saqlanmadi"); return; }
+    if (error || !data?.ok) { toast.error(data?.message || error?.message || t.admin.common.saveFailed); return; }
     toast.success(myReview ? "Izoh yangilandi" : "Rahmat! Izohingiz qo'shildi");
     setEditing(false);
     load();
@@ -102,7 +104,7 @@ export function CourseReviews({
   return (
     <section className="space-y-5">
       <div className="flex items-end justify-between gap-4">
-        <h2 className="font-display font-bold text-2xl tracking-tight">Baholar va izohlar</h2>
+        <h2 className="font-display font-bold text-2xl tracking-tight">{t.reviews.title}</h2>
         {count > 0 && (
           <span className="text-sm text-muted-foreground">
             <span className="numeric">{count}</span> ta izoh
@@ -145,7 +147,7 @@ export function CourseReviews({
           myReview && !editing ? (
             <div className="p-5 rounded-2xl border border-neon-purple/25 bg-neon-purple/[0.04] space-y-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold">Sizning bahoyingiz</p>
+                <p className="text-sm font-semibold">{t.reviews.yourRating}</p>
                 <div className="flex gap-1">
                   <button onClick={() => setEditing(true)}
                     className="text-xs text-muted-foreground hover:text-neon-purple transition inline-flex items-center gap-1.5">
@@ -165,7 +167,7 @@ export function CourseReviews({
           ) : (
             <div className="p-5 rounded-2xl border border-border/60 bg-card/40 space-y-4">
               <p className="text-sm font-semibold">
-                {myReview ? "Bahoyingizni o'zgartiring" : "Kursni baholang"}
+                {myReview ? "Bahoyingizni o'zgartiring" : t.reviews.rateThis}
               </p>
 
               <div onMouseLeave={() => setHover(0)}>
@@ -183,7 +185,7 @@ export function CourseReviews({
               <textarea
                 value={comment}
                 onChange={e => setComment(e.target.value)}
-                placeholder="Kurs haqida fikringiz — nima yoqdi, nima yetishmadi? (ixtiyoriy)"
+                placeholder={t.reviews.placeholder}
                 className="input-field w-full text-sm min-h-[90px] resize-y"
                 maxLength={2000}
               />
@@ -202,7 +204,7 @@ export function CourseReviews({
                   <button onClick={save} disabled={saving || rating < 1}
                     className="btn-primary py-2.5 px-6 text-sm inline-flex items-center gap-2 disabled:opacity-50">
                     {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {myReview ? "Yangilash" : "Yuborish"}
+                    {myReview ? "Yangilash" : t.reviews.submit}
                   </button>
                 </div>
               </div>
@@ -210,7 +212,7 @@ export function CourseReviews({
           )
         ) : (
           <p className="text-sm text-muted-foreground p-4 rounded-xl border border-dashed border-border">
-            Baho qoldirish uchun avval kursga yozilishingiz kerak.
+            {t.reviews.needEnroll}
           </p>
         )
       )}
@@ -245,7 +247,7 @@ export function CourseReviews({
                       <span className="font-semibold text-sm">{r.full_name}</span>
                       {r.completed && (
                         <span className="inline-flex items-center gap-1 text-[10px] text-neon-green bg-neon-green/10 border border-neon-green/25 px-1.5 py-0.5 rounded">
-                          <BadgeCheck className="w-3 h-3" /> kursni tugatgan
+                          <BadgeCheck className="w-3 h-3" /> {t.reviews.completedBadge}
                         </span>
                       )}
                       <span className="text-[11px] text-muted-foreground ml-auto">{formatDate(r.created_at)}</span>

@@ -105,7 +105,7 @@ export default function TeacherDashboardPage() {
         kind: "submission" as const,
         name: nameMap[s.user_id] || t.teacher.unknown,
         ok: s.status === "accepted",
-        detail: `${s.language} · ${s.task_type === "challenge" ? "Topshiriq" : "Amaliy"}`,
+        detail: `${s.language} · ${s.task_type === "challenge" ? t.teacher.task : "Amaliy"}`,
         at: s.created_at,
       })),
       ...((gameResults.data as any[]) || []).map(g => ({
@@ -133,13 +133,13 @@ export default function TeacherDashboardPage() {
   const statCards = [
     { label: t.teacher.students, value: stats.totalStudents, Icon: Users, cls: "text-neon-purple" },
     { label: t.teacher.submissions, value: stats.totalSubmissions, Icon: Target, cls: "text-neon-blue" },
-    { label: "Qabul qilingan", value: stats.accepted, Icon: TrendingUp, cls: "text-neon-green" },
+    { label: t.teacher.accepted, value: stats.accepted, Icon: TrendingUp, cls: "text-neon-green" },
     { label: t.teacher.avgQuiz, value: `${stats.avgQuizScore}%`, Icon: Brain, cls: "text-neon-yellow" },
   ];
 
   const quickLinks = [
     { label: t.teacher.groups, href: "/t-groups", Icon: School },
-    { label: "Dars o'yinlari", href: "/t-lesson-games", Icon: Gamepad2 },
+    { label: t.nav.lessonGames, href: "/t-lesson-games", Icon: Gamepad2 },
     { label: t.nav.challenges, href: "/t-assignments", Icon: ClipboardList },
     { label: t.nav.methods, href: "/t-methods", Icon: Lightbulb },
     { label: t.teacher.analytics, href: "/t-analytics", Icon: BarChart3 },
@@ -167,9 +167,9 @@ export default function TeacherDashboardPage() {
           <School className="w-10 h-10 text-neon-purple mb-4" />
           <h2 className="font-display font-bold text-xl mb-2">{t.teacher.dash.startWithGroup}</h2>
           <p className="text-muted-foreground leading-relaxed mb-6 max-w-lg">
-            Hozircha sizga o&apos;quvchi biriktirilmagan. Guruh yarating — unga
-            avtomatik kod beriladi. O&apos;quvchilar shu kodni <code className="px-1.5 py-0.5 rounded bg-surface border border-border text-xs">/join</code>{" "}
-            sahifasida kiritsa, natijalari shu panelda ko&apos;rina boshlaydi.
+            {t.teacher.dash.joinHintA}{" "}
+            <code className="px-1.5 py-0.5 rounded bg-surface border border-border text-xs">/join</code>{" "}
+            {t.teacher.dash.joinHintB}
           </p>
 
           <ol className="space-y-3 mb-7">
@@ -190,10 +190,10 @@ export default function TeacherDashboardPage() {
 
           <div className="flex flex-wrap gap-3">
             <Link href="/t-groups" className="btn-primary py-2.5 px-5 text-sm inline-flex items-center gap-2">
-              Guruh yaratish <ArrowRight className="w-4 h-4" />
+              {t.teacher.asg.createGroup} <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/t-lesson-games" className="btn-ghost py-2.5 px-5 text-sm">
-              O&apos;yinlarni ko&apos;rish
+              {t.teacher.dash.viewGames}
             </Link>
           </div>
         </motion.div>
@@ -379,7 +379,7 @@ export default function TeacherDashboardPage() {
             />
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            <span className="numeric">{stats.accepted}</span> / <span className="numeric">{stats.totalSubmissions}</span> yuborish qabul qilindi
+            <span className="numeric">{stats.accepted}</span> / <span className="numeric">{stats.totalSubmissions}</span> {t.teacher.dash.submissionsAccepted}
           </p>
         </motion.div>
       )}

@@ -111,13 +111,13 @@ export default function AdminContestsPage() {
   }
 
   async function save(publish?: boolean) {
-    if (!form.title.trim()) { toast.error("Nom kiriting"); return; }
+    if (!form.title.trim()) { toast.error(t.admin.cnt.enterName); return; }
     if (!userId) { toast.error(t.admin.cnt.sessionNotFound); return; }
 
     const startsAt = new Date(form.starts_at);
     const endsAt = new Date(form.ends_at);
-    if (!(endsAt > startsAt)) { toast.error("Tugash vaqti boshlanishdan keyin bo'lishi kerak"); return; }
-    if (picked.length === 0) { toast.error("Kamida bitta masala tanlang"); return; }
+    if (!(endsAt > startsAt)) { toast.error(t.admin.cnt.endAfterStart); return; }
+    if (picked.length === 0) { toast.error(t.admin.cnt.pickProblem); return; }
 
     setSaving(true);
     const payload = {
@@ -155,7 +155,7 @@ export default function AdminContestsPage() {
 
     setSaving(false);
     if (pErr) { toast.error(`Masalalar saqlanmadi: ${pErr.message}`); return; }
-    toast.success(editId ? "Saqlandi" : "Yaratildi");
+    toast.success(editId ? t.admin.common.saved : t.admin.common.created);
     setShowForm(false);
     load();
   }
@@ -208,7 +208,7 @@ export default function AdminContestsPage() {
             <div>
               <label className="text-sm font-medium mb-1 block">{t.admin.common.description}</label>
               <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                className="input-field resize-none" rows={2} placeholder="Kimlar uchun, qanday mavzular" maxLength={400} />
+                className="input-field resize-none" rows={2} placeholder={t.admin.cnt.descPh} maxLength={400} />
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
@@ -243,7 +243,7 @@ export default function AdminContestsPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium">
-                  Masalalar <span className="numeric text-muted-foreground">({picked.length})</span>
+                  {t.admin.cnt.problems} <span className="numeric text-muted-foreground">({picked.length})</span>
                 </label>
                 {picked.length > 0 && (
                   <button onClick={() => setPicked([])} className="text-xs text-muted-foreground hover:text-neon-red">
@@ -271,7 +271,7 @@ export default function AdminContestsPage() {
                     );
                   })}
                   <p className="text-xs text-muted-foreground pt-1">
-                    Harflar tanlash tartibida beriladi
+                    {t.admin.cnt.letterHint}
                   </p>
                 </div>
               )}
@@ -285,7 +285,7 @@ export default function AdminContestsPage() {
               <div className="max-h-56 overflow-y-auto space-y-1 rounded-lg border border-border p-2">
                 {filteredChallenges.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    {challenges.length === 0 ? "Nashr qilingan topshiriq yo'q" : "Natija topilmadi"}
+                    {challenges.length === 0 ? t.admin.cnt.noPublished : t.admin.common.noResults}
                   </p>
                 ) : filteredChallenges.map(ch => {
                   const on = picked.includes(ch.id);
@@ -335,7 +335,7 @@ export default function AdminContestsPage() {
             <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p className="mb-4">{t.admin.cnt.empty}</p>
             <button onClick={openNew} className="btn-primary text-sm py-2 px-5">
-              <Plus className="w-4 h-4 inline mr-1" /> Birinchi olimpiada
+              <Plus className="w-4 h-4 inline mr-1" /> {t.admin.cnt.first}
             </button>
           </div>
         ) : contests.map(c => {
@@ -365,7 +365,7 @@ export default function AdminContestsPage() {
                 </Link>
               )}
               <button onClick={() => togglePublish(c)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground"
-                title={c.is_published ? "Yashirish" : "E'lon qilish"}>
+                title={c.is_published ? "Yashirish" : t.admin.cnt.publish}>
                 {c.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
               <button onClick={() => openEdit(c)} className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground">

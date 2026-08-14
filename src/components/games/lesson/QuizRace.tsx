@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { QuizRaceContent } from "@/types";
 import { Check, X, Zap, Clock } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Tezlik viktorinasi (Kahoot uslubi).
@@ -44,6 +45,7 @@ export function QuizRace({
   content: QuizRaceContent;
   onFinish: (r: QuizRaceResult) => void;
 }) {
+  const { t } = useI18n();
   const questions = content.questions || [];
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
@@ -122,7 +124,7 @@ export function QuizRace({
       {/* Yuqori panel */}
       <div className="flex items-center justify-between gap-4 mb-4">
         <span className="eyebrow">
-          Savol <span className="numeric">{idx + 1}</span>/<span className="numeric">{total}</span>
+          {t.lg.question} <span className="numeric">{idx + 1}</span>/<span className="numeric">{total}</span>
         </span>
         <div className="flex items-center gap-4">
           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-neon-yellow">
@@ -221,7 +223,7 @@ export function QuizRace({
               )}
             </p>
             <button onClick={next} className="btn-primary py-2.5 px-6 text-sm inline-flex items-center gap-2">
-              {idx + 1 >= total ? "Yakunlash" : "Keyingi savol"}
+              {idx + 1 >= total ? "Yakunlash" : t.lg.nextQuestion}
               <kbd className="hidden sm:inline px-1.5 py-0.5 rounded border border-white/25 bg-white/10 text-[10px] font-mono">
                 Enter
               </kbd>

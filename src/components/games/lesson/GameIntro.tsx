@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { Play, Keyboard } from "lucide-react";
 import type { LessonGameType } from "@/types";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 /**
  * O'yin oldidan chiqadigan qoidalar ekrani.
@@ -23,13 +25,13 @@ export interface GameRules {
   keys?: { key: string; action: string }[];
 }
 
-export const GAME_RULES: Record<LessonGameType, GameRules> = {
+export const GAME_RULES = (t: Dictionary): Record<LessonGameType, GameRules> => ({
   quiz_race: {
-    summary: "Vaqtga qarshi savol-javob. Qanchalik tez javob bersangiz, shuncha ko'p ball.",
+    summary: t.lg.quizDesc,
     steps: [
-      "Har savolga cheklangan vaqt beriladi",
-      "To'g'ri javob 500 ball, qolgan vaqt uchun 500 gacha bonus",
-      "Noto'g'ri javob ball kamaytirmaydi — taxmin qilishdan qo'rqmang",
+      t.lg.quizRule1,
+      t.lg.quizRule2,
+      t.lg.quizRule3,
     ],
     keys: [
       { key: "1 – 4", action: "variant tanlash" },
@@ -37,26 +39,26 @@ export const GAME_RULES: Record<LessonGameType, GameRules> = {
     ],
   },
   match_pairs: {
-    summary: "Chapdagi terminni o'ngdagi ta'rifi bilan juftlashtiring.",
+    summary: t.lg.matchDesc,
     steps: [
-      "Avval chapdan termin tanlang, so'ng o'ngdan mos ta'rifni bosing",
+      t.lg.matchRule1,
       "Har to'g'ri juftlik 100 ball",
       "Xato urinish 20 ball ayiradi — shoshilmang",
     ],
   },
   jeopardy: {
-    summary: "Kategoriya va ball bo'yicha savollar taxtasi. Sinf bilan jamoaga bo'linib o'ynash uchun.",
+    summary: t.lg.jeopardyDesc,
     steps: [
-      "Katakni tanlang — savol ochiladi",
-      "Jamoa javob beradi, keyin javobni ochib tekshiring",
-      "To'g'ri javob bergan jamoaga katak bali yoziladi",
+      t.lg.jeopardyRule1,
+      t.lg.jeopardyRule2,
+      t.lg.jeopardyRule3,
     ],
   },
   crossword: {
-    summary: "Ta'riflar bo'yicha so'zlarni toping va to'rga yozing.",
+    summary: t.lg.crosswordDesc,
     steps: [
-      "Ta'rifni bosing yoki katakka o'ting — so'z belgilanadi",
-      "Bir katakda ikki so'z kesishsa, uni qayta bosib yo'nalishni almashtiring",
+      t.lg.crosswordRule1,
+      t.lg.crosswordRule2,
       "Har to'liq so'z 100 ball; yordam ishlatilgan so'z 50 ball",
     ],
     keys: [
@@ -64,7 +66,7 @@ export const GAME_RULES: Record<LessonGameType, GameRules> = {
       { key: "Backspace", action: "o'chirib orqaga qaytish" },
     ],
   },
-};
+});
 
 export function GameIntro({
   type,
@@ -75,7 +77,8 @@ export function GameIntro({
   title: string;
   onStart: () => void;
 }) {
-  const rules = GAME_RULES[type];
+  const { t } = useI18n();
+  const rules = GAME_RULES(t)[type];
   if (!rules) return null;
 
   return (

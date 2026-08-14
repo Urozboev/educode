@@ -53,11 +53,10 @@ export function LessonGamesView() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
         <p className="eyebrow mb-3">{t.explore.lessonGamesEyebrow}</p>
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight mb-3">
-          Dars o&apos;yinlari
+          {t.lg.title}
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Mavzu bo&apos;yicha viktorina, Jeopardy taxtasi va juftlik o&apos;yinlari.
-          Proyektorda sinf bilan birga yoki yakka tartibda o&apos;ynash mumkin.
+          {t.lg.subtitle}
         </p>
       </motion.div>
 
@@ -116,7 +115,7 @@ export function LessonGamesView() {
         <div className="py-20 text-center">
           <Gamepad2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {games.length === 0 ? "O'yinlar tez orada qo'shiladi" : "Natija topilmadi"}
+            {games.length === 0 ? "O'yinlar tez orada qo'shiladi" : t.lg.notFound}
           </p>
         </div>
       ) : (

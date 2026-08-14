@@ -5,6 +5,7 @@ import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { cn, formatDate } from "@/lib/utils";
 import { NotebookPen, ChevronDown, ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Kurs bo'yicha barcha shaxsiy qaydlar bir ro'yxatda.
@@ -22,6 +23,7 @@ interface NoteRow {
 }
 
 export function CourseNotes({ courseId, courseSlug }: { courseId: string; courseSlug: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [notes, setNotes] = useState<NoteRow[]>([]);
   const [open, setOpen] = useState(false);
@@ -61,7 +63,7 @@ export function CourseNotes({ courseId, courseSlug }: { courseId: string; course
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm">Qaydlarim</p>
           <p className="text-xs text-muted-foreground">
-            <span className="numeric">{notes.length}</span> ta mavzu bo&apos;yicha — takrorlash uchun
+            <span className="numeric">{notes.length}</span> {t.courses.notesHint}
           </p>
         </div>
         <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform flex-shrink-0", open && "rotate-180")} />

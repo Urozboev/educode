@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Sparkles, Loader2, Coins, Users, Clock, Lock } from "lucide-react";
 import { cn, getDifficultyConfig, getCategoryLabel, formatRelativeDate } from "@/lib/utils";
 import { PasteBadge } from "./PasteBadge";
+import { useI18n } from "@/lib/i18n";
 
 const CodeEditor = dynamic(() => import("@/components/editor/CodeEditor"), { ssr: false });
 
@@ -36,6 +37,7 @@ export function ChallengeSolver({
   loginRedirect: string;
   onSolved?: () => void;
 }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [lang, setLang] = useState<SupportedLanguage>(
     (challenge.languages?.[0] as SupportedLanguage) || "python"
@@ -111,12 +113,12 @@ export function ChallengeSolver({
 
         {submissions.length > 0 && (
           <div className="glass-card p-5">
-            <h3 className="font-semibold text-sm mb-3">So&apos;nggi yuborishlar</h3>
+            <h3 className="font-semibold text-sm mb-3">{t.courses.recentSubmissions}</h3>
             <div className="space-y-2">
               {submissions.slice(0, 5).map(sub => (
                 <div key={sub.id} className="flex items-center gap-2 text-xs bg-surface rounded-lg px-3 py-2">
                   <span className={cn("font-mono font-semibold", sub.status === "accepted" ? "text-neon-green" : "text-neon-red")}>
-                    {sub.status === "accepted" ? "✓ Qabul qilindi" : "✗ " + sub.status.replace(/_/g, " ")}
+                    {sub.status === "accepted" ? t.courses.accepted : "✗ " + sub.status.replace(/_/g, " ")}
                   </span>
                   {/* O'z yechimidagi nusxa belgisi — talaba nima qayd
                       etilayotganini bilib tursin */}
@@ -137,7 +139,7 @@ export function ChallengeSolver({
               <h3 className="font-semibold text-sm">AI Tahlil</h3>
             </div>
             {aiLoading
-              ? <div className="flex items-center gap-2 text-muted-foreground text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Tahlil qilinmoqda...</div>
+              ? <div className="flex items-center gap-2 text-muted-foreground text-sm"><Loader2 className="w-4 h-4 animate-spin" /> {t.courses.topic.analysing}</div>
               : <div className="text-sm text-muted-foreground whitespace-pre-wrap">{aiFeedback}</div>}
           </div>
         )}
@@ -172,9 +174,9 @@ export function ChallengeSolver({
             <div className="w-14 h-14 rounded-2xl bg-neon-purple/10 flex items-center justify-center mb-4">
               <Lock className="w-7 h-7 text-neon-purple" />
             </div>
-            <h3 className="font-display font-bold text-lg mb-2">Yechish uchun ro&apos;yxatdan o&apos;ting</h3>
+            <h3 className="font-display font-bold text-lg mb-2">{t.explore.guestCtaTitle}</h3>
             <p className="text-sm text-muted-foreground mb-5 max-w-sm">
-              Bepul hisob yarating, kod yozing va avtomatik testlar orqali yechimni tekshirib ko&apos;ring.
+              {t.courses.solverCta}
             </p>
             <div className="flex flex-col sm:flex-row gap-2 w-full max-w-xs">
               <Link href={`/register?redirect=${encodeURIComponent(loginRedirect)}`} className="btn-primary flex-1 py-2.5 text-sm">

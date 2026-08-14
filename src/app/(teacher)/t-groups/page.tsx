@@ -79,7 +79,7 @@ export default function TeacherGroupsPage() {
   useEffect(() => { load(); }, [load]);
 
   async function createGroup() {
-    if (!name.trim()) { toast.error("Guruh nomini kiriting"); return; }
+    if (!name.trim()) { toast.error(t.teacher.grp.enterName); return; }
     setCreating(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setCreating(false); return; }
@@ -135,12 +135,12 @@ export default function TeacherGroupsPage() {
             <School className="w-6 h-6 text-neon-purple" /> Guruhlar
           </h1>
           <p className="text-sm text-muted-foreground">
-            <span className="numeric">{groups.length}</span> guruh ·{" "}
-            <span className="numeric">{students.length}</span> o&apos;quvchi
+            <span className="numeric">{groups.length}</span> {t.teacher.grp.groupWord} ·{" "}
+            <span className="numeric">{students.length}</span> {t.teacher.grp.studentWord}
           </p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
-          <Plus className="w-4 h-4" /> Yangi guruh
+          <Plus className="w-4 h-4" /> {t.teacher.grp.newGroup}
         </button>
       </div>
 
@@ -148,10 +148,9 @@ export default function TeacherGroupsPage() {
       <div className="flex items-start gap-2.5 p-4 rounded-xl bg-neon-blue/[0.06] border border-neon-blue/20 text-sm">
         <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-neon-blue" />
         <span className="leading-relaxed text-muted-foreground">
-          Guruh yaratganingizda unga <b className="text-foreground">kod</b> beriladi.
-          O&apos;quvchilarga kodni ayting — ular <code className="px-1.5 py-0.5 rounded bg-surface border border-border text-xs">/join</code>{" "}
-          sahifasida kiritib guruhga qo&apos;shiladi. Shundan keyin natijalari
-          sizning jurnalingizda ko&apos;rinadi.
+          {t.teacher.grp.codeHintA} <b className="text-foreground">{t.teacher.grp.codeWord}</b>{" "}
+          {t.teacher.grp.codeHintMid} <code className="px-1.5 py-0.5 rounded bg-surface border border-border text-xs">/join</code>{" "}
+          {t.teacher.grp.codeHintTail}
         </span>
       </div>
 
@@ -196,7 +195,7 @@ export default function TeacherGroupsPage() {
           <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p className="mb-4">{t.teacher.grp.empty}</p>
           <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-2 px-5">
-            <Plus className="w-4 h-4 inline mr-1" /> Birinchi guruh
+            <Plus className="w-4 h-4 inline mr-1" /> {t.teacher.grp.first}
           </button>
         </div>
       ) : (
@@ -262,7 +261,7 @@ export default function TeacherGroupsPage() {
                 {/* A'zolar */}
                 {members.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4 border border-dashed border-border rounded-lg">
-                    Hali hech kim qo&apos;shilmagan
+                    {t.teacher.grp.nobodyJoined}
                   </p>
                 ) : (
                   <div className="space-y-1.5">
@@ -293,12 +292,12 @@ export default function TeacherGroupsPage() {
         </div>
       )}
 
-      {/* Guruhsiz o'quvchilar */}
+      {/* Guruhsiz {t.teacher.grp.studentWord}lar */}
       {ungrouped.length > 0 && (
         <div className="glass-card p-5">
           <h3 className="font-display font-semibold mb-1">{t.teacher.grp.unassigned}</h3>
           <p className="text-sm text-muted-foreground mb-3">
-            Bu o&apos;quvchilar sizga bog&apos;langan, lekin guruhi yo&apos;q
+            {t.teacher.grp.noGroupStudents}
           </p>
           <div className="space-y-1.5">
             {ungrouped.map(s => (

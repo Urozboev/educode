@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useAgentVoice } from "./useAgentVoice";
 import QuizView from "./QuizView";
 import TaskView from "./TaskView";
+import { useI18n } from "@/lib/i18n";
 
 interface Example {
   title: string;
@@ -35,6 +36,7 @@ interface Lesson {
 }
 
 export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string; lang?: string }) {
+  const { t } = useI18n();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [cached, setCached] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
           body: JSON.stringify({ moduleId }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Dars ochilmadi");
+        if (!res.ok) throw new Error(data.error || t.agent.lessonFailed);
         if (cancelled) return;
 
         setLesson(data.lesson);
@@ -114,7 +116,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
     return (
       <div className="py-24 text-center">
         <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Dars tayyorlanmoqda...</p>
+        <p className="text-sm text-muted-foreground">{t.agent.lessonPreparing}</p>
       </div>
     );
   }
@@ -122,7 +124,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
   if (error || !lesson) {
     return (
       <div className="py-16 text-center">
-        <p className="mb-4 text-sm text-destructive">{error || "Dars topilmadi"}</p>
+        <p className="mb-4 text-sm text-destructive">{error || t.agent.lessonNotFound}</p>
         <Link href="/agent/reja" className="text-sm text-primary hover:underline">
           Rejaga qaytish
         </Link>
@@ -142,7 +144,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
         body: JSON.stringify({ action: "start", moduleId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Topshiriq ochilmadi");
+      if (!res.ok) throw new Error(data.error || t.agent.taskFailed);
 
       setTask({ task: data.task, assessmentId: data.assessmentId });
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -205,7 +207,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
             </span>
             <span className="min-w-0">
               <span className="block text-sm font-medium">
-                {speaking ? "To'xtatish" : "Darsni eshitish"}
+                {speaking ? "To'xtatish" : t.agent.listenLesson}
               </span>
               <span className="block font-mono text-[11px] text-muted-foreground">
                 {speaking ? "Ustoz gapiryapti" : "~2 daqiqa · Ustoz ovozida"}
@@ -217,7 +219,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
         {cached && (
           <div className="mt-4 flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
             <Zap className="h-3 w-3" />
-            tayyor darsdan olindi
+            {t.agent.fromReadyLesson}
           </div>
         )}
       </header>
@@ -276,7 +278,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
           className="flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-medium hover:bg-muted"
         >
           <MessageCircle className="h-4 w-4" />
-          Savolim bor
+          {t.agent.haveQuestion}
         </Link>
       </div>
 

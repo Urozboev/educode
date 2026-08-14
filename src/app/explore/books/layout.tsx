@@ -1,39 +1,41 @@
 import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl } from "@/lib/seo";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const revalidate = 3600;
 
-const PAGE_TITLE = "Dasturlash kitoblari — bepul yuklab olish, o'zbek tilida";
-const PAGE_DESC =
-  "Dasturlash, algoritmlar va kompyuter savodxonligi bo'yicha kitoblar to'plami. PDF formatida bepul yuklab oling — ro'yxatdan o'tish talab qilinmaydi.";
 
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-  description: PAGE_DESC,
-  alternates: { canonical: absUrl("/explore/books") },
-  openGraph: {
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    url: absUrl("/explore/books"),
-    type: "website",
-    images: [ogImageUrl({ title: "Kitoblar", subtitle: "Bepul yuklab olish", type: "default" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    images: [ogImageUrl({ title: "Kitoblar", subtitle: "Bepul yuklab olish", type: "default" })],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.seo.booksTitle,
+    description: t.seo.booksDesc,
+    alternates: { canonical: absUrl("/explore/books") },
+    openGraph: {
+      title: t.seo.booksTitle,
+      description: t.seo.booksDesc,
+      url: absUrl("/explore/books"),
+      type: "website",
+      images: [ogImageUrl({ title: t.seo.booksOg, subtitle: t.seo.booksOgSub, type: "default" })],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.seo.booksTitle,
+      description: t.seo.booksDesc,
+      images: [ogImageUrl({ title: t.seo.booksOg, subtitle: t.seo.booksOgSub, type: "default" })],
+    },
+  };
+}
 
-export default function BooksLayout({ children }: { children: React.ReactNode }) {
+export default async function BooksLayout({ children }: { children: React.ReactNode }) {
+  const t = await getServerDictionary();
   return (
     <>
       <BreadcrumbJsonLd
         items={[
-          { name: "Bosh sahifa", url: "/" },
-          { name: "Kitoblar", url: "/explore/books" },
+          { name: t.seo.homeCrumb, url: "/" },
+          { name: t.seo.booksCrumb, url: "/explore/books" },
         ]}
       />
       {children}

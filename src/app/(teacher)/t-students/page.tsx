@@ -84,7 +84,7 @@ export default function TeacherStudentsPage() {
       ) : sorted.length === 0 ? (
         <div className="text-center py-20">
           <Users className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
-          <p className="text-muted-foreground mb-2">{students.length === 0 ? "Talaba biriktirilmagan" : "Topilmadi"}</p>
+          <p className="text-muted-foreground mb-2">{students.length === 0 ? t.teacher.stu.empty : t.teacher.stu.notFound}</p>
           {students.length === 0 && <p className="text-xs text-muted-foreground">{t.teacher.stu.empty}</p>}
         </div>
       ) : (

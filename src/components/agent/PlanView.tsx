@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 interface Module {
   id: string;
@@ -65,6 +66,7 @@ function isRemedial(m: Module): boolean {
 }
 
 export default function PlanView({ track, modules }: { track: Track; modules: Module[] }) {
+  const { t } = useI18n();
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -133,7 +135,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
           className="mt-6 inline-flex items-center gap-2 font-mono text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
           <RotateCcw className="h-3.5 w-3.5" />
-          boshqa yo'nalish tanlash
+          {t.agent.pickOtherTrack}
         </Link>
       </header>
 
@@ -253,7 +255,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
                       )}
                     >
                       <Play className="h-3.5 w-3.5" fill="currentColor" />
-                      Darsni ochish
+                      {t.agent.openLesson}
                     </Link>
 
                     <button
@@ -274,7 +276,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
                     href={`/agent/dars/${m.id}`}
                     className="mt-2 inline-block font-mono text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                   >
-                    qayta o'qish
+                    {t.agent.reread}
                   </Link>
                 )}
               </div>
@@ -287,7 +289,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
       <div className="relative mt-2 pl-14">
         <span className="absolute left-[13px] top-1 h-3.5 w-3.5 rounded-full border-2 border-dashed border-border" />
         <span className="font-mono text-xs text-muted-foreground">
-          {percent === 100 ? "yo'l tugadi" : "yo'l shu yerda tugaydi"}
+          {percent === 100 ? "yo'l tugadi" : t.agent.pathEndsHere}
         </span>
       </div>
     </div>

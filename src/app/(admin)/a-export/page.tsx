@@ -70,7 +70,7 @@ export default function AdminExportPage() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Eksport qilingan CSV fayllarni Excel, Google Sheets yoki boshqa dasturlarda ochishingiz mumkin. Bu ma'lumotlarni dissertatsiya tahlili uchun ishlatishingiz mumkin.
+        {t.admin.exp.csvHint}
       </p>
     </div>
   );

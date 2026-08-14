@@ -4,6 +4,7 @@ import Link from "@/components/i18n/Link";
 import { motion } from "framer-motion";
 import { PlayCircle, RotateCcw, ArrowRight } from "lucide-react";
 import { pendingText, type ResumePoint } from "@/lib/resume";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Kurs sahifasining tepasidagi "davom ettirish" kartasi.
@@ -13,6 +14,7 @@ import { pendingText, type ResumePoint } from "@/lib/resume";
  * aylantirib qidirish o'rniga bitta tugma.
  */
 export function ResumeCard({ courseSlug, point }: { courseSlug: string; point: ResumePoint }) {
+  const { t } = useI18n();
   const href = `/courses/${courseSlug}/topics/${point.slug}`;
   const left = pendingText(point.pending);
 
@@ -31,7 +33,7 @@ export function ResumeCard({ courseSlug, point }: { courseSlug: string; point: R
       <div className="flex-1 min-w-0">
         <p className="text-xs font-semibold uppercase tracking-widest text-neon-purple mb-1">
           {point.courseDone
-            ? "Kurs tugatilgan"
+            ? t.courses.courseFinished
             : point.fresh
             ? "Keyingi mavzu"
             : "Qoldirgan joyingiz"}

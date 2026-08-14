@@ -62,7 +62,7 @@ export default function AdminCertificatesPage() {
           <tbody>
             {loading ? <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">{t.admin.common.loading}</td></tr> :
             filtered.length === 0 ? <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">
-              {certificates.length === 0 ? "Hali sertifikat berilmagan" : "Topilmadi"}</td></tr> :
+              {certificates.length === 0 ? t.admin.cert.empty : t.admin.common.noResults}</td></tr> :
             filtered.map(c => (
               <tr key={c.id} className="border-b border-border/30 hover:bg-surface/30">
                 <td className="px-5 py-3"><p className="font-medium text-sm">{c.full_name}</p></td>

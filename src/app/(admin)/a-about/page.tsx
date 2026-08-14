@@ -45,7 +45,7 @@ export default function AdminAboutPage() {
         { onConflict: "key" }
       );
     }
-    toast.success("Saqlandi");
+    toast.success(t.admin.common.saved);
     setSaving(false);
   }
 

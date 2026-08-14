@@ -8,18 +8,23 @@ import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
 import {
-  Code2, LayoutDashboard, Users, Coins, LogOut, Moon, Sun, ChevronLeft, Menu,
+  Code2, LayoutDashboard, Coins, LogOut, Moon, Sun, ChevronLeft, Menu,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
-const parentLinks = [
-  { href: "/p-dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
-  { href: "/p-children", label: "Farzandlarim", icon: Users },
-  { href: "/p-coins", label: "Coinlar", icon: Coins },
+// "Farzandlarim" alohida sahifa emas — /p-children faqat /p-dashboard ga
+// qaytaruvchi redirect. Menyuda turgani foydalanuvchini chalg'itardi:
+// bosilganda o'sha bosh sahifaning o'zi qayta yuklanardi.
+const parentLinks = (t: Dictionary) => [
+  { href: "/p-dashboard", label: t.cabinet.dashboard, icon: LayoutDashboard },
+  { href: "/p-coins", label: t.parent.coins, icon: Coins },
 ];
 
 export default function ParentLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -60,7 +65,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-sm truncate">{profile.full_name}</p>
-              <p className="text-xs text-neon-blue font-medium">Ota-ona</p>
+              <p className="text-xs text-neon-blue font-medium">{t.parent.role}</p>
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neon-yellow/10 border border-neon-yellow/20">
@@ -71,8 +76,11 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
         </div>
       )}
       <nav className="flex-1 p-3 space-y-1">
-        {parentLinks.map(link => {
-          const active = pathname.startsWith(link.href);
+        {parentLinks(t).map(link => {
+          // Farzand sahifasi bosh sahifadan ochiladi — menyuda o'sha
+          // bo'lim yoritilgan qolsin
+          const active = pathname.startsWith(link.href)
+            || (link.href === "/p-dashboard" && pathname.startsWith("/p-children"));
           return (
             <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
               className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
@@ -90,7 +98,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
         </button>
         <button onClick={handleLogout}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-neon-red/70 hover:bg-neon-red/10 w-full", collapsed && "justify-center px-3")}>
-          <LogOut className="w-5 h-5" />{!collapsed && <span>Chiqish</span>}
+          <LogOut className="w-5 h-5" />{!collapsed && <span>{t.nav.logout}</span>}
         </button>
       </div>
     </div>
@@ -108,7 +116,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
       </aside>
       <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-card/80 backdrop-blur-xl border-b border-border/50 z-30 flex items-center justify-between px-4">
         <button onClick={() => setMobileOpen(true)} className="p-2 hover:bg-accent rounded-xl"><Menu className="w-5 h-5" /></button>
-        <span className="font-display font-bold text-sm">Ota-ona paneli</span>
+        <span className="font-display font-bold text-sm">{t.parent.panel}</span>
         <div className="w-9" />
       </header>
       <AnimatePresence>

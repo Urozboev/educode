@@ -68,7 +68,7 @@ export default function TeacherAssignmentsPage() {
 
   // ===== ASSIGNMENT CRUD =====
   async function handleSave() {
-    if (!form.challenge_id) { toast.error("Topshiriq tanlang"); return; }
+    if (!form.challenge_id) { toast.error(t.teacher.asg.pickTask); return; }
     setSaving(true);
     const { error } = await supabase.from("teacher_assignments").insert({
       teacher_id: userId, challenge_id: form.challenge_id,
@@ -96,7 +96,7 @@ export default function TeacherAssignmentsPage() {
 
   // ===== GROUP CRUD =====
   async function createGroup() {
-    if (!groupForm.name.trim()) { toast.error("Guruh nomini kiriting"); return; }
+    if (!groupForm.name.trim()) { toast.error(t.teacher.asg.enterGroupName); return; }
     const { error } = await supabase.from("teacher_groups").insert({
       teacher_id: userId, name: groupForm.name, description: groupForm.description || null,
     });
@@ -146,7 +146,7 @@ export default function TeacherAssignmentsPage() {
         </motion.div>
         <div className="flex gap-2">
           <button onClick={() => setShowGroupForm(!showGroupForm)} className="btn-ghost py-2.5 px-4 text-sm flex items-center gap-2">
-            <Users className="w-4 h-4" /> Guruh yaratish
+            <Users className="w-4 h-4" /> {t.teacher.asg.createGroup}
           </button>
           <button onClick={() => setShowForm(true)} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
             <Plus className="w-4 h-4" /> Biriktirish
@@ -227,7 +227,7 @@ export default function TeacherAssignmentsPage() {
             <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p className="mb-2">{t.teacher.asg.empty}</p>
             <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-2 px-5">
-              <Plus className="w-4 h-4 inline mr-1" /> Birinchi topshiriqni biriktirish
+              <Plus className="w-4 h-4 inline mr-1" /> {t.teacher.asg.firstAssign}
             </button>
           </div>
         ) : assignments.map(a => (

@@ -16,12 +16,14 @@ import {
   Map,
   Bird,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
-const games = [
+const games = (t: Dictionary) => [
   {
     id: "puzzle",
     title: "Code Puzzle",
-    desc: "Kod qatorlarini to'g'ri tartibga qo'ying. Mantiqiy fikrlash va algoritm tuzilishini mashq qilasiz.",
+    desc: t.explore.gPuzzle,
     icon: Puzzle,
     color: "#6C5CE7",
     difficulty: "Oson",
@@ -29,7 +31,7 @@ const games = [
   {
     id: "bugfix",
     title: "Bug Fix Challenge",
-    desc: "Kodning qayeri xato ekanligini toping va tuzating. Debug qilish ko'nikmalaringizni rivojlantirasiz.",
+    desc: t.explore.gBugFix,
     icon: Bug,
     color: "#FF5252",
     difficulty: "O'rta",
@@ -37,7 +39,7 @@ const games = [
   {
     id: "typing",
     title: "Code Typing Race",
-    desc: "Kod yozish tezligingizni sinab ko'ring. WPM va aniqlikni o'lchovchi real-time musobaqa.",
+    desc: t.explore.gTyping,
     icon: Keyboard,
     color: "#00D2FF",
     difficulty: "Oson",
@@ -45,7 +47,7 @@ const games = [
   {
     id: "battle",
     title: "Code Battle",
-    desc: "30 soniyada ko'proq masalani yeching. Streak bilan ko'p ochko to'plang.",
+    desc: t.explore.gBattle,
     icon: Swords,
     color: "#00E676",
     difficulty: "Qiyin",
@@ -53,7 +55,7 @@ const games = [
   {
     id: "maze",
     title: "Maze Runner",
-    desc: "Robotni buyruqlar ketma-ketligi bilan labirintdan olib chiqing. Sikllar va shartlarni o'rganing.",
+    desc: t.explore.gMaze,
     icon: Map,
     color: "#FFD600",
     difficulty: "O'rta",
@@ -61,7 +63,7 @@ const games = [
   {
     id: "bird",
     title: "Code Bird",
-    desc: "Qushni yulduzlarga yo'naltiring. 8 yo'nalishli harakat va to'siqlarni oldini olish.",
+    desc: t.explore.gBird,
     icon: Bird,
     color: "#FF6B9D",
     difficulty: "Qiyin",
@@ -69,6 +71,7 @@ const games = [
 ];
 
 export default function ExploreGames() {
+  const { t } = useI18n();
   const supabase = createClient();
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -98,14 +101,13 @@ export default function ExploreGames() {
           Interaktiv o'yinlar
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed">
-          Dasturlashni o'yin orqali osonroq va qiziqarliroq o'rganing. 6 xil format —
-          algoritm, debug, tezlik va mantiq uchun.
+          {t.explore.gamesSubtitle}
         </p>
       </motion.div>
 
       {/* Games grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {games.map((game, i) => (
+        {games(t).map((game, i) => (
           <motion.button
             key={game.id}
             onClick={handleClick}
@@ -148,10 +150,10 @@ export default function ExploreGames() {
             <Gamepad2 className="w-6 h-6 text-neon-purple" />
           </div>
           <h3 className="font-display font-bold text-xl mb-2">
-            O'yinlarda ishtirok etish uchun ro'yxatdan o'ting
+            {t.explore.gamesCtaTitle}
           </h3>
           <p className="text-muted-foreground text-base mb-5 max-w-md mx-auto">
-            Har bir o'yinda coin va XP yig'ing. Reytingda yuqori o'ringa chiqing.
+            {t.explore.gamesCtaText}
           </p>
           <Link
             href="/register"
@@ -163,7 +165,7 @@ export default function ExploreGames() {
       ) : (
         <div className="p-8 md:p-10 rounded-3xl border border-border/50 bg-surface/30 text-center">
           <p className="text-muted-foreground text-base mb-4">
-            O'yin vaqtida XP va coin yig'ib, reytingda yuqoriga ko'tariling.
+            {t.explore.gamesRewardNote}
           </p>
           <Link
             href="/games"

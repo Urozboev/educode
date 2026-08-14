@@ -5,13 +5,18 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getAgentAccess } from "@/lib/agent/access";
 import PlanWizard from "@/components/agent/PlanWizard";
 import PlanView from "@/components/agent/PlanView";
+import type { Metadata } from "next";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "O'quv reja | Ustoz — EduCode",
-  description: "AI agent tuzgan shaxsiy o'quv reja: modullar, daraja va progress.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: "O'quv reja | Ustoz — EduCode",
+    description: t.agent.seoPlan,
+    };
+}
 
 export default async function AgentPlanPage({
   searchParams,

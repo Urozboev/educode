@@ -93,7 +93,7 @@ export default function TeacherAnalyticsPage() {
   const cards = [
     { label: t.teacher.students, value: stats.students, icon: Users, color: "#6C5CE7" },
     { label: t.teacher.submissions, value: stats.submissions, icon: Target, color: "#00D2FF" },
-    { label: "Qabul qilingan", value: stats.accepted, icon: TrendingUp, color: "#00E676" },
+    { label: t.teacher.accepted, value: stats.accepted, icon: TrendingUp, color: "#00E676" },
     { label: t.teacher.avgQuiz, value: `${stats.avgScore}%`, icon: Brain, color: "#FFD600" },
   ];
 
@@ -145,7 +145,7 @@ export default function TeacherAnalyticsPage() {
           <h2 className="font-display font-semibold text-lg">{t.teacher.ana.aiUsage}</h2>
         </div>
         <p className="text-xs text-muted-foreground mb-5">
-          Talabalarning AI mentordan foydalanishi, mustaqil tafakkur va akademik halollik ko'rsatkichlari.
+          {t.teacher.ana.subtitle}
         </p>
 
         {/* Agregat kartalar */}
@@ -211,7 +211,7 @@ export default function TeacherAnalyticsPage() {
               </tbody>
             </table>
             <p className="text-[11px] text-muted-foreground mt-3">
-              💡 AI bog'liqlik &le;30% — sog'lom, 61%+ — e'tibor talab qiladi. Paste ogohlantirishlari akademik halollik uchun.
+              {t.teacher.ana.legend}
             </p>
           </div>
         ) : (

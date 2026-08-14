@@ -81,8 +81,8 @@ export default function AdminGlossaryPage() {
   }
 
   async function save(publish?: boolean) {
-    if (!form.term.trim()) { toast.error("Terminni kiriting"); return; }
-    if (!form.definition.trim()) { toast.error("Ta'rifni kiriting"); return; }
+    if (!form.term.trim()) { toast.error(t.admin.gls.enterTerm); return; }
+    if (!form.definition.trim()) { toast.error(t.admin.gls.enterDefinition); return; }
     setSaving(true);
 
     const payload = {
@@ -106,7 +106,7 @@ export default function AdminGlossaryPage() {
 
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(editId ? "Saqlandi" : "Qo'shildi");
+    toast.success(editId ? t.admin.common.saved : t.admin.common.added);
     // Ketma-ket termin kiritish qulay bo'lishi uchun forma ochiq qoladi
     if (editId) { setShowForm(false); } else { setForm({ ...empty, category: form.category }); }
     load();
@@ -170,7 +170,7 @@ export default function AdminGlossaryPage() {
                 onChange={e => setForm({ ...form, definition: e.target.value })}
                 className="input-field resize-none"
                 rows={3}
-                placeholder="Bir jumlada, o'quvchi tushunadigan tilda. Flash-card orqasida shu ko'rinadi."
+                placeholder={t.admin.gls.defPh}
                 maxLength={500}
               />
               <p className="text-xs text-muted-foreground mt-1">{form.definition.length}/500</p>
@@ -204,7 +204,7 @@ export default function AdminGlossaryPage() {
               <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.admin.common.close}</button>
               <button onClick={() => save(true)} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {editId ? "Saqlash" : "Qo'shish va davom etish"}
+                {editId ? t.admin.common.save : t.admin.gls.saveAndContinue}
               </button>
             </div>
           </motion.div>
@@ -229,7 +229,7 @@ export default function AdminGlossaryPage() {
         filtered.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <BookMarked className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="mb-4">{terms.length === 0 ? "Hali termin qo'shilmagan" : "Natija topilmadi"}</p>
+            <p className="mb-4">{terms.length === 0 ? t.admin.gls.empty : t.admin.common.noResults}</p>
             {terms.length === 0 && (
               <button onClick={openNew} className="btn-primary text-sm py-2 px-5"><Plus className="w-4 h-4 inline mr-1" /> {t.admin.gls.first}</button>
             )}

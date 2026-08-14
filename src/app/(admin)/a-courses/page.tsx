@@ -23,6 +23,7 @@ import {
   ImagePlus,
   Upload,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 type CourseFormType = {
   title: string;
@@ -51,6 +52,7 @@ const emptyForm: CourseFormType = {
 };
 
 export default function AdminCoursesPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState("");
@@ -64,11 +66,11 @@ export default function AdminCoursesPage() {
   /** Rasm faylini Supabase Storage'ga yuklab, public URL ni formaga yozadi */
   async function handleThumbnailUpload(file: File) {
     if (!file.type.startsWith("image/")) {
-      toast.error("Faqat rasm fayli yuklang (JPG, PNG, WebP)");
+      toast.error(t.admin.crs.onlyImageFile);
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("Rasm 2MB dan kichik bo'lishi kerak");
+      toast.error(t.admin.crs.imageTooBig);
       return;
     }
     setUploading(true);
@@ -130,7 +132,7 @@ export default function AdminCoursesPage() {
 
   async function handleSave() {
     if (!form.title.trim()) {
-      toast.error("Kurs nomini kiriting");
+      toast.error(t.admin.crs.enterName);
       return;
     }
     setSaving(true);
@@ -160,11 +162,11 @@ export default function AdminCoursesPage() {
         .update(payload)
         .eq("id", editId);
       if (error) {
-        toast.error("Xatolik: " + error.message);
+        toast.error(t.admin.common.error + ": " + error.message);
         setSaving(false);
         return;
       }
-      toast.success("Kurs yangilandi");
+      toast.success(t.admin.crs.updated);
     } else {
       const { error } = await supabase
         .from("courses")
@@ -174,11 +176,11 @@ export default function AdminCoursesPage() {
           order_index: courses.length,
         });
       if (error) {
-        toast.error("Xatolik: " + error.message);
+        toast.error(t.admin.common.error + ": " + error.message);
         setSaving(false);
         return;
       }
-      toast.success("Yangi kurs yaratildi");
+      toast.success(t.admin.crs.created);
     }
     setShowForm(false);
     setSaving(false);
@@ -192,7 +194,7 @@ export default function AdminCoursesPage() {
       .from("courses")
       .update({ is_published: !c.is_published })
       .eq("id", c.id);
-    toast.success(c.is_published ? "Kurs yashirildi" : "Kurs nashr qilindi");
+    toast.success(c.is_published ? t.admin.crs.hiddenToast : t.admin.crs.publishedToast);
     loadCourses();
     fetch("/api/revalidate", { method: "POST" }).catch(() => {});
   }
@@ -200,7 +202,7 @@ export default function AdminCoursesPage() {
   async function handleDelete(c: Course) {
     if (!confirm(`"${c.title}" kursini o'chirishni tasdiqlaysizmi?`)) return;
     await supabase.from("courses").delete().eq("id", c.id);
-    toast.success("Kurs o'chirildi");
+    toast.success(t.admin.crs.deleted);
     loadCourses();
     fetch("/api/revalidate", { method: "POST" }).catch(() => {});
   }
@@ -217,7 +219,7 @@ export default function AdminCoursesPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="font-display font-bold text-3xl">
-            Kurslar boshqaruvi
+            {t.admin.crs.pageTitle}
           </h1>
           <p className="text-muted-foreground text-sm">
             {courses.length} ta kurs
@@ -227,7 +229,7 @@ export default function AdminCoursesPage() {
           onClick={openNew}
           className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm"
         >
-          <Plus className="w-4 h-4" /> Yangi kurs
+          <Plus className="w-4 h-4" /> {t.admin.common.newCourse}
         </button>
       </div>
 
@@ -237,7 +239,7 @@ export default function AdminCoursesPage() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Kurs qidirish..."
+          placeholder={t.admin.crs.searchPh}
           className="input-field pl-11"
         />
       </div>
@@ -251,7 +253,7 @@ export default function AdminCoursesPage() {
         >
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display font-semibold text-lg">
-              {editId ? "Kursni tahrirlash" : "Yangi kurs"}
+              {editId ? t.admin.crs.editTitle : t.admin.common.newCourse}
             </h2>
             <button
               onClick={() => setShowForm(false)}
@@ -263,7 +265,7 @@ export default function AdminCoursesPage() {
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Kurs nomi *
+                {t.admin.crs.nameLabel} *
               </label>
               <input
                 value={form.title}
@@ -281,25 +283,25 @@ export default function AdminCoursesPage() {
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="input-field"
               >
-                <option value="programming">Dasturlash</option>
+                <option value="programming">{t.admin.crs.catProgramming}</option>
                 <option value="python">Python</option>
-                <option value="frontend">Frontend</option>
+                <option value="frontend">{t.admin.crs.catFrontend}</option>
                 <option value="computer_literacy">
                   Kompyuter savodxonligi
                 </option>
-                <option value="prompt_engineering">Prompt Engineering</option>
-                <option value="algorithms">Algoritmlar</option>
+                <option value="prompt_engineering">{t.admin.crs.catPrompt}</option>
+                <option value="algorithms">{t.admin.crs.catAlgorithms}</option>
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium mb-1 block">Tavsif</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.description}</label>
               <textarea
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
                 className="input-field min-h-[80px]"
-                placeholder="Kurs haqida qisqacha..."
+                placeholder={t.admin.crs.descPh}
               />
             </div>
             <div>
@@ -313,9 +315,9 @@ export default function AdminCoursesPage() {
                 }
                 className="input-field"
               >
-                <option value="beginner">Boshlang'ich</option>
-                <option value="intermediate">O'rta</option>
-                <option value="advanced">Yuqori</option>
+                <option value="beginner">{t.difficulty.beginner}</option>
+                <option value="intermediate">{t.difficulty.intermediate}</option>
+                <option value="advanced">{t.difficulty.advanced}</option>
               </select>
             </div>
             <div>
@@ -332,7 +334,7 @@ export default function AdminCoursesPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Bepulmi?</label>
+              <label className="text-sm font-medium mb-1 block">{t.admin.common.isFree}</label>
               <div className="flex items-center gap-3 mt-2">
                 <button
                   onClick={() => setForm({ ...form, is_free: true })}
@@ -361,7 +363,7 @@ export default function AdminCoursesPage() {
             {!form.is_free && (
               <div>
                 <label className="text-sm font-medium mb-1 block">
-                  Narxi (coin)
+                  {t.admin.crs.priceCoins}
                 </label>
                 <input
                   type="number"
@@ -375,7 +377,7 @@ export default function AdminCoursesPage() {
             )}
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Coin mukofot (tugatganda)
+                {t.admin.crs.rewardOnFinish}
               </label>
               <input
                 type="number"
@@ -388,7 +390,7 @@ export default function AdminCoursesPage() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Teglar (vergul bilan)
+                {t.admin.common.tags}
               </label>
               <input
                 value={form.tags}
@@ -401,7 +403,7 @@ export default function AdminCoursesPage() {
             {/* Kurs rasmi (cover) */}
             <div className="md:col-span-2">
               <label className="text-sm font-medium mb-1 block">
-                Kurs rasmi (cover) — kartada ko'rinadi, tavsiya: 800×500
+                {t.admin.crs.coverHint}
               </label>
               <div className="flex flex-col sm:flex-row gap-4 items-start">
                 {/* Preview */}
@@ -409,7 +411,7 @@ export default function AdminCoursesPage() {
                   {form.thumbnail_url ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={form.thumbnail_url} alt="Kurs rasmi" className="w-full h-full object-cover" />
+                      <img src={form.thumbnail_url} alt={t.admin.crs.coverLabel} className="w-full h-full object-cover" />
                       <button
                         onClick={() => setForm({ ...form, thumbnail_url: "" })}
                         className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white hover:bg-neon-red/80 transition-colors"
@@ -421,7 +423,7 @@ export default function AdminCoursesPage() {
                   ) : (
                     <div className="text-center text-muted-foreground">
                       <ImagePlus className="w-8 h-8 mx-auto mb-1 opacity-40" />
-                      <p className="text-[11px]">Rasm yo'q</p>
+                      <p className="text-[11px]">{t.admin.common.noImage}</p>
                     </div>
                   )}
                 </div>
@@ -435,7 +437,7 @@ export default function AdminCoursesPage() {
                       : "border-border hover:border-neon-purple/40 hover:bg-neon-purple/5 text-muted-foreground hover:text-foreground",
                   )}>
                     {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                    {uploading ? "Yuklanmoqda..." : "Kompyuterdan rasm tanlash (max 2MB)"}
+                    {uploading ? "Yuklanmoqda..." : t.admin.crs.pickFromPc}
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,image/gif"
@@ -452,7 +454,7 @@ export default function AdminCoursesPage() {
                     value={form.thumbnail_url}
                     onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })}
                     className="input-field text-xs font-mono"
-                    placeholder="yoki tashqi rasm URL kiriting: https://..."
+                    placeholder={t.admin.crs.orExternalUrl}
                   />
                 </div>
               </div>
@@ -475,7 +477,7 @@ export default function AdminCoursesPage() {
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              {editId ? "Saqlash" : "Yaratish"}
+              {editId ? t.admin.common.save : "Yaratish"}
             </button>
           </div>
         </motion.div>
@@ -487,14 +489,14 @@ export default function AdminCoursesPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border/50 text-xs text-muted-foreground font-semibold">
-                <th className="text-left px-5 py-3">Kurs</th>
-                <th className="text-left px-5 py-3">Kategoriya</th>
-                <th className="text-center px-5 py-3">Daraja</th>
-                <th className="text-center px-5 py-3">Narx</th>
-                <th className="text-center px-5 py-3">Mavzular</th>
-                <th className="text-center px-5 py-3">Talabalar</th>
-                <th className="text-center px-5 py-3">Holat</th>
-                <th className="text-right px-5 py-3">Amallar</th>
+                <th className="text-left px-5 py-3">{t.admin.common.course}</th>
+                <th className="text-left px-5 py-3">{t.admin.common.category}</th>
+                <th className="text-center px-5 py-3">{t.admin.common.level}</th>
+                <th className="text-center px-5 py-3">{t.admin.common.price}</th>
+                <th className="text-center px-5 py-3">{t.admin.common.topics}</th>
+                <th className="text-center px-5 py-3">{t.admin.common.students}</th>
+                <th className="text-center px-5 py-3">{t.admin.common.status}</th>
+                <th className="text-right px-5 py-3">{t.admin.common.actions}</th>
               </tr>
             </thead>
             <tbody>
@@ -529,7 +531,7 @@ export default function AdminCoursesPage() {
                       </td>
                       <td className="px-5 py-3 text-center">
                         {c.is_free ? (
-                          <span className="text-xs text-neon-green">Bepul</span>
+                          <span className="text-xs text-neon-green">{t.courses.free}</span>
                         ) : (
                           <span className="coin-badge text-[10px]">
                             <Coins className="w-3 h-3" />
@@ -560,14 +562,14 @@ export default function AdminCoursesPage() {
                           <Link
                             href={`/a-courses/${c.id}/topics`}
                             className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"
-                            title="Mavzular"
+                            title={t.admin.common.topics}
                           >
                             <BookOpen className="w-4 h-4" />
                           </Link>
                           <button
                             onClick={() => openEdit(c)}
                             className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"
-                            title="Tahrirlash"
+                            title={t.common.edit}
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
@@ -575,7 +577,7 @@ export default function AdminCoursesPage() {
                             onClick={() => togglePublish(c)}
                             className="p-1.5 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground"
                             title={
-                              c.is_published ? "Yashirish" : "Nashr qilish"
+                              c.is_published ? "Yashirish" : t.admin.crs.publish
                             }
                           >
                             {c.is_published ? (
@@ -587,7 +589,7 @@ export default function AdminCoursesPage() {
                           <button
                             onClick={() => handleDelete(c)}
                             className="p-1.5 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"
-                            title="O'chirish"
+                            title={t.common.delete}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

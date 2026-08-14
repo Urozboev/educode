@@ -94,9 +94,9 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
   }
 
   async function saveItem() {
-    if (!form.title.trim()) { toast.error("Nom kiriting"); return; }
-    if (form.price_coins < 1) { toast.error("Narx 1 coindan kam bo'lmasin"); return; }
-    if (form.stock < 0) { toast.error("Zaxira manfiy bo'lmaydi"); return; }
+    if (!form.title.trim()) { toast.error(t.store.enterName); return; }
+    if (form.price_coins < 1) { toast.error(t.store.priceMin); return; }
+    if (form.stock < 0) { toast.error(t.store.stockNonNegative); return; }
 
     setSaving(true);
     const payload: any = {
@@ -117,8 +117,8 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
       : await supabase.from("store_items").insert({ ...payload, order_index: items.length, is_active: true });
 
     setSaving(false);
-    if (error) { toast.error("Saqlanmadi: " + error.message); return; }
-    toast.success(editId ? "Yangilandi" : "Sovg'a qo'shildi");
+    if (error) { toast.error(t.admin.common.saveFailed + ": " + error.message); return; }
+    toast.success(editId ? t.store.updatedToast : t.store.giftAdded);
     setShowForm(false);
     resetForm();
     load();
@@ -135,7 +135,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
   }
 
   async function deleteItem(id: string) {
-    if (!confirm("Sovg'ani o'chirasizmi? Berilgan buyurtmalar saqlanib qoladi.")) return;
+    if (!confirm(t.store.confirmDelete)) return;
     const { error } = await supabase.from("store_items").delete().eq("id", id);
     if (error) { toast.error(t.store.manage.deleteFailed + ": " + error.message); return; }
     toast.success(t.store.manage.deleted);
@@ -170,12 +170,12 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="font-display font-bold text-3xl">
-            {scope === "teacher" ? "Mening sovg'alarim" : "Do'kon boshqaruvi"}
+            {scope === "teacher" ? t.store.myGifts : t.store.manageTitle}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             {scope === "teacher"
-              ? "Qo'shgan sovg'alaringizni faqat sizning o'quvchilaringiz coinga almashtira oladi"
-              : "Platforma sovg'alari va barcha buyurtmalar"}
+              ? t.store.teacherSubtitle
+              : t.store.adminSubtitle}
           </p>
         </div>
         {tab === "items" && (
@@ -183,7 +183,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
             onClick={() => { resetForm(); setShowForm(true); }}
             className="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
           >
-            <Plus className="w-4 h-4" /> Sovg'a qo'shish
+            <Plus className="w-4 h-4" /> {t.store.addGift}
           </button>
         )}
       </div>
@@ -351,8 +351,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
                 ) : (
                   <p className="text-xs text-neon-blue bg-neon-blue/10 border border-neon-blue/20 rounded-xl p-3 flex items-start gap-2">
                     <Users className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                    Bu sovg'ani faqat guruhlaringizga qo'shilgan o'quvchilar ko'radi va
-                    faqat ular coinga almashtira oladi.
+                    {t.store.myStudentsOnly}
                   </p>
                 )}
               </div>
@@ -516,7 +515,7 @@ function OrderList({ orders, buyers, onChanged }: {
                       </div>
                     ) : (
                       <p className="text-xs text-muted-foreground pt-2 border-t border-border/60">
-                        Bu buyurtma yakunlangan — holatini o'zgartirib bo'lmaydi.
+                        {t.store.orderClosed}
                       </p>
                     )}
                   </div>

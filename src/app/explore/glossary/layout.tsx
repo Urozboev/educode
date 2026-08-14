@@ -1,39 +1,41 @@
 import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl } from "@/lib/seo";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const revalidate = 3600;
 
-const PAGE_TITLE = "IT terminlar lug'ati — o'zbek tilida ta'riflar va flash-cardlar";
-const PAGE_DESC =
-  "Dasturlash, frontend, algoritmlar va kompyuter savodxonligi terminlari o'zbek tilida. Har bir termin uchun sodda ta'rif, misol va kartochkalar rejimi.";
 
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-  description: PAGE_DESC,
-  alternates: { canonical: absUrl("/explore/glossary") },
-  openGraph: {
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    url: absUrl("/explore/glossary"),
-    type: "website",
-    images: [ogImageUrl({ title: "Terminlar lug'ati", subtitle: "Flash-cardlar bilan", type: "topic" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    images: [ogImageUrl({ title: "Terminlar lug'ati", subtitle: "Flash-cardlar bilan", type: "topic" })],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.seo.glossaryTitle,
+    description: t.seo.glossaryDesc,
+    alternates: { canonical: absUrl("/explore/glossary") },
+    openGraph: {
+      title: t.seo.glossaryTitle,
+      description: t.seo.glossaryDesc,
+      url: absUrl("/explore/glossary"),
+      type: "website",
+      images: [ogImageUrl({ title: t.seo.glossaryOg, subtitle: t.seo.glossaryOgSub, type: "topic" })],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.seo.glossaryTitle,
+      description: t.seo.glossaryDesc,
+      images: [ogImageUrl({ title: t.seo.glossaryOg, subtitle: t.seo.glossaryOgSub, type: "topic" })],
+    },
+  };
+}
 
-export default function GlossaryLayout({ children }: { children: React.ReactNode }) {
+export default async function GlossaryLayout({ children }: { children: React.ReactNode }) {
+  const t = await getServerDictionary();
   return (
     <>
       <BreadcrumbJsonLd
         items={[
-          { name: "Bosh sahifa", url: "/" },
-          { name: "Terminlar", url: "/explore/glossary" },
+          { name: t.seo.homeCrumb, url: "/" },
+          { name: t.seo.glossaryCrumb, url: "/explore/glossary" },
         ]}
       />
       {children}

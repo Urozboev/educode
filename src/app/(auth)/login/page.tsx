@@ -100,7 +100,7 @@ function LoginForm() {
     if (error) {
       setErrorMsg(
         error.message === "Invalid login credentials"
-          ? "Email yoki parol noto'g'ri"
+          ? t.auth.wrongCredentials
           : error.message === "Email not confirmed"
           ? "Email tasdiqlanmagan. Pochtangizni tekshiring."
           : "Kirish xatoligi."
@@ -177,7 +177,7 @@ function LoginForm() {
               />
             </svg>
           )}
-          {googleLoading ? "Kutilmoqda..." : "Google bilan kirish"}
+          {googleLoading ? "Kutilmoqda..." : t.auth.googleLogin}
         </button>
 
         <div className="relative mb-6">
@@ -185,7 +185,7 @@ function LoginForm() {
             <div className="w-full border-t border-border/60" />
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-card px-4 text-sm text-muted-foreground">yoki email bilan</span>
+            <span className="bg-card px-4 text-sm text-muted-foreground">{t.auth.orWithEmail}</span>
           </div>
         </div>
 
@@ -198,7 +198,7 @@ function LoginForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="sizning@email.uz"
+                placeholder={t.auth.emailPh}
                 className="w-full bg-surface/60 border border-border rounded-xl pl-12 pr-4 py-3.5 text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
                 required
               />

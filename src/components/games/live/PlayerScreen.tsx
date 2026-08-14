@@ -11,6 +11,7 @@ import {
   type LiveSession, type LivePlayer,
 } from "@/lib/liveGame";
 import { Check, X, Clock, Trophy, Loader2, Hourglass } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * O'quvchi ekrani — telefon uchun.
@@ -20,6 +21,7 @@ import { Check, X, Clock, Trophy, Loader2, Hourglass } from "lucide-react";
  * tugmalar — Kahoot shu tamoyilda ishlaydi va sinfni jipslashtiradi.
  */
 export function PlayerScreen({ sessionId }: { sessionId: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [session, setSession] = useState<LiveSession | null>(null);
   const [game, setGame] = useState<LessonGame | null>(null);
@@ -131,15 +133,15 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
     return (
       <Center>
         <p className="text-muted-foreground mb-6 text-center">
-          Bu sessiyaga qo&apos;shilmagansiz
+          {t.lg.notInSession}
         </p>
-        <Link href="/live" className="btn-primary py-2.5 px-6 text-sm">PIN kiritish</Link>
+        <Link href="/live" className="btn-primary py-2.5 px-6 text-sm">{t.lg.enterPin}</Link>
       </Center>
     );
   }
 
   if (!session) {
-    return <Center><p className="text-muted-foreground">Sessiya topilmadi</p></Center>;
+    return <Center><p className="text-muted-foreground">{t.lg.sessionNotFound}</p></Center>;
   }
 
   /* ===== LOBBI ===== */
@@ -153,12 +155,12 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
         >
           <Hourglass className="w-9 h-9 text-neon-purple" />
         </motion.div>
-        <h1 className="font-display font-extrabold text-2xl mb-2">Siz o&apos;yindasiz</h1>
+        <h1 className="font-display font-extrabold text-2xl mb-2">{t.lg.youAreIn}</h1>
         <p className="text-muted-foreground text-center mb-1">
           <b className="text-foreground">{me?.nickname}</b>
         </p>
         <p className="text-muted-foreground text-center">
-          O&apos;qituvchi boshlashini kuting
+          {t.lg.waitTeacher}
         </p>
       </Center>
     );
@@ -173,7 +175,7 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
         <h1 className="font-display font-extrabold text-3xl mb-1">O&apos;yin tugadi</h1>
         {myRank > 0 && (
           <p className="text-lg text-muted-foreground mb-6">
-            Sizning o&apos;rningiz: <b className="numeric text-foreground">{myRank}</b>
+            {t.lg.yourPlace} <b className="numeric text-foreground">{myRank}</b>
           </p>
         )}
 
@@ -238,7 +240,7 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
           Jami: <span className="numeric text-foreground">{me?.score ?? 0}</span> ball
         </p>
         <p className="text-sm text-muted-foreground mt-6 text-center">
-          Keyingi savolni kuting
+          {t.lg.waitNext}
         </p>
       </Center>
     );
@@ -266,12 +268,12 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
         <Center>
           <Hourglass className="w-10 h-10 text-muted-foreground/40 mb-4" />
           <p className="text-muted-foreground text-center">Vaqt tugadi</p>
-          <p className="text-sm text-muted-foreground mt-1">Keyingi savolni kuting</p>
+          <p className="text-sm text-muted-foreground mt-1">{t.lg.waitNext}</p>
         </Center>
       ) : (
         <>
           <p className="text-center text-muted-foreground mb-4">
-            Ekranga qarang va javobni tanlang
+            {t.lg.lookAtScreen}
           </p>
           <div className="grid grid-cols-2 gap-3 flex-1">
             {(q?.options ?? []).map((_, i) => {

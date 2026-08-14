@@ -1,38 +1,41 @@
 import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl } from "@/lib/seo";
+import { getServerDictionary } from "@/lib/i18n/server";
 
 export const revalidate = 3600;
 
-const PAGE_TITLE = "Talabalar portfoliosi — ishlar, sertifikatlar va natijalar";
-const PAGE_DESC = "EduCode platformasida o'qiyotgan talabalarning loyihalari, sertifikatlari va o'quv natijalari. Har bir portfolio ochiq havola orqali ko'riladi.";
 
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-  description: PAGE_DESC,
-  alternates: { canonical: absUrl("/explore/portfolios") },
-  openGraph: {
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    url: absUrl("/explore/portfolios"),
-    type: "website",
-    images: [ogImageUrl({ title: "Talabalar portfoliosi", subtitle: "Ishlar va natijalar", type: "default" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: PAGE_TITLE,
-    description: PAGE_DESC,
-    images: [ogImageUrl({ title: "Talabalar portfoliosi", subtitle: "Ishlar va natijalar", type: "default" })],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerDictionary();
+  return {
+    title: t.seo.portfoliosTitle,
+    description: t.seo.portfoliosDesc,
+    alternates: { canonical: absUrl("/explore/portfolios") },
+    openGraph: {
+      title: t.seo.portfoliosTitle,
+      description: t.seo.portfoliosDesc,
+      url: absUrl("/explore/portfolios"),
+      type: "website",
+      images: [ogImageUrl({ title: t.seo.portfoliosOg, subtitle: t.seo.portfoliosOgSub, type: "default" })],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.seo.portfoliosTitle,
+      description: t.seo.portfoliosDesc,
+      images: [ogImageUrl({ title: t.seo.portfoliosOg, subtitle: t.seo.portfoliosOgSub, type: "default" })],
+    },
+  };
+}
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const t = await getServerDictionary();
   return (
     <>
       <BreadcrumbJsonLd
         items={[
-          { name: "Bosh sahifa", url: "/" },
-          { name: "Portfoliolar", url: "/explore/portfolios" },
+          { name: t.seo.homeCrumb, url: "/" },
+          { name: t.seo.portfoliosCrumb, url: "/explore/portfolios" },
         ]}
       />
       {children}

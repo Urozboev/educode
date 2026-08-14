@@ -23,6 +23,7 @@ import {
 type Finished = { score: number; maxScore: number; correct: number; total: number };
 
 export function GamePlayer({ slug }: { slug: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [game, setGame] = useState<LessonGame | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,7 +77,7 @@ export function GamePlayer({ slug }: { slug: string }) {
     setSaving(false);
     if (error) {
       // Xatoning o'zini ko'rsatamiz — "xatolik yuz berdi" hech narsa tushuntirmaydi
-      toast.error(error.message || "Natijani saqlashda xatolik");
+      toast.error(error.message || t.lg.saveError);
       setOutcome("error");
       return;
     }
@@ -106,7 +107,7 @@ export function GamePlayer({ slug }: { slug: string }) {
     return (
       <div className="max-w-md mx-auto text-center py-20">
         <Gamepad2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-        <p className="text-muted-foreground mb-6">O&apos;yin topilmadi yoki hali nashr qilinmagan</p>
+        <p className="text-muted-foreground mb-6">{t.lg.gameNotFound}</p>
         <Link href="/explore/lesson-games" className="btn-primary py-2.5 px-5 text-sm">
           O&apos;yinlar ro&apos;yxati
         </Link>
@@ -130,7 +131,7 @@ export function GamePlayer({ slug }: { slug: string }) {
         </div>
 
         <h1 className="font-display font-extrabold text-3xl tracking-tight mb-2">
-          {pct >= 80 ? "Ajoyib natija!" : pct >= 50 ? "Yaxshi!" : "Yana urinib ko'ring"}
+          {pct >= 80 ? t.lg.greatResult : pct >= 50 ? "Yaxshi!" : "Yana urinib ko'ring"}
         </h1>
         <p className="text-muted-foreground mb-8">{game.title}</p>
 
@@ -142,7 +143,7 @@ export function GamePlayer({ slug }: { slug: string }) {
 
         {saving && (
           <p className="text-sm text-muted-foreground mb-6 inline-flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin" /> Natija saqlanmoqda
+            <Loader2 className="w-4 h-4 animate-spin" /> {t.lg.savingResult}
           </p>
         )}
 
@@ -169,11 +170,11 @@ export function GamePlayer({ slug }: { slug: string }) {
         {!reward && !saving && outcome && outcome !== "ok" && (
           <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto leading-relaxed">
             {{
-              already_played: "Natija saqlandi. Coin va XP faqat birinchi o'ynaganda beriladi.",
-              low_score: "Natija saqlandi. Coin olish uchun savollarning yarmidan ko'pini to'g'ri yechish kerak.",
-              draft: "Bu o'yin hali nashr qilinmagan — natija saqlandi, lekin mukofot berilmaydi.",
-              guest: "Natijani saqlash uchun tizimga kiring.",
-              error: "Natijani saqlab bo'lmadi.",
+              already_played: t.lg.savedFirstOnly,
+              low_score: t.lg.savedNeedHalf,
+              draft: t.lg.savedUnpublished,
+              guest: t.lg.loginToSave,
+              error: t.lg.saveFailed,
             }[outcome] ?? ""}
           </p>
         )}

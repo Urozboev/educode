@@ -226,7 +226,7 @@ export default function ExploreCourses() {
                     </p>
 
                     <div className="flex flex-wrap gap-1.5 mb-4 min-h-[26px]">
-                      {(course.tags?.length ? course.tags : (fallbackTags[course.category] || ["KURS"])).slice(0, 3).map(tag => (
+                      {(course.tags?.length ? course.tags : (fallbackTags[course.category] || [t.explore.tagFallback])).slice(0, 3).map(tag => (
                         <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
                           {tag}
                         </span>
@@ -258,7 +258,7 @@ export default function ExploreCourses() {
                       {/* Rang tokendan olinadi — kategoriya accent'i (masalan React'ning
                           och siyanı) matn sifatida oq fonda o'qilmaydi */}
                       <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple transition-all group-hover:gap-2.5">
-                        <Play className="w-3.5 h-3.5" /> Ko'rish <ChevronRight className="w-4 h-4" />
+                        <Play className="w-3.5 h-3.5" /> {t.explore.view} <ChevronRight className="w-4 h-4" />
                       </span>
                     </div>
                   </div>
@@ -276,10 +276,10 @@ export default function ExploreCourses() {
             <Lock className="w-6 h-6 text-neon-purple" />
           </div>
           <h3 className="font-display font-bold text-xl mb-2">
-            Kurslarda o'qish uchun ro'yxatdan o'ting
+            {t.explore.coursesCtaTitle}
           </h3>
           <p className="text-muted-foreground text-base mb-5 max-w-md mx-auto">
-            100 bepul coin, AI yordamchi va barcha kurslarga kirish huquqi.
+            {t.explore.coursesCtaText}
           </p>
           <Link
             href="/register"

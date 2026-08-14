@@ -34,15 +34,22 @@ export default function AdminPaymentsPage() {
     setLoading(true);
     let q = supabase
       .from("coin_purchase_requests")
-      .select("*, parent:profiles!coin_purchase_requests_parent_id_fkey(full_name)")
+      .select("*")
       .order("created_at", { ascending: false });
     if (filter === "pending") q = q.eq("status", "pending");
 
     const { data } = await q.limit(100);
+
+    // Ota-ona ismlari (FK auth.users ga qaraydi — embed ishlamaydi)
+    const parentIds = [...new Set((data || []).map((r: any) => r.parent_id))];
+    const { data: parents } = parentIds.length
+      ? await supabase.from("profiles").select("id, full_name").in("id", parentIds)
+      : { data: [] as { id: string; full_name: string }[] };
+
     setRequests(
       (data || []).map((r: any) => ({
         id: r.id, parent_id: r.parent_id,
-        parent_name: r.parent?.full_name || "Ota-ona",
+        parent_name: parents?.find(p => p.id === r.parent_id)?.full_name || "Ota-ona",
         amount_coins: r.amount_coins, amount_uzs: r.amount_uzs,
         payment_note: r.payment_note, status: r.status,
         created_at: r.created_at, review_note: r.review_note,
@@ -97,7 +104,7 @@ export default function AdminPaymentsPage() {
       ) : requests.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <Coins className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-          <p className="text-muted-foreground">{filter === "pending" ? "Kutilayotgan so'rov yo'q" : "So'rovlar yo'q"}</p>
+          <p className="text-muted-foreground">{filter === "pending" ? t.admin.pay.empty : t.admin.pay.emptyAll}</p>
         </div>
       ) : (
         <div className="space-y-3">

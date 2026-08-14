@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 import { LABS } from "@/lib/labs";
 import { LevelBadge } from "@/components/ui/LevelBadge";
 import { FlaskConical, Clock, ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 export default function LabsPage() {
+  const { t } = useI18n();
   return (
     <div className="space-y-8 md:space-y-10">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
@@ -15,8 +17,7 @@ export default function LabsPage() {
           Virtual laboratoriyalar
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Nazariyani o&apos;qib emas, o&apos;zgartirib o&apos;rganing: qiymatlarni
-          o&apos;zingiz kiriting va natijani qadamma-qadam kuzating.
+          {t.explore.labsSubtitle}
         </p>
       </motion.div>
 

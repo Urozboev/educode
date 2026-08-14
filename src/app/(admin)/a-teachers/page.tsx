@@ -80,7 +80,7 @@ export default function AdminTeachersPage() {
   }
 
   async function revoke(a: TeacherApplication) {
-    const reason = prompt("Huquqni bekor qilish sababi:", "");
+    const reason = prompt(t.admin.tch.revokeReason, "");
     if (reason === null) return;
     setBusyId(a.id);
     const { error } = await supabase.rpc("revoke_teacher_role", {
@@ -89,7 +89,7 @@ export default function AdminTeachersPage() {
     });
     setBusyId(null);
     if (error) { toast.error(error.message); return; }
-    toast.success("O'qituvchi huquqi bekor qilindi");
+    toast.success(t.admin.tch.revoked);
     load();
   }
 
@@ -98,12 +98,12 @@ export default function AdminTeachersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl flex items-center gap-2">
-            <Presentation className="w-6 h-6 text-neon-purple" /> O&apos;qituvchi arizalari
+            <Presentation className="w-6 h-6 text-neon-purple" /> {t.admin.teacherApplications}
           </h1>
           <p className="text-sm text-muted-foreground">
             {pendingCount > 0
               ? `${pendingCount} ta ariza ko'rib chiqilishi kutilmoqda`
-              : "Ko'rib chiqilmagan ariza yo'q"}
+              : t.admin.tch.emptyPending}
           </p>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function AdminTeachersPage() {
           <div className="text-center py-16 text-muted-foreground">
             <Presentation className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p>
-              {tab === "pending" ? "Yangi ariza yo'q" : "Bu bo'limda ariza yo'q"}
+              {tab === "pending" ? t.admin.tch.emptyNew : t.admin.tch.emptyTab}
             </p>
           </div>
         ) : filtered.map(a => {

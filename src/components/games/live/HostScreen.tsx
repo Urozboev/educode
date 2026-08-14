@@ -12,15 +12,17 @@ import {
   Users, Play, SkipForward, Square, Loader2, Trophy, Clock,
   Copy, Check, ArrowLeft, Monitor,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * O'qituvchi ekrani — proyektorga chiqariladi.
  *
- * Savol matni va variantlar SHU YERDA turadi; o'quvchi telefonida faqat
+ * {t.lg.question} matni va variantlar SHU YERDA turadi; o'quvchi telefonida faqat
  * rangli tugmalar bo'ladi. Shuning uchun bu ekranda shrift katta va
  * kontrast baland — orqa qatordan ham o'qilishi kerak.
  */
 export function HostScreen({ sessionId }: { sessionId: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [session, setSession] = useState<LiveSession | null>(null);
   const [game, setGame] = useState<LessonGame | null>(null);
@@ -153,7 +155,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
     return (
       <div className="text-center py-20">
         <Monitor className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-        <p className="text-muted-foreground mb-6">Sessiya topilmadi</p>
+        <p className="text-muted-foreground mb-6">{t.lg.sessionNotFound}</p>
         <Link href="/t-lesson-games" className="btn-primary py-2.5 px-5 text-sm">O&apos;yinlar</Link>
       </div>
     );
@@ -174,7 +176,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
           </h1>
 
           <div className="inline-block p-8 rounded-3xl bg-neon-purple/[0.07] border-2 border-neon-purple/25">
-            <p className="eyebrow mb-3">Kirish uchun PIN</p>
+            <p className="eyebrow mb-3">{t.lg.joinPin}</p>
             <p className="font-display font-extrabold text-6xl sm:text-7xl tracking-[0.15em] text-neon-purple">
               {session.pin}
             </p>
@@ -202,7 +204,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
 
           {players.length === 0 ? (
             <p className="text-center text-muted-foreground py-10 border border-dashed border-border rounded-2xl">
-              Hali hech kim qo&apos;shilmadi
+              {t.lg.nobodyJoined}
             </p>
           ) : (
             <div className="flex flex-wrap gap-2 justify-center">
@@ -234,7 +236,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
         </div>
         {players.length === 0 && (
           <p className="text-center text-sm text-muted-foreground -mt-4">
-            Kamida bitta o&apos;quvchi qo&apos;shilishi kerak
+            {t.lg.needOneStudent}
           </p>
         )}
       </div>
@@ -311,7 +313,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
         </span>
         <div className="flex items-center gap-5">
           <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Users className="w-4 h-4" /><span className="numeric">{answerCount}</span>/<span className="numeric">{players.length}</span> javob berdi
+            <Users className="w-4 h-4" /><span className="numeric">{answerCount}</span>/<span className="numeric">{players.length}</span> {t.lg.answered}
           </span>
           <span className={cn(
             "inline-flex items-center gap-1.5 font-display font-bold text-2xl",
@@ -363,12 +365,12 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
         <div className="flex gap-3">
           {!showAnswers && (
             <button onClick={() => setRevealed(true)} className="btn-ghost py-2.5 px-5 text-sm">
-              Javobni ochish
+              {t.lg.revealAnswer}
             </button>
           )}
           <button onClick={next} disabled={busy} className="btn-primary py-2.5 px-6 text-sm inline-flex items-center gap-2 disabled:opacity-50">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipForward className="w-4 h-4" />}
-            {isLast ? "Yakunlash" : "Keyingi savol"}
+            {isLast ? "Yakunlash" : t.lg.nextQuestion}
           </button>
         </div>
       </div>

@@ -136,8 +136,8 @@ export default function AdminBooksPage() {
   }
 
   async function save(publish?: boolean) {
-    if (!form.title.trim()) { toast.error("Sarlavha kiriting"); return; }
-    if (!form.file_url.trim()) { toast.error("Kitob fayli yoki havolasini qo'shing"); return; }
+    if (!form.title.trim()) { toast.error(t.admin.common.enterTitle); return; }
+    if (!form.file_url.trim()) { toast.error(t.admin.bks.needFile); return; }
     setSaving(true);
 
     const payload = {
@@ -168,7 +168,7 @@ export default function AdminBooksPage() {
 
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(editId ? "Saqlandi" : "Qo'shildi");
+    toast.success(editId ? t.admin.common.saved : t.admin.common.added);
     setShowForm(false);
     load();
   }
@@ -226,7 +226,7 @@ export default function AdminBooksPage() {
 
             <div>
               <label className="text-sm font-medium mb-1 block">{t.admin.common.shortDesc}</label>
-              <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="input-field resize-none" rows={2} placeholder="Kitob nima haqida va kimga mo'ljallangan" maxLength={400} />
+              <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="input-field resize-none" rows={2} placeholder={t.admin.bks.descPh} maxLength={400} />
             </div>
 
             <div className="grid sm:grid-cols-4 gap-4">
@@ -306,7 +306,7 @@ export default function AdminBooksPage() {
               <div className="mt-2">
                 <label className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
                   <Link2 className="w-3.5 h-3.5" />
-                  yoki tashqi havola (fayl 50 MB dan katta bo'lsa)
+                  {t.admin.bks.orExternal}
                 </label>
                 <input
                   value={form.file_url}

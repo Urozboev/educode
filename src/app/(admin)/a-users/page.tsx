@@ -56,7 +56,7 @@ export default function AdminUsersPage() {
     );
     if (!amt) return;
     const amount = parseInt(amt);
-    if (isNaN(amount) || amount === 0) { toast.error("To'g'ri son kiriting"); return; }
+    if (isNaN(amount) || amount === 0) { toast.error(t.admin.usr.enterNumber); return; }
     const newBalance = user.coins + amount;
     if (newBalance < 0) { toast.error(`Yetarli coin yo'q! Hozirgi: ${user.coins}, ayirish: ${Math.abs(amount)}`); return; }
     await supabase.from("profiles").update({ coins: newBalance }).eq("id", userId);
