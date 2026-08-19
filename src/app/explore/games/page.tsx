@@ -17,6 +17,7 @@ import {
   Bird,
   Bot,
   Plane,
+  Binary,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
@@ -45,6 +46,14 @@ const games = (t: Dictionary) => [
     icon: Plane,
     color: "#00D2FF",
     difficulty: "3D Parvoz",
+  },
+  {
+    id: "binary",
+    title: "Binary Bridge",
+    desc: "Ikkilik sanoq sistemasida bitlarni yoqib berilgan sonlarni hosil qiling va ko'prik quring.",
+    icon: Binary,
+    color: "#00E676",
+    difficulty: "O'rta",
   },
   {
     id: "puzzle",
