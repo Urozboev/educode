@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { motion, Reorder } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 // Three.js og'ir — faqat o'yin ochilganda yuklanadi
 function Loading3D({ title }: { title: string }) {
@@ -33,11 +34,6 @@ const CyberFlight3D = dynamic(() => import("@/components/games/CyberFlight3D"), 
   loading: () => <Loading3D title="Cyber Flight 3D" />,
 });
 
-const BinaryBridge3D = dynamic(() => import("@/components/games/BinaryBridge3D"), {
-  ssr: false,
-  loading: () => <Loading3D title="Binary Bridge 3D" />,
-});
-
 import {
   Puzzle,
   Bug,
@@ -49,6 +45,7 @@ import {
   XCircle,
   RotateCcw,
   Trophy,
+  Coins,
   Clock,
   Zap,
   Map,
@@ -82,7 +79,7 @@ type GameType =
   | "quiz3d"
   | "maze3d"
   | "flight3d"
-  | "binary3d";
+  | "binary";
 
 const gameCards = (t: Dictionary) => [
   {
@@ -113,13 +110,13 @@ const gameCards = (t: Dictionary) => [
     category: "3d",
   },
   {
-    type: "binary3d" as const,
-    title: "Binary Bridge 3D",
-    desc: t.cabinet.gamesPage.descBinary3d,
+    type: "binary" as const,
+    title: "Binary Bridge",
+    desc: "Ikkilik sanoq sistemasida bitlarni yoqib berilgan sonlarni hosil qiling va ko'prik quring.",
     Icon: Binary,
     color: "#00E676",
-    diff: `3D · ${t.cabinet.gamesPage.isNew}`,
-    category: "3d",
+    diff: t.difficulty.medium,
+    category: "classic",
   },
   {
     type: "puzzle" as const,
@@ -309,7 +306,7 @@ export default function GamesPage() {
           {game === "quiz3d" && <QuizBattle3D />}
           {game === "maze3d" && <MazeRunner3D />}
           {game === "flight3d" && <CyberFlight3D />}
-          {game === "binary3d" && <BinaryBridge3D />}
+          {game === "binary" && <BinaryGame />}
           {game === "puzzle" && <PuzzleGame />}
           {game === "bugfix" && <BugFixGame />}
           {game === "typing" && <TypingGame />}
@@ -1696,6 +1693,203 @@ function BirdGame() {
           </div>
           <p className="text-sm text-muted-foreground mt-1">{t.cabinet.gamesPage.tryAgain}</p>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ===== 8. BINARY BRIDGE (2D) =====
+const BITS_COUNT = 8;
+const BIT_WEIGHTS = [128, 64, 32, 16, 8, 4, 2, 1];
+const BINARY_TARGETS = [5, 12, 42, 65, 85, 128, 170, 200, 255];
+
+function BinaryGame() {
+  const { t } = useI18n();
+  const supabase = createClient();
+  const [levelIdx, setLevelIdx] = useState(0);
+  const [bits, setBits] = useState<boolean[]>(() => Array(BITS_COUNT).fill(false));
+  const [score, setScore] = useState(0);
+  const [coins, setCoins] = useState(0);
+  const [won, setWon] = useState(false);
+
+  const target = BINARY_TARGETS[levelIdx % BINARY_TARGETS.length];
+
+  const currentSum = useMemo(() => {
+    return bits.reduce((acc, active, idx) => (active ? acc + BIT_WEIGHTS[idx] : acc), 0);
+  }, [bits]);
+
+  const isCorrect = currentSum === target;
+
+  useEffect(() => {
+    if (isCorrect && !won) {
+      setWon(true);
+      const bonus = 10;
+      setScore((s) => s + 100);
+      setCoins((c) => c + bonus);
+      toast.success(`To'g'ri! Ikkilik ko'prik qurildi! +${bonus} coin 🎉`);
+
+      try {
+        supabase.auth.getUser().then((res: any) => {
+          const user = res?.data?.user;
+          if (user) {
+            supabase.rpc("increment_coins", {
+              user_id: user.id,
+              amount: bonus,
+            });
+          }
+        });
+      } catch (_err) {
+        /* */
+      }
+    }
+  }, [isCorrect, won, supabase]);
+
+  const toggleBit = (idx: number) => {
+    if (won) return;
+    setBits((prev) => {
+      const next = [...prev];
+      next[idx] = !next[idx];
+      return next;
+    });
+  };
+
+  const nextLevel = () => {
+    setLevelIdx((i) => (i + 1) % BINARY_TARGETS.length);
+    setBits(Array(BITS_COUNT).fill(false));
+    setWon(false);
+  };
+
+  const resetBits = () => {
+    setBits(Array(BITS_COUNT).fill(false));
+    setWon(false);
+  };
+
+  const activeSumFormula = bits
+    .map((active, i) => (active ? BIT_WEIGHTS[i] : null))
+    .filter((v): v is number => v !== null);
+
+  return (
+    <div className="max-w-2xl space-y-6">
+      <GameHeader
+        Icon={Binary}
+        title="Binary Bridge"
+        meta={
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-neon-yellow flex items-center gap-1">
+              <Coins className="w-3.5 h-3.5" /> +{coins}
+            </span>
+            <span className="text-xs font-bold text-neon-green flex items-center gap-1">
+              <Trophy className="w-3.5 h-3.5" /> {score}
+            </span>
+          </div>
+        }
+      />
+
+      <p className="text-[15px] text-muted-foreground">
+        Bitlarni yoqib-o&apos;chirish (<code className="text-neon-cyan font-bold">1</code> / <code className="text-muted-foreground font-bold">0</code>) orqali berilgan o&apos;nlik songa tenglang va ko&apos;prikni quring.
+      </p>
+
+      {/* Target Mission Card */}
+      <div className="p-6 rounded-3xl bg-surface/60 border border-border flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            Hosil qilinishi kerak bo&apos;lgan son (Target):
+          </span>
+          <div className="font-display font-extrabold text-3xl text-foreground flex items-baseline gap-2 mt-1">
+            <span>{target}</span>
+            <span className="text-xs font-mono text-neon-purple font-semibold">
+              ({levelIdx + 1}/{BINARY_TARGETS.length}-bosqich)
+            </span>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            Joriy summa:
+          </span>
+          <div
+            className={cn(
+              "font-display font-extrabold text-3xl font-mono mt-1",
+              currentSum === target
+                ? "text-neon-green"
+                : currentSum > target
+                ? "text-neon-red"
+                : "text-neon-yellow"
+            )}
+          >
+            {currentSum} / {target}
+          </div>
+        </div>
+      </div>
+
+      {/* 8 Bit Switches Grid */}
+      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5">
+        {BIT_WEIGHTS.map((weight, idx) => {
+          const active = bits[idx];
+          return (
+            <button
+              key={weight}
+              onClick={() => toggleBit(idx)}
+              className={cn(
+                "p-3.5 rounded-2xl border flex flex-col items-center gap-1.5 transition-all active:scale-95",
+                active
+                  ? "bg-neon-green/15 border-neon-green text-neon-green shadow-lg shadow-neon-green/10"
+                  : "bg-surface/40 border-border/60 text-muted-foreground hover:border-border hover:bg-surface"
+              )}
+            >
+              <span className="text-[11px] font-mono text-muted-foreground/70">
+                2^{7 - idx}
+              </span>
+              <span className="text-xl font-bold font-mono">
+                {active ? "1" : "0"}
+              </span>
+              <span className="text-xs font-mono font-semibold">
+                {weight}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Formula Breakdown */}
+      <div className="p-4 rounded-2xl bg-black/40 border border-border/60 flex items-center justify-between text-xs font-mono">
+        <span className="text-muted-foreground">Hisob:</span>
+        <span className="text-foreground">
+          {activeSumFormula.length > 0 ? activeSumFormula.join(" + ") : "0"} ={" "}
+          <strong className="text-neon-green">{currentSum}</strong>
+        </span>
+        <button
+          onClick={resetBits}
+          className="text-muted-foreground hover:text-foreground p-1 rounded transition"
+          title="Tozalash"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Victory Action */}
+      {won && (
+        <motion.div
+          className="rounded-3xl border border-neon-green/30 bg-neon-green/5 p-6 text-center"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center mx-auto mb-3">
+            <Trophy className="w-7 h-7 text-neon-green" />
+          </div>
+          <p className="font-display font-bold text-neon-green text-xl">
+            Ajoyib! Ko&apos;prik Muvaffaqiyatli Qurildi!
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Ikkilik sanoq sistemasida son to&apos;g&apos;ri terildi.
+          </p>
+          <button
+            onClick={nextLevel}
+            className="btn-primary py-3 px-8 rounded-xl text-sm font-semibold mt-4 inline-flex items-center gap-2 shadow-lg shadow-neon-green/20"
+          >
+            Keyingi son <ArrowRight className="w-4 h-4" />
+          </button>
+        </motion.div>
       )}
     </div>
   );
