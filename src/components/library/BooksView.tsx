@@ -64,8 +64,7 @@ export function BooksView() {
           Kitoblar
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Dasturlash va kompyuter savodxonligi bo&apos;yicha kitoblar. Yuklab olish bepul,
-          ro&apos;yxatdan o&apos;tish talab qilinmaydi.
+          {t.misc.booksSubtitle}
         </p>
       </motion.div>
 
@@ -111,7 +110,7 @@ export function BooksView() {
         <div className="py-20 text-center">
           <Library className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {books.length === 0 ? "Kitoblar tez orada qo'shiladi" : "Natija topilmadi"}
+            {books.length === 0 ? "Kitoblar tez orada qo'shiladi" : t.misc.noResults}
           </p>
         </div>
       ) : (

@@ -264,11 +264,11 @@ export default function ChildDetailPage() {
             <input type="number" value={giftAmount} onChange={e => setGiftAmount(Math.max(0, +e.target.value))}
               className="input-field mb-3" placeholder={t.parent.amount} />
             <textarea value={giftMsg} onChange={e => setGiftMsg(e.target.value)} rows={2}
-              className="input-field resize-none mb-4 text-sm" placeholder="Xabar (ixtiyoriy): Zo'r ishlayapsan!" />
+              className="input-field resize-none mb-4 text-sm" placeholder={t.parent.giftMsgPh} />
             <div className="flex gap-2 justify-end">
               <button onClick={() => setGiftOpen(false)} className="btn-ghost py-2 px-4 text-sm">{t.common.cancel}</button>
               <button onClick={sendGift} disabled={gifting || giftAmount > myCoins} className="btn-primary py-2 px-4 text-sm flex items-center gap-2 disabled:opacity-50">
-                {gifting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />} Sovg'a qilish
+                {gifting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />} {t.parent.giftAction}
               </button>
             </div>
           </motion.div>

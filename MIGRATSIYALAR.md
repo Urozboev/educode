@@ -34,6 +34,20 @@ oldingisiga tayanadi.
 | 41 | `41_kurs_izohlari.sql` | Kurs baholari va izohlari (yulduzcha + matn) |
 | 42 | `42_kontent_tarjimalari.sql` | Baza kontenti uchun tarjima jadvallari + admin paneli |
 | 43 | `43_ai_agent.sql` | AI agent ("Ustoz"): obuna, suhbat, xotira, reja, dars keshi, ovoz keshi |
+| 44 | `44_ota_ona_link_boshqaruvi.sql` | Ota-ona havolasi boshqaruvi va o'quvchi monitoringi |
+| 45 | `45_tarjimalar_kutubxona.sql` | Kutubxona: 48 termin va 10 ta dars metodi tarjimalari (ru, en, kaa) |
+| 46 | `46_tarjimalar_kurslar_va_mavzular.sql` | Kurslar va 24 ta mavzu nomlari tarjimalari (ru, en, kaa) |
+| 47 | `47_tarjimalar_testlar.sql` | Test savollari, variantlari va tushuntirishlari (ru, en, kaa) |
+| 48 | `48_tarjimalar_topshiriqlar.sql` | Mavzu topshiriqlari va maslahatlari tarjimalari (ru, en, kaa) |
+| 49 | `49_tarjimalar_masalalar_va_olimpiada.sql` | Musobaqalar va 45 ta masala shartlari tarjimalari (ru, en, kaa) |
+| 50 | `50_tarjimalar_oyinlar.sql` | 12 ta dars o'yini kontenti tarjimalari (ru, en, kaa) |
+| 51-56 | `51_`...`56_tarjimalar_dars_matnlari_*.sql` | 1-12 ma'ruza mavzularining to'liq HTML dars matnlari (ru, en, kaa) |
+| 57-58 | `57_`...`58_tarjimalar_amaliyot_*.sql` | 1-6 amaliy mashg'ulotlarning to'liq HTML dars matnlari (ru, en, kaa) |
+| 59-60 | `59_`...`60_tarjimalar_laboratoriya_*.sql` | 1-6 laboratoriya ishlarining to'liq HTML dars matnlari (ru, en, kaa) |
+| 61 | `61_tarjimalar_barcha_masalalar.sql` | 51 ta amaliy va olimpiada masalasi to'liq shartlari (ru, en, kaa) |
+| 62 | `62_tarjimalar_dars_oyinlari_kontenti.sql` | 12 ta o'yin to'liq kontenti: savollar, juftliklar, krossvord, taxta (ru, en, kaa) |
+| 63 | `63_tarjimalar_topshiriqlar_toliq.sql` | Mavzulardagi amaliy topshiriqlar nomlari va shartlari (ru, en, kaa) |
+| 64 | `64_tarjimalar_testlar_toliq.sql` | Mavzulardagi test savollari, JSONB variantlari va tushuntirishlari (ru, en, kaa) |
 
 ## Har biridan keyin nima tekshirish kerak
 

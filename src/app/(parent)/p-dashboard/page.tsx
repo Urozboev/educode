@@ -249,7 +249,7 @@ export default function ParentDashboard() {
                   <button
                     onClick={e => { e.preventDefault(); e.stopPropagation(); removeLink(c.link_id, false, c.full_name); }}
                     disabled={removing === c.link_id}
-                    title="Ro'yxatdan olib tashlash"
+                    title={t.parent.unlink}
                     className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-neon-red hover:bg-neon-red/10 transition-colors disabled:opacity-50">
                     {removing === c.link_id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Unlink className="w-4 h-4" />}
                   </button>

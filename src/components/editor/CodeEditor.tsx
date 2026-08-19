@@ -8,6 +8,7 @@ import type { SupportedLanguage, TestCase, SubmissionTestResult } from "@/types"
 import { Play, RotateCcw, CheckCircle2, XCircle, Clock, Loader2, Sparkles, Copy, Check, Send, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import AIDeclarationModal, { type AIDeclarationData } from "@/components/ai/AIDeclarationModal";
+import { useI18n } from "@/lib/i18n";
 
 interface CodeEditorProps {
   language: SupportedLanguage;
@@ -25,6 +26,7 @@ export default function CodeEditor({
   language, starterCode = "", testCases = [], taskId, taskType,
   onSubmit, onAIFeedback, readOnly = false, height = "400px",
 }: CodeEditorProps) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [code, setCode] = useState(starterCode);
   const [output, setOutput] = useState("");
@@ -109,7 +111,7 @@ export default function CodeEditor({
   //  - stdin tugaganda EOFError (CPython kabi) — tushunarli xato
   //  - exit()/SystemExit chiqishni buzmaydi
   async function runPython(src: string, stdin: string = ""): Promise<{ stdout: string; stderr: string; time_ms: number }> {
-    if (!pyodideRef.current) throw new Error("Pyodide tayyor emas");
+    if (!pyodideRef.current) throw new Error(t.misc.pyodideNotReady);
     const t0 = performance.now();
     try {
       pyodideRef.current.globals.set('__user_code__', src);
@@ -228,7 +230,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
 
   // ===== BARCHA TESTLARNI TEKSHIRISH =====
   async function handleRunTests() {
-    if (testCases.length === 0) { toast.info("Test mavjud emas"); return; }
+    if (testCases.length === 0) { toast.info(t.misc.noTests); return; }
     setIsRunning(true); setTestResults([]); setActiveTab("tests");
     const results = await executeTests(code);
     setTestResults(results);
@@ -357,15 +359,15 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
 
           toast.success(`Barcha testlar o'tdi! +${coinReward} coin, +${xpReward} XP 🎉`);
         } else {
-          toast.success("Barcha testlar o'tdi! ✅");
+          toast.success(t.misc.allTestsPassed + " ✅");
         }
       } else {
-        toast.success("Barcha testlar o'tdi! (oldin yechilgan)");
+        toast.success(t.misc.allTestsPassedAgain);
       }
     } else if (allPassed) {
-      toast.success("Barcha testlar o'tdi! ✅");
+      toast.success(t.misc.allTestsPassed + " ✅");
     } else {
-      toast.info(`${passed}/${total} test o'tdi. Qayta urinib ko'ring.`);
+      toast.info(t.misc.testsPassedOf.replace("{p}", String(passed)).replace("{n}", String(total)));
     }
 
     if (onSubmit) onSubmit(code, results);
@@ -398,7 +400,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         <div className="px-4 py-1.5 bg-neon-yellow/5 border-b border-neon-yellow/10 flex items-center gap-2">
           <AlertTriangle className="w-3.5 h-3.5 text-neon-yellow flex-shrink-0" />
           <p className="text-[10px] text-neon-yellow">
-            <strong>input()</strong> funksiyasidan foydalaning! Testlar stdin orqali qiymat beradi. Masalan: <code className="bg-surface px-1 rounded">n = int(input())</code>
+            <strong>input()</strong> {t.misc.stdinHint} <code className="bg-surface px-1 rounded">n = int(input())</code>
           </p>
         </div>
       )}
@@ -459,7 +461,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
           <button onClick={requestSubmit} disabled={isRunning || isSubmitting}
             className="btn-neon py-2 px-4 flex items-center gap-1.5 text-sm disabled:opacity-50">
             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            {isSubmitting ? "Yuborilmoqda..." : "Yuborish"}
+            {isSubmitting ? t.misc.submitting : t.misc.submit}
           </button>
         )}
         {onAIFeedback && (
@@ -476,7 +478,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
       {/* Output / Tests */}
       <div className="border-t border-border/50">
         <div className="flex items-center gap-1 px-4 pt-2">
-          <button onClick={() => setActiveTab("output")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium", activeTab === "output" ? "bg-surface text-foreground" : "text-muted-foreground")}>Natija</button>
+          <button onClick={() => setActiveTab("output")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium", activeTab === "output" ? "bg-surface text-foreground" : "text-muted-foreground")}>{t.misc.result}</button>
           {testCases.length > 0 && (
             <button onClick={() => setActiveTab("tests")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5", activeTab === "tests" ? "bg-surface text-foreground" : "text-muted-foreground")}>
               Testlar {testResults.length > 0 && <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", allPassed ? "bg-neon-green/10 text-neon-green" : "bg-neon-red/10 text-neon-red")}>{passedCount}/{testResults.length}</span>}
@@ -505,7 +507,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
                       </div>
                     </div>
                   ))}
-                  {allPassed && <div className="p-3 rounded-xl bg-neon-green/5 border border-neon-green/20 text-center"><CheckCircle2 className="w-6 h-6 text-neon-green mx-auto mb-1" /><p className="font-semibold text-sm text-neon-green">Barcha testlar o'tdi! 🎉</p></div>}
+                  {allPassed && <div className="p-3 rounded-xl bg-neon-green/5 border border-neon-green/20 text-center"><CheckCircle2 className="w-6 h-6 text-neon-green mx-auto mb-1" /><p className="font-semibold text-sm text-neon-green">{t.misc.allTestsPassed} 🎉</p></div>}
                 </>
               )}
             </div>

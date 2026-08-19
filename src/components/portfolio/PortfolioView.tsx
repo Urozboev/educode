@@ -128,11 +128,11 @@ export function PortfolioView({ username }: { username: string }) {
 
       {/* Statistika */}
       <section className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-        <Stat Icon={GraduationCap} value={stats.courses_completed} label="tugatilgan kurs" />
-        <Stat Icon={BookOpen} value={stats.topics_completed ?? 0} label="dars" />
-        <Stat Icon={Swords} value={stats.challenges_solved} label="topshiriq" />
-        <Stat Icon={Award} value={stats.certificates} label="sertifikat" />
-        <Stat Icon={Trophy} value={stats.achievements ?? 0} label="yutuq" />
+        <Stat Icon={GraduationCap} value={stats.courses_completed} label={t.cabinet.portfolioView.completedCourses} />
+        <Stat Icon={BookOpen} value={stats.topics_completed ?? 0} label={t.cabinet.portfolioView.lessonStat} />
+        <Stat Icon={Swords} value={stats.challenges_solved} label={t.cabinet.portfolioView.challengeStat} />
+        <Stat Icon={Award} value={stats.certificates} label={t.cabinet.portfolioView.certificateStat} />
+        <Stat Icon={Trophy} value={stats.achievements ?? 0} label={t.cabinet.portfolioView.achievementStat} />
         <Stat Icon={Zap} value={p.xp} label="XP" />
       </section>
 
@@ -140,7 +140,7 @@ export function PortfolioView({ username }: { username: string }) {
       {activity.length > 0 && (
         <section>
           <h2 className="eyebrow mb-3 inline-flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5" /> Faollik — oxirgi 12 hafta
+            <Activity className="w-3.5 h-3.5" /> {t.cabinet.portfolioView.activityHeading}
           </h2>
           <ActivityStrip weeks={activity} />
         </section>
@@ -149,7 +149,7 @@ export function PortfolioView({ username }: { username: string }) {
       {/* Ko'nikmalar */}
       {p.skills?.length > 0 && (
         <section>
-          <h2 className="eyebrow mb-3">Ko&apos;nikmalar</h2>
+          <h2 className="eyebrow mb-3">{t.cabinet.portfolioView.skills}</h2>
           <div className="flex flex-wrap gap-2">
             {p.skills.map(s => (
               <span key={s} className="px-3 py-1.5 rounded-lg text-sm bg-surface border border-border">
@@ -163,7 +163,7 @@ export function PortfolioView({ username }: { username: string }) {
       {/* Loyihalar */}
       {projects.length > 0 && (
         <section>
-          <h2 className="font-display font-bold text-xl mb-4">Loyihalar</h2>
+          <h2 className="font-display font-bold text-xl mb-4">{t.cabinet.portfolioView.projects}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {projects.map(pr => (
               <article
@@ -198,7 +198,7 @@ export function PortfolioView({ username }: { username: string }) {
                     {pr.repo_url && (
                       <a href={pr.repo_url} target="_blank" rel="noopener noreferrer nofollow"
                         className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-                        <Github className="w-3.5 h-3.5" /> Kod
+                        <Github className="w-3.5 h-3.5" /> {t.cabinet.portfolioView.code}
                       </a>
                     )}
                   </div>
@@ -266,7 +266,7 @@ export function PortfolioView({ username }: { username: string }) {
       {/* Yutuqlar */}
       {achievements.length > 0 && (
         <section>
-          <h2 className="font-display font-bold text-xl mb-4">Yutuqlar</h2>
+          <h2 className="font-display font-bold text-xl mb-4">{t.cabinet.portfolioView.achievements}</h2>
           <div className="grid gap-2.5 sm:grid-cols-2">
             {achievements.map(a => (
               <div key={a.id} className="flex items-center gap-3 p-3.5 rounded-xl border border-border/60 bg-card/40">
@@ -291,7 +291,7 @@ export function PortfolioView({ username }: { username: string }) {
       {/* Sertifikatlar */}
       {certificates.length > 0 && (
         <section>
-          <h2 className="font-display font-bold text-xl mb-4">Sertifikatlar</h2>
+          <h2 className="font-display font-bold text-xl mb-4">{t.cabinet.portfolioView.certificates}</h2>
           <ul className="space-y-2">
             {certificates.map(c => (
               <li key={c.id} className="flex items-center gap-4 p-4 rounded-xl border border-border/60 bg-card/40">

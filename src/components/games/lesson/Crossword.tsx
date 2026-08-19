@@ -249,8 +249,8 @@ export function Crossword({
 
         {/* Ta'riflar */}
         <div className="space-y-6 min-w-0">
-          <ClueList title="Gorizontal" items={across} activeWord={activeWord} solved={solved} onPick={setActiveWord} />
-          <ClueList title="Vertikal" items={down} activeWord={activeWord} solved={solved} onPick={setActiveWord} />
+          <ClueList title={t.lg.horizontal} items={across} activeWord={activeWord} solved={solved} onPick={setActiveWord} />
+          <ClueList title={t.lg.vertical} items={down} activeWord={activeWord} solved={solved} onPick={setActiveWord} />
         </div>
       </div>
 
@@ -258,13 +258,13 @@ export function Crossword({
       <div className="mt-8 pt-6 border-t border-border/50 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-2">
           <button onClick={hint} className="btn-ghost py-2.5 px-4 text-sm inline-flex items-center gap-2">
-            <Lightbulb className="w-4 h-4" /> Harfni ochish
+            <Lightbulb className="w-4 h-4" /> {t.lg.revealLetter}
           </button>
           <button onClick={() => setChecked(true)} className="btn-ghost py-2.5 px-4 text-sm inline-flex items-center gap-2">
-            <Eye className="w-4 h-4" /> Tekshirish
+            <Eye className="w-4 h-4" /> {t.lg.check}
           </button>
           <button onClick={reset} className="btn-ghost py-2.5 px-4 text-sm inline-flex items-center gap-2">
-            <RotateCcw className="w-4 h-4" /> Tozalash
+            <RotateCcw className="w-4 h-4" /> {t.common.clear}
           </button>
         </div>
         <button

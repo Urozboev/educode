@@ -112,7 +112,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
             <LanguageSwitcher compact />
 
             <button suppressHydrationWarning onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors" title="Mavzu o'zgartirish">
+              className="p-2.5 hover:bg-accent rounded-xl text-muted-foreground transition-colors" title={t.nav.theme}>
               {mounted && theme === "light" ? <Moon className="w-[18px] h-[18px]" /> : <Sun className="w-[18px] h-[18px]" />}
             </button>
 
@@ -132,21 +132,27 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
 
-        {/* Mobile dropdown */}
+        {/* Mobile dropdown. Past ekranda ro'yxat sig'masdi va oxirgi
+            havolalarga umuman yetib bo'lmasdi — ichidan aylantiriladi. */}
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div className="lg:hidden bg-card border-b border-border px-4 py-3 space-y-1"
+            <motion.div className="lg:hidden bg-card border-b border-border overflow-hidden"
               initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-              {allLinks.map(l => (
-                <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
-                  className={`block py-2.5 px-3 rounded-lg text-sm ${pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent"}`}>{l.label}</Link>
-              ))}
-              {!user && (
-                <div className="flex gap-2 pt-2 border-t border-border mt-2">
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-ghost text-sm py-2 px-4 flex-1 text-center">{t.nav.login}</Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary text-sm py-2 px-4 flex-1 text-center">{t.nav.getStarted}</Link>
-                </div>
-              )}
+              {/* Balandlik animatsiyasi TASHQI qavatda, aylantirish ICHKIDA.
+                  Ikkalasi bitta elementda bo'lsa framer-motion "auto" ni
+                  o'lchay olmay qoladi va panel ochilmaydi. */}
+              <div className="px-4 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
+                {allLinks.map(l => (
+                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
+                    className={`block py-2.5 px-3 rounded-lg text-sm ${pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent"}`}>{l.label}</Link>
+                ))}
+                {!user && (
+                  <div className="flex gap-2 pt-2 border-t border-border mt-2">
+                    <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-ghost text-sm py-2 px-4 flex-1 text-center">{t.nav.login}</Link>
+                    <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary text-sm py-2 px-4 flex-1 text-center">{t.nav.getStarted}</Link>
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -292,6 +292,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
 }
 
 function ExampleCard({ example }: { example: Example }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   return (
@@ -307,7 +308,7 @@ function ExampleCard({ example }: { example: Example }) {
               setTimeout(() => setCopied(false), 1500);
             }}
             className="text-muted-foreground hover:text-foreground"
-            title="Nusxa olish"
+            title={t.cabinet.play.copy}
           >
             {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
           </button>

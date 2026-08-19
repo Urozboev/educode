@@ -48,11 +48,10 @@ export function MethodsView() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
         <p className="eyebrow mb-3">{t.explore.methodsEyebrow}</p>
         <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight mb-3">
-          Dars metodlari
+          {t.misc.methodsTitle}
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Har bir metod bo&apos;yicha qadamma-qadam yo&apos;riqnoma, afzallik va kamchiliklari.
-          Dars bosqichiga qarab tanlang.
+          {t.misc.methodsSubtitle}
         </p>
       </motion.div>
 
@@ -112,7 +111,7 @@ export function MethodsView() {
         <div className="py-20 text-center">
           <Lightbulb className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {methods.length === 0 ? "Metodlar tez orada qo'shiladi" : "Natija topilmadi"}
+            {methods.length === 0 ? "Metodlar tez orada qo'shiladi" : t.misc.noResults}
           </p>
         </div>
       ) : (

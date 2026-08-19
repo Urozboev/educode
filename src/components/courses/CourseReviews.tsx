@@ -223,7 +223,7 @@ export function CourseReviews({
           count === 0 && (
             <div className="py-12 text-center border border-dashed border-border rounded-2xl">
               <MessageSquare className="w-10 h-10 text-muted-foreground/25 mx-auto mb-3" />
-              <p className="text-muted-foreground text-sm">Hali izoh yo&apos;q — birinchi bo&apos;ling</p>
+              <p className="text-muted-foreground text-sm">{t.reviews.empty}</p>
             </div>
           )
         ) : (

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "@/components/i18n/Link";
 import { Loader2, Lock, Video as VideoIcon, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n";
 
 interface Props {
   topicId: string;
@@ -31,6 +32,7 @@ interface TokenResponse {
  *   (ekran yozib olishda kim tarqatganini aniqlash uchun)
  */
 export default function ProtectedVideoPlayer({ topicId, redirectPath, className, onProgress }: Props) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [data, setData] = useState<TokenResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,7 +90,7 @@ export default function ProtectedVideoPlayer({ topicId, redirectPath, className,
       const json: TokenResponse = await res.json();
       setData(json);
     } catch {
-      setData({ error: "Video yuklashda xatolik. Qayta urinib ko'ring." });
+      setData({ error: t.misc.videoError });
     }
     setLoading(false);
   }
@@ -137,7 +139,7 @@ export default function ProtectedVideoPlayer({ topicId, redirectPath, className,
         <div className="w-14 h-14 rounded-2xl bg-neon-purple/15 flex items-center justify-center">
           {data?.requires ? <Lock className="w-7 h-7 text-neon-purple" /> : <VideoIcon className="w-7 h-7 text-neon-purple" />}
         </div>
-        <p className="text-sm text-white/80 max-w-sm">{data?.error || "Video mavjud emas"}</p>
+        <p className="text-sm text-white/80 max-w-sm">{data?.error || t.misc.videoMissing}</p>
         {data?.requires === "auth" && (
           <Link
             href={`/register${redirectPath ? `?redirect=${encodeURIComponent(redirectPath)}` : ""}`}
@@ -151,7 +153,7 @@ export default function ProtectedVideoPlayer({ topicId, redirectPath, className,
             href={redirectPath.split("/topics")[0]}
             className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:opacity-90 transition"
           >
-            Kursga yozilish
+            {t.misc.enrollToWatch}
           </Link>
         )}
         {!data?.requires && (
@@ -159,7 +161,7 @@ export default function ProtectedVideoPlayer({ topicId, redirectPath, className,
             onClick={fetchToken}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/20 text-white/80 text-sm hover:bg-white/10 transition"
           >
-            <RefreshCw className="w-4 h-4" /> Qayta urinish
+            <RefreshCw className="w-4 h-4" /> {t.misc.retry}
           </button>
         )}
       </div>

@@ -91,7 +91,7 @@ export function CourseSearch({ courseId, courseSlug }: { courseId: string; cours
           <button
             onClick={() => setQ("")}
             className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-surface transition"
-            aria-label="Tozalash"
+            aria-label={t.common.clear}
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>

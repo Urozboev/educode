@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Brain, TrendingUp, Clock, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 interface AIStats {
   daily: { used: number; limit: number; remaining: number; cooldownUntil?: string | null };
@@ -13,34 +15,35 @@ interface AIStats {
   trend: { date: string; total_queries: number }[];
 }
 
-function getZone(score: number): { label: string; emoji: string; cls: string; tip: string } {
+function getZone(score: number, t: Dictionary): { label: string; emoji: string; cls: string; tip: string } {
   if (score <= 30) return {
     label: "Sog'lom",
     emoji: "🟢",
     cls: "bg-neon-green/10 border-neon-green/30 text-neon-green",
-    tip: "Sog'lom muvozanat saqlamoqdasiz! Bunday davom eting.",
+    tip: t.misc.balanceHealthy,
   };
   if (score <= 60) return {
     label: "O'rtacha",
     emoji: "🟡",
     cls: "bg-neon-yellow/10 border-neon-yellow/30 text-neon-yellow",
-    tip: "AI yordamini me'yorida ishlatyapsiz. Mustaqil yechishga ko'proq harakat qiling.",
+    tip: t.misc.balanceModerate,
   };
   if (score <= 80) return {
     label: "Yuqori",
     emoji: "🟠",
     cls: "bg-orange-500/10 border-orange-500/30 text-orange-400",
-    tip: "AI ga juda ko'p tayanyapsiz. Bir nechta topshiriqni AI yordamisiz urinib ko'ring.",
+    tip: t.misc.balanceHigh,
   };
   return {
     label: "Juda yuqori",
     emoji: "🔴",
     cls: "bg-neon-red/10 border-neon-red/30 text-neon-red",
-    tip: "AI bog'liqlik xavfli darajada. Ertaga AI siz boshlang.",
+    tip: t.misc.balanceRisky,
   };
 }
 
 export default function CognitiveHealthCard({ className }: { className?: string }) {
+  const { t } = useI18n();
   const [stats, setStats] = useState<AIStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +57,7 @@ export default function CognitiveHealthCard({ className }: { className?: string 
   if (loading) return <div className={cn("glass-card p-5 h-48 animate-pulse", className)} />;
   if (!stats) return null;
 
-  const zone = getZone(stats.dependencyScore);
+  const zone = getZone(stats.dependencyScore, t);
   const used = stats.daily.used;
   const limit = stats.daily.limit;
   const usedPct = Math.min(100, (used / Math.max(limit, 1)) * 100);
@@ -72,7 +75,7 @@ export default function CognitiveHealthCard({ className }: { className?: string 
           </div>
           <div>
             <h3 className="font-semibold text-sm">Cognitive Health</h3>
-            <p className="text-[10px] text-muted-foreground">AI bilan sog'lom muvozanat</p>
+            <p className="text-[10px] text-muted-foreground">{t.misc.balanceTitle}</p>
           </div>
         </div>
         <span
@@ -108,7 +111,7 @@ export default function CognitiveHealthCard({ className }: { className?: string 
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div className="bg-surface/40 rounded-lg p-2.5">
           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1">
-            <Activity className="w-3 h-3" /> Bugun AI savollari
+            <Activity className="w-3 h-3" /> {t.misc.todayAiQuestions}
           </div>
           <div className="text-sm font-semibold font-mono">
             {used}/{limit}

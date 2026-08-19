@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AILabel } from "@/components/ai/AILabel";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 interface Props {
   taskId: string;
@@ -28,18 +30,18 @@ interface PlanRow {
   ai_review_pseudocode?: string;
 }
 
-const STEP_META: Record<StepKey, { idx: number; label: string; helper: string; placeholder: string; min: number }> = {
+const STEP_META = (t: Dictionary): Record<StepKey, { idx: number; label: string; helper: string; placeholder: string; min: number }> => ({
   understanding: {
     idx: 1,
     label: "Tushunish",
-    helper: "Bu masalada nimani topish kerak? O'z so'zingiz bilan yozing.",
-    placeholder: "Masalan: ro'yxatdagi eng katta sonni topib, uning indeksini chiqarish kerak...",
+    helper: t.misc.planWhatToFind,
+    placeholder: t.misc.planWhatPh,
     min: 20,
   },
   algorithm: {
     idx: 2,
-    label: "Algoritm so'z bilan",
-    helper: "Yechimni qadamma-qadam so'z bilan yozing (kod yozmasdan).",
+    label: t.misc.planAlgorithm,
+    helper: t.misc.planAlgorithmHint,
     placeholder: "1. ro'yxatdagi har element ko'rib chiqaman\n2. eng katta qiymat va indeksini eslab qolaman\n3. oxirida ikki qiymatni qaytaraman...",
     min: 40,
   },
@@ -50,11 +52,12 @@ const STEP_META: Record<StepKey, { idx: number; label: string; helper: string; p
     placeholder: "max ← arr[0]\nmax_idx ← 0\nFOR i FROM 1 TO len(arr) DO\n  IF arr[i] > max THEN\n    max ← arr[i]\n    max_idx ← i\nRETURN max, max_idx",
     min: 30,
   },
-};
+});
 
 const STEP_ORDER: StepKey[] = ["understanding", "algorithm", "pseudocode"];
 
 export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCodeUnlocked, difficulty }: Props) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [row, setRow] = useState<PlanRow | null>(null);
   const [drafts, setDrafts] = useState<Record<StepKey, string>>({
@@ -111,7 +114,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
 
   async function handleSubmitStep(step: StepKey) {
     const value = drafts[step].trim();
-    const meta = STEP_META[step];
+    const meta = STEP_META(t)[step];
     if (value.length < meta.min) {
       toast.warning(`Kamida ${meta.min} belgili javob bering.`);
       return;
@@ -134,7 +137,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
 
       // 2. AI tasdiqlamasa — saqlamaymiz, talaba qayta yozsin
       if (review.verdict !== 'approved') {
-        toast.warning(review.feedback || "Yana biroz aniqlik kiriting.");
+        toast.warning(review.feedback || t.misc.planMoreDetail);
         setLoading(null);
         return;
       }
@@ -169,7 +172,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
         return;
       }
       setRow(upserted as any);
-      toast.success(`Bosqich ${STEP_META[step].idx} tasdiqlandi ✓`);
+      toast.success(`Bosqich ${STEP_META(t)[step].idx} tasdiqlandi ✓`);
 
       // Keyingi bosqichga avtomatik o'tish
       const idx = STEP_ORDER.indexOf(step);
@@ -199,17 +202,17 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
         <Sparkles className="w-4 h-4 text-neon-purple" />
         <h3 className="font-semibold text-sm">Plan-First yondashuvi</h3>
         {!isRequired && (
-          <span className="text-[10px] text-muted-foreground">(ixtiyoriy — lekin tavsiya qilinadi)</span>
+          <span className="text-[10px] text-muted-foreground">{t.misc.optionalRecommended}</span>
         )}
       </div>
       <p className="text-xs text-muted-foreground mb-4">
-        Avval rejani tuzing, keyin kod yozing. Bu yondashuv mustaqil tafakkurni rivojlantiradi va xato kamayadi.
+        {t.misc.planFirstNote}
       </p>
 
       {/* Steps */}
       <div className="space-y-3">
         {STEP_ORDER.map((step) => {
-          const meta = STEP_META[step];
+          const meta = STEP_META(t)[step];
           const idx = meta.idx;
           const done = isStepDone(step);
           const isActive = activeStep === step;
@@ -309,7 +312,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
         >
           {codeUnlocked ? <CheckCircle2 className="w-4 h-4" /> : <Lock className="w-3.5 h-3.5" />}
           <span className="font-medium">
-            {codeUnlocked ? "Kod yozish bosqichi ochildi!" : "Kod yozish — barcha bosqichlardan keyin"}
+            {codeUnlocked ? "Kod yozish bosqichi ochildi!" : t.misc.planCodeLast}
           </span>
         </div>
       </div>

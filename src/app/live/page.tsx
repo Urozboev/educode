@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { savePlayer } from "@/lib/liveGame";
 import { Code2, Loader2, LogIn } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * PIN bilan o'yinga kirish.
@@ -15,6 +16,7 @@ import { Code2, Loader2, LogIn } from "lucide-react";
  * mumkin, lekin hamma o'ynay olishi kerak.
  */
 export default function LiveJoinPage() {
+  const { t } = useI18n();
   const supabase = createClient();
   const router = useRouter();
   const [pin, setPin] = useState("");
@@ -23,8 +25,8 @@ export default function LiveJoinPage() {
 
   async function join(e: React.FormEvent) {
     e.preventDefault();
-    if (pin.trim().length < 4) { toast.error("PIN to'liq emas"); return; }
-    if (nickname.trim().length < 2) { toast.error("Ismingizni kiriting"); return; }
+    if (pin.trim().length < 4) { toast.error(t.liveJoin.pinError); return; }
+    if (nickname.trim().length < 2) { toast.error(t.liveJoin.nameError); return; }
 
     setBusy(true);
     const { data, error } = await supabase.rpc("join_game_session", {
@@ -57,9 +59,9 @@ export default function LiveJoinPage() {
         className="w-full max-w-sm space-y-4"
       >
         <div className="text-center mb-6">
-          <h1 className="font-display font-extrabold text-3xl mb-2">O&apos;yinga kirish</h1>
+          <h1 className="font-display font-extrabold text-3xl mb-2">{t.liveJoin.title}</h1>
           <p className="text-muted-foreground">
-            O&apos;qituvchi ekranidagi PIN kodni kiriting
+            {t.liveJoin.subtitle}
           </p>
         </div>
 
@@ -70,16 +72,16 @@ export default function LiveJoinPage() {
           placeholder="123456"
           inputMode="numeric"
           autoComplete="off"
-          aria-label="PIN kod"
+          aria-label={t.liveJoin.pinLabel}
         />
 
         <input
           value={nickname}
           onChange={e => setNickname(e.target.value.slice(0, 20))}
           className="input-field text-center text-lg"
-          placeholder="Ismingiz"
+          placeholder={t.liveJoin.namePlaceholder}
           autoComplete="off"
-          aria-label="Ismingiz"
+          aria-label={t.liveJoin.namePlaceholder}
         />
 
         <button
@@ -88,11 +90,11 @@ export default function LiveJoinPage() {
           className="btn-primary w-full py-3.5 flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
-          Kirish
+          {t.liveJoin.enterBtn}
         </button>
 
         <p className="text-center text-xs text-muted-foreground pt-2">
-          Ro&apos;yxatdan o&apos;tish shart emas
+          {t.liveJoin.noAccountNeeded}
         </p>
       </motion.form>
     </div>

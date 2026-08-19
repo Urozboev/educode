@@ -8,6 +8,7 @@ import {
   Users, Key, Copy, Check, Loader2, Clock, CheckCircle2, XCircle,
   ShieldCheck, RefreshCw,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface PendingLink { id: string; parent_id: string; parent_name: string; created_at: string; }
 interface ConfirmedParent { id: string; parent_name: string; }
@@ -20,6 +21,7 @@ interface ActiveCode { code: string; expires_at: string; }
  * - bog'langan ota-onalar ro'yxati
  */
 export default function ParentControlSection() {
+  const { t } = useI18n();
   const supabase = createClient();
   const [pending, setPending] = useState<PendingLink[]>([]);
   const [parents, setParents] = useState<ConfirmedParent[]>([]);
@@ -109,14 +111,14 @@ export default function ParentControlSection() {
     <div className="glass-card p-6">
       <div className="flex items-center gap-2 mb-4">
         <ShieldCheck className="w-5 h-5 text-neon-blue" />
-        <h2 className="font-display font-semibold text-lg">Ota-ona nazorati</h2>
+        <h2 className="font-display font-semibold text-lg">{t.studentParent.title}</h2>
       </div>
 
       {/* Pending so'rovlar */}
       {pending.length > 0 && (
         <div className="mb-5 space-y-2">
           <p className="text-sm font-medium text-neon-yellow flex items-center gap-1.5">
-            <Clock className="w-4 h-4" /> Tasdiqlashni kutayotgan so'rovlar
+            <Clock className="w-4 h-4" /> {t.studentParent.pendingRequests}
           </p>
           {pending.map(p => (
             <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-neon-yellow/5 border border-neon-yellow/20">
@@ -125,12 +127,12 @@ export default function ParentControlSection() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{p.parent_name}</p>
-                <p className="text-xs text-muted-foreground">sizni kuzatmoqchi</p>
+                <p className="text-xs text-muted-foreground">{t.studentParent.wantsToTrack}</p>
               </div>
-              <button onClick={() => respond(p.id, true)} className="p-2 rounded-lg bg-neon-green/10 text-neon-green hover:bg-neon-green/20" title="Tasdiqlash">
+              <button onClick={() => respond(p.id, true)} className="p-2 rounded-lg bg-neon-green/10 text-neon-green hover:bg-neon-green/20" title={t.common.confirm}>
                 <CheckCircle2 className="w-4 h-4" />
               </button>
-              <button onClick={() => respond(p.id, false)} className="p-2 rounded-lg bg-neon-red/10 text-neon-red hover:bg-neon-red/20" title="Rad etish">
+              <button onClick={() => respond(p.id, false)} className="p-2 rounded-lg bg-neon-red/10 text-neon-red hover:bg-neon-red/20" title={t.parent.rejected}>
                 <XCircle className="w-4 h-4" />
               </button>
             </div>
@@ -140,9 +142,9 @@ export default function ParentControlSection() {
 
       {/* Ulanish kodi */}
       <div className="mb-5">
-        <p className="text-sm font-medium mb-2 flex items-center gap-1.5"><Key className="w-4 h-4 text-neon-blue" /> Ulanish kodi</p>
+        <p className="text-sm font-medium mb-2 flex items-center gap-1.5"><Key className="w-4 h-4 text-neon-blue" /> {t.studentParent.linkCode}</p>
         <p className="text-xs text-muted-foreground mb-3">
-          Ota-onangiz sizni kuzatishi uchun bu kodni ularga bering. Kod 24 soat amal qiladi.
+          {t.studentParent.linkCodeHint}
         </p>
         {activeCode ? (
           <div className="flex items-center gap-2">
@@ -152,13 +154,13 @@ export default function ParentControlSection() {
                 {copied ? <Check className="w-4 h-4 text-neon-green" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
               </button>
             </div>
-            <button onClick={generateCode} disabled={generating} className="btn-ghost py-3 px-3 border border-border" title="Yangi kod">
+            <button onClick={generateCode} disabled={generating} className="btn-ghost py-3 px-3 border border-border" title={t.studentParent.newCode}>
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             </button>
           </div>
         ) : (
           <button onClick={generateCode} disabled={generating} className="btn-primary py-2.5 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />} Kod yaratish
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />} {t.studentParent.generateCode}
           </button>
         )}
       </div>
@@ -166,7 +168,7 @@ export default function ParentControlSection() {
       {/* Bog'langan ota-onalar */}
       {parents.length > 0 && (
         <div>
-          <p className="text-sm font-medium mb-2 flex items-center gap-1.5"><Users className="w-4 h-4 text-neon-green" /> Bog'langan ota-onalar</p>
+          <p className="text-sm font-medium mb-2 flex items-center gap-1.5"><Users className="w-4 h-4 text-neon-green" /> {t.studentParent.linkedParents}</p>
           <div className="space-y-2">
             {parents.map(p => (
               <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface/50">

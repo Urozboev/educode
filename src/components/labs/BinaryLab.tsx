@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { RotateCcw, Check, Shuffle, Target, Lightbulb } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 /**
  * Ikkilik sanoq sistemasi laboratoriyasi.
@@ -20,6 +21,7 @@ const WEIGHTS = Array.from({ length: BITS }, (_, i) => 2 ** (BITS - 1 - i)); // 
 type Mode = "explore" | "practice";
 
 export function BinaryLab() {
+  const { t } = useI18n();
   const [mode, setMode] = useState<Mode>("explore");
   const [bits, setBits] = useState<boolean[]>(() => Array(BITS).fill(false));
   const [target, setTarget] = useState(() => randomTarget());
@@ -81,7 +83,7 @@ export function BinaryLab() {
 
         {mode === "practice" && (
           <span className="text-sm text-muted-foreground">
-            Topildi: <span className="numeric text-foreground">{solved}</span>
+            {t.labs.found} <span className="numeric text-foreground">{solved}</span>
           </span>
         )}
       </div>
@@ -194,11 +196,8 @@ export function BinaryLab() {
 
       {mode === "explore" && (
         <div className="p-4 rounded-xl border border-border bg-surface/30 text-sm text-muted-foreground leading-relaxed">
-          Har bir katak — bitta <b className="text-foreground">bit</b>. O&apos;ngdan chapga
-          qarab har bitning qiymati ikki barobar oshadi: 1, 2, 4, 8, 16… Yoqilgan
-          bitlarning qiymatlarini qo&apos;shsangiz, o&apos;nlik son chiqadi.
-          Sakkiz bit — bu bitta <b className="text-foreground">bayt</b>, u 0 dan 255 gacha
-          sonni saqlay oladi.
+          {t.labs.bitPrefix} <b className="text-foreground">{t.labs.bitWord}</b>{t.labs.bitExplain}
+          {t.labs.bytePrefix} <b className="text-foreground">{t.labs.byteWord}</b>{t.labs.byteExplain}
         </div>
       )}
     </div>

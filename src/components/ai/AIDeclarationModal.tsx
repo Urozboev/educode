@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 export type DeclarationAnswer = "yes" | "no" | "partial";
 
@@ -23,20 +24,21 @@ interface Props {
   hint?: { aiUsedToday?: number; pasteDetected?: boolean };
 }
 
-const AI_AREAS = [
-  { id: "algorithm", label: "Algoritm rejasi" },
-  { id: "syntax", label: "Sintaksis tushunish" },
-  { id: "debugging", label: "Xatolarni tuzatish" },
-  { id: "concept", label: "Mavzu tushunchasi" },
-];
-
 export default function AIDeclarationModal({ open, onClose, onConfirm, submitting, hint }: Props) {
+  const { t } = useI18n();
   const [usedAI, setUsedAI] = useState<DeclarationAnswer | null>(null);
   const [areas, setAreas] = useState<string[]>([]);
   const [otherText, setOtherText] = useState("");
   const [otherChecked, setOtherChecked] = useState(false);
   const [couldSolve, setCouldSolve] = useState<DeclarationAnswer | null>(null);
   const [pledge, setPledge] = useState(false);
+
+  const AI_AREAS = [
+    { id: "algorithm", label: t.aiDeclaration.areas.algorithm },
+    { id: "syntax", label: t.aiDeclaration.areas.syntax },
+    { id: "debugging", label: t.aiDeclaration.areas.debugging },
+    { id: "concept", label: t.aiDeclaration.areas.concept },
+  ];
 
   const valid =
     usedAI !== null &&
@@ -84,8 +86,8 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                   <ShieldCheck className="w-5 h-5 text-neon-purple" />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-lg">Akademik halollik</h2>
-                  <p className="text-xs text-muted-foreground">Topshirishdan oldin javob bering</p>
+                  <h2 className="font-display font-bold text-lg">{t.aiDeclaration.title}</h2>
+                  <p className="text-xs text-muted-foreground">{t.aiDeclaration.subtitle}</p>
                 </div>
               </div>
               <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-surface">
@@ -95,19 +97,19 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
 
             {hint?.aiUsedToday !== undefined && hint.aiUsedToday > 0 && (
               <div className="mb-4 px-3 py-2 rounded-lg bg-neon-blue/5 border border-neon-blue/20 text-[11px] text-muted-foreground">
-                ℹ️ Bugun AI mentordan <span className="font-semibold text-neon-blue">{hint.aiUsedToday}</span> marta yordam olgansiz.
+                ℹ️ {t.aiDeclaration.aiUsedCount.replace("{count}", String(hint.aiUsedToday))}
               </div>
             )}
             {hint?.pasteDetected && (
               <div className="mb-4 px-3 py-2 rounded-lg bg-neon-yellow/5 border border-neon-yellow/20 text-[11px] text-neon-yellow">
-                ⚠️ Editor'da katta paste hodisasi aniqlandi.
+                ⚠️ {t.aiDeclaration.pasteWarning}
               </div>
             )}
 
             {/* 1-savol */}
             <div className="space-y-2 mb-4">
               <p className="text-sm font-medium">
-                1. Bu topshiriqda AI yordamidan foydalandingizmi?
+                {t.aiDeclaration.q1}
               </p>
               <div className="flex gap-2">
                 {(["yes", "no", "partial"] as DeclarationAnswer[]).map(opt => (
@@ -121,7 +123,7 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                         : "bg-surface border-border text-muted-foreground hover:bg-surface-hover",
                     )}
                   >
-                    {opt === "yes" ? "Ha" : opt === "no" ? "Yo'q" : "Qisman"}
+                    {opt === "yes" ? t.aiDeclaration.yes : opt === "no" ? t.aiDeclaration.no : t.aiDeclaration.partial}
                   </button>
                 ))}
               </div>
@@ -130,7 +132,7 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
             {/* 2-savol — agar yes/partial */}
             {(usedAI === "yes" || usedAI === "partial") && (
               <div className="space-y-2 mb-4">
-                <p className="text-sm font-medium">2. Qaysi qismlarda foydalandingiz?</p>
+                <p className="text-sm font-medium">{t.aiDeclaration.q2}</p>
                 <div className="grid grid-cols-2 gap-2">
                   {AI_AREAS.map(a => (
                     <label
@@ -138,8 +140,8 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm",
                         areas.includes(a.id)
-                          ? "bg-neon-purple/10 border-neon-purple/40"
-                          : "bg-surface border-border hover:bg-surface-hover",
+                          ? "bg-neon-purple/10 border-neon-purple/40 text-foreground"
+                          : "bg-surface border-border text-muted-foreground hover:bg-surface-hover",
                       )}
                     >
                       <input
@@ -163,13 +165,13 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                       onChange={e => setOtherChecked(e.target.checked)}
                       className="accent-neon-purple"
                     />
-                    <span>Boshqa:</span>
+                    <span>{t.aiDeclaration.other}</span>
                     <input
                       type="text"
                       value={otherText}
                       onChange={e => setOtherText(e.target.value)}
                       disabled={!otherChecked}
-                      placeholder="qisqa izoh"
+                      placeholder={t.aiDeclaration.otherPh}
                       className="input-field flex-1 py-1 px-2 text-xs"
                     />
                   </label>
@@ -179,7 +181,7 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
 
             {/* 3-savol */}
             <div className="space-y-2 mb-4">
-              <p className="text-sm font-medium">3. AI yordamisiz bu topshiriqni o'zingiz yecha olarmidingiz?</p>
+              <p className="text-sm font-medium">{t.aiDeclaration.q3}</p>
               <div className="flex gap-2">
                 {(["yes", "no", "partial"] as DeclarationAnswer[]).map(opt => (
                   <button
@@ -192,7 +194,7 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                         : "bg-surface border-border text-muted-foreground hover:bg-surface-hover",
                     )}
                   >
-                    {opt === "yes" ? "Ha" : opt === "no" ? "Yo'q" : "Qisman"}
+                    {opt === "yes" ? t.aiDeclaration.yes : opt === "no" ? t.aiDeclaration.no : t.aiDeclaration.partial}
                   </button>
                 ))}
               </div>
@@ -210,7 +212,7 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                 className="accent-neon-green mt-1"
               />
               <span className="text-xs leading-relaxed">
-                Yuqoridagi javoblar to'g'ri ekanini va akademik halollik qoidalariga rioya qilganimni tasdiqlayman.
+                {t.aiDeclaration.pledge}
               </span>
             </label>
 
@@ -221,7 +223,7 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                 disabled={submitting}
                 className="btn-ghost py-2 px-4 text-sm"
               >
-                Bekor qilish
+                {t.common.cancel}
               </button>
               <button
                 onClick={handleSubmit}
@@ -229,7 +231,7 @@ export default function AIDeclarationModal({ open, onClose, onConfirm, submittin
                 className="btn-primary py-2 px-4 text-sm flex items-center gap-2 disabled:opacity-50"
               >
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
-                Topshirishni tasdiqlang
+                {t.aiDeclaration.confirmSubmit}
               </button>
             </div>
           </motion.div>

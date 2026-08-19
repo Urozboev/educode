@@ -254,7 +254,7 @@ export default function RegisterPage() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Ism Familiya"
+                placeholder={t.auth.fullNamePh}
                 className="w-full bg-surface/60 border border-border rounded-xl pl-12 pr-4 py-3.5 text-[15px] placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-purple/40 focus:border-neon-purple/40 transition-all"
                 required
               />

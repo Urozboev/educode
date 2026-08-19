@@ -72,8 +72,7 @@ export function GlossaryView() {
           Terminlar
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Dasturlash va IT sohasidagi terminlar o&apos;zbek tilida. Kartochkalar rejimida
-          o&apos;zingizni sinab ko&apos;ring.
+          {t.misc.glossarySubtitle}
         </p>
       </motion.div>
 
@@ -141,7 +140,7 @@ export function GlossaryView() {
         <div className="py-20 text-center">
           <BookMarked className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {terms.length === 0 ? "Terminlar tez orada qo'shiladi" : "Natija topilmadi"}
+            {terms.length === 0 ? "Terminlar tez orada qo'shiladi" : t.misc.noResults}
           </p>
         </div>
       ) : mode === "cards" ? (
@@ -265,7 +264,7 @@ function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
         onClick={() => setFlipped(f => !f)}
         role="button"
         tabIndex={0}
-        aria-label="Kartochkani ag'darish"
+        aria-label={t.explore.flipHint}
         onKeyDown={e => { if (e.key === "Enter") setFlipped(f => !f); }}
       >
         <motion.div
@@ -299,7 +298,7 @@ function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
             )}
             {current.synonyms?.length > 0 && (
               <p className="text-xs text-muted-foreground mt-4">
-                Sinonimlar: {current.synonyms.join(", ")}
+                {t.explore.synonyms} {current.synonyms.join(", ")}
               </p>
             )}
           </div>
@@ -312,7 +311,7 @@ function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
           onClick={() => go(-1)}
           disabled={pos === 0}
           className="p-3 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-          aria-label="Oldingi"
+          aria-label={t.common.back}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -322,13 +321,13 @@ function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
             onClick={() => mark(false)}
             className="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold border border-neon-red/30 text-neon-red bg-neon-red/[0.06] hover:bg-neon-red/[0.12] transition-colors"
           >
-            <XIcon className="w-4 h-4" /> Bilmadim
+            <XIcon className="w-4 h-4" /> {t.explore.dontKnow}
           </button>
           <button
             onClick={() => mark(true)}
             className="inline-flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold border border-neon-green/30 text-neon-green bg-neon-green/[0.06] hover:bg-neon-green/[0.12] transition-colors"
           >
-            <Check className="w-4 h-4" /> Bilaman
+            <Check className="w-4 h-4" /> {t.explore.know}
           </button>
         </div>
 
@@ -336,7 +335,7 @@ function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
           onClick={() => go(1)}
           disabled={pos === order.length - 1}
           className="p-3 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-          aria-label="Keyingi"
+          aria-label={t.common.next}
         >
           <ChevronRight className="w-5 h-5" />
         </button>

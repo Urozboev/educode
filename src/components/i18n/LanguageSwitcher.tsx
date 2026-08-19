@@ -87,14 +87,18 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
         aria-label={t.nav.language}
         aria-expanded={open}
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface/60 hover:bg-surface transition font-medium",
-          compact ? "px-2.5 py-2 text-xs" : "px-3 py-2 text-sm"
+          // O'lcham oldingisining ~90% i. Matn o'lchamini qavs ichida
+          // BERMANG (`text-[13px]`) — Tailwind unda qator balandligini
+          // qo'ymaydi va quti pastdan kichraymay qoladi. `text-xs` o'zi
+          // `leading-4` ni ham beradi.
+          "inline-flex items-center rounded-lg border border-border bg-surface/60 hover:bg-surface transition font-medium",
+          compact ? "gap-1 px-2 py-1.5 text-xs" : "gap-1.5 px-2.5 py-2 text-xs"
         )}
       >
-        <Globe className="w-4 h-4 flex-shrink-0" />
+        <Globe className="w-3.5 h-3.5 flex-shrink-0" />
         <span>{meta.code}</span>
         {!compact && (
-          <ChevronDown className={cn("w-3.5 h-3.5 transition-transform ml-auto", open && "rotate-180")} />
+          <ChevronDown className={cn("w-3 h-3 transition-transform ml-auto", open && "rotate-180")} />
         )}
         <span className="sr-only">{meta.native}</span>
       </button>

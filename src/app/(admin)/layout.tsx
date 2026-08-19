@@ -106,19 +106,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         })}
       </nav>
       <div className="p-3 border-t border-border/50 space-y-1">
-        {!collapsed && (
-          <div className="px-1 pb-1">
-            <LanguageSwitcher />
-          </div>
-        )}
         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-accent w-full", collapsed && "justify-center px-3")}>
-          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}{!collapsed && <span>{theme === "dark" ? "Yorug'" : "Qorong'u"}</span>}
+          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}{!collapsed && <span>{theme === "dark" ? t.cabinet.lightMode : t.cabinet.darkMode}</span>}
         </button>
-        <button onClick={handleLogout}
-          className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-neon-red/70 hover:bg-neon-red/10 w-full", collapsed && "justify-center px-3")}>
-          <LogOut className="w-5 h-5" />{!collapsed && <span>{t.nav.logout}</span>}
-        </button>
+        {/* Til tanlagich chiqish bilan bir qatorda — yon panel pastida
+            alohida qator egallamasligi uchun */}
+        <div className="flex items-center gap-2">
+          <button onClick={handleLogout}
+            className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-neon-red/70 hover:bg-neon-red/10 flex-1", collapsed && "justify-center px-3")}>
+            <LogOut className="w-5 h-5" />{!collapsed && <span>{t.nav.logout}</span>}
+          </button>
+          {!collapsed && <LanguageSwitcher />}
+        </div>
       </div>
     </div>
   );

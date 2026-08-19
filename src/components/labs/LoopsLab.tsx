@@ -3,9 +3,11 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 import {
   Play, Pause, SkipBack, SkipForward, RotateCcw, Rabbit, Turtle,
 } from "lucide-react";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 /**
  * Sikl va shart operatorlari laboratoriyasi.
@@ -37,10 +39,10 @@ type Program = {
    DASTURLAR
    ============================================================ */
 
-const forSum: Program = {
+const forSum = (t: Dictionary): Program => ({
   id: "for-sum",
-  title: "for sikli",
-  hint: "1 dan 5 gacha sonlarni qo'shish",
+  title: t.labs.progFor,
+  hint: t.labs.progForHint,
   code: [
     "jami = 0",
     "for i in range(1, 6):",
@@ -50,23 +52,23 @@ const forSum: Program = {
   build() {
     const steps: Step[] = [];
     let jami = 0;
-    steps.push({ line: 1, vars: { jami }, output: [], note: "jami o'zgaruvchisi 0 qiymat bilan yaratildi" });
+    steps.push({ line: 1, vars: { jami }, output: [], note: t.labs.noteSumInit });
     for (let i = 1; i <= 5; i++) {
-      steps.push({ line: 2, vars: { jami, i }, output: [], note: `Sikl ${i}-marta aylanmoqda, i = ${i}` });
+      steps.push({ line: 2, vars: { jami, i }, output: [], note: t.labs.noteLoopTurn.replace(/\{n\}/g, String(i)) });
       const prev = jami;
       jami += i;
-      steps.push({ line: 3, vars: { jami, i }, output: [], note: `jami = ${prev} + ${i} = ${jami}` });
+      steps.push({ line: 3, vars: { jami, i }, output: [], note: t.labs.noteSumStep.replace("{prev}", String(prev)).replace("{i}", String(i)).replace("{sum}", String(jami)) });
     }
-    steps.push({ line: 2, vars: { jami, i: 6 }, output: [], note: "i 6 ga yetdi — sikl tugadi" });
-    steps.push({ line: 4, vars: { jami }, output: [String(jami)], note: `Natija chop etildi: ${jami}` });
+    steps.push({ line: 2, vars: { jami, i: 6 }, output: [], note: t.labs.noteLoopEnd });
+    steps.push({ line: 4, vars: { jami }, output: [String(jami)], note: t.labs.notePrinted.replace("{v}", String(jami)) });
     return steps;
   },
-};
+});
 
-const whileCount: Program = {
+const whileCount = (t: Dictionary): Program => ({
   id: "while",
-  title: "while sikli",
-  hint: "Shart yolg'on bo'lguncha takrorlash",
+  title: t.labs.progWhile,
+  hint: t.labs.progWhileHint,
   code: [
     "son = 10",
     "while son > 0:",
@@ -76,23 +78,23 @@ const whileCount: Program = {
   build() {
     const steps: Step[] = [];
     let son = 10;
-    steps.push({ line: 1, vars: { son }, output: [], note: "son = 10" });
+    steps.push({ line: 1, vars: { son }, output: [], note: t.labs.noteAssign });
     while (son > 0) {
-      steps.push({ line: 2, vars: { son }, output: [], note: `Shart tekshirilmoqda: ${son} > 0 → rost` });
+      steps.push({ line: 2, vars: { son }, output: [], note: t.labs.noteCheckTrue.replace("{v}", String(son)) });
       const prev = son;
       son -= 3;
-      steps.push({ line: 3, vars: { son }, output: [], note: `son = ${prev} − 3 = ${son}` });
+      steps.push({ line: 3, vars: { son }, output: [], note: t.labs.noteMinus.replace("{prev}", String(prev)).replace("{v}", String(son)) });
     }
-    steps.push({ line: 2, vars: { son }, output: [], note: `Shart tekshirilmoqda: ${son} > 0 → yolg'on, sikl to'xtadi` });
-    steps.push({ line: 4, vars: { son }, output: [String(son)], note: `Natija: ${son}` });
+    steps.push({ line: 2, vars: { son }, output: [], note: t.labs.noteCheckFalse.replace("{v}", String(son)) });
+    steps.push({ line: 4, vars: { son }, output: [String(son)], note: t.labs.noteResult.replace("{v}", String(son)) });
     return steps;
   },
-};
+});
 
-const ifElse: Program = {
+const ifElse = (t: Dictionary): Program => ({
   id: "if",
-  title: "if / elif / else",
-  hint: "Shartga qarab yo'l tanlash",
+  title: t.labs.progIf,
+  hint: t.labs.progIfHint,
   code: [
     "baho = 85",
     "if baho >= 90:",
@@ -106,19 +108,19 @@ const ifElse: Program = {
   build(): Step[] {
     const baho = 85;
     return [
-      { line: 1, vars: { baho }, output: [], note: "baho = 85" },
-      { line: 2, vars: { baho }, output: [], note: "85 >= 90 → yolg'on, keyingi shartga o'tamiz" },
-      { line: 4, vars: { baho }, output: [], note: "85 >= 70 → rost, shu tarmoq bajariladi" },
+      { line: 1, vars: { baho }, output: [], note: t.labs.noteGrade },
+      { line: 2, vars: { baho }, output: [], note: t.labs.noteGradeFalse },
+      { line: 4, vars: { baho }, output: [], note: t.labs.noteGradeTrue },
       { line: 5, vars: { baho, natija: "Yaxshi" }, output: [], note: "natija = \"Yaxshi\"" },
-      { line: 8, vars: { baho, natija: "Yaxshi" }, output: ["Yaxshi"], note: "else tarmog'i o'tkazib yuborildi, natija chop etildi" },
+      { line: 8, vars: { baho, natija: "Yaxshi" }, output: ["Yaxshi"], note: t.labs.noteElseSkipped },
     ];
   },
-};
+});
 
-const nested: Program = {
+const nested = (t: Dictionary): Program => ({
   id: "nested",
-  title: "Ichma-ich sikl",
-  hint: "Ko'paytirish jadvali",
+  title: t.labs.progNested,
+  hint: t.labs.progNestedHint,
   code: [
     "for i in range(1, 4):",
     "    for j in range(1, 4):",
@@ -128,20 +130,20 @@ const nested: Program = {
     const steps: Step[] = [];
     const out: string[] = [];
     for (let i = 1; i <= 3; i++) {
-      steps.push({ line: 1, vars: { i }, output: [...out], note: `Tashqi sikl: i = ${i}` });
+      steps.push({ line: 1, vars: { i }, output: [...out], note: t.labs.noteOuter.replace("{i}", String(i)) });
       for (let j = 1; j <= 3; j++) {
-        steps.push({ line: 2, vars: { i, j }, output: [...out], note: `Ichki sikl: j = ${j}` });
+        steps.push({ line: 2, vars: { i, j }, output: [...out], note: t.labs.noteInner.replace("{j}", String(j)) });
         out.push(`${i} x ${j} = ${i * j}`);
-        steps.push({ line: 3, vars: { i, j }, output: [...out], note: `${i} × ${j} = ${i * j} chop etildi` });
+        steps.push({ line: 3, vars: { i, j }, output: [...out], note: t.labs.noteMultiplied.replace("{i}", String(i)).replace("{j}", String(j)).replace("{r}", String(i * j)) });
       }
-      steps.push({ line: 2, vars: { i, j: 4 }, output: [...out], note: `Ichki sikl tugadi, tashqisiga qaytamiz` });
+      steps.push({ line: 2, vars: { i, j: 4 }, output: [...out], note: t.labs.noteInnerDone });
     }
-    steps.push({ line: 1, vars: { i: 4 }, output: [...out], note: "Ikkala sikl ham tugadi" });
+    steps.push({ line: 1, vars: { i: 4 }, output: [...out], note: t.labs.noteBothDone });
     return steps;
   },
-};
+});
 
-const PROGRAMS = [forSum, whileCount, ifElse, nested];
+const PROGRAMS = (t: Dictionary) => [forSum(t), whileCount(t), ifElse(t), nested(t)];
 
 const SPEEDS = [
   { label: "Sekin", ms: 1400, Icon: Turtle },
@@ -154,12 +156,13 @@ const SPEEDS = [
    ============================================================ */
 
 export function LoopsLab() {
-  const [progId, setProgId] = useState(PROGRAMS[0].id);
+  const { t } = useI18n();
+  const [progId, setProgId] = useState(PROGRAMS(t)[0].id);
   const [pos, setPos] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speedIdx, setSpeedIdx] = useState(0);
 
-  const program = useMemo(() => PROGRAMS.find(p => p.id === progId)!, [progId]);
+  const program = useMemo(() => PROGRAMS(t).find(p => p.id === progId)!, [progId]);
   const steps = useMemo(() => program.build(), [program]);
   const step = steps[Math.min(pos, steps.length - 1)];
   const atEnd = pos >= steps.length - 1;
@@ -172,11 +175,11 @@ export function LoopsLab() {
   posRef.current = pos;
   useEffect(() => {
     if (!playing) return;
-    const t = setInterval(() => {
+    const interval = setInterval(() => {
       if (posRef.current >= steps.length - 1) { setPlaying(false); return; }
       setPos(p => p + 1);
     }, SPEEDS[speedIdx].ms);
-    return () => clearInterval(t);
+    return () => clearInterval(interval);
   }, [playing, speedIdx, steps.length]);
 
   const varEntries = Object.entries(step.vars);
@@ -185,15 +188,15 @@ export function LoopsLab() {
     <div className="space-y-6">
       {/* Dastur tanlash */}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-        {PROGRAMS.map(p => (
+        {PROGRAMS(t).map(p => (
           <button
             key={p.id}
             onClick={() => setProgId(p.id)}
             className={cn(
               "px-4 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0 border text-left",
               progId === p.id
-                ? "bg-foreground text-background border-foreground"
-                : "bg-surface/40 text-muted-foreground border-border/50 hover:border-border hover:text-foreground"
+                ? "bg-foreground text-background border-foreground shadow-sm"
+                : "bg-card text-muted-foreground hover:text-foreground border-border hover:bg-surface"
             )}
           >
             {p.title}
@@ -206,7 +209,7 @@ export function LoopsLab() {
         {/* Kod */}
         <div className="rounded-xl overflow-hidden border border-border">
           <div className="flex items-center justify-between px-4 py-2.5 bg-surface border-b border-border">
-            <span className="eyebrow">Kod</span>
+            <span className="eyebrow">{t.cabinet.portfolioView.code}</span>
             <span className="numeric text-xs text-muted-foreground">
               {Math.min(pos + 1, steps.length)}/{steps.length}
             </span>
@@ -228,69 +231,54 @@ export function LoopsLab() {
                   )}>
                     {i + 1}
                   </span>
-                  <pre className={cn("whitespace-pre", active ? "text-[#e6edf3]" : "text-[#8b949e]")}>
+                  <span className={active ? "text-foreground font-semibold" : "text-[#c9d1d9]"}>
                     {line}
-                  </pre>
+                  </span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* O'zgaruvchilar va chiqish */}
-        <div className="space-y-4">
-          <div className="rounded-xl border border-border p-4">
+        {/* O'ng tomon: o'zgaruvchilar + terminal */}
+        <div className="flex flex-col gap-4">
+          {/* O'zgaruvchilar jadvali */}
+          <div className="rounded-xl border border-border bg-card p-4 flex-1">
             <p className="eyebrow mb-3">O&apos;zgaruvchilar</p>
             {varEntries.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Hali yaratilmagan</p>
+              <p className="text-xs text-muted-foreground italic">{t.labs.noVars}</p>
             ) : (
-              <div className="space-y-2">
-                <AnimatePresence initial={false}>
-                  {varEntries.map(([name, value]) => (
-                    <motion.div
-                      key={name}
-                      layout
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center gap-3"
-                    >
-                      <span className="font-mono text-sm text-neon-purple w-16 flex-shrink-0">{name}</span>
-                      <span className="text-muted-foreground">=</span>
-                      <motion.span
-                        key={`${name}-${value}`}
-                        initial={{ scale: 1.15, color: "hsl(var(--brand-amber))" }}
-                        animate={{ scale: 1, color: "hsl(var(--foreground))" }}
-                        transition={{ duration: 0.4 }}
-                        className="numeric font-semibold"
-                      >
-                        {typeof value === "string" ? `"${value}"` : value}
-                      </motion.span>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+              <div className="grid grid-cols-2 gap-2">
+                {varEntries.map(([k, v]) => (
+                  <div key={k} className="p-2.5 rounded-lg bg-surface border border-border flex items-center justify-between">
+                    <span className="font-mono text-xs text-muted-foreground">{k}</span>
+                    <span className="font-mono text-sm font-bold text-neon-purple">{String(v)}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
-          <div className="rounded-xl border border-border p-4">
-            <p className="eyebrow mb-3">Chiqish</p>
+          {/* Terminal / stdout */}
+          <div className="rounded-xl border border-border bg-[#0d1117] p-4 min-h-[120px]">
+            <p className="eyebrow text-[#8b949e] mb-2">{t.cabinet.play.terminal}</p>
             {step.output.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Hali hech narsa chop etilmagan</p>
+              <p className="text-xs text-[#484f58] italic">{t.cabinet.play.emptyOutput}</p>
             ) : (
-              <pre className="font-mono text-sm space-y-0.5">
+              <div className="font-mono text-xs text-neon-green space-y-0.5">
                 {step.output.map((o, i) => <div key={i}>{o}</div>)}
-              </pre>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Izoh */}
+      {/* Izoh kartochkasi */}
       <motion.div
         key={pos}
-        initial={{ opacity: 0, y: 6 }}
+        initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-4 rounded-xl bg-neon-purple/[0.06] border border-neon-purple/20"
+        className="p-4 rounded-xl border border-neon-purple/30 bg-neon-purple/[0.06]"
       >
         <p className="text-sm leading-relaxed">{step.note}</p>
       </motion.div>
@@ -301,7 +289,7 @@ export function LoopsLab() {
           <button
             onClick={() => { setPlaying(false); setPos(0); }}
             className="p-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface transition-colors"
-            aria-label="Boshidan"
+            aria-label={t.labs.restart}
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -309,7 +297,7 @@ export function LoopsLab() {
             onClick={() => { setPlaying(false); setPos(p => Math.max(0, p - 1)); }}
             disabled={pos === 0}
             className="p-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface disabled:opacity-30 transition-colors"
-            aria-label="Orqaga"
+            aria-label={t.common.back}
           >
             <SkipBack className="w-4 h-4" />
           </button>
@@ -318,13 +306,13 @@ export function LoopsLab() {
             className="btn-primary py-2.5 px-5 text-sm inline-flex items-center gap-2"
           >
             {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            {playing ? "To'xtatish" : atEnd ? "Qaytadan" : "Ishga tushirish"}
+            {playing ? t.labs.pause : atEnd ? t.labs.restart : t.labs.run}
           </button>
           <button
             onClick={() => { setPlaying(false); setPos(p => Math.min(steps.length - 1, p + 1)); }}
             disabled={atEnd}
             className="p-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface disabled:opacity-30 transition-colors"
-            aria-label="Oldinga"
+            aria-label={t.common.next}
           >
             <SkipForward className="w-4 h-4" />
           </button>

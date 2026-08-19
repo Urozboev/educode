@@ -10,6 +10,7 @@ import { useCallback, useRef, useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough, Code,
   Heading1, Heading2, Heading3, List, ListOrdered, Quote, Minus,
@@ -46,11 +47,12 @@ function Btn({ onClick, active, disabled, title, children }: {
 }
 
 function Toolbar({ editor, onImage, uploading }: { editor: Editor; onImage: () => void; uploading: boolean }) {
+  const { t } = useI18n();
   const Sep = () => <div className="w-px h-5 bg-border/60 mx-0.5 flex-shrink-0" />;
 
   function setLink() {
     const prev = editor.getAttributes("link").href;
-    const url = window.prompt("Havola URL:", prev || "https://");
+    const url = window.prompt(t.richEditor.linkPrompt, prev || "https://");
     if (url === null) return;
     if (url === "") { editor.chain().focus().unsetLink().run(); return; }
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
@@ -58,34 +60,35 @@ function Toolbar({ editor, onImage, uploading }: { editor: Editor; onImage: () =
 
   return (
     <div className="flex items-center gap-0.5 flex-wrap p-2 border-b border-border/60 bg-surface/40 sticky top-0 z-10">
-      <Btn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Qalin (Ctrl+B)"><Bold className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} title="Kursiv (Ctrl+I)"><Italic className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} title="Tagchiziq"><UnderlineIcon className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} title="O'chirilgan"><Strikethrough className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive("code")} title="Kod (inline)"><Code className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title={t.richEditor.bold}><Bold className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} title={t.richEditor.italic}><Italic className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} title={t.richEditor.underline}><UnderlineIcon className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} title={t.richEditor.strike}><Strikethrough className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive("code")} title={t.richEditor.code}><Code className="w-4 h-4" /></Btn>
       <Sep />
-      <Btn onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })} title="Sarlavha 1"><Heading1 className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })} title="Sarlavha 2"><Heading2 className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive("heading", { level: 3 })} title="Sarlavha 3"><Heading3 className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })} title={t.richEditor.h1}><Heading1 className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })} title={t.richEditor.h2}><Heading2 className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive("heading", { level: 3 })} title={t.richEditor.h3}><Heading3 className="w-4 h-4" /></Btn>
       <Sep />
-      <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title="Belgili ro'yxat"><List className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title="Raqamli ro'yxat"><ListOrdered className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")} title="Iqtibos"><Quote className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive("codeBlock")} title="Kod bloki"><Code2 className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Ajratuvchi chiziq"><Minus className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title={t.richEditor.bulletList}><List className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title={t.richEditor.orderedList}><ListOrdered className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")} title={t.richEditor.quote}><Quote className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive("codeBlock")} title={t.richEditor.codeBlock}><Code2 className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()} title={t.richEditor.horizontalRule}><Minus className="w-4 h-4" /></Btn>
       <Sep />
-      <Btn onClick={setLink} active={editor.isActive("link")} title="Havola qo'shish"><LinkIcon className="w-4 h-4" /></Btn>
-      <Btn onClick={onImage} disabled={uploading} title="Rasm qo'shish">
+      <Btn onClick={setLink} active={editor.isActive("link")} title={t.richEditor.addLink}><LinkIcon className="w-4 h-4" /></Btn>
+      <Btn onClick={onImage} disabled={uploading} title={t.richEditor.addImage}>
         {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
       </Btn>
       <Sep />
-      <Btn onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Ortga"><Undo className="w-4 h-4" /></Btn>
-      <Btn onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="Oldinga"><Redo className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title={t.richEditor.undo}><Undo className="w-4 h-4" /></Btn>
+      <Btn onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title={t.richEditor.redo}><Redo className="w-4 h-4" /></Btn>
     </div>
   );
 }
 
 export default function RichTextEditor({ value, onChange, placeholder, bucket = "course-thumbnails" }: Props) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -96,7 +99,7 @@ export default function RichTextEditor({ value, onChange, placeholder, bucket = 
       Underline,
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-neon-purple underline", rel: "noopener", target: "_blank" } }),
       Image.configure({ HTMLAttributes: { class: "rounded-xl my-4 max-w-full" } }),
-      Placeholder.configure({ placeholder: placeholder || "Dars matnini shu yerga yozing..." }),
+      Placeholder.configure({ placeholder: placeholder || t.richEditor.defaultPlaceholder }),
     ],
     content: value || "",
     editorProps: {
@@ -119,8 +122,8 @@ export default function RichTextEditor({ value, onChange, placeholder, bucket = 
   }, [value, editor]);
 
   const uploadImage = useCallback(async (file: File) => {
-    if (!file.type.startsWith("image/")) { toast.error("Faqat rasm"); return; }
-    if (file.size > 3 * 1024 * 1024) { toast.error("Rasm 3MB dan kichik bo'lsin"); return; }
+    if (!file.type.startsWith("image/")) { toast.error(t.misc.onlyImage); return; }
+    if (file.size > 3 * 1024 * 1024) { toast.error(t.misc.imageMax3); return; }
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";

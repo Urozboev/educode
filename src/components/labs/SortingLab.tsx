@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 import {
   ALGOS, algoMeta, generateFrames, randomArray, parseArray,
   type SortAlgo,
@@ -33,6 +34,7 @@ const SPEEDS = [
 const DEFAULT_ARRAY = [42, 17, 93, 8, 55, 71, 24, 60, 33, 88, 5, 49];
 
 export function SortingLab() {
+  const { t } = useI18n();
   const [algo, setAlgo] = useState<SortAlgo>("bubble");
   const [size, setSize] = useState(DEFAULT_ARRAY.length);
   const [input, setInput] = useState<number[]>(DEFAULT_ARRAY);
@@ -98,7 +100,7 @@ export function SortingLab() {
 
       {/* Diagramma */}
       <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
-        <div className="flex items-end gap-[3px] h-56 sm:h-72" role="img" aria-label="Saralash diagrammasi">
+        <div className="flex items-end gap-[3px] h-56 sm:h-72" role="img" aria-label={t.labs.chartTitle}>
           {frame.array.map((v, i) => {
             const isComparing = frame.comparing?.includes(i);
             const isSwapping = frame.swapping?.includes(i);
@@ -154,10 +156,10 @@ export function SortingLab() {
           value={pos}
           onChange={e => { setPlaying(false); setPos(+e.target.value); }}
           className="w-full accent-[hsl(var(--brand-purple))]"
-          aria-label="Qadam"
+          aria-label={t.labs.step}
         />
         <div className="flex justify-between text-[11px] text-muted-foreground mt-1">
-          <span>Qadam <span className="numeric">{pos + 1}</span></span>
+          <span>{t.labs.step} <span className="numeric">{pos + 1}</span></span>
           <span className="numeric">{frames.length}</span>
         </div>
       </div>
@@ -168,7 +170,7 @@ export function SortingLab() {
           onClick={() => { setPlaying(false); setPos(p => Math.max(0, p - 1)); }}
           disabled={pos === 0}
           className="p-3 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface disabled:opacity-30 transition-colors"
-          aria-label="Orqaga"
+          aria-label={t.common.back}
         >
           <SkipBack className="w-4 h-4" />
         </button>
@@ -178,14 +180,14 @@ export function SortingLab() {
           className="btn-primary py-3 px-6 inline-flex items-center gap-2 text-sm"
         >
           {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-          {playing ? "To'xtatish" : atEnd ? "Qaytadan" : "Boshlash"}
+          {playing ? t.labs.pause : atEnd ? t.labs.restart : t.labs.run}
         </button>
 
         <button
           onClick={() => { setPlaying(false); setPos(p => Math.min(frames.length - 1, p + 1)); }}
           disabled={atEnd}
           className="p-3 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface disabled:opacity-30 transition-colors"
-          aria-label="Oldinga"
+          aria-label={t.common.next}
         >
           <SkipForward className="w-4 h-4" />
         </button>
@@ -193,7 +195,7 @@ export function SortingLab() {
         <button
           onClick={() => { setPlaying(false); setPos(0); }}
           className="p-3 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-surface transition-colors"
-          aria-label="Boshiga"
+          aria-label={t.labs.restart}
         >
           <RotateCcw className="w-4 h-4" />
         </button>

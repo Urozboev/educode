@@ -2,6 +2,7 @@
 
 import { Bot, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 export interface AILabelProps {
   model?: string;
@@ -83,10 +84,11 @@ export function AILabel({
  * AI javobi tagidagi ogohlantirish — AI ba'zan xato bo'lishi mumkin.
  */
 export function AIDisclaimer({ className }: { className?: string }) {
+  const { t } = useI18n();
   return (
     <div className={cn("inline-flex items-center gap-1 text-[10px] text-muted-foreground/80", className)}>
       <AlertTriangle className="w-3 h-3 text-neon-yellow/80" />
-      <span>AI ba'zan xato qilishi mumkin — javobni mustaqil tekshiring.</span>
+      <span>{t.misc.aiWarning}</span>
     </div>
   );
 }

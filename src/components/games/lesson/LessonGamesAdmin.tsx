@@ -155,7 +155,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
   }
 
   async function del(g: LessonGame) {
-    if (!confirm(`"${g.title}" o'chirilsinmi? Natijalar ham o'chadi.`)) return;
+    if (!confirm(t.lg.confirmDeleteGame.replace("{name}", g.title))) return;
     await supabase.from("lesson_games").delete().eq("id", g.id);
     toast.success("O'chirildi");
     load();

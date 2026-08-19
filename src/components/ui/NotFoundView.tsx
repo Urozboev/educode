@@ -31,7 +31,7 @@ export function NotFoundView() {
         className="btn-ghost inline-flex items-center gap-2"
       >
         <BookOpen className="w-4 h-4" />
-        Kurslarni ko'rish
+        {t.misc.viewCourses}
       </Link>
       <button
         type="button"

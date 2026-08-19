@@ -239,14 +239,14 @@ export default function CertificatePage() {
       <motion.div className="glass-card p-4 print:hidden" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
         <label className="flex items-center gap-2 text-sm font-medium mb-2">
           <Pencil className="w-4 h-4 text-neon-purple" />
-          Sertifikatdagi ism-familiya
+          {t.challenges.cert.nameOnCert}
         </label>
         <div className="flex gap-2 flex-wrap">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ism Familiya"
+            placeholder={t.auth.fullNamePh}
             maxLength={60}
             className="input-field flex-1 min-w-[220px]"
           />

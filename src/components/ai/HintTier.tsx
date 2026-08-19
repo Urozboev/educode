@@ -6,6 +6,7 @@ import { Lightbulb, Lock, Loader2, Coins, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 export interface HintTierItem {
   level: number;             // 1..4
@@ -27,6 +28,7 @@ const DEFAULT_COSTS = [0, 2, 5, 10];
  * Har bir daraja uchun talaba REASONING yozadi, keyin coin sarflab ochadi.
  */
 export default function HintTier({ taskId, taskType, hints }: Props) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [unlocked, setUnlocked] = useState<Record<number, boolean>>({});
   const [reasoning, setReasoning] = useState<Record<number, string>>({});
@@ -69,7 +71,7 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
 
     const why = (reasoning[level] || "").trim();
     if (level > 1 && why.length < 10) {
-      toast.warning("Avval o'z yondashuvingizni 1-2 jumla bilan tushuntiring.");
+      toast.warning(t.misc.hintExplainFirst);
       return;
     }
 
@@ -144,7 +146,7 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
         )}
       </div>
       <p className="text-[11px] text-muted-foreground mb-2">
-        Avval o'z yondashuvingizni yozing, keyin maslahatni oching. Maslahat darajasi qanchalik aniq bo'lsa, shuncha ko'p coin sarflanadi.
+        {t.misc.hintNote}
       </p>
 
       {tieredHints.map((h) => {
@@ -213,12 +215,12 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
                         {level > 1 && (
                           <div>
                             <label className="text-[10px] text-muted-foreground block mb-1">
-                              Avval yozing: hozirgi yondashuvingiz qanday va nimaga to'g'ri kelmadi?
+                              {t.hintTier.reasonPrompt}
                             </label>
                             <textarea
                               value={reasoning[level] || ""}
                               onChange={e => setReasoning(p => ({ ...p, [level]: e.target.value }))}
-                              placeholder="Masalan: men for sikli ishlatdim, lekin oxirgi elementni o'tkazib yubordim..."
+                              placeholder={t.hintTier.placeholder}
                               className="input-field w-full resize-none text-xs"
                               rows={2}
                             />
@@ -237,7 +239,7 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
                           {loading === level
                             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             : <Lightbulb className="w-3.5 h-3.5" />}
-                          {cost === 0 ? "Maslahatni ochish" : `${cost} coinga ochish`}
+                          {cost === 0 ? t.hintTier.unlockFree : `${cost} ${t.hintTier.unlockPaid}`}
                         </button>
                       </>
                     )}

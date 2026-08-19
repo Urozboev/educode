@@ -181,48 +181,48 @@ export default function TeacherApplyPage() {
 
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium mb-1 block">Ism-familiya *</label>
-            <input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} className="input-field" placeholder="Aliyev Vali" />
+            <label className="text-sm font-medium mb-1 block">{t.auth.fullName} *</label>
+            <input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} className="input-field" placeholder={t.auth.fullNamePh} />
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-1 block">Telefon *</label>
+            <label className="text-sm font-medium mb-1 block">{t.auth.phone} *</label>
             <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="input-field" placeholder="+998 90 123 45 67" inputMode="tel" />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium mb-1 block">Viloyat</label>
+              <label className="text-sm font-medium mb-1 block">{t.auth.region}</label>
               <select value={form.region} onChange={e => setForm({ ...form, region: e.target.value })} className="input-field">
                 {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">{t.auth.district}</label>
-              <input value={form.district} onChange={e => setForm({ ...form, district: e.target.value })} className="input-field" placeholder="Yunusobod" />
+              <input value={form.district} onChange={e => setForm({ ...form, district: e.target.value })} className="input-field" placeholder={t.auth.district} />
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-1 block">Ish joyi (maktab/kollej) *</label>
-            <input value={form.school} onChange={e => setForm({ ...form, school: e.target.value })} className="input-field" placeholder="45-umumta'lim maktabi" />
+            <label className="text-sm font-medium mb-1 block">{t.auth.workplace} *</label>
+            <input value={form.school} onChange={e => setForm({ ...form, school: e.target.value })} className="input-field" placeholder="45-maktab" />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium mb-1 block">Fan</label>
+              <label className="text-sm font-medium mb-1 block">{t.auth.subject}</label>
               <select value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className="input-field">
                 {SUBJECTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Ish tajribasi (yil)</label>
+              <label className="text-sm font-medium mb-1 block">{t.auth.experience}</label>
               <input type="number" min={0} max={60} value={form.experience_years || ""} onChange={e => setForm({ ...form, experience_years: +e.target.value })} className="input-field" placeholder="5" />
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-1 block">Qo&apos;shimcha</label>
+            <label className="text-sm font-medium mb-1 block">{t.auth.additional}</label>
             <textarea value={form.about} onChange={e => setForm({ ...form, about: e.target.value })} className="input-field resize-none" rows={3} placeholder={t.auth.motivationPh} maxLength={500} />
           </div>
 

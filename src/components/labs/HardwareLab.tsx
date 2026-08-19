@@ -3,10 +3,12 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 import {
   Monitor, Keyboard, Mouse, Headphones, Network, Plug, Printer,
   Check, RotateCcw, Info, X as XIcon,
 } from "lucide-react";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 /**
  * Kompyuter qurilmalarini ulash laboratoriyasi.
@@ -36,43 +38,38 @@ type Port = {
   color: string;
 };
 
-const DEVICES: Device[] = [
-  { id: "monitor", name: "Monitor", Icon: Monitor, port: "hdmi",
-    fact: "HDMI bitta kabel orqali ham tasvir, ham ovoz uzatadi." },
-  { id: "keyboard", name: "Klaviatura", Icon: Keyboard, port: "usb",
-    fact: "Klaviatura va sichqoncha USB orqali ulanadi — port universal." },
-  { id: "mouse", name: "Sichqoncha", Icon: Mouse, port: "usb",
-    fact: "USB portlar bir xil: qaysi biriga ulash farq qilmaydi." },
-  { id: "printer", name: "Printer", Icon: Printer, port: "usb",
-    fact: "Printer ham USB orqali ulanadi va drayver talab qiladi." },
-  { id: "headphones", name: "Quloqchin", Icon: Headphones, port: "audio",
-    fact: "3.5 mm audio uyasi odatda yashil rang bilan belgilanadi." },
-  { id: "lan", name: "Tarmoq kabeli", Icon: Network, port: "lan",
-    fact: "RJ-45 (Ethernet) simli internet uchun — Wi-Fi'dan barqarorroq." },
-  { id: "power", name: "Quvvat kabeli", Icon: Plug, port: "power",
-    fact: "Quvvat oxirida ulanadi va birinchi bo'lib uziladi." },
+const DEVICES = (t: Dictionary): Device[] => [
+  { id: "monitor", name: t.labs.devMonitor, Icon: Monitor, port: "hdmi",
+    fact: t.labs.factHdmi },
+  { id: "keyboard", name: t.labs.devKeyboard, Icon: Keyboard, port: "usb",
+    fact: t.labs.factUsb },
+  { id: "mouse", name: t.labs.devMouse, Icon: Mouse, port: "usb",
+    fact: t.labs.factMouse },
+  { id: "printer", name: t.labs.devPrinter, Icon: Printer, port: "usb",
+    fact: t.labs.factPrinter },
+  { id: "headphones", name: t.labs.devHeadphones, Icon: Headphones, port: "audio",
+    fact: t.labs.factAudio },
+  { id: "lan", name: t.labs.devLan, Icon: Network, port: "lan",
+    fact: t.labs.factLan },
+  { id: "power", name: t.labs.devPower, Icon: Plug, port: "power",
+    fact: t.labs.factPower },
 ];
 
-const PORTS: Port[] = [
-  { id: "hdmi-1", type: "hdmi", label: "HDMI", color: "text-neon-purple",
-    purpose: "HDMI — monitor yoki proyektor uchun tasvir porti." },
-  { id: "usb-1", type: "usb", label: "USB", color: "text-neon-blue",
-    purpose: "USB — klaviatura, sichqoncha, printer va flesh xotira uchun." },
-  { id: "usb-2", type: "usb", label: "USB", color: "text-neon-blue",
-    purpose: "USB — klaviatura, sichqoncha, printer va flesh xotira uchun." },
+const PORTS = (t: Dictionary): Port[] => [
   { id: "usb-3", type: "usb", label: "USB", color: "text-neon-blue",
-    purpose: "USB — klaviatura, sichqoncha, printer va flesh xotira uchun." },
+    purpose: t.labs.portUsb },
   { id: "audio-1", type: "audio", label: "Audio", color: "text-neon-green",
-    purpose: "Audio uyasi — quloqchin yoki kolonka uchun." },
+    purpose: t.labs.portAudio },
   { id: "lan-1", type: "lan", label: "LAN", color: "text-neon-yellow",
-    purpose: "LAN (RJ-45) — simli internet kabeli uchun." },
+    purpose: t.labs.portLan },
   { id: "power-1", type: "power", label: "220V", color: "text-neon-red",
-    purpose: "Quvvat uyasi — faqat elektr kabeli uchun." },
+    purpose: t.labs.portPower },
 ];
 
 type Feedback = { ok: boolean; text: string } | null;
 
 export function HardwareLab() {
+  const { t } = useI18n();
   const [selected, setSelected] = useState<string | null>(null);
   // portId → deviceId
   const [connected, setConnected] = useState<Record<string, string>>({});
@@ -87,15 +84,15 @@ export function HardwareLab() {
 
   function pickPort(port: Port) {
     if (!selected) {
-      setFeedback({ ok: false, text: "Avval chapdan qurilmani tanlang." });
+      setFeedback({ ok: false, text: t.labs.pickDeviceFirst });
       return;
     }
     if (connected[port.id]) {
-      setFeedback({ ok: false, text: "Bu port band — avval undagi qurilmani uzing." });
+      setFeedback({ ok: false, text: t.labs.portBusy });
       return;
     }
 
-    const device = DEVICES.find(d => d.id === selected)!;
+    const device = DEVICES(t).find(d => d.id === selected)!;
 
     if (device.port === port.type) {
       setConnected(c => ({ ...c, [port.id]: device.id }));
@@ -103,7 +100,7 @@ export function HardwareLab() {
       setFeedback({ ok: true, text: `${device.name} ulandi. ${device.fact}` });
     } else {
       setMistakes(m => m + 1);
-      const right = PORTS.find(p => p.type === device.port);
+      const right = PORTS(t).find(p => p.type === device.port);
       setFeedback({
         ok: false,
         text: `${device.name} bu portga ulanmaydi. ${port.purpose} ${device.name} uchun ${right?.label} kerak.`,
@@ -157,7 +154,7 @@ export function HardwareLab() {
         <div>
           <p className="eyebrow mb-3">Qurilmalar</p>
           <div className="grid grid-cols-2 gap-2.5">
-            {DEVICES.map(d => {
+            {DEVICES(t).map(d => {
               const isConnected = connectedDevices.has(d.id);
               const isSelected = selected === d.id;
               return (
@@ -186,9 +183,9 @@ export function HardwareLab() {
           <p className="eyebrow mb-3">Tizim bloki — portlar</p>
           <div className="rounded-xl border-2 border-border bg-surface/40 p-4">
             <div className="space-y-2">
-              {PORTS.map(p => {
+              {PORTS(t).map(p => {
                 const devId = connected[p.id];
-                const dev = devId ? DEVICES.find(d => d.id === devId) : null;
+                const dev = devId ? DEVICES(t).find(d => d.id === devId) : null;
                 return (
                   <div
                     key={p.id}
@@ -217,7 +214,7 @@ export function HardwareLab() {
                         <button
                           onClick={() => disconnect(p.id)}
                           className="p-1.5 rounded text-muted-foreground hover:text-neon-red hover:bg-neon-red/10 flex-shrink-0"
-                          title="Uzish"
+                          title={t.labs.disconnect}
                         >
                           <XIcon className="w-3.5 h-3.5" />
                         </button>
@@ -227,7 +224,7 @@ export function HardwareLab() {
                         onClick={() => pickPort(p)}
                         className="flex-1 text-left text-sm text-muted-foreground hover:text-foreground py-1"
                       >
-                        {selected ? "Shu yerga ulash" : "Bo'sh"}
+                        {selected ? t.labs.connectHere : "Bo'sh"}
                       </button>
                     )}
                   </div>
@@ -263,7 +260,7 @@ export function HardwareLab() {
 
       {!selected && !done && !feedback && (
         <p className="text-center text-sm text-muted-foreground">
-          Qurilmani tanlang, so&apos;ng mos portni bosing
+          {t.labs.pickDeviceThenPort}
         </p>
       )}
 
@@ -279,7 +276,7 @@ export function HardwareLab() {
             </p>
             <p className="text-sm text-muted-foreground">
               {mistakes === 0
-                ? "Bironta ham xato qilmadingiz."
+                ? t.labs.noMistakes
                 : `${mistakes} ta xato bilan yakunladingiz — qaytadan urinib ko'ring.`}
             </p>
           </motion.div>

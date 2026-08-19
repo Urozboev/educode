@@ -5,6 +5,7 @@ import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { formatDate } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 import {
   ShieldCheck, ShieldX, Award, Calendar, Loader2, ExternalLink, Search,
 } from "lucide-react";
@@ -27,6 +28,7 @@ type Verified = {
  * Sahifa bitta savolga javob beradi: bu sertifikat haqiqiymi?
  */
 export function VerifyView({ number }: { number: string }) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [data, setData] = useState<Verified | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,26 +65,26 @@ export function VerifyView({ number }: { number: string }) {
               <ShieldCheck className="w-6 h-6 text-neon-green" />
             </span>
             <div>
-              <p className="font-display font-bold text-neon-green">Sertifikat haqiqiy</p>
+              <p className="font-display font-bold text-neon-green">{t.verifyCert.validTitle}</p>
               <p className="text-xs text-muted-foreground">
-                EduCode ma&apos;lumotlar bazasidan tasdiqlandi
+                {t.verifyCert.validSubtitle}
               </p>
             </div>
           </div>
 
           <dl className="p-5 space-y-4">
-            <Row label="Egasi" value={data.full_name} big />
-            <Row label="Kurs" value={data.course_title} />
+            <Row label={t.verifyCert.owner} value={data.full_name} big />
+            <Row label={t.verifyCert.course} value={data.course_title} />
             <Row
-              label="Tugatilgan sana"
+              label={t.verifyCert.completionDate}
               value={formatDate(data.completion_date)}
               icon={<Calendar className="w-3.5 h-3.5" />}
             />
             {data.score_percentage != null && data.score_percentage > 0 && (
-              <Row label="O'rtacha ball" value={`${Math.round(data.score_percentage)}%`} />
+              <Row label={t.verifyCert.avgScore} value={`${Math.round(data.score_percentage)}%`} />
             )}
             <Row
-              label="Sertifikat raqami"
+              label={t.verifyCert.certNumber}
               value={data.certificate_number}
               mono
               icon={<Award className="w-3.5 h-3.5" />}
@@ -95,7 +97,7 @@ export function VerifyView({ number }: { number: string }) {
                 href={`/u/${data.portfolio_username}`}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-neon-purple hover:underline"
               >
-                Egasining portfoliosini ko&apos;rish <ExternalLink className="w-3.5 h-3.5" />
+                {t.verifyCert.viewPortfolio} <ExternalLink className="w-3.5 h-3.5" />
               </Link>
             </div>
           )}
@@ -109,11 +111,11 @@ export function VerifyView({ number }: { number: string }) {
           <span className="w-12 h-12 rounded-xl bg-neon-red/10 border border-neon-red/25 flex items-center justify-center mx-auto mb-4">
             <ShieldX className="w-6 h-6 text-neon-red" />
           </span>
-          <p className="font-display font-bold text-neon-red mb-1">Sertifikat topilmadi</p>
+          <p className="font-display font-bold text-neon-red mb-1">{t.verifyCert.notFoundTitle}</p>
           <p className="text-sm text-muted-foreground">
             {number
-              ? <>Bu raqamli sertifikat bazada yo&apos;q: <span className="font-mono">{number}</span></>
-              : "Tekshirish uchun sertifikat raqamini kiriting"}
+              ? <>{t.verifyCert.notFoundDesc} <span className="font-mono">{number}</span></>
+              : t.verifyCert.enterNumberPrompt}
           </p>
         </motion.div>
       )}
@@ -127,7 +129,7 @@ export function VerifyView({ number }: { number: string }) {
         }}
         className="space-y-3"
       >
-        <label className="eyebrow block">Boshqa sertifikatni tekshirish</label>
+        <label className="eyebrow block">{t.verifyCert.checkAnother}</label>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -136,16 +138,15 @@ export function VerifyView({ number }: { number: string }) {
               onChange={e => setQuery(e.target.value)}
               className="input-field pl-10 font-mono text-sm"
               placeholder="CERT-2026-000123"
-              aria-label="Sertifikat raqami"
+              aria-label={t.verifyCert.certNumber}
             />
           </div>
-          <button type="submit" className="btn-primary py-2.5 px-5 text-sm">Tekshirish</button>
+          <button type="submit" className="btn-primary py-2.5 px-5 text-sm">{t.verifyCert.checkBtn}</button>
         </div>
       </form>
 
       <p className="text-xs text-muted-foreground text-center leading-relaxed">
-        Sertifikat raqami uning pastki chap burchagida yozilgan. QR kodni
-        telefon kamerasi bilan skanerlasangiz ham shu sahifa ochiladi.
+        {t.verifyCert.footerHint}
       </p>
     </div>
   );

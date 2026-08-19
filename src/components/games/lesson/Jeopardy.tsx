@@ -112,7 +112,7 @@ export function Jeopardy({
         className="max-w-sm mx-auto text-center py-6"
       >
         <Users className="w-10 h-10 text-neon-purple mx-auto mb-4" />
-        <h2 className="font-display font-bold text-xl mb-2">Nechta jamoa o&apos;ynaydi?</h2>
+        <h2 className="font-display font-bold text-xl mb-2">{t.lg.howManyTeams}</h2>
         <p className="text-sm text-muted-foreground mb-7">
           {t.lg.teamHint}
         </p>
@@ -122,7 +122,7 @@ export function Jeopardy({
             onClick={() => setTeamCount(t => Math.max(1, t - 1))}
             disabled={teamCount <= 1}
             className="w-11 h-11 rounded-xl border border-border bg-surface flex items-center justify-center hover:border-neon-purple/40 transition disabled:opacity-30"
-            aria-label="Kamaytirish"
+            aria-label={t.lg.decrease}
           >
             <Minus className="w-4 h-4" />
           </button>
@@ -131,14 +131,14 @@ export function Jeopardy({
             onClick={() => setTeamCount(t => Math.min(4, t + 1))}
             disabled={teamCount >= 4}
             className="w-11 h-11 rounded-xl border border-border bg-surface flex items-center justify-center hover:border-neon-purple/40 transition disabled:opacity-30"
-            aria-label="Ko'paytirish"
+            aria-label={t.lg.increase}
           >
             <Plus className="w-4 h-4" />
           </button>
         </div>
 
         <button onClick={() => setStarted(true)} className="btn-primary py-3 px-8 text-sm">
-          Taxtani ochish
+          {t.lg.openBoard}
         </button>
       </motion.div>
     );

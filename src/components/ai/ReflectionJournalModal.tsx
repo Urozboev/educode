@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, X, Loader2, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { useI18n } from "@/lib/i18n";
 
 export interface ReflectionEntry {
   what_learned: string;
@@ -25,6 +26,7 @@ interface Props {
 export default function ReflectionJournalModal({
   open, onClose, topicId, courseId, topicTitle, onSaved,
 }: Props) {
+  const { t } = useI18n();
   const supabase = createClient();
   const [entry, setEntry] = useState<ReflectionEntry>({
     what_learned: "",
@@ -38,13 +40,13 @@ export default function ReflectionJournalModal({
 
   async function handleSave() {
     if (!isFilled) {
-      toast.warning("Iltimos, kamida 'Bugun nimani o'rgandim?' savoliga javob bering.");
+      toast.warning(t.reflection.minLenError);
       return;
     }
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error("Tizimga kiring"); setSaving(false); return; }
+      if (!user) { toast.error(t.nav.login); setSaving(false); return; }
       const { error } = await supabase.from("reflection_journals").insert({
         user_id: user.id,
         topic_id: topicId || null,
@@ -54,8 +56,8 @@ export default function ReflectionJournalModal({
         difficulties: entry.difficulties.trim() || null,
         next_steps: entry.next_steps.trim() || null,
       });
-      if (error) { toast.error(`Saqlash xatolik: ${error.message}`); setSaving(false); return; }
-      toast.success("Refleksiya saqlandi! 🌱");
+      if (error) { toast.error(error.message); setSaving(false); return; }
+      toast.success(t.reflection.savedToast);
       onSaved?.(entry);
       onClose();
     } catch (e: any) {
@@ -87,9 +89,9 @@ export default function ReflectionJournalModal({
                   <BookOpen className="w-5 h-5 text-neon-green" />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-lg">Refleksiv kundalik</h2>
+                  <h2 className="font-display font-bold text-lg">{t.reflection.title}</h2>
                   <p className="text-xs text-muted-foreground">
-                    {topicTitle ? `"${topicTitle}" — ` : ""}3 daqiqa o'zingizga vaqt bering
+                    {topicTitle ? `"${topicTitle}" — ` : ""}{t.reflection.subtitle}
                   </p>
                 </div>
               </div>
@@ -101,48 +103,48 @@ export default function ReflectionJournalModal({
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-neon-yellow" /> Bugun nimani o'rgandim? *
+                  <Sparkles className="w-3 h-3 text-neon-yellow" /> {t.reflection.q1}
                 </label>
                 <textarea
                   value={entry.what_learned}
                   onChange={e => setEntry(p => ({ ...p, what_learned: e.target.value }))}
-                  placeholder="Masalan: list comprehension va shartli filterlash..."
+                  placeholder={t.reflection.ph1}
                   className="input-field w-full resize-none text-sm"
                   rows={2}
                 />
               </div>
               <div>
                 <label className="text-xs font-medium text-foreground mb-1 block">
-                  AI yordamidan qanday foydalandim?
+                  {t.reflection.q2}
                 </label>
                 <textarea
                   value={entry.ai_usage_reflection}
                   onChange={e => setEntry(p => ({ ...p, ai_usage_reflection: e.target.value }))}
-                  placeholder="Masalan: faqat sintaksis tushunmagan joyda so'radim..."
+                  placeholder={t.reflection.ph2}
                   className="input-field w-full resize-none text-sm"
                   rows={2}
                 />
               </div>
               <div>
                 <label className="text-xs font-medium text-foreground mb-1 block">
-                  Qanday qiyinchiliklarga uchradim?
+                  {t.reflection.q3}
                 </label>
                 <textarea
                   value={entry.difficulties}
                   onChange={e => setEntry(p => ({ ...p, difficulties: e.target.value }))}
-                  placeholder="Masalan: rekursiyani to'liq tushunmadim..."
+                  placeholder={t.reflection.ph3}
                   className="input-field w-full resize-none text-sm"
                   rows={2}
                 />
               </div>
               <div>
                 <label className="text-xs font-medium text-foreground mb-1 block">
-                  Ertaga nimaga e'tibor beraman?
+                  {t.reflection.q4}
                 </label>
                 <textarea
                   value={entry.next_steps}
                   onChange={e => setEntry(p => ({ ...p, next_steps: e.target.value }))}
-                  placeholder="Masalan: rekursiya bo'yicha 3 ta misol yechaman..."
+                  placeholder={t.reflection.ph4}
                   className="input-field w-full resize-none text-sm"
                   rows={2}
                 />
@@ -151,7 +153,7 @@ export default function ReflectionJournalModal({
 
             <div className="flex gap-2 justify-end mt-4">
               <button onClick={onClose} disabled={saving} className="btn-ghost py-2 px-4 text-sm">
-                Keyinroq
+                {t.reflection.later}
               </button>
               <button
                 onClick={handleSave}
@@ -159,7 +161,7 @@ export default function ReflectionJournalModal({
                 className="btn-primary py-2 px-4 text-sm flex items-center gap-2 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4" />}
-                Saqlash
+                {t.common.save}
               </button>
             </div>
           </motion.div>

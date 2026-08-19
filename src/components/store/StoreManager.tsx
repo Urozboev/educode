@@ -270,7 +270,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <h2 className="font-display font-bold text-xl">{editId ? "Sovg'ani tahrirlash" : "Yangi sovg'a"}</h2>
+                <h2 className="font-display font-bold text-xl">{editId ? t.misc.editGift : t.misc.newGift}</h2>
                 <button onClick={() => setShowForm(false)} className="p-2 rounded-lg hover:bg-surface transition"><X className="w-5 h-5" /></button>
               </div>
 
@@ -361,7 +361,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
                 <button onClick={saveItem} disabled={saving}
                   className="btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-60">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  {saving ? "Saqlanmoqda..." : "Saqlash"}
+                  {saving ? t.misc.saving : t.misc.save}
                 </button>
               </div>
             </motion.div>
@@ -401,7 +401,7 @@ function OrderList({ orders, buyers, onChanged }: {
     });
     setBusy(null);
     if (error || !data?.ok) { toast.error(data?.message || error?.message || "O'zgartirilmadi"); return; }
-    toast.success(data.refunded ? "Holat o'zgardi, coin qaytarildi" : "Holat o'zgardi");
+    toast.success(data.refunded ? t.misc.statusChanged : "Holat o'zgardi");
     setNote("");
     onChanged();
   }
@@ -439,7 +439,7 @@ function OrderList({ orders, buyers, onChanged }: {
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{o.item_title}</p>
                 <p className="text-xs text-muted-foreground">
-                  {buyers[o.user_id] ?? "O'quvchi"} · {formatDateTime(o.created_at)} · {o.price_coins} coin
+                  {buyers[o.user_id] ?? t.misc.student} · {formatDateTime(o.created_at)} · {o.price_coins} coin
                 </p>
               </div>
               <span className={cn("text-xs font-medium px-3 py-1 rounded-full border flex-shrink-0", sc.color)}>{sc.label}</span>
@@ -491,7 +491,7 @@ function OrderList({ orders, buyers, onChanged }: {
                         <input
                           value={note}
                           onChange={e => setNote(e.target.value)}
-                          placeholder="Izoh: kuzatuv raqami, sabab yoki qachon topshirilishi"
+                          placeholder={t.misc.trackingNotePh}
                           className="input-field w-full text-sm"
                         />
                         <div className="flex gap-2 flex-wrap">

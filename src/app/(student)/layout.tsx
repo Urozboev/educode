@@ -221,11 +221,6 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
       {/* Bottom Actions */}
       <div className="p-3 border-t border-border/50 space-y-1">
-        {!collapsed && (
-          <div className="px-1 pb-1">
-            <LanguageSwitcher />
-          </div>
-        )}
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all w-full", collapsed && "justify-center px-3")}
@@ -233,13 +228,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           {!collapsed && <span>{theme === "dark" ? t.cabinet.lightMode : t.cabinet.darkMode}</span>}
         </button>
-        <button
-          onClick={handleLogout}
-          className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-neon-red/70 hover:bg-neon-red/10 hover:text-neon-red transition-all w-full", collapsed && "justify-center px-3")}
-        >
-          <LogOut className="w-5 h-5" />
-          {!collapsed && <span>{t.nav.logout}</span>}
-        </button>
+        {/* Til tanlagich chiqish bilan bir qatorda */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleLogout}
+            className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-neon-red/70 hover:bg-neon-red/10 hover:text-neon-red transition-all flex-1", collapsed && "justify-center px-3")}
+          >
+            <LogOut className="w-5 h-5" />
+            {!collapsed && <span>{t.nav.logout}</span>}
+          </button>
+          {!collapsed && <LanguageSwitcher />}
+        </div>
       </div>
     </div>
   );
@@ -285,20 +284,24 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
 
-          {/* Mobil dropdown */}
+          {/* Mobil dropdown. Past ekranda ro'yxat sig'masdi va oxirgi
+              havolalarga yetib bo'lmasdi — ichidan aylantiriladi. */}
           <AnimatePresence>
             {mobileOpen && (
-              <motion.div className="md:hidden bg-card border-b border-border px-4 py-3 space-y-1"
+              <motion.div className="md:hidden bg-card border-b border-border overflow-hidden"
                 initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                {allGuestLinks(t).map(l => (
-                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
-                    className={cn("block py-2.5 px-3 rounded-lg text-sm", pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent")}>
-                    {l.label}
-                  </Link>
-                ))}
-                <div className="flex gap-2 pt-2 border-t border-border mt-2">
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-medium border border-border hover:bg-accent transition-all">{t.nav.login}</Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.getStarted}</Link>
+                {/* Balandlik animatsiyasi TASHQI qavatda, aylantirish ICHKIDA */}
+                <div className="px-4 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
+                  {allGuestLinks(t).map(l => (
+                    <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
+                      className={cn("block py-2.5 px-3 rounded-lg text-sm", pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent")}>
+                      {l.label}
+                    </Link>
+                  ))}
+                  <div className="flex gap-2 pt-2 border-t border-border mt-2">
+                    <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-medium border border-border hover:bg-accent transition-all">{t.nav.login}</Link>
+                    <Link href="/register" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2 px-4 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.getStarted}</Link>
+                  </div>
                 </div>
               </motion.div>
             )}

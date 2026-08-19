@@ -329,7 +329,7 @@ export default function TeacherDashboardPage() {
           {/* Faollik lentasi */}
           <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
             <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-neon-purple" /> So&apos;nggi faollik
+              <Activity className="w-5 h-5 text-neon-purple" /> {t.teacher.dash.recentActivity}
             </h2>
 
             {feed.length === 0 ? (
