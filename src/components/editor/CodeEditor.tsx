@@ -508,63 +508,68 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-t border-border/50 bg-surface/30 flex-wrap">
-        <button onClick={handleRun} disabled={isRunning || (language === "python" && !pyodideReady)}
-          className="btn-primary py-2 px-4 flex items-center gap-1.5 text-sm disabled:opacity-50">
-          {isRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />} Ishga tushirish
-        </button>
-        {testCases.length > 0 && (
-          <button onClick={handleRunTests} disabled={isRunning || (language === "python" && !pyodideReady)}
-            className="flex items-center gap-1.5 py-2 px-4 rounded-full text-sm font-medium bg-neon-green/10 text-neon-green border border-neon-green/20 hover:bg-neon-green/20 disabled:opacity-50 transition-all">
-            <CheckCircle2 className="w-4 h-4" /> Testlarni tekshirish
+      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-t border-border/50 bg-surface/30 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={handleRun} disabled={isRunning || (language === "python" && !pyodideReady)}
+            className="btn-primary py-1.5 px-3.5 flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 shadow-sm">
+            {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />} Ishga tushirish
           </button>
-        )}
-        {language === "python" && (
-          <button onClick={handleTrace} disabled={isTracing || !pyodideReady}
-            className="flex items-center gap-1.5 py-2 px-3.5 rounded-full text-xs font-semibold bg-neon-purple/10 text-neon-purple border border-neon-purple/30 hover:bg-neon-purple/20 transition-all disabled:opacity-50 shadow-sm">
-            {isTracing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Layers className="w-3.5 h-3.5" />}
-            {t.visualizer.toggleBtn}
+          {testCases.length > 0 && (
+            <button onClick={handleRunTests} disabled={isRunning || (language === "python" && !pyodideReady)}
+              className="flex items-center gap-1.5 py-1.5 px-3.5 rounded-full text-xs font-semibold bg-neon-green/10 text-neon-green border border-neon-green/25 hover:bg-neon-green/20 disabled:opacity-50 transition-all">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Testlarni tekshirish
+            </button>
+          )}
+          {language === "python" && (
+            <button onClick={handleTrace} disabled={isTracing || !pyodideReady}
+              className="flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-neon-purple/10 text-neon-purple border border-neon-purple/30 hover:bg-neon-purple/20 transition-all disabled:opacity-50 shadow-sm">
+              {isTracing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Layers className="w-3.5 h-3.5" />}
+              <span>{t.visualizer.toggleBtn}</span>
+            </button>
+          )}
+          <button onClick={() => setShowSemanticBridge(true)}
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all shadow-sm">
+            <Compass className="w-3.5 h-3.5" />
+            <span>{t.semanticBridge.toggleBtn}</span>
           </button>
-        )}
-        <button onClick={() => setShowSemanticBridge(true)}
-          className="flex items-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all shadow-sm">
-          <Compass className="w-3.5 h-3.5" />
-          {t.semanticBridge.toggleBtn}
-        </button>
-        <button onClick={() => setShowKnowledgeGraph(true)}
-          className="flex items-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold bg-surface border border-border hover:bg-card text-muted-foreground hover:text-foreground transition-all">
-          <Network className="w-3.5 h-3.5 text-neon-purple" />
-          {t.misconceptions.openGraph}
-        </button>
-        {taskId && (
-          <button onClick={requestSubmit} disabled={isRunning || isSubmitting}
-            className="btn-neon py-2 px-4 flex items-center gap-1.5 text-sm disabled:opacity-50">
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            {isSubmitting ? t.misc.submitting : t.misc.submit}
+          <button onClick={() => setShowKnowledgeGraph(true)}
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-surface border border-border hover:bg-card text-muted-foreground hover:text-foreground transition-all">
+            <Network className="w-3.5 h-3.5 text-neon-purple" />
+            <span>{t.misconceptions.openGraph}</span>
           </button>
-        )}
-        {onAIFeedback && (
-          <button onClick={() => onAIFeedback(code, testResults)}
-            className="flex items-center gap-1 px-3 py-2 rounded-full text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 transition-all">
-            <Sparkles className="w-3.5 h-3.5" /> AI
-          </button>
-        )}
-        {testResults.length > 0 && (
-          <span className={cn("ml-auto text-xs font-mono font-bold", allPassed ? "text-neon-green" : "text-neon-red")}>{passedCount}/{testResults.length}</span>
-        )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {taskId && (
+            <button onClick={requestSubmit} disabled={isRunning || isSubmitting}
+              className="btn-neon py-1.5 px-3.5 flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50">
+              {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+              {isSubmitting ? t.misc.submitting : t.misc.submit}
+            </button>
+          )}
+          {onAIFeedback && (
+            <button onClick={() => onAIFeedback(code, testResults)}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 transition-all">
+              <Sparkles className="w-3.5 h-3.5" /> AI
+            </button>
+          )}
+          {testResults.length > 0 && (
+            <span className={cn("ml-2 text-xs font-mono font-bold", allPassed ? "text-neon-green" : "text-neon-red")}>{passedCount}/{testResults.length}</span>
+          )}
+        </div>
       </div>
 
       {/* Output / Tests / Visualizer */}
       <div className="border-t border-border/50">
         <div className="flex items-center gap-1 px-4 pt-2">
-          <button onClick={() => setActiveTab("output")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium", activeTab === "output" ? "bg-surface text-foreground" : "text-muted-foreground")}>{t.misc.result}</button>
+          <button onClick={() => setActiveTab("output")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium", activeTab === "output" ? "bg-surface text-foreground font-semibold" : "text-muted-foreground")}>{t.misc.result}</button>
           {testCases.length > 0 && (
-            <button onClick={() => setActiveTab("tests")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5", activeTab === "tests" ? "bg-surface text-foreground" : "text-muted-foreground")}>
+            <button onClick={() => setActiveTab("tests")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5", activeTab === "tests" ? "bg-surface text-foreground font-semibold" : "text-muted-foreground")}>
               Testlar {testResults.length > 0 && <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", allPassed ? "bg-neon-green/10 text-neon-green" : "bg-neon-red/10 text-neon-red")}>{passedCount}/{testResults.length}</span>}
             </button>
           )}
           <button onClick={() => setActiveTab("visualizer")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5", activeTab === "visualizer" ? "bg-neon-purple/15 text-neon-purple font-semibold" : "text-muted-foreground")}>
-            <Layers className="w-3.5 h-3.5" /> {t.visualizer.title}
+            <Layers className="w-3.5 h-3.5" /> {t.visualizer.toggleBtn}
           </button>
         </div>
         <div className="p-4 max-h-[480px] overflow-y-auto">

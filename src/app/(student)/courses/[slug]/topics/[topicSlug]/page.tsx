@@ -26,6 +26,7 @@ import {
 import { cn, formatDuration } from "@/lib/utils";
 import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
 import ProtectedVideoPlayer from "@/components/video/ProtectedVideoPlayer";
+import TopicAudioPlayer from "@/components/courses/TopicAudioPlayer";
 
 export default function TopicPage() {
   const { slug, topicSlug } = useParams<{ slug: string; topicSlug: string }>();
@@ -318,6 +319,12 @@ export default function TopicPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
+          {/* Audio Tinglash Pleyeri */}
+          <TopicAudioPlayer
+            contentHtml={topic.content_html}
+            topicTitle={topic.title}
+          />
+
           <div
             className="prose prose-invert prose-purple max-w-none
               prose-headings:font-display prose-headings:tracking-tight

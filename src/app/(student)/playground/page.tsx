@@ -429,7 +429,7 @@ export default function PlaygroundPage() {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/20 text-xs font-semibold transition shadow-sm"
           >
             <Compass className="w-4 h-4" />
-            <span className="hidden sm:inline">{t.semanticBridge.title}</span>
+            <span className="hidden sm:inline">{t.semanticBridge.toggleBtn}</span>
           </button>
 
           <button

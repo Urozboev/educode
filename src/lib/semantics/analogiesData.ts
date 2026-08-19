@@ -79,10 +79,10 @@ export const CONCEPT_METAPHORS: ConceptMetaphor[] = [
     id: "loop_for",
     category: "logic",
     title: {
-      uz: "For Sikli (For Loop)",
-      ru: "Цикл For (For Loop)",
-      en: "For Loop",
-      kaa: "For Cikli (For Loop)",
+      uz: "For sikli (For loop)",
+      ru: "Цикл For (For loop)",
+      en: "For loop",
+      kaa: "For cikli (For loop)",
     },
     analogy: {
       uz: "Po'chtachi ko'chadagi har bir xonadonga birma-bir maktub tashlab chiqishiga o'xshaydi. Xonadonlar ro'yxati tugamaguncha u keyingisiga o'taveradi.",
@@ -108,10 +108,10 @@ export const CONCEPT_METAPHORS: ConceptMetaphor[] = [
     id: "loop_while",
     category: "logic",
     title: {
-      uz: "While Sikli (While Loop)",
-      ru: "Цикл While (While Loop)",
-      en: "While Loop",
-      kaa: "While Cikli (While Loop)",
+      uz: "While sikli (While loop)",
+      ru: "Цикл While (While loop)",
+      en: "While loop",
+      kaa: "While cikli (While loop)",
     },
     analogy: {
       uz: "Telefoningiz quvvati tugamaguncha video tomosha qilish. Har daqiqada 'quvvat bormi?' deb tekshiriladi; quvvat 0 bo'lishi bilan video to'xtaydi.",

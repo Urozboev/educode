@@ -1962,4 +1962,17 @@ export const en: Dictionary = {
     keyTakeaway: "Key Takeaway",
     toggleBtn: "Code Semantics",
   },
+
+  audioPlayer: {
+    title: "Audio Lesson Reader",
+    subtitle: "Listen to the lesson text spoken naturally by AI narrator",
+    play: "Listen to Audio",
+    pause: "Pause",
+    resume: "Resume",
+    stop: "Stop",
+    speed: "Speed",
+    converting: "Generating voice audio...",
+    aiVoice: "AI Audio Narrator",
+    error: "Error loading audio voice",
+  },
 };
