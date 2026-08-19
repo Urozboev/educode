@@ -48,12 +48,12 @@ const games = (t: Dictionary) => [
     difficulty: "3D Parvoz",
   },
   {
-    id: "binary",
-    title: "Binary Bridge",
-    desc: "Ikkilik sanoq sistemasida bitlarni yoqib berilgan sonlarni hosil qiling va ko'prik quring.",
+    id: "binary3d",
+    title: "Binary Bridge 3D",
+    desc: t.cabinet.gamesPage.descBinary3d,
     icon: Binary,
     color: "#00E676",
-    difficulty: "O'rta",
+    difficulty: "3D Kosmik",
   },
   {
     id: "puzzle",
