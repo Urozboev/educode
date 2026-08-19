@@ -5,10 +5,14 @@ import Editor from "@monaco-editor/react";
 import { cn } from "@/lib/utils";
 import {
   Play, Loader2, RotateCcw, Copy, Check, Terminal, Globe,
-  ChevronDown, Cpu, Clock, Keyboard, AlertCircle, X, CornerDownLeft,
+  ChevronDown, Cpu, Clock, Keyboard, AlertCircle, X, CornerDownLeft, Compass, Network,
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 import { useI18n } from "@/lib/i18n";
+import { diagnoseMisconceptions, type MisconceptionDiagnostic } from "@/lib/diagnostics/misconceptionEngine";
+import MisconceptionAlert from "@/components/diagnostics/MisconceptionAlert";
+import SemanticBridgeModal from "@/components/semantics/SemanticBridgeModal";
+import KnowledgeGraphModal from "@/components/diagnostics/KnowledgeGraphModal";
 
 type Lang = {
   id: string;
@@ -198,6 +202,11 @@ export default function PlaygroundPage() {
   const inlineRef = useRef<HTMLInputElement>(null);
   const consoleRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Ilmiy-pedagogik modallar va xatoliklar
+  const [misconception, setMisconception] = useState<MisconceptionDiagnostic | null>(null);
+  const [showSemanticBridge, setShowSemanticBridge] = useState(false);
+  const [showKnowledgeGraph, setShowKnowledgeGraph] = useState(false);
 
   // Kod tarkibida stdin kerakligini aniqlash (interaktiv bo'lmagan tillar uchun)
   const needsStdin = useMemo(() => {
@@ -414,6 +423,23 @@ export default function PlaygroundPage() {
             )}
           </div>
 
+          {/* Semantik ko'prik va Bilim xaritasi */}
+          <button
+            onClick={() => setShowSemanticBridge(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/20 text-xs font-semibold transition shadow-sm"
+          >
+            <Compass className="w-4 h-4" />
+            <span className="hidden sm:inline">{t.semanticBridge.title}</span>
+          </button>
+
+          <button
+            onClick={() => setShowKnowledgeGraph(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface border border-border text-muted-foreground hover:text-foreground hover:bg-card text-xs font-semibold transition"
+          >
+            <Network className="w-4 h-4 text-neon-purple" />
+            <span className="hidden sm:inline">{t.misconceptions.openGraph}</span>
+          </button>
+
           <button
             onClick={handleRun}
             disabled={running || awaitingInput}
@@ -427,6 +453,13 @@ export default function PlaygroundPage() {
           </kbd>
         </div>
       </div>
+
+      {/* Misconception Alert if detected */}
+      {misconception && (
+        <div className="mb-3">
+          <MisconceptionAlert rule={misconception.rule} onClose={() => setMisconception(null)} />
+        </div>
+      )}
 
       {/* Editor + Output */}
       <div className="flex-1 flex flex-col lg:flex-row min-h-0 rounded-2xl border border-border/50 overflow-hidden bg-card/30">
@@ -627,6 +660,17 @@ export default function PlaygroundPage() {
           </div>
         </div>
       </div>
+
+      <SemanticBridgeModal
+        open={showSemanticBridge}
+        onClose={() => setShowSemanticBridge(false)}
+        currentCode={code}
+      />
+
+      <KnowledgeGraphModal
+        open={showKnowledgeGraph}
+        onClose={() => setShowKnowledgeGraph(false)}
+      />
     </div>
   );
 }

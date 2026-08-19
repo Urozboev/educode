@@ -5,10 +5,16 @@ import Editor from "@monaco-editor/react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { SupportedLanguage, TestCase, SubmissionTestResult } from "@/types";
-import { Play, RotateCcw, CheckCircle2, XCircle, Clock, Loader2, Sparkles, Copy, Check, Send, AlertTriangle } from "lucide-react";
+import { Play, RotateCcw, CheckCircle2, XCircle, Clock, Loader2, Sparkles, Copy, Check, Send, AlertTriangle, Layers, Compass, Network } from "lucide-react";
 import { toast } from "sonner";
 import AIDeclarationModal, { type AIDeclarationData } from "@/components/ai/AIDeclarationModal";
 import { useI18n } from "@/lib/i18n";
+import { diagnoseMisconceptions, type MisconceptionDiagnostic } from "@/lib/diagnostics/misconceptionEngine";
+import MisconceptionAlert from "@/components/diagnostics/MisconceptionAlert";
+import KnowledgeGraphModal from "@/components/diagnostics/KnowledgeGraphModal";
+import { tracePythonExecution, type TraceResult } from "@/lib/visualizer/pythonTracer";
+import MemoryVisualizer from "@/components/visualizer/MemoryVisualizer";
+import SemanticBridgeModal from "@/components/semantics/SemanticBridgeModal";
 
 interface CodeEditorProps {
   language: SupportedLanguage;
@@ -33,7 +39,7 @@ export default function CodeEditor({
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testResults, setTestResults] = useState<SubmissionTestResult[]>([]);
-  const [activeTab, setActiveTab] = useState<"output" | "tests">("output");
+  const [activeTab, setActiveTab] = useState<"output" | "tests" | "visualizer">("output");
   const [pyodideReady, setPyodideReady] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showDeclaration, setShowDeclaration] = useState(false);
@@ -41,6 +47,13 @@ export default function CodeEditor({
   const [pasteDetected, setPasteDetected] = useState(false);
   const [pendingResults, setPendingResults] = useState<SubmissionTestResult[] | null>(null);
   const pyodideRef = useRef<any>(null);
+
+  // Ilmiy-pedagogik holatlar (Visualizer, Diagnostics, Semantics)
+  const [misconception, setMisconception] = useState<MisconceptionDiagnostic | null>(null);
+  const [traceResult, setTraceResult] = useState<TraceResult | null>(null);
+  const [isTracing, setIsTracing] = useState(false);
+  const [showSemanticBridge, setShowSemanticBridge] = useState(false);
+  const [showKnowledgeGraph, setShowKnowledgeGraph] = useState(false);
 
   /**
    * Paste statistikasi. `useRef`, chunki Monaco'ning onDidPaste
@@ -217,27 +230,69 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
 
   // ===== ODDIY ISHGA TUSHIRISH (testlarsiz) =====
   async function handleRun() {
-    setIsRunning(true); setOutput(""); setTestResults([]);
+    setIsRunning(true); setOutput(""); setTestResults([]); setMisconception(null);
     try {
-      // Birinchi test input ni stdin sifatida berish (agar mavjud bo'lsa)
       const defaultStdin = testCases.length > 0 ? testCases[0].input : "";
       const r = await runCode(code, defaultStdin);
-      if (r.stderr) setOutput(`❌ Xatolik:\n${r.stderr}\n\n⏱ ${r.time_ms}ms`);
-      else setOutput(`${r.stdout}\n\n⏱ ${r.time_ms}ms`);
-    } catch (err: any) { setOutput(`❌ ${err.message}`); }
+      if (r.stderr) {
+        setOutput(`❌ Xatolik:\n${r.stderr}\n\n⏱ ${r.time_ms}ms`);
+        // Mental xatolikni aniqlash
+        const diag = diagnoseMisconceptions(code, r.stderr);
+        if (diag) setMisconception(diag);
+      } else {
+        setOutput(`${r.stdout}\n\n⏱ ${r.time_ms}ms`);
+      }
+    } catch (err: any) {
+      setOutput(`❌ ${err.message}`);
+      const diag = diagnoseMisconceptions(code, err.message);
+      if (diag) setMisconception(diag);
+    }
     setIsRunning(false);
   }
 
   // ===== BARCHA TESTLARNI TEKSHIRISH =====
   async function handleRunTests() {
     if (testCases.length === 0) { toast.info(t.misc.noTests); return; }
-    setIsRunning(true); setTestResults([]); setActiveTab("tests");
+    setIsRunning(true); setTestResults([]); setActiveTab("tests"); setMisconception(null);
     const results = await executeTests(code);
     setTestResults(results);
     const passed = results.filter(r => r.passed).length;
-    if (passed === results.length) setOutput(`✅ Barcha ${results.length} ta test o'tdi!`);
-    else setOutput(`⚠️ ${passed}/${results.length} test o'tdi.`);
+    if (passed === results.length) {
+      setOutput(`✅ Barcha ${results.length} ta test o'tdi!`);
+    } else {
+      setOutput(`⚠️ ${passed}/${results.length} test o'tdi.`);
+      // Failed testlar ichidan xatolikni tahlil qilish
+      const failed = results.find(r => !r.passed);
+      const diag = diagnoseMisconceptions(code, failed?.actual);
+      if (diag) setMisconception(diag);
+    }
     setIsRunning(false);
+  }
+
+  // ===== JONLI XOTIRA VIZUALIZATSIYASI =====
+  async function handleTrace() {
+    if (language !== "python") {
+      toast.info("Xotira vizualizatsiyasi hozirda Python tili uchun ishlaydi.");
+      return;
+    }
+    if (!pyodideRef.current) {
+      toast.info(t.misc.pyodideNotReady);
+      return;
+    }
+    setIsTracing(true);
+    setActiveTab("visualizer");
+    try {
+      const defaultStdin = testCases.length > 0 ? testCases[0].input : "";
+      const res = await tracePythonExecution(pyodideRef.current, code, defaultStdin);
+      setTraceResult(res);
+      if (res.error) {
+        const diag = diagnoseMisconceptions(code, res.error);
+        if (diag) setMisconception(diag);
+      }
+    } catch (err: any) {
+      toast.error(t.visualizer.traceError + ": " + (err.message || String(err)));
+    }
+    setIsTracing(false);
   }
 
   // ===== YUBORISH — testlarni ishga tushirib, AI Declaration modal'ni ko'rsatadi =====
@@ -445,6 +500,13 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         theme="vs-dark"
         options={{ minimap: { enabled: false }, fontSize: 14, fontFamily: "'JetBrains Mono', monospace", lineNumbers: "on", scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4, readOnly, padding: { top: 12, bottom: 12 }, renderLineHighlight: "line", cursorBlinking: "smooth" }} /></div>
 
+      {/* Misconception Socratic Banner */}
+      {misconception && (
+        <div className="px-4 py-2 bg-amber-500/5 border-b border-amber-500/20">
+          <MisconceptionAlert rule={misconception.rule} onClose={() => setMisconception(null)} />
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-t border-border/50 bg-surface/30 flex-wrap">
         <button onClick={handleRun} disabled={isRunning || (language === "python" && !pyodideReady)}
@@ -457,6 +519,23 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
             <CheckCircle2 className="w-4 h-4" /> Testlarni tekshirish
           </button>
         )}
+        {language === "python" && (
+          <button onClick={handleTrace} disabled={isTracing || !pyodideReady}
+            className="flex items-center gap-1.5 py-2 px-3.5 rounded-full text-xs font-semibold bg-neon-purple/10 text-neon-purple border border-neon-purple/30 hover:bg-neon-purple/20 transition-all disabled:opacity-50 shadow-sm">
+            {isTracing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Layers className="w-3.5 h-3.5" />}
+            {t.visualizer.toggleBtn}
+          </button>
+        )}
+        <button onClick={() => setShowSemanticBridge(true)}
+          className="flex items-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all shadow-sm">
+          <Compass className="w-3.5 h-3.5" />
+          {t.semanticBridge.toggleBtn}
+        </button>
+        <button onClick={() => setShowKnowledgeGraph(true)}
+          className="flex items-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold bg-surface border border-border hover:bg-card text-muted-foreground hover:text-foreground transition-all">
+          <Network className="w-3.5 h-3.5 text-neon-purple" />
+          {t.misconceptions.openGraph}
+        </button>
         {taskId && (
           <button onClick={requestSubmit} disabled={isRunning || isSubmitting}
             className="btn-neon py-2 px-4 flex items-center gap-1.5 text-sm disabled:opacity-50">
@@ -475,7 +554,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         )}
       </div>
 
-      {/* Output / Tests */}
+      {/* Output / Tests / Visualizer */}
       <div className="border-t border-border/50">
         <div className="flex items-center gap-1 px-4 pt-2">
           <button onClick={() => setActiveTab("output")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium", activeTab === "output" ? "bg-surface text-foreground" : "text-muted-foreground")}>{t.misc.result}</button>
@@ -484,14 +563,17 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
               Testlar {testResults.length > 0 && <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", allPassed ? "bg-neon-green/10 text-neon-green" : "bg-neon-red/10 text-neon-red")}>{passedCount}/{testResults.length}</span>}
             </button>
           )}
+          <button onClick={() => setActiveTab("visualizer")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5", activeTab === "visualizer" ? "bg-neon-purple/15 text-neon-purple font-semibold" : "text-muted-foreground")}>
+            <Layers className="w-3.5 h-3.5" /> {t.visualizer.title}
+          </button>
         </div>
-        <div className="p-4 max-h-60 overflow-y-auto">
+        <div className="p-4 max-h-[480px] overflow-y-auto">
           {activeTab === "output" ? (
             output ? <pre className="font-mono text-sm whitespace-pre-wrap text-muted-foreground">{output}</pre>
               : <p className="text-sm text-muted-foreground italic">Kodni ishga tushiring...</p>
-          ) : (
+          ) : activeTab === "tests" ? (
             <div className="space-y-2">
-              {testResults.length === 0 ? <p className="text-sm text-muted-foreground italic">"Testlarni tekshirish" tugmasini bosing</p> : (
+              {testResults.length === 0 ? <p className="text-sm text-muted-foreground italic">&quot;Testlarni tekshirish&quot; tugmasini bosing</p> : (
                 <>
                   {testResults.map((r, i) => (
                     <div key={i} className={cn("p-3 rounded-xl border", r.passed ? "bg-neon-green/5 border-neon-green/20" : "bg-neon-red/5 border-neon-red/20")}>
@@ -511,6 +593,8 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
                 </>
               )}
             </div>
+          ) : (
+            <MemoryVisualizer traceResult={traceResult} code={code} isLoading={isTracing} />
           )}
         </div>
       </div>
@@ -525,6 +609,17 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
           setShowDeclaration(false);
           setPendingResults(null);
         }}
+      />
+
+      <SemanticBridgeModal
+        open={showSemanticBridge}
+        onClose={() => setShowSemanticBridge(false)}
+        currentCode={code}
+      />
+
+      <KnowledgeGraphModal
+        open={showKnowledgeGraph}
+        onClose={() => setShowKnowledgeGraph(false)}
       />
     </div>
   );
