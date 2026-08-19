@@ -34,11 +34,6 @@ const CyberFlight3D = dynamic(() => import("@/components/games/CyberFlight3D"), 
   loading: () => <Loading3D title="Cyber Flight 3D" />,
 });
 
-const BinaryBridge3D = dynamic(() => import("@/components/games/BinaryBridge3D"), {
-  ssr: false,
-  loading: () => <Loading3D title="Binary Bridge 3D" />,
-});
-
 import {
   Puzzle,
   Bug,
@@ -66,7 +61,6 @@ import {
   AlertTriangle,
   Bot,
   Plane,
-  Binary,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
@@ -82,8 +76,7 @@ type GameType =
   | "bird"
   | "quiz3d"
   | "maze3d"
-  | "flight3d"
-  | "binary3d";
+  | "flight3d";
 
 const gameCards = (t: Dictionary) => [
   {
@@ -110,15 +103,6 @@ const gameCards = (t: Dictionary) => [
     desc: t.cabinet.gamesPage.descFlight3d,
     Icon: Plane,
     color: "#00D2FF",
-    diff: `3D · ${t.cabinet.gamesPage.isNew}`,
-    category: "3d",
-  },
-  {
-    type: "binary3d" as const,
-    title: "Binary Bridge 3D",
-    desc: t.cabinet.gamesPage.descBinary3d,
-    Icon: Binary,
-    color: "#00E676",
     diff: `3D · ${t.cabinet.gamesPage.isNew}`,
     category: "3d",
   },
@@ -310,7 +294,6 @@ export default function GamesPage() {
           {game === "quiz3d" && <QuizBattle3D />}
           {game === "maze3d" && <MazeRunner3D />}
           {game === "flight3d" && <CyberFlight3D />}
-          {game === "binary3d" && <BinaryBridge3D />}
           {game === "puzzle" && <PuzzleGame />}
           {game === "bugfix" && <BugFixGame />}
           {game === "typing" && <TypingGame />}

@@ -17,7 +17,6 @@ import {
   Bird,
   Bot,
   Plane,
-  Binary,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
@@ -46,14 +45,6 @@ const games = (t: Dictionary) => [
     icon: Plane,
     color: "#00D2FF",
     difficulty: "3D Parvoz",
-  },
-  {
-    id: "binary3d",
-    title: "Binary Bridge 3D",
-    desc: t.cabinet.gamesPage.descBinary3d,
-    icon: Binary,
-    color: "#00E676",
-    difficulty: "3D Kosmik",
   },
   {
     id: "puzzle",
