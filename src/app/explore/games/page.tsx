@@ -15,11 +15,46 @@ import {
   Gamepad2,
   Map,
   Bird,
+  Bot,
+  Plane,
+  Binary,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 const games = (t: Dictionary) => [
+  {
+    id: "quiz3d",
+    title: "Quiz Battle 3D",
+    desc: t.cabinet.gamesPage.descQuiz3d,
+    icon: Swords,
+    color: "#B388FF",
+    difficulty: "3D Arena",
+  },
+  {
+    id: "maze3d",
+    title: "Maze Runner 3D",
+    desc: t.cabinet.gamesPage.descMaze3d,
+    icon: Bot,
+    color: "#FFD600",
+    difficulty: "3D Labirint",
+  },
+  {
+    id: "flight3d",
+    title: "Cyber Flight 3D",
+    desc: t.cabinet.gamesPage.descFlight3d,
+    icon: Plane,
+    color: "#00D2FF",
+    difficulty: "3D Parvoz",
+  },
+  {
+    id: "binary3d",
+    title: "Binary Bridge 3D",
+    desc: t.cabinet.gamesPage.descBinary3d,
+    icon: Binary,
+    color: "#00E676",
+    difficulty: "3D Kosmik",
+  },
   {
     id: "puzzle",
     title: "Code Puzzle",
@@ -83,7 +118,7 @@ export default function ExploreGames() {
       } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
     })();
-  }, []);
+  }, [supabase]);
 
   function handleClick() {
     router.push(isLoggedIn ? "/games" : "/login?redirect=/games");
@@ -95,85 +130,91 @@ export default function ExploreGames() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl"
+        className="text-center max-w-2xl mx-auto"
       >
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-semibold tracking-widest uppercase mb-4">
+          <Gamepad2 className="w-3.5 h-3.5" />
+          {t.cabinet.gamesPage.eyebrow}
+        </div>
         <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight mb-3">
-          Interaktiv o'yinlar
+          {t.cabinet.gamesPage.title}
         </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed">
+        <p className="text-[15px] md:text-base text-muted-foreground">
           {t.explore.gamesSubtitle}
         </p>
       </motion.div>
 
-      {/* Games grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {games(t).map((game, i) => (
-          <motion.button
-            key={game.id}
-            onClick={handleClick}
-            className="group w-full text-left p-6 rounded-2xl border border-border/50 bg-card/40 hover:bg-card hover:border-border hover:shadow-xl hover:shadow-black/[0.04] transition-all duration-300"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-transform group-hover:scale-105"
-              style={{
-                backgroundColor: `${game.color}14`,
-                border: `1px solid ${game.color}33`,
-              }}
+      {/* Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {games(t).map((game, i) => {
+          const Icon = game.icon;
+          return (
+            <motion.div
+              key={game.id}
+              onClick={handleClick}
+              className="group relative p-6 rounded-3xl border border-border/50 bg-card/40 hover:bg-card/80 hover:border-border transition-all overflow-hidden cursor-pointer"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
             >
-              <game.icon className="w-7 h-7" style={{ color: game.color }} />
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-display font-bold text-xl group-hover:text-neon-purple transition-colors">
-                {game.title}
-              </h3>
-            </div>
-            <p className="text-[15px] text-muted-foreground leading-relaxed mb-4 line-clamp-3">
-              {game.desc}
-            </p>
-            <div className="flex items-center justify-between pt-4 border-t border-border/40">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-surface text-muted-foreground border border-border/60">
-                {game.difficulty}
-              </span>
-              <ArrowRight className="w-5 h-5 text-muted-foreground/60 group-hover:text-neon-purple group-hover:translate-x-1 transition-all" />
-            </div>
-          </motion.button>
-        ))}
+              <div
+                className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-opacity"
+                style={{ backgroundColor: game.color }}
+              />
+              <div className="relative">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border"
+                  style={{
+                    backgroundColor: `${game.color}14`,
+                    borderColor: `${game.color}33`,
+                    color: game.color,
+                  }}
+                >
+                  <Icon className="w-7 h-7" strokeWidth={2} />
+                </div>
+
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-display font-bold text-lg tracking-tight group-hover:text-neon-purple transition-colors">
+                    {game.title}
+                  </h3>
+                  <span className="text-[11px] px-2 py-0.5 rounded-full border border-border bg-surface/60 text-muted-foreground font-medium">
+                    {game.difficulty}
+                  </span>
+                </div>
+                <p className="text-[15px] text-muted-foreground leading-relaxed">{game.desc}</p>
+
+                <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-foreground/70 group-hover:text-neon-purple transition-colors">
+                  {!isLoggedIn && <Lock className="w-3.5 h-3.5" />}
+                  {isLoggedIn ? "O'ynash" : "Kirish va o'ynash"}
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* CTA */}
-      {!isLoggedIn ? (
-        <div className="p-8 md:p-10 rounded-3xl border border-border/50 bg-surface/30 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mx-auto mb-4">
-            <Gamepad2 className="w-6 h-6 text-neon-purple" />
-          </div>
+      {/* CTA for non-logged in */}
+      {!isLoggedIn && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center p-8 rounded-3xl border border-neon-purple/20 bg-neon-purple/5 max-w-xl mx-auto"
+        >
           <h3 className="font-display font-bold text-xl mb-2">
             {t.explore.gamesCtaTitle}
           </h3>
-          <p className="text-muted-foreground text-base mb-5 max-w-md mx-auto">
+          <p className="text-sm text-muted-foreground mb-4">
             {t.explore.gamesCtaText}
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-display font-semibold text-sm hover:opacity-90 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition"
           >
-            Bepul boshlash <ArrowRight className="w-4 h-4" />
+            {t.explore.guestCtaButton}
+            <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
-      ) : (
-        <div className="p-8 md:p-10 rounded-3xl border border-border/50 bg-surface/30 text-center">
-          <p className="text-muted-foreground text-base mb-4">
-            {t.explore.gamesRewardNote}
-          </p>
-          <Link
-            href="/games"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-display font-semibold text-sm hover:opacity-90 transition-all"
-          >
-            O'yinlarga kirish <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+        </motion.div>
       )}
     </div>
   );

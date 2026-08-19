@@ -1,4 +1,5 @@
 "use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
@@ -6,17 +7,38 @@ import { motion, Reorder } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 // Three.js og'ir — faqat o'yin ochilganda yuklanadi
-const QuizBattle3D = dynamic(() => import("@/components/games/QuizBattle3D"), {
-  ssr: false,
-  loading: () => (
+function Loading3D({ title }: { title: string }) {
+  return (
     <div className="h-[520px] rounded-3xl border border-border/50 bg-[#0a0a14] flex items-center justify-center">
       <div className="text-center">
         <div className="text-4xl mb-3 animate-bounce">⚔️</div>
-        <p className="text-white/60 text-sm">3D sahna yuklanmoqda...</p>
+        <p className="text-white/80 font-bold text-base mb-1">{title}</p>
+        <p className="text-white/60 text-xs">3D sahna va fizik modellar yuklanmoqda...</p>
       </div>
     </div>
-  ),
+  );
+}
+
+const QuizBattle3D = dynamic(() => import("@/components/games/QuizBattle3D"), {
+  ssr: false,
+  loading: () => <Loading3D title="Quiz Battle 3D" />,
 });
+
+const MazeRunner3D = dynamic(() => import("@/components/games/MazeRunner3D"), {
+  ssr: false,
+  loading: () => <Loading3D title="Maze Runner 3D" />,
+});
+
+const CyberFlight3D = dynamic(() => import("@/components/games/CyberFlight3D"), {
+  ssr: false,
+  loading: () => <Loading3D title="Cyber Flight 3D" />,
+});
+
+const BinaryBridge3D = dynamic(() => import("@/components/games/BinaryBridge3D"), {
+  ssr: false,
+  loading: () => <Loading3D title="Binary Bridge 3D" />,
+});
+
 import {
   Puzzle,
   Bug,
@@ -42,12 +64,26 @@ import {
   ArrowRight as ARight,
   Sparkles,
   AlertTriangle,
+  Bot,
+  Plane,
+  Binary,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { useI18n } from "@/lib/i18n";
 
-type GameType = null | "puzzle" | "bugfix" | "typing" | "battle" | "maze" | "bird" | "quiz3d";
+type GameType =
+  | null
+  | "puzzle"
+  | "bugfix"
+  | "typing"
+  | "battle"
+  | "maze"
+  | "bird"
+  | "quiz3d"
+  | "maze3d"
+  | "flight3d"
+  | "binary3d";
 
 const gameCards = (t: Dictionary) => [
   {
@@ -57,6 +93,34 @@ const gameCards = (t: Dictionary) => [
     Icon: Swords,
     color: "#B388FF",
     diff: `3D · ${t.cabinet.gamesPage.isNew}`,
+    category: "3d",
+  },
+  {
+    type: "maze3d" as const,
+    title: "Maze Runner 3D",
+    desc: t.cabinet.gamesPage.descMaze3d,
+    Icon: Bot,
+    color: "#FFD600",
+    diff: `3D · ${t.cabinet.gamesPage.isNew}`,
+    category: "3d",
+  },
+  {
+    type: "flight3d" as const,
+    title: "Cyber Flight 3D",
+    desc: t.cabinet.gamesPage.descFlight3d,
+    Icon: Plane,
+    color: "#00D2FF",
+    diff: `3D · ${t.cabinet.gamesPage.isNew}`,
+    category: "3d",
+  },
+  {
+    type: "binary3d" as const,
+    title: "Binary Bridge 3D",
+    desc: t.cabinet.gamesPage.descBinary3d,
+    Icon: Binary,
+    color: "#00E676",
+    diff: `3D · ${t.cabinet.gamesPage.isNew}`,
+    category: "3d",
   },
   {
     type: "puzzle" as const,
@@ -65,6 +129,7 @@ const gameCards = (t: Dictionary) => [
     Icon: Puzzle,
     color: "#6C5CE7",
     diff: t.difficulty.easy,
+    category: "classic",
   },
   {
     type: "bugfix" as const,
@@ -73,6 +138,7 @@ const gameCards = (t: Dictionary) => [
     Icon: Bug,
     color: "#FF5252",
     diff: t.difficulty.medium,
+    category: "classic",
   },
   {
     type: "typing" as const,
@@ -81,6 +147,7 @@ const gameCards = (t: Dictionary) => [
     Icon: Keyboard,
     color: "#00D2FF",
     diff: t.difficulty.easy,
+    category: "classic",
   },
   {
     type: "battle" as const,
@@ -89,22 +156,25 @@ const gameCards = (t: Dictionary) => [
     Icon: Swords,
     color: "#00E676",
     diff: t.difficulty.hard,
+    category: "classic",
   },
   {
     type: "maze" as const,
-    title: "Maze Runner",
+    title: "Maze Runner (2D)",
     desc: t.cabinet.gamesPage.descMaze,
     Icon: Map,
     color: "#FFD600",
     diff: t.difficulty.medium,
+    category: "classic",
   },
   {
     type: "bird" as const,
-    title: "Code Bird",
+    title: "Code Bird (2D)",
     desc: t.cabinet.gamesPage.descBird,
     Icon: Bird,
     color: "#FF6B9D",
     diff: t.difficulty.medium,
+    category: "classic",
   },
 ];
 
@@ -120,9 +190,14 @@ function shuffle<T>(a: T[]): T[] {
 export default function GamesPage() {
   const { t } = useI18n();
   const [game, setGame] = useState<GameType>(null);
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "3d" | "classic">("all");
+
+  const filteredCards = gameCards(t).filter(
+    (g) => categoryFilter === "all" || g.category === categoryFilter
+  );
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-semibold tracking-widest uppercase mb-4">
           <Sparkles className="w-3.5 h-3.5" />
@@ -134,11 +209,51 @@ export default function GamesPage() {
         <p className="text-[15px] md:text-base text-muted-foreground max-w-2xl">
           {t.cabinet.gamesPage.subtitle}
         </p>
+
+        {/* Category Filters */}
+        {!game && (
+          <div className="flex items-center gap-2 mt-6">
+            <button
+              onClick={() => setCategoryFilter("all")}
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-semibold transition",
+                categoryFilter === "all"
+                  ? "bg-foreground text-background"
+                  : "bg-surface border border-border text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {t.cabinet.gamesPage.filterAll || "Barcha o'yinlar"}
+            </button>
+            <button
+              onClick={() => setCategoryFilter("3d")}
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5",
+                categoryFilter === "3d"
+                  ? "bg-neon-purple text-white shadow-lg shadow-neon-purple/20"
+                  : "bg-surface border border-border text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              {t.cabinet.gamesPage.filter3d || "3D O'yinlar"}
+            </button>
+            <button
+              onClick={() => setCategoryFilter("classic")}
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-semibold transition",
+                categoryFilter === "classic"
+                  ? "bg-foreground text-background"
+                  : "bg-surface border border-border text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {t.cabinet.gamesPage.filterClassic || "Klassik"}
+            </button>
+          </div>
+        )}
       </motion.div>
 
       {!game ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {gameCards(t).map((g, i) => {
+          {filteredCards.map((g, i) => {
             const Icon = g.Icon;
             return (
               <motion.button
@@ -147,7 +262,7 @@ export default function GamesPage() {
                 className="group relative text-left p-6 rounded-3xl border border-border/50 bg-card/40 hover:bg-card/80 hover:border-border transition-all overflow-hidden"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
+                transition={{ delay: i * 0.05 }}
               >
                 <div
                   className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-opacity"
@@ -176,7 +291,7 @@ export default function GamesPage() {
                   <p className="text-[15px] text-muted-foreground leading-relaxed">{g.desc}</p>
 
                   <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-foreground/70 group-hover:text-neon-purple transition-colors">
-                    O'ynash
+                    O&apos;ynash
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </div>
@@ -190,9 +305,12 @@ export default function GamesPage() {
             onClick={() => setGame(null)}
             className="inline-flex items-center gap-2 text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
-            <ArrowLeft className="w-4 h-4" /> O'yinlarga qaytish
+            <ArrowLeft className="w-4 h-4" /> O&apos;yinlarga qaytish
           </button>
           {game === "quiz3d" && <QuizBattle3D />}
+          {game === "maze3d" && <MazeRunner3D />}
+          {game === "flight3d" && <CyberFlight3D />}
+          {game === "binary3d" && <BinaryBridge3D />}
           {game === "puzzle" && <PuzzleGame />}
           {game === "bugfix" && <BugFixGame />}
           {game === "typing" && <TypingGame />}
