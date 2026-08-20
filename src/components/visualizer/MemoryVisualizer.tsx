@@ -86,7 +86,7 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="viz-shell flex flex-col gap-4">
       {/* Playback Controls Toolbar */}
       <div className="p-3.5 rounded-2xl bg-surface border border-border flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
             }}
             disabled={currentStepIdx === 0}
             className="p-2 rounded-lg hover:bg-card border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 transition"
-            title="Boshiga o'tish"
+            title={t.visualizer.goToStart}
           >
             <SkipBack className="w-4 h-4" />
           </button>
@@ -149,14 +149,14 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
             }}
             disabled={currentStepIdx >= steps.length - 1}
             className="p-2 rounded-lg hover:bg-card border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 transition"
-            title="Oxiriga o'tish"
+            title={t.visualizer.goToEnd}
           >
             <SkipForward className="w-4 h-4" />
           </button>
         </div>
 
         {/* Step Slider & Indicator */}
-        <div className="flex-1 min-w-[200px] flex items-center gap-3">
+        <div className="flex-1 min-w-[140px] flex items-center gap-3">
           <input
             type="range"
             min={0}
@@ -175,7 +175,7 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
 
         {/* Speed Selector */}
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span>{t.visualizer.speed}:</span>
+          <span className="viz-speed-label">{t.visualizer.speed}:</span>
           <select
             value={playbackSpeed}
             onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
@@ -189,12 +189,12 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
       </div>
 
       {/* Visualizer Grid: Code on left, Call Stack & Heap on right */}
-      <div className="grid lg:grid-cols-12 gap-4">
+      <div className="viz-grid">
         {/* Left: Code with Active Line Indicator */}
-        <div className="lg:col-span-5 rounded-2xl bg-card border border-border p-4 flex flex-col">
+        <div className="min-w-0 rounded-2xl bg-card border border-border p-4 flex flex-col">
           <div className="flex items-center justify-between pb-3 mb-3 border-b border-border text-xs font-semibold text-muted-foreground">
             <span className="flex items-center gap-1.5 text-neon-blue">
-              <Code2 className="w-4 h-4" /> Python kodi
+              <Code2 className="w-4 h-4" /> {t.visualizer.pythonCode}
             </span>
             {currentStep && (
               <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
@@ -229,13 +229,13 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
               <span>{t.visualizer.output}</span>
             </div>
             <pre className="font-mono text-xs p-2.5 rounded-xl bg-black/50 border border-border text-neon-green/90 min-h-[48px] max-h-[90px] overflow-y-auto whitespace-pre-wrap">
-              {currentStep?.stdout || <span className="opacity-40 text-muted-foreground">Chiqish yo&apos;q</span>}
+              {currentStep?.stdout || <span className="opacity-40 text-muted-foreground">{t.visualizer.noOutput}</span>}
             </pre>
           </div>
         </div>
 
         {/* Right: Stack & Heap Visual Representation */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
+        <div className="min-w-0 flex flex-col gap-4">
           {/* Call Stack Section */}
           <div className="p-4 rounded-2xl bg-card border border-border">
             <div className="flex items-center gap-2 pb-3 mb-3 border-b border-border text-xs font-semibold text-muted-foreground">
@@ -266,7 +266,7 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
 
                     {/* Local variables list */}
                     {Object.keys(frame.locals).length > 0 ? (
-                      <div className="grid sm:grid-cols-2 gap-2">
+                      <div className="viz-cards">
                         {Object.entries(frame.locals).map(([varName, varVal]) => (
                           <div
                             key={varName}
@@ -279,7 +279,7 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[11px] text-muted-foreground italic">O&apos;zgaruvchilar mavjud emas</p>
+                      <p className="text-[11px] text-muted-foreground italic">{t.visualizer.noVariables}</p>
                     )}
                   </div>
                 );
@@ -295,7 +295,7 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
             </div>
 
             {currentStep && Object.keys(currentStep.heap).length > 0 ? (
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="viz-cards">
                 {Object.values(currentStep.heap).map((obj) => (
                   <div key={obj.id} className="p-3 rounded-xl bg-surface border border-neon-green/30 space-y-2">
                     <div className="flex items-center justify-between text-xs">
@@ -335,7 +335,7 @@ export default function MemoryVisualizer({ traceResult, code, isLoading }: Memor
               </div>
             ) : (
               <p className="text-xs text-muted-foreground italic py-2">
-                Hozircha Heap xotirada murakkab tuzilmalar (ro&apos;yxat, lug&apos;at) yaratilmagan.
+                {t.visualizer.noHeapObjects}
               </p>
             )}
           </div>

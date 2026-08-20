@@ -129,6 +129,9 @@ export default function CodeEditor({
     try {
       pyodideRef.current.globals.set('__user_code__', src);
       pyodideRef.current.globals.set('__user_stdin__', stdin);
+      // EOF xabari interfeys tilida chiqsin — harness ichida matn
+      // yozib qo'yilsa u har doim o'zbekcha qolardi
+      pyodideRef.current.globals.set('__eof_msg__', t.misc.stdinExhausted);
       pyodideRef.current.runPython(`
 import sys, builtins
 from io import StringIO
@@ -139,7 +142,7 @@ _stdout_buf = StringIO()
 def _test_input(prompt=""):
     line = _stdin_buf.readline()
     if not line:
-        raise EOFError("EOF when reading a line (kirish qiymatlari tugadi)")
+        raise EOFError("EOF when reading a line (" + __eof_msg__ + ")")
     return line.rstrip("\\r\\n")
 
 # Har bajarishda TOZA global muhit — testlar orasida holat sizmaydi
@@ -217,12 +220,12 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         results.push({
           input: tc.input,
           expected: tc.expected_output.trim(),
-          actual: r.stderr ? `Xatolik: ${r.stderr}` : r.stdout.trim(),
+          actual: r.stderr ? `${t.misc.errorLabel}: ${r.stderr}` : r.stdout.trim(),
           passed: !r.stderr && actual === expected,
           time_ms: r.time_ms,
         });
       } catch (err: any) {
-        results.push({ input: tc.input, expected: tc.expected_output.trim(), actual: `Xatolik: ${err.message}`, passed: false, time_ms: 0 });
+        results.push({ input: tc.input, expected: tc.expected_output.trim(), actual: `${t.misc.errorLabel}: ${err.message}`, passed: false, time_ms: 0 });
       }
     }
     return results;
@@ -235,7 +238,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
       const defaultStdin = testCases.length > 0 ? testCases[0].input : "";
       const r = await runCode(code, defaultStdin);
       if (r.stderr) {
-        setOutput(`❌ Xatolik:\n${r.stderr}\n\n⏱ ${r.time_ms}ms`);
+        setOutput(`❌ ${t.misc.errorLabel}:\n${r.stderr}\n\n⏱ ${r.time_ms}ms`);
         // Mental xatolikni aniqlash
         const diag = diagnoseMisconceptions(code, r.stderr);
         if (diag) setMisconception(diag);
@@ -258,9 +261,9 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
     setTestResults(results);
     const passed = results.filter(r => r.passed).length;
     if (passed === results.length) {
-      setOutput(`✅ Barcha ${results.length} ta test o'tdi!`);
+      setOutput(`✅ ${t.misc.allTestsPassedN.replace("{n}", String(results.length))}`);
     } else {
-      setOutput(`⚠️ ${passed}/${results.length} test o'tdi.`);
+      setOutput(`⚠️ ${t.misc.someTestsPassedN.replace("{p}", String(passed)).replace("{n}", String(results.length))}`);
       // Failed testlar ichidan xatolikni tahlil qilish
       const failed = results.find(r => !r.passed);
       const diag = diagnoseMisconceptions(code, failed?.actual);
@@ -272,7 +275,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
   // ===== JONLI XOTIRA VIZUALIZATSIYASI =====
   async function handleTrace() {
     if (language !== "python") {
-      toast.info("Xotira vizualizatsiyasi hozirda Python tili uchun ishlaydi.");
+      toast.info(t.misc.visualizerPythonOnly);
       return;
     }
     if (!pyodideRef.current) {
@@ -412,7 +415,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
             solved_count: (challenge.solved_count || 0) + 1,
           }).eq('id', taskId);
 
-          toast.success(`Barcha testlar o'tdi! +${coinReward} coin, +${xpReward} XP 🎉`);
+          toast.success(t.misc.rewardToast.replace("{c}", String(coinReward)).replace("{x}", String(xpReward)) + " 🎉");
         } else {
           toast.success(t.misc.allTestsPassed + " ✅");
         }
@@ -442,7 +445,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-neon-red/60" /><div className="w-2.5 h-2.5 rounded-full bg-neon-yellow/60" /><div className="w-2.5 h-2.5 rounded-full bg-neon-green/60" /></div>
           <span className="text-xs font-mono text-muted-foreground">{language === "python" ? "main.py" : "main.js"}</span>
-          {language === "python" && <span className={cn("text-[10px] px-2 py-0.5 rounded-full", pyodideReady ? "bg-neon-green/10 text-neon-green" : "bg-neon-yellow/10 text-neon-yellow")}>{pyodideReady ? "✓ Tayyor" : "⏳ Yuklanmoqda..."}</span>}
+          {language === "python" && <span className={cn("text-[10px] px-2 py-0.5 rounded-full", pyodideReady ? "bg-neon-green/10 text-neon-green" : "bg-neon-yellow/10 text-neon-yellow")}>{pyodideReady ? `✓ ${t.misc.ready}` : `⏳ ${t.misc.loadingShort}`}</span>}
         </div>
         <div className="flex items-center gap-1">
           <button onClick={handleCopy} className="p-1.5 hover:bg-accent rounded-lg">{copied ? <Check className="w-3.5 h-3.5 text-neon-green" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}</button>
@@ -507,55 +510,56 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-t border-border/50 bg-surface/30 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
-          <button onClick={handleRun} disabled={isRunning || (language === "python" && !pyodideReady)}
-            className="btn-primary py-1.5 px-3.5 flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 shadow-sm">
-            {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />} Ishga tushirish
+      {/* Actions — chapda asosiy amallar, o'ngda pedagogik asboblar.
+          Asboblar faqat ikonka: bu panel topshiriq sahifasida tor ustunga
+          tushadi va matnli tugmalar bilan uch qatorga bo'linib ketardi.
+          Ekran kengaygandagina yozuv chiqadi. */}
+      <div className="flex items-center gap-2 px-4 py-2.5 border-t border-border/50 bg-surface/30 flex-wrap">
+        <button onClick={handleRun} disabled={isRunning || (language === "python" && !pyodideReady)}
+          className="btn-primary py-1.5 px-3.5 flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 shadow-sm whitespace-nowrap">
+          {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />} {t.misc.run}
+        </button>
+        {testCases.length > 0 && (
+          <button onClick={handleRunTests} disabled={isRunning || (language === "python" && !pyodideReady)}
+            className="flex items-center gap-1.5 py-1.5 px-3.5 rounded-full text-xs font-semibold bg-neon-green/10 text-neon-green border border-neon-green/25 hover:bg-neon-green/20 disabled:opacity-50 transition-all whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5" /> {t.misc.checkTests}
           </button>
-          {testCases.length > 0 && (
-            <button onClick={handleRunTests} disabled={isRunning || (language === "python" && !pyodideReady)}
-              className="flex items-center gap-1.5 py-1.5 px-3.5 rounded-full text-xs font-semibold bg-neon-green/10 text-neon-green border border-neon-green/25 hover:bg-neon-green/20 disabled:opacity-50 transition-all">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Testlarni tekshirish
-            </button>
-          )}
+        )}
+        {taskId && (
+          <button onClick={requestSubmit} disabled={isRunning || isSubmitting}
+            className="btn-neon py-1.5 px-3.5 flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 whitespace-nowrap">
+            {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+            {isSubmitting ? t.misc.submitting : t.misc.submit}
+          </button>
+        )}
+        {onAIFeedback && (
+          <button onClick={() => onAIFeedback(code, testResults)}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 transition-all">
+            <Sparkles className="w-3.5 h-3.5" /> AI
+          </button>
+        )}
+        {testResults.length > 0 && (
+          <span className={cn("text-xs font-mono font-bold", allPassed ? "text-neon-green" : "text-neon-red")}>{passedCount}/{testResults.length}</span>
+        )}
+
+        <div className="flex items-center gap-1.5 ml-auto">
           {language === "python" && (
             <button onClick={handleTrace} disabled={isTracing || !pyodideReady}
-              className="flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-neon-purple/10 text-neon-purple border border-neon-purple/30 hover:bg-neon-purple/20 transition-all disabled:opacity-50 shadow-sm">
+              title={t.visualizer.toggleBtn} aria-label={t.visualizer.toggleBtn}
+              className="flex items-center p-2 rounded-full text-xs font-semibold bg-neon-purple/10 text-neon-purple border border-neon-purple/30 hover:bg-neon-purple/20 transition-all disabled:opacity-50 shadow-sm">
               {isTracing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Layers className="w-3.5 h-3.5" />}
-              <span>{t.visualizer.toggleBtn}</span>
             </button>
           )}
           <button onClick={() => setShowSemanticBridge(true)}
-            className="flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all shadow-sm">
+            title={t.semanticBridge.toggleBtn} aria-label={t.semanticBridge.toggleBtn}
+            className="flex items-center p-2 rounded-full text-xs font-semibold bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all shadow-sm">
             <Compass className="w-3.5 h-3.5" />
-            <span>{t.semanticBridge.toggleBtn}</span>
           </button>
           <button onClick={() => setShowKnowledgeGraph(true)}
-            className="flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-surface border border-border hover:bg-card text-muted-foreground hover:text-foreground transition-all">
+            title={t.misconceptions.openGraph} aria-label={t.misconceptions.openGraph}
+            className="flex items-center p-2 rounded-full text-xs font-semibold bg-surface border border-border hover:bg-card text-muted-foreground hover:text-foreground transition-all">
             <Network className="w-3.5 h-3.5 text-neon-purple" />
-            <span>{t.misconceptions.openGraph}</span>
           </button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {taskId && (
-            <button onClick={requestSubmit} disabled={isRunning || isSubmitting}
-              className="btn-neon py-1.5 px-3.5 flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50">
-              {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-              {isSubmitting ? t.misc.submitting : t.misc.submit}
-            </button>
-          )}
-          {onAIFeedback && (
-            <button onClick={() => onAIFeedback(code, testResults)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 transition-all">
-              <Sparkles className="w-3.5 h-3.5" /> AI
-            </button>
-          )}
-          {testResults.length > 0 && (
-            <span className={cn("ml-2 text-xs font-mono font-bold", allPassed ? "text-neon-green" : "text-neon-red")}>{passedCount}/{testResults.length}</span>
-          )}
         </div>
       </div>
 
@@ -565,7 +569,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
           <button onClick={() => setActiveTab("output")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium", activeTab === "output" ? "bg-surface text-foreground font-semibold" : "text-muted-foreground")}>{t.misc.result}</button>
           {testCases.length > 0 && (
             <button onClick={() => setActiveTab("tests")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5", activeTab === "tests" ? "bg-surface text-foreground font-semibold" : "text-muted-foreground")}>
-              Testlar {testResults.length > 0 && <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", allPassed ? "bg-neon-green/10 text-neon-green" : "bg-neon-red/10 text-neon-red")}>{passedCount}/{testResults.length}</span>}
+              {t.misc.testsTab} {testResults.length > 0 && <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", allPassed ? "bg-neon-green/10 text-neon-green" : "bg-neon-red/10 text-neon-red")}>{passedCount}/{testResults.length}</span>}
             </button>
           )}
           <button onClick={() => setActiveTab("visualizer")} className={cn("px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5", activeTab === "visualizer" ? "bg-neon-purple/15 text-neon-purple font-semibold" : "text-muted-foreground")}>
@@ -575,10 +579,10 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         <div className="p-4 max-h-[480px] overflow-y-auto">
           {activeTab === "output" ? (
             output ? <pre className="font-mono text-sm whitespace-pre-wrap text-muted-foreground">{output}</pre>
-              : <p className="text-sm text-muted-foreground italic">Kodni ishga tushiring...</p>
+              : <p className="text-sm text-muted-foreground italic">{t.misc.runPrompt}</p>
           ) : activeTab === "tests" ? (
             <div className="space-y-2">
-              {testResults.length === 0 ? <p className="text-sm text-muted-foreground italic">&quot;Testlarni tekshirish&quot; tugmasini bosing</p> : (
+              {testResults.length === 0 ? <p className="text-sm text-muted-foreground italic">{t.misc.pressCheckTests}</p> : (
                 <>
                   {testResults.map((r, i) => (
                     <div key={i} className={cn("p-3 rounded-xl border", r.passed ? "bg-neon-green/5 border-neon-green/20" : "bg-neon-red/5 border-neon-red/20")}>
@@ -588,9 +592,9 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
                         <span className="ml-auto text-[10px] text-muted-foreground"><Clock className="w-3 h-3 inline mr-0.5" />{r.time_ms}ms</span>
                       </div>
                       <div className="space-y-0.5 text-xs font-mono">
-                        <div className="flex gap-2"><span className="text-muted-foreground w-16">Kirish:</span><span className="text-foreground">{r.input || "(bo'sh)"}</span></div>
-                        <div className="flex gap-2"><span className="text-muted-foreground w-16">Kutilgan:</span><span className="text-neon-green">{r.expected}</span></div>
-                        <div className="flex gap-2"><span className="text-muted-foreground w-16">Chiqish:</span><span className={r.passed ? "text-neon-green" : "text-neon-red"}>{r.actual || "(bo'sh)"}</span></div>
+                        <div className="flex gap-2"><span className="text-muted-foreground w-16">{t.misc.inputLabel}</span><span className="text-foreground">{r.input || t.misc.emptyValue}</span></div>
+                        <div className="flex gap-2"><span className="text-muted-foreground w-16">{t.misc.expectedLabel}</span><span className="text-neon-green">{r.expected}</span></div>
+                        <div className="flex gap-2"><span className="text-muted-foreground w-16">{t.misc.outputLabel}</span><span className={r.passed ? "text-neon-green" : "text-neon-red"}>{r.actual || t.misc.emptyValue}</span></div>
                       </div>
                     </div>
                   ))}

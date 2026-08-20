@@ -347,32 +347,114 @@ export function diagnoseMisconceptions(code: string, error?: string): Misconcept
   return null;
 }
 
+export type NodeStatus = "mastered" | "needs_practice" | "unlocked" | "locked";
+
 export interface KnowledgeGraphNode {
   id: string;
   label: Record<Locale, string>;
   category: "syntax" | "flow" | "structures" | "functions" | "algorithms";
   x: number;
   y: number;
-  status: "mastered" | "needs_practice" | "unlocked" | "locked";
+  /**
+   * Bu tushunchani qamrab oladigan mavzular (topics.slug).
+   * Bo'sh ro'yxat — platformada hali mos dars yo'q; bunday tugun
+   * hech qachon "o'zlashtirilgan" bo'lmaydi, faqat ochiladi.
+   */
+  topicSlugs: string[];
   prerequisites: string[];
 }
 
 export const KNOWLEDGE_GRAPH_NODES: KnowledgeGraphNode[] = [
-  { id: "syntax_io", label: { uz: "Kirish / Chiqish (I/O)", ru: "Ввод / Вывод (I/O)", en: "Input / Output (I/O)", kaa: "Kiriw / Shıǵıw (I/O)" }, category: "syntax", x: 100, y: 80, status: "mastered", prerequisites: [] },
-  { id: "types_vars", label: { uz: "O'zgaruvchilar va Turlar", ru: "Переменные и Типы", en: "Variables & Types", kaa: "Ózgeriwshiler hám Túrler" }, category: "syntax", x: 300, y: 80, status: "mastered", prerequisites: ["syntax_io"] },
-  { id: "arithmetic", label: { uz: "Arifmetik Amallar", ru: "Арифметика", en: "Arithmetic Operations", kaa: "Arifmetikalıq Ámeller" }, category: "syntax", x: 500, y: 80, status: "mastered", prerequisites: ["types_vars"] },
-  
-  { id: "conditions", label: { uz: "Shartlar (if/else)", ru: "Условия (if/else)", en: "Conditionals (if/else)", kaa: "Shártler (if/else)" }, category: "flow", x: 200, y: 220, status: "needs_practice", prerequisites: ["arithmetic"] },
-  { id: "loops_for", label: { uz: "For Sikllari", ru: "Циклы For", en: "For Loops & Range", kaa: "For Ciklları" }, category: "flow", x: 400, y: 220, status: "mastered", prerequisites: ["conditions"] },
-  { id: "loops_while", label: { uz: "While Sikli", ru: "Цикл While", en: "While Loops", kaa: "While Cikli" }, category: "flow", x: 600, y: 220, status: "needs_practice", prerequisites: ["loops_for"] },
-  
-  { id: "lists", label: { uz: "Ro'yxatlar (Lists)", ru: "Списки (Lists)", en: "Lists & Arrays", kaa: "Dizimler (Lists)" }, category: "structures", x: 260, y: 360, status: "mastered", prerequisites: ["loops_for"] },
-  { id: "strings_methods", label: { uz: "Satrlar Metodlari", ru: "Методы строк", en: "String Methods", kaa: "Qatarlar Metodları" }, category: "structures", x: 460, y: 360, status: "mastered", prerequisites: ["lists"] },
-  { id: "dicts_sets", label: { uz: "Lug'atlar (Dicts)", ru: "Словари и Множества", en: "Dicts & Sets", kaa: "Sózlikler hám Kóplikler" }, category: "structures", x: 660, y: 360, status: "unlocked", prerequisites: ["lists"] },
-  
-  { id: "functions_basic", label: { uz: "Funksiyalar (def)", ru: "Функции (def/return)", en: "Functions & Scope", kaa: "Funktsiyalar (def/return)" }, category: "functions", x: 340, y: 500, status: "needs_practice", prerequisites: ["lists", "loops_while"] },
-  { id: "modules", label: { uz: "Standart Modullar", ru: "Модули (math, random)", en: "Standard Modules", kaa: "Standart Moduller" }, category: "functions", x: 540, y: 500, status: "unlocked", prerequisites: ["functions_basic"] },
-  
-  { id: "recursion", label: { uz: "Rekursiya va Stek", ru: "Рекурсия и Стек", en: "Recursion & Stack", kaa: "Rekursiya hám Stek" }, category: "algorithms", x: 280, y: 640, status: "locked", prerequisites: ["functions_basic"] },
-  { id: "binary_search", label: { uz: "Ikkilik Qidiruv", ru: "Бинарный поиск", en: "Binary Search", kaa: "Ekilik Izlew" }, category: "algorithms", x: 480, y: 640, status: "locked", prerequisites: ["lists", "functions_basic"] },
+  { id: "syntax_io", label: { uz: "Kirish / Chiqish (I/O)", ru: "Ввод / Вывод (I/O)", en: "Input / Output (I/O)", kaa: "Kiriw / Shıǵıw (I/O)" }, category: "syntax", x: 100, y: 80, prerequisites: [], topicSlugs: ["python-sintaksis", "amaliy-1-sintaksis", "lab-1-sintaksis-turlar"] },
+  { id: "types_vars", label: { uz: "O'zgaruvchilar va Turlar", ru: "Переменные и Типы", en: "Variables & Types", kaa: "Ózgeriwshiler hám Túrler" }, category: "syntax", x: 300, y: 80, prerequisites: ["syntax_io"], topicSlugs: ["ozgaruvchilar-va-turlar"] },
+  { id: "arithmetic", label: { uz: "Arifmetik Amallar", ru: "Арифметика", en: "Arithmetic Operations", kaa: "Arifmetikalıq Ámeller" }, category: "syntax", x: 500, y: 80, prerequisites: ["types_vars"], topicSlugs: ["arifmetik-amallar"] },
+
+  { id: "conditions", label: { uz: "Shartlar (if/else)", ru: "Условия (if/else)", en: "Conditionals (if/else)", kaa: "Shártler (if/else)" }, category: "flow", x: 200, y: 220, prerequisites: ["arithmetic"], topicSlugs: ["shartlar-va-tarmoqlanish", "amaliy-4-shartlar", "lab-4-shartlar"] },
+  { id: "loops_for", label: { uz: "For Sikllari", ru: "Циклы For", en: "For Loops & Range", kaa: "For Ciklları" }, category: "flow", x: 400, y: 220, prerequisites: ["conditions"], topicSlugs: ["royxatlar-va-for", "amaliy-3-sikllar", "lab-3-royxatlar-for"] },
+  { id: "loops_while", label: { uz: "While Sikli", ru: "Цикл While", en: "While Loops", kaa: "While Cikli" }, category: "flow", x: 600, y: 220, prerequisites: ["loops_for"], topicSlugs: ["while-sikli", "amaliy-5-while", "lab-5-while"] },
+
+  { id: "lists", label: { uz: "Ro'yxatlar (Lists)", ru: "Списки (Lists)", en: "Lists & Arrays", kaa: "Dizimler (Lists)" }, category: "structures", x: 260, y: 360, prerequisites: ["loops_for"], topicSlugs: ["royxatlar-va-for", "lab-3-royxatlar-for"] },
+  { id: "strings_methods", label: { uz: "Satrlar Metodlari", ru: "Методы строк", en: "String Methods", kaa: "Qatarlar Metodları" }, category: "structures", x: 460, y: 360, prerequisites: ["lists"], topicSlugs: ["matnlar-va-sonlar", "lab-2-matnlar"] },
+  { id: "dicts_sets", label: { uz: "Lug'atlar (Dicts)", ru: "Словари и Множества", en: "Dicts & Sets", kaa: "Sózlikler hám Kóplikler" }, category: "structures", x: 660, y: 360, prerequisites: ["lists"], topicSlugs: ["lugat-va-toplam"] },
+
+  { id: "functions_basic", label: { uz: "Funksiyalar (def)", ru: "Функции (def/return)", en: "Functions & Scope", kaa: "Funktsiyalar (def/return)" }, category: "functions", x: 340, y: 500, prerequisites: ["lists", "loops_while"], topicSlugs: ["funksiyalar", "amaliy-6-funksiyalar", "lab-6-funksiyalar"] },
+  { id: "modules", label: { uz: "Standart Modullar", ru: "Модули (math, random)", en: "Standard Modules", kaa: "Standart Moduller" }, category: "functions", x: 540, y: 500, prerequisites: ["functions_basic"], topicSlugs: ["modullar"] },
+
+  // Bu ikkisiga hozircha platformada dars yo'q — shuning uchun slug'lar bo'sh
+  { id: "recursion", label: { uz: "Rekursiya va Stek", ru: "Рекурсия и Стек", en: "Recursion & Stack", kaa: "Rekursiya hám Stek" }, category: "algorithms", x: 280, y: 640, prerequisites: ["functions_basic"], topicSlugs: [] },
+  { id: "binary_search", label: { uz: "Ikkilik Qidiruv", ru: "Бинарный поиск", en: "Binary Search", kaa: "Ekilik Izlew" }, category: "algorithms", x: 480, y: 640, prerequisites: ["lists", "functions_basic"], topicSlugs: [] },
 ];
+
+/** Bitta mavzu bo'yicha foydalanuvchi progressi (topic_progress qatori). */
+export interface TopicProgressRow {
+  slug: string;
+  is_completed: boolean;
+  quiz_passed: boolean;
+  quiz_score: number | null;
+  quiz_total: number | null;
+  tasks_completed: boolean;
+}
+
+/** Test natijasi shu ulushdan past bo'lsa — mashq kerak deb hisoblanadi. */
+const MASTERY_QUIZ_RATIO = 0.8;
+
+/**
+ * Har bir tugunning haqiqiy holatini foydalanuvchi progressidan hisoblaydi.
+ *
+ * Qoidalar:
+ *  - `mastered`      — tugunga tegishli BARCHA mavzu tugatilgan va test
+ *                      natijasi 80% dan past emas;
+ *  - `needs_practice`— boshlangan, lekin tugallanmagan yoki test past;
+ *  - `unlocked`      — barcha old shartlar o'zlashtirilgan, o'zi boshlanmagan;
+ *  - `locked`        — old shartlardan kamida bittasi o'zlashtirilmagan.
+ *
+ * Tugunlar old shart grafi bo'yicha tartiblanmagani uchun holat barqaror
+ * bo'lguncha takrorlanadi (13 ta tugun — arzon).
+ */
+export function computeNodeStatuses(progress: TopicProgressRow[]): Record<string, NodeStatus> {
+  const byslug = new Map(progress.map((p) => [p.slug, p]));
+  const status: Record<string, NodeStatus> = {};
+
+  const ownStatus = (node: KnowledgeGraphNode): NodeStatus | null => {
+    const rows = node.topicSlugs.map((s) => byslug.get(s)).filter(Boolean) as TopicProgressRow[];
+    if (rows.length === 0) return null; // boshlanmagan yoki darsi yo'q
+
+    const allDone = node.topicSlugs.length > 0 && rows.length === node.topicSlugs.length
+      && rows.every((r) => r.is_completed);
+
+    const quizWeak = rows.some(
+      (r) => r.quiz_total != null && r.quiz_total > 0 && r.quiz_score != null
+        && r.quiz_score / r.quiz_total < MASTERY_QUIZ_RATIO,
+    );
+
+    if (allDone && !quizWeak) return "mastered";
+    return "needs_practice";
+  };
+
+  for (const node of KNOWLEDGE_GRAPH_NODES) status[node.id] = "locked";
+
+  for (let pass = 0; pass < KNOWLEDGE_GRAPH_NODES.length; pass++) {
+    let changed = false;
+    for (const node of KNOWLEDGE_GRAPH_NODES) {
+      const own = ownStatus(node);
+      const prereqsOk = node.prerequisites.every((id) => status[id] === "mastered");
+      const next: NodeStatus = own ?? (prereqsOk ? "unlocked" : "locked");
+      if (status[node.id] !== next) { status[node.id] = next; changed = true; }
+    }
+    if (!changed) break;
+  }
+
+  return status;
+}
+
+/** O'zlashtirish indeksi (%): o'zlashtirilgan 1, mashq kerak 0.5 ball. */
+export function masteryIndex(status: Record<string, NodeStatus>): number {
+  const total = KNOWLEDGE_GRAPH_NODES.length;
+  if (total === 0) return 0;
+  const score = KNOWLEDGE_GRAPH_NODES.reduce((acc, n) => {
+    if (status[n.id] === "mastered") return acc + 1;
+    if (status[n.id] === "needs_practice") return acc + 0.5;
+    return acc;
+  }, 0);
+  return Math.round((score / total) * 100);
+}

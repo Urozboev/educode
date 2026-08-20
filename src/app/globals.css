@@ -361,3 +361,35 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ===== Xotira vizualizatori — konteyner so'rovlari =====
+   Bu panel ikki joyda ko'rsatiladi: Playground'da deyarli to'liq
+   kenglikda, topshiriq sahifasida esa ~600px li tor ustunda. Shuning
+   uchun `lg:` kabi ekran (viewport) nuqtalari yaramaydi — ular tor
+   ustunda ham ikki ustunli tarhni yoqib yuborardi. O'lchov konteyner
+   kengligidan olinadi. */
+.viz-shell { container-type: inline-size; }
+
+.viz-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+.viz-cards {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+
+/* Boshqaruv paneli: tor konteynerda "Tezlik" yozuvi olib tashlanadi */
+.viz-speed-label { display: none; }
+
+@container (min-width: 560px) {
+  .viz-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .viz-speed-label { display: inline; }
+}
+
+@container (min-width: 900px) {
+  .viz-grid { grid-template-columns: 5fr 7fr; }
+}

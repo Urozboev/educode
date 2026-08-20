@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useI18n } from "@/lib/i18n";
 import { CONCEPT_METAPHORS, KEYWORD_EXPLANATIONS, type ConceptMetaphor } from "@/lib/semantics/analogiesData";
 import { explainPythonCode, type LineSemanticExplanation } from "@/lib/semantics/codeExplainer";
@@ -38,9 +39,13 @@ export default function SemanticBridgeModal({ open, onClose, currentCode = "" }:
     });
   }, [locale, selectedCategory, searchQuery]);
 
-  if (!open) return null;
+  // Modal <body> ga portal qilinadi. Bu panel .glass-card ichida
+  // ko'rsatiladi, .glass-card da esa backdrop-filter bor — u
+  // `position: fixed` uchun yangi konteyner yaratadi va modal
+  // ekranni emas, kartaning ichini qoplab qolardi.
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 15 }}
@@ -132,7 +137,7 @@ export default function SemanticBridgeModal({ open, onClose, currentCode = "" }:
                 </div>
               ) : (
                 <div className="text-center py-16 text-muted-foreground text-xs">
-                  Muharrirda kod mavjud emas. Kod yozing va ushbu bo&apos;limda uning ona tilidagi semantik ma&apos;nosini ko&apos;ring.
+                  {t.semanticBridge.noCode}
                 </div>
               )}
             </div>
@@ -224,6 +229,7 @@ export default function SemanticBridgeModal({ open, onClose, currentCode = "" }:
           )}
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }

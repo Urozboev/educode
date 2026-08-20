@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { diagnoseMisconceptions, type MisconceptionDiagnostic } from "@/lib/diagnostics/misconceptionEngine";
 import MisconceptionAlert from "@/components/diagnostics/MisconceptionAlert";
 import SemanticBridgeModal from "@/components/semantics/SemanticBridgeModal";
@@ -30,7 +31,12 @@ type Lang = {
   eofPattern?: RegExp;
 };
 
-const languages: Lang[] = [
+/**
+ * Til ro'yxati lug'atga bog'liq: namuna kodlardagi izohlar, so'rov
+ * matnlari va chiqariladigan yozuvlar interfeys tilida bo'lishi kerak.
+ * Til kalit so'zlari va API nomlari, tabiiyki, o'zgarmaydi.
+ */
+const buildLanguages = (t: Dictionary): Lang[] => [
   {
     id: "python",
     label: "Python",
@@ -41,10 +47,10 @@ const languages: Lang[] = [
     eofPattern: /EOFError/,
     stdinPattern: /(^|\W)input\s*\(/,
     starter: `# Python Playground
-# input() chaqirilganda dastur to'xtab, konsolda qiymat so'raydi
-name = input("Ismingiz: ")
-age = input("Yoshingiz: ")
-print(f"Xush kelibsiz, {name}! Siz {age} yoshdasiz.")`,
+# ${t.cabinet.play.tplPyNote}
+name = input("${t.cabinet.play.tplAskName}")
+age = input("${t.cabinet.play.tplAskAge}")
+print(f"${t.cabinet.play.tplWelcomeLine}")`,
   },
   {
     id: "javascript",
@@ -54,11 +60,11 @@ print(f"Xush kelibsiz, {name}! Siz {age} yoshdasiz.")`,
     api: true,
     stdinPattern: /readline|process\.stdin/,
     starter: `// JavaScript (Node) Playground
-console.log("Salom, Dunyo!");
+console.log("${t.cabinet.play.tplHelloWorld}");
 
 const arr = [1, 2, 3, 4, 5];
 const sum = arr.reduce((a, b) => a + b, 0);
-console.log(\`Yig'indi: \${sum}\`);`,
+console.log(\`${t.cabinet.play.tplSum}\${sum}\`);`,
   },
   {
     id: "typescript",
@@ -68,7 +74,7 @@ console.log(\`Yig'indi: \${sum}\`);`,
     api: true,
     starter: `// TypeScript Playground
 const greet = (name: string): string => {
-  return \`Salom, \${name}!\`;
+  return \`${t.cabinet.play.tplGreet}, \${name}!\`;
 };
 console.log(greet("TypeScript"));`,
   },
@@ -86,7 +92,7 @@ using namespace std;
 int main() {
     int a, b;
     cin >> a >> b;
-    cout << "Yig'indi: " << a + b << endl;
+    cout << "${t.cabinet.play.tplSum}" << a + b << endl;
     return 0;
 }`,
   },
@@ -105,7 +111,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         String name = sc.nextLine();
-        System.out.println("Salom, " + name + "!");
+        System.out.println("${t.cabinet.play.tplGreet}, " + name + "!");
     }
 }`,
   },
@@ -123,7 +129,7 @@ public class Main {
 class Program {
     static void Main() {
         string name = Console.ReadLine();
-        Console.WriteLine($"Salom, {name}!");
+        Console.WriteLine($"${t.cabinet.play.tplGreet}, {name}!");
     }
 }`,
   },
@@ -161,8 +167,8 @@ class Program {
 </head>
 <body>
   <div class="card">
-    <h1>Salom, Dunyo!</h1>
-    <p>HTML va CSS bilan ishlash</p>
+    <h1>${t.cabinet.play.tplHelloWorld}</h1>
+    <p>${t.cabinet.play.tplHtmlSub}</p>
   </div>
 </body>
 </html>`,
@@ -184,8 +190,11 @@ function fixPyLineNumbers(stderr: string): string {
 
 export default function PlaygroundPage() {
   const { t } = useI18n();
-  const [lang, setLang] = useState<Lang>(languages[0]);
-  const [code, setCode] = useState(languages[0].starter);
+  // Namunalar lug'atdan yasaladi. `useMemo` — har render'da yangi
+  // massiv tug'ilib, tanlangan til obyekti almashib ketmasligi uchun.
+  const languages = useMemo(() => buildLanguages(t), [t]);
+  const [lang, setLang] = useState<Lang>(() => buildLanguages(t)[0]);
+  const [code, setCode] = useState(() => buildLanguages(t)[0].starter);
   const [output, setOutput] = useState("");
   const [running, setRunning] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -213,6 +222,18 @@ export default function PlaygroundPage() {
     if (!lang.stdinPattern || lang.interactive) return false;
     return lang.stdinPattern.test(code);
   }, [code, lang]);
+
+  /**
+   * Til almashganda tanlangan yozuv yangi lug'atdagi nusxasiga
+   * ko'chiriladi — "Qayta yuklash" yangi tildagi namunani bersin.
+   * Muharrirdagi kod tegilmaydi: foydalanuvchi yozganini o'chirib
+   * yuborish kutilmagan yo'qotish bo'lardi.
+   */
+  useEffect(() => {
+    const mos = languages.find((l) => l.id === lang.id);
+    if (mos && mos !== lang) setLang(mos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [languages]);
 
   // Inline input paydo bo'lganda avtofokus + scroll
   useEffect(() => {
@@ -286,6 +307,7 @@ export default function PlaygroundPage() {
       setAwaitingInput(false);
       if (err) {
         setOutput(`${out}${out ? "\n" : ""}${isPy ? fixPyLineNumbers(err) : err}`);
+        setMisconception(diagnoseMisconceptions(code, err));
       } else if (data.status === "timeout") {
         setOutput(out + "\n⏱ " + t.cabinet.play.timeout);
       } else {
@@ -308,6 +330,7 @@ export default function PlaygroundPage() {
     const err = data.stderr || "";
     if (err) {
       setOutput(`${err}${out ? "\n\n" + out : ""}`);
+      setMisconception(diagnoseMisconceptions(code, err));
     } else if (data.status === "timeout") {
       setOutput(t.cabinet.play.timeout);
     } else {
@@ -318,6 +341,7 @@ export default function PlaygroundPage() {
   async function handleRun() {
     setRunning(true);
     setOutput("");
+    setMisconception(null);
     setShowHtml(false);
     setMeta({});
     setAwaitingInput(false);
@@ -389,7 +413,10 @@ export default function PlaygroundPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Tugmalar guruhi. `flex-wrap` shart — semantik ko'prik va bilim
+            xaritasi qo'shilgach bu qator 320px li ekranda sig'may, "Ishga
+            tushirish" tugmasi ekrandan chiqib ketardi. */}
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {/* Til tanlash */}
           <div className="relative">
             <button
@@ -443,7 +470,7 @@ export default function PlaygroundPage() {
           <button
             onClick={handleRun}
             disabled={running || awaitingInput}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-neon-green text-white font-semibold text-sm hover:bg-neon-green/90 disabled:opacity-50 transition-all shadow-lg shadow-neon-green/20"
+            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl bg-neon-green text-white font-semibold text-sm whitespace-nowrap hover:bg-neon-green/90 disabled:opacity-50 transition-all shadow-lg shadow-neon-green/20"
           >
             {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
             {running ? t.cabinet.play.running : t.cabinet.play.run}
