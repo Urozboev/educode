@@ -187,7 +187,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
           </div>
 
           <p className="text-muted-foreground mt-6">
-            Telefondan <b className="text-foreground">educode</b> saytining{" "}
+            Telefondan <b className="text-foreground">miracademy</b> saytining{" "}
             <code className="px-2 py-1 rounded bg-surface border border-border">/live</code>{" "}
             sahifasiga kirib PIN kiritsin
           </p>

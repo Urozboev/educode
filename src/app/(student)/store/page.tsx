@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, formatDate } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -38,7 +39,7 @@ export default function StorePage() {
   const [cancelling, setCancelling] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) return;
 
     const [{ data: profile }, { data: i }, { data: o }] = await Promise.all([

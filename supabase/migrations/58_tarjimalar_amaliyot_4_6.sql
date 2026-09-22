@@ -58,7 +58,7 @@ if god % 4 == 0 and (god % 100 != 0 or god % 400 == 0):
     print("Високосный")
 else:
     print("Не високосный")</code></pre>
-<p>Скобки обязательны — без них порядок <code>and</code> и <code>or</code> искажает результат.</p>
+<p>Здесь скобки не меняют результат — вариант без них даёт тот же ответ, ведь число, делящееся на 400, делится и на 4. Но писать их стоит: когда <code>and</code> и <code>or</code> смешаны, скобки делают намерение однозначным и код читается легче.</p>
 
 <h3>Как избежать ошибок</h3>
 <ul>
@@ -106,7 +106,7 @@ if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
     print("Leap year")
 else:
     print("Not a leap year")</code></pre>
-<p>The brackets are required — without them the order of <code>and</code> and <code>or</code> spoils the result.</p>
+<p>Here the brackets do not change the result — the version without them gives the same answer, since any number divisible by 400 is also divisible by 4. They are still worth writing: when <code>and</code> and <code>or</code> are mixed, brackets make the intent unambiguous and the code easier to read.</p>
 
 <h3>Avoiding mistakes</h3>
 <ul>
@@ -154,7 +154,7 @@ if jıl % 4 == 0 and (jıl % 100 != 0 or jıl % 400 == 0):
     print("Kábisa")
 else:
     print("Kábisa emes")</code></pre>
-<p>Qawsıra shárt — onsız <code>and</code> hám <code>or</code> tártibi nátiyjeni buzadı.</p>
+<p>Bul jerde qawsıra nátiyjeni ózgertpeydi — qawsırasız variant ta dál sol juwaptı beredi, sebebi 400 ge bólinetuǵın san 4 ke de bólinedi. Biraq onı jazıw kerek: <code>and</code> hám <code>or</code> aralasqanda qawsıra niyetti anıq kórsetedi hám kodtı oqıwdı jeńillestiredi.</p>
 
 <h3>Qáteliklerden saqlanıw</h3>
 <ul>

@@ -127,8 +127,8 @@ export function CertificatePdf({
 }: CertificatePdfProps) {
   return (
     <Document
-      title={`EduCode sertifikat — ${fullName}`}
-      author="EduCode"
+      title={`MirAcademy sertifikat — ${fullName}`}
+      author="MirAcademy"
       subject={courseTitle}
     >
       {/* A4 landshaft — ekrandagi 1.414:1 nisbat bilan bir xil */}
@@ -142,7 +142,7 @@ export function CertificatePdf({
             <View style={s.brandMark}>
               <Text style={s.brandMarkText}>&lt;/&gt;</Text>
             </View>
-            <Text style={s.brandName}>EduCode</Text>
+            <Text style={s.brandName}>MirAcademy</Text>
           </View>
 
           <Text style={s.title}>SERTIFIKAT</Text>
@@ -171,7 +171,7 @@ export function CertificatePdf({
             <Medal />
 
             <View style={s.sideCol}>
-              <Text style={s.sideValueItalic}>EduCode</Text>
+              <Text style={s.sideValueItalic}>MirAcademy</Text>
               <Text style={s.sideLabel}>PLATFORMA</Text>
             </View>
           </View>

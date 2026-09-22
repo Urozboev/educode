@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — darsdan keyingi test va Tracker.
+ * MirAcademy AI Agent — darsdan keyingi test va Tracker.
  *
  * POST { action: "start", moduleId }               → savollar
  * POST { action: "submit", assessmentId, answers } → baho + rejaning o'zgarishi

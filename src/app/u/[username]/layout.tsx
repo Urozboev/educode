@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ogImageUrl, absUrl, SITE_NAME } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/server";
+import { cached, CACHE_TAGS } from "@/lib/cache";
 
 export const revalidate = 600;
 
@@ -11,25 +12,29 @@ interface Params {
 /**
  * Portfolio havolasi tashqariga ulashiladi — Telegram, LinkedIn, elektron xat.
  * Shuning uchun sarlavha va tavsif dinamik: havola ko'chirilganda talabaning
- * ismi va qisqa tavsifi ko'rinadi, "EduCode" degan quruq matn emas.
+ * ismi va qisqa tavsifi ko'rinadi, "MirAcademy" degan quruq matn emas.
  *
  * Yopiq portfolio uchun metadata umumiy bo'ladi va indekslanmaydi —
  * yopiq profil qidiruvda chiqib qolmasligi kerak.
  */
-async function fetchProfile(username: string) {
-  try {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("profiles")
-      .select("full_name, username, headline, bio, avatar_url, is_portfolio_public, is_blocked")
-      .eq("username", username)
-      .maybeSingle();
-    if (!data || data.is_blocked || !data.is_portfolio_public) return null;
-    return data;
-  } catch {
-    return null;
-  }
-}
+const fetchProfile = cached(
+  async (username: string) => {
+    try {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, username, headline, bio, avatar_url, is_portfolio_public, is_blocked")
+        .eq("username", username)
+        .maybeSingle();
+      if (!data || data.is_blocked || !data.is_portfolio_public) return null;
+      return data;
+    } catch {
+      return null;
+    }
+  },
+  "public-profile",
+  { revalidate: 600, tags: [CACHE_TAGS.profiles] },
+);
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const p = await fetchProfile(params.username);

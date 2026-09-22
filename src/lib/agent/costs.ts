@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — tannarx hisobi.
+ * MirAcademy AI Agent — tannarx hisobi.
  *
  * Savol oddiy: obuna puli xarajatni qoplayaptimi? Javob esa faqat
  * o'lchov bilan beriladi — shuning uchun har LLM va TTS chaqiruvi

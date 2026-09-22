@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Lock, Loader2, Sparkles, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AILabel } from "@/components/ai/AILabel";
@@ -78,7 +79,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) return;
       const { data } = await supabase
         .from('plan_first_submissions')
@@ -120,7 +121,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { toast.error("Tizimga kiring"); return; }
 
     setLoading(step);

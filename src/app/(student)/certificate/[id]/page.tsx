@@ -153,7 +153,7 @@ export default function CertificatePage() {
     try {
       const canvas = await captureCanvas();
       const link = document.createElement("a");
-      link.download = `EduCode-Sertifikat-${cert?.certificate_number || "cert"}.png`;
+      link.download = `MirAcademy-Sertifikat-${cert?.certificate_number || "cert"}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
       toast.success("PNG yuklab olindi!");
@@ -192,7 +192,7 @@ export default function CertificatePage() {
 
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.download = `EduCode-Sertifikat-${cert.certificate_number}.pdf`;
+      link.download = `MirAcademy-Sertifikat-${cert.certificate_number}.pdf`;
       link.href = url;
       link.click();
       URL.revokeObjectURL(url);
@@ -298,7 +298,7 @@ export default function CertificatePage() {
               <div style={{ width: "34px", height: "34px", borderRadius: "9px", background: "linear-gradient(135deg,#6C5CE7,#00A8E8)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
               </div>
-              <span style={{ fontFamily: "Georgia, serif", fontSize: "17px", fontWeight: "bold", letterSpacing: "1px", color: "#1a1a2e" }}>EduCode</span>
+              <span style={{ fontFamily: "Georgia, serif", fontSize: "17px", fontWeight: "bold", letterSpacing: "1px", color: "#1a1a2e" }}>MirAcademy</span>
             </div>
 
             {/* Sarlavha */}
@@ -357,7 +357,7 @@ export default function CertificatePage() {
 
               {/* Imzo */}
               <div style={{ textAlign: "center", flex: 1 }}>
-                <p style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: "17px", color: "#1a1a2e", borderBottom: "1px solid #999", paddingBottom: "3px", marginBottom: "4px" }}>EduCode</p>
+                <p style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: "17px", color: "#1a1a2e", borderBottom: "1px solid #999", paddingBottom: "3px", marginBottom: "4px" }}>MirAcademy</p>
                 <p style={{ fontSize: "10px", color: "#999", letterSpacing: "1px" }}>PLATFORMA</p>
               </div>
             </div>
@@ -377,7 +377,7 @@ export default function CertificatePage() {
                 </div>
               )}
 
-              <p style={{ fontSize: "10px", color: "#aaa" }}>malla.uz — Raqamli intellektual ta&apos;lim platformasi</p>
+              <p style={{ fontSize: "10px", color: "#aaa" }}>miracademy.uz — Raqamli intellektual ta&apos;lim platformasi</p>
             </div>
           </div>
         </div>

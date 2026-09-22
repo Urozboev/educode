@@ -83,6 +83,22 @@ export default function RegisterPage() {
     }
 
     if (data?.session) {
+      // Haqiqiy rolni serverdan so'raymiz. Formadagi tanlov — bu faqat
+      // niyat: baza trigger'i yangi hisobni 'student' qilib yaratadi,
+      // o'qituvchi roli ariza tasdiqlangach beriladi. Agar rol allaqachon
+      // boshqa bo'lsa (masalan admin oldindan tayinlagan), o'sha kabinet
+      // ochiladi.
+      try {
+        const res = await fetch("/api/auth/sync-role", { method: "POST" });
+        if (res.ok) {
+          const info = await res.json();
+          router.push(
+            role === "teacher" && info.role === "student" ? "/teacher-apply" : info.next,
+          );
+          router.refresh();
+          return;
+        }
+      } catch (_e) { /* quyidagi zaxira yo'l */ }
       router.push(nextPath);
       return;
     }

@@ -46,7 +46,7 @@ export default function AboutPage() {
           Platforma
         </p>
         <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight mb-4">
-          {data.project_title || "EduCode Platformasi"}
+          {data.project_title || "MirAcademy Platformasi"}
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
           {data.project_description || ""}

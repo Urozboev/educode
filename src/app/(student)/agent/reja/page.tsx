@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerDictionary();
   return {
-    title: "O'quv reja | Ustoz — EduCode",
+    title: "O'quv reja | Ustoz — MirAcademy",
     description: t.agent.seoPlan,
     };
 }

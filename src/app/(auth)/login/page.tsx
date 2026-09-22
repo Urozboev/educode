@@ -5,6 +5,7 @@ import Link from "@/components/i18n/Link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n";
+import { isPathAllowedForRole } from "@/lib/auth/roles";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -44,49 +45,29 @@ function LoginForm() {
 
   const supabase = createClient();
 
-  async function checkPlacementAndRedirect() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    document.cookie = "user-role=; path=/; max-age=0";
-
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      // Rolga qarab yo'naltirish
-      if (profile?.role === "parent") {
-        router.push("/p-dashboard");
-        router.refresh();
-        return;
+  /**
+   * Rol va keyingi manzilni server hal qiladi: u bir yo'la `user-role`
+   * keshini ham yangilaydi. Bu kesh `httpOnly`, ya'ni uni bu yerdan
+   * `document.cookie` bilan o'chirib bo'lmaydi — ilgari aynan shu
+   * sababli rol o'zgargan odam eski kabinetda qolib ketardi.
+   */
+  async function redirectAfterLogin() {
+    let target = redirect;
+    try {
+      const res = await fetch("/api/auth/sync-role", { method: "POST" });
+      if (res.ok) {
+        const info = await res.json();
+        // `redirect` parametri faqat shu rolga ruxsat etilgan bo'lsa hurmat
+        // qilinadi, aks holda middleware baribir orqaga qaytarardi.
+        const explicit = redirect && redirect !== "/dashboard";
+        target = explicit && isPathAllowedForRole(info.role, redirect)
+          ? redirect
+          : info.next;
       }
-      if (profile?.role === "admin") {
-        router.push("/a-dashboard");
-        router.refresh();
-        return;
-      }
-      if (profile?.role === "teacher") {
-        router.push("/t-dashboard");
-        router.refresh();
-        return;
-      }
-
-      // Talaba — placement test tekshiruvi
-      const { data: placement } = await supabase
-        .from("placement_results")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!placement) {
-        router.push("/placement-test");
-        return;
-      }
+    } catch (_e) {
+      /* tarmoq uzilsa — quyidagi target bilan davom etamiz */
     }
-    router.push(redirect);
+    router.push(target);
     router.refresh();
   }
 
@@ -109,7 +90,7 @@ function LoginForm() {
       return;
     }
 
-    await checkPlacementAndRedirect();
+    await redirectAfterLogin();
   }
 
   async function handleGoogleLogin() {

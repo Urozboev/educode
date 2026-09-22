@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, formatDate } from "@/lib/utils";
 import { NotebookPen, ChevronDown, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -32,7 +33,7 @@ export function CourseNotes({ courseId, courseSlug }: { courseId: string; course
   useEffect(() => {
     let alive = true;
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) { setLoaded(true); return; }
       const { data } = await supabase
         .from("topic_notes")

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 import { withTranslations } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
@@ -68,7 +69,7 @@ export default function CoursesPage() {
   }, [locale]);
 
   async function loadData() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
 
     const { data: coursesData } = await supabase
       .from("courses")

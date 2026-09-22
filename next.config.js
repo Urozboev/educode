@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Tekshiruv build'ini alohida papkaga yozish uchun:
+  //   NEXT_DIST_DIR=.next-check npm run build
+  // Aks holda build ishlab turgan `npm run dev` ning .next papkasini
+  // ustidan yozadi va dev server hamma narsani qayta kompilyatsiya qiladi.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'tydufbtkbkefqcxxajdk.supabase.co', pathname: '/storage/v1/object/public/**' },

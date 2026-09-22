@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 import { withTranslation } from "@/lib/i18n/content";
 import type { Challenge } from "@/types";
@@ -23,7 +24,7 @@ export default function ChallengeDetailPage() {
     (async () => {
       const [{ data: ch }, { data: { user } }] = await Promise.all([
         supabase.from("challenges").select("*").eq("slug", slug).eq("is_published", true).maybeSingle(),
-        supabase.auth.getUser(),
+        getCurrentUser(supabase).then((u) => ({ data: { user: u } })),
       ]);
       if (ch) setChallenge(await withTranslation(supabase, "challenges", ch as Challenge, locale));
       if (user) setUserId(user.id);

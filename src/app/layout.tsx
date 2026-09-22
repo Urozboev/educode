@@ -14,6 +14,7 @@ import {
   DEFAULT_KEYWORDS,
   ORG_SOCIAL,
   ogImageUrl,
+  localesAlternates,
 } from "@/lib/seo";
 import "./globals.css";
 
@@ -56,13 +57,7 @@ export const metadata: Metadata = {
   publisher: SITE_NAME,
   applicationName: SITE_NAME,
   category: "education",
-  alternates: {
-    canonical: SITE_URL,
-    languages: {
-      "uz-UZ": SITE_URL,
-      "x-default": SITE_URL,
-    },
-  },
+  alternates: localesAlternates("/"),
   openGraph: {
     type: "website",
     siteName: SITE_NAME,

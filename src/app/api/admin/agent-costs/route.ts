@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — tannarx hisoboti (faqat admin).
+ * MirAcademy AI Agent — tannarx hisoboti (faqat admin).
  *
  * GET ?days=30 → davr bo'yicha xarajat, daromad va kesh tejami
  *

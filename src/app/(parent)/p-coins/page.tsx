@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, formatNumber } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -32,7 +33,7 @@ export default function ParentCoinsPage() {
   const [payingProvider, setPayingProvider] = useState<"payme" | "click" | null>(null);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) return;
 
     const [{ data: profile }, { data: setting }, { data: reqs }, { data: g }] = await Promise.all([
@@ -73,7 +74,7 @@ export default function ParentCoinsPage() {
   async function submitRequest() {
     if (!selectedPkg) { toast.error(t.parent.pickPackage); return; }
     setSubmitting(true);
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { setSubmitting(false); return; }
 
     const { error } = await supabase.from("coin_purchase_requests").insert({

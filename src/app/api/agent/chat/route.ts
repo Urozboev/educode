@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — suhbat oqimi (SSE).
+ * MirAcademy AI Agent — suhbat oqimi (SSE).
  *
  * NEGA STREAM: ovozli agent uchun bu shart. Javob to'liq kelishini
  * kutsak, foydalanuvchi 5-8 soniya jimlikni eshitadi. Oqim bilan

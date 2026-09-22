@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Text, RoundedBox, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { toast } from "sonner";
 import {
   Play,
@@ -215,9 +216,7 @@ export default function CyberFlight3D() {
 
     if (coinsEarned > 0) {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+        const user = await getCurrentUser(supabase);
         if (user) {
           await supabase.rpc("increment_coins", {
             user_id: user.id,

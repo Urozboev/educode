@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — Planner.
+ * MirAcademy AI Agent — Planner.
  *
  * Ikki qadam:
  *   1. Kirish testi → hozirgi daraja va zaif mavzular

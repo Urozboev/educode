@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — ovoz qatlami (server tomon).
+ * MirAcademy AI Agent — ovoz qatlami (server tomon).
  *
  * NEGA ADAPTER: o'zbek TTS bozori hali barqaror emas — narx, sifat
  * va provayderlar tez o'zgaradi. Route'lar to'g'ridan-to'g'ri

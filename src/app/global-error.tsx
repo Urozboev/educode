@@ -56,7 +56,7 @@ export default function GlobalError({
                   color: "#7d8590",
                 }}
               >
-                educode — bash
+                miracademy — bash
               </span>
               <span
                 style={{
@@ -81,7 +81,7 @@ export default function GlobalError({
             >
               <p style={{ margin: 0, color: "#c9d1d9" }}>
                 <span style={{ color: "#f0655c" }}>$</span>{" "}
-                <span style={{ color: "#79c0ff" }}>educode boot</span>
+                <span style={{ color: "#79c0ff" }}>miracademy boot</span>
               </p>
               <p style={{ margin: 0, color: "#7d8590" }}>
                 → ilova ishga tushirilmoqda

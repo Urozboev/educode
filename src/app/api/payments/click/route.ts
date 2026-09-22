@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 /**
  * Click Merchant API (Shop API) — Prepare (action=0) + Complete (action=1).
  * Click dashboard'da ikkala URL ham shu endpointga:
- *   https://malla.uz/api/payments/click
+ *   https://miracademy.uz/api/payments/click
  *
  * Kerakli env:
  *   CLICK_SERVICE_ID

@@ -17,7 +17,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 const RichTextEditor = dynamic(() => import("@/components/editor/RichTextEditor"), { ssr: false });
 
-const CATEGORIES = ["dasturlash", "kompyuter savodxonligi", "sun'iy intellekt", "karyera", "umumiy"];
+const CATEGORIES = ["dasturlash", "kompyuter savodxonligi", "sun'iy intellekt", "IT yangiliklari", "karyera", "umumiy"];
 
 const empty = {
   title: "", excerpt: "", content_html: "", cover_url: "",

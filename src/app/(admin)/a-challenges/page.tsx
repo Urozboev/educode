@@ -204,6 +204,8 @@ export default function AdminChallengesPage() {
       }
       toast.success(t.admin.chl.created);
     }
+    // Ommaviy sahifalar keshini tozalash (lib/cache.ts)
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
     setShowForm(false);
     setSaving(false);
     load();
@@ -215,6 +217,8 @@ export default function AdminChallengesPage() {
       .update({ is_published: !c.is_published })
       .eq("id", c.id);
     toast.success(c.is_published ? t.admin.blg.hiddenToast : t.admin.common.publishedToast);
+    // Ommaviy sahifalar keshini tozalash (lib/cache.ts)
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
     load();
   }
 
@@ -222,6 +226,8 @@ export default function AdminChallengesPage() {
     if (!confirm(`"${c.title}" ni o'chirish?`)) return;
     await supabase.from("challenges").delete().eq("id", c.id);
     toast.success(t.admin.common.deleted);
+    // Ommaviy sahifalar keshini tozalash (lib/cache.ts)
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
     load();
   }
 

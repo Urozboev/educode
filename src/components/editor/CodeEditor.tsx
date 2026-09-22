@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import type { SupportedLanguage, TestCase, SubmissionTestResult } from "@/types";
 import { Play, RotateCcw, CheckCircle2, XCircle, Clock, Loader2, Sparkles, Copy, Check, Send, AlertTriangle, Layers, Compass, Network } from "lucide-react";
 import { toast } from "sonner";
@@ -82,7 +83,7 @@ export default function CodeEditor({
     const interval = setInterval(async () => {
       if (!code || code === starterCode) return;
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getCurrentUser(supabase);
         if (!user) return;
         await supabase.from('code_snapshots').insert({
           user_id: user.id,
@@ -338,7 +339,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
     const status = total === 0 ? 'accepted' : (allPassed ? 'accepted' : 'wrong_answer');
 
     // 2. User
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { toast.error("Tizimga kiring"); setIsSubmitting(false); return; }
 
     // 3. Submission saqlash
@@ -483,7 +484,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
             setPasteDetected(true);
 
             try {
-              const { data: { user } } = await supabase.auth.getUser();
+              const user = await getCurrentUser(supabase);
               if (user && taskId) {
                 await supabase.from('code_snapshots').insert({
                   user_id: user.id,

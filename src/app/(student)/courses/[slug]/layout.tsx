@@ -3,6 +3,7 @@ import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl, SITE_NAME } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getServerDictionary } from "@/lib/i18n/server";
+import { cached, CACHE_TAGS } from "@/lib/cache";
 
 export const revalidate = 1800;
 
@@ -10,22 +11,26 @@ interface Params {
   params: { slug: string };
 }
 
-async function fetchCourse(slug: string) {
-  try {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("courses")
-      .select(
-        "title, slug, description, long_description, thumbnail_url, difficulty, estimated_hours, is_free, price_coins, average_rating, total_enrolled, created_at, updated_at, is_published",
-      )
-      .eq("slug", slug)
-      .eq("is_published", true)
-      .maybeSingle();
-    return data ?? null;
-  } catch {
-    return null;
-  }
-}
+const fetchCourse = cached(
+  async (slug: string) => {
+    try {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("courses")
+        .select(
+          "title, slug, description, long_description, thumbnail_url, difficulty, estimated_hours, is_free, price_coins, average_rating, total_enrolled, created_at, updated_at, is_published",
+        )
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .maybeSingle();
+      return data ?? null;
+    } catch {
+      return null;
+    }
+  },
+  "course-meta",
+  { revalidate: 1800, tags: [CACHE_TAGS.courses] },
+);
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const course = await fetchCourse(params.slug);

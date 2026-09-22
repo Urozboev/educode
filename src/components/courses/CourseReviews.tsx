@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, formatDate, getInitials } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -51,7 +52,7 @@ export function CourseReviews({
 
   const load = useCallback(async () => {
     const [{ data: { user } }, { data }] = await Promise.all([
-      supabase.auth.getUser(),
+      getCurrentUser(supabase).then((u) => ({ data: { user: u } })),
       supabase.rpc("course_reviews_list", { p_course_id: courseId, p_limit: 100 }),
     ]);
     setMe(user?.id ?? null);

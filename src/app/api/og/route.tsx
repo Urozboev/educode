@@ -9,7 +9,7 @@ export const runtime = "edge";
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const title = (searchParams.get("title") || "EduCode").slice(0, 80);
+  const title = (searchParams.get("title") || "MirAcademy").slice(0, 80);
   const subtitle = (searchParams.get("subtitle") || "Dasturlashni o'ynab o'rgan").slice(0, 120);
   const type = searchParams.get("type") || "default";
 
@@ -78,9 +78,9 @@ export async function GET(req: NextRequest) {
           >
             🚀
           </div>
-          <span style={{ display: "flex", color: "#fff" }}>EduCode</span>
+          <span style={{ display: "flex", color: "#fff" }}>MirAcademy</span>
           <span style={{ display: "flex", color: "#7a7a8a", fontWeight: 400, fontSize: 22 }}>
-            · malla.uz
+            · miracademy.uz
           </span>
         </div>
 
@@ -146,7 +146,7 @@ export async function GET(req: NextRequest) {
             fontSize: 22,
           }}
         >
-          <span style={{ display: "flex" }}>educode.uz · interaktiv kurslar</span>
+          <span style={{ display: "flex" }}>miracademy.uz · interaktiv kurslar</span>
           <span style={{ display: "flex", color: "#a0a0b0" }}>
             o'zbek tilida · bepul
           </span>

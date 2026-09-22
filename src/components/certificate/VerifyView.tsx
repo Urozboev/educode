@@ -24,7 +24,7 @@ type Verified = {
  * Sertifikatni ommaviy tekshirish.
  *
  * Bu sahifaga QR kod olib keladi. Uni ish beruvchi yoki o'qituvchi ochadi —
- * EduCode'da hisobi bo'lmasligi mumkin, shuning uchun hech qanday login yo'q.
+ * MirAcademy'da hisobi bo'lmasligi mumkin, shuning uchun hech qanday login yo'q.
  * Sahifa bitta savolga javob beradi: bu sertifikat haqiqiymi?
  */
 export function VerifyView({ number }: { number: string }) {

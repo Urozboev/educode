@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — uzoq muddatli xotira.
+ * MirAcademy AI Agent — uzoq muddatli xotira.
  *
  * Muammo: suhbat tarixi o'sgan sari uni to'liq promptga solish
  * token xarajatini chiziqli oshiradi va oxiri kontekst chegarasiga

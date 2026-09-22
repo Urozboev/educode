@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
@@ -35,7 +36,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) { router.push("/login"); return; }
       const p = await getOrCreateProfile(supabase, user.id);
       if (p) setProfile(p as Profile);
@@ -54,7 +55,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
       <div className={cn("flex items-center px-5 h-16 border-b border-border/50", collapsed && "justify-center px-3")}>
         <Link href="/p-dashboard" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
           <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center"><Code2 className="w-5 h-5 text-white" /></div>
-          {!collapsed && <span className="font-display font-bold text-lg">Edu<span className="gradient-text">Code</span></span>}
+          {!collapsed && <span className="font-display font-bold text-lg">Mir<span className="gradient-text">Academy</span></span>}
         </Link>
       </div>
       {profile && !collapsed && (

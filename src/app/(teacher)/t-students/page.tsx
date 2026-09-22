@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { getInitials, getLevelLabel, getLevelColor, cn, formatDate } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Search, Users, Zap, Flame, BookOpen, Target, ChevronRight, BarChart3, Eye } from "lucide-react";
@@ -18,7 +19,7 @@ export default function TeacherStudentsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) return;
 
       const { data: ts } = await supabase.from("teacher_students").select("student_id").eq("teacher_id", user.id);

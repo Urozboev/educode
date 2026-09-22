@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/utils";
@@ -26,7 +27,7 @@ export default function JoinPage() {
   const [justJoined, setJustJoined] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { setLoading(false); return; }
 
     const { data: rows } = await supabase

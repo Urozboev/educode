@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 import { withTranslation, withTranslations } from "@/lib/i18n/content";
 import type { Challenge, ContestOverview } from "@/types";
@@ -38,7 +39,7 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
   const load = useCallback(async () => {
     const [{ data: overview }, { data: { user } }] = await Promise.all([
       supabase.rpc("contest_overview", { p_slug: slug }),
-      supabase.auth.getUser(),
+      getCurrentUser(supabase).then((u) => ({ data: { user: u } })),
     ]);
     if (user) setUserId(user.id);
     if (!overview) { setLoading(false); return; }

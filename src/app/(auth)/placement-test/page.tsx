@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, getLevelLabel, getLevelColor } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ import {
   BookOpen, Target, XCircle, ChevronRight
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { roleHome, needsPlacement, normalizeRole } from "@/lib/auth/roles";
 
 interface PlacementQuestion {
   id: string; question: string; category: string; difficulty: string;
@@ -35,6 +37,9 @@ export default function PlacementTestPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState("");
+  // Qaysi kabinetga qaytarish — rolga bog'liq. Ilgari hamma joyda
+  // "/dashboard" yozilgan edi va o'qituvchi o'quvchi kabinetiga tushardi.
+  const [home, setHome] = useState("/dashboard");
 
   // Natijalar
   const [result, setResult] = useState<{
@@ -48,13 +53,20 @@ export default function PlacementTestPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) { router.push("/login"); return; }
       setUserId(user.id);
 
+      // Rolni aniqlash: test faqat o'quvchiga tegishli
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+      const role = normalizeRole(profile?.role);
+      const target = roleHome(role);
+      setHome(target);
+      if (!needsPlacement(role)) { router.replace(target); return; }
+
       // Oldin test topshirganmi tekshirish
       const { data: existing } = await supabase.from("placement_results").select("id").eq("user_id", user.id).maybeSingle();
-      if (existing) { router.push("/dashboard"); return; }
+      if (existing) { router.replace(target); return; }
 
       // Savollarni yuklash — har kategoriyadan aralashtirish
       const { data } = await supabase.from("placement_tests").select("*").eq("is_active", true).order("order_index");
@@ -169,7 +181,7 @@ export default function PlacementTestPage() {
         user_id: userId, answers: {}, score: 0, total: 0, assigned_level: "beginner",
         ai_recommendation: "Test topshirilmadi",
       });
-      router.push("/dashboard");
+      router.push(home);
     })();
   }
 
@@ -282,7 +294,7 @@ export default function PlacementTestPage() {
               <BookOpen className="w-4 h-4" /> {t.auth.goToCourse}
             </button>
           )}
-          <button onClick={() => router.push("/dashboard")}
+          <button onClick={() => router.push(home)}
             className="btn-primary py-3 px-8 flex items-center gap-2">
             Dashboard <ArrowRight className="w-5 h-5" />
           </button>

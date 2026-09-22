@@ -44,13 +44,16 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
     <div className="min-h-screen bg-background overflow-x-hidden">
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20"><Code2 className="w-5 h-5 text-white" /></div>
-            <span className="font-display font-bold text-xl tracking-tight">Edu<span className="gradient-text">Code</span></span>
+            <span className="font-display font-bold text-xl tracking-tight">Mir<span className="gradient-text">Academy</span></span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-1">
+          {/* To'liq menyu faqat xl dan: MirAcademy logotipi uzunroq va rus tilida
+              yozuvlar ham uzun — lg (1024px) da o'ng tomondagi tugmalar ekrandan
+              chiqib ketardi. */}
+          <div className="hidden xl:flex items-center gap-1">
             {primary.map(l => (
               <Link key={l.href} href={l.href} className={`px-3.5 py-2 rounded-lg text-[15px] font-medium transition-all ${pathname === l.href ? "text-neon-purple bg-neon-purple/8" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>{l.label}</Link>
             ))}
@@ -119,14 +122,14 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
             {user ? (
               <Link href={dashboardUrl} className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.dashboard}</Link>
             ) : (
-              <div className="hidden lg:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2">
                 <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.login}</Link>
                 <Link href="/register" className="px-5 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.register}</Link>
               </div>
             )}
 
             {/* Mobile menu toggle */}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-2 hover:bg-accent rounded-lg">
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="xl:hidden p-2 hover:bg-accent rounded-lg">
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
@@ -136,7 +139,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
             havolalarga umuman yetib bo'lmasdi — ichidan aylantiriladi. */}
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div className="lg:hidden bg-card border-b border-border overflow-hidden"
+            <motion.div className="xl:hidden bg-card border-b border-border overflow-hidden"
               initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
               {/* Balandlik animatsiyasi TASHQI qavatda, aylantirish ICHKIDA.
                   Ikkalasi bitta elementda bo'lsa framer-motion "auto" ni

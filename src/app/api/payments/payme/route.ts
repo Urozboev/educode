@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 /**
  * Payme Merchant API (JSON-RPC 2.0) webhook.
  * Payme dashboard'da "Endpoint URL" sifatida ko'rsatiladi:
- *   https://malla.uz/api/payments/payme
+ *   https://miracademy.uz/api/payments/payme
  * Auth: Basic base64("Paycom:" + PAYME_KEY)
  *
  * Kerakli env:

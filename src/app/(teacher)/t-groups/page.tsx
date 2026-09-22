@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { cn, getInitials, formatDate } from "@/lib/utils";
@@ -43,7 +44,7 @@ export default function TeacherGroupsPage() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { setLoading(false); return; }
 
     const [{ data: g }, { data: ts }] = await Promise.all([
@@ -81,7 +82,7 @@ export default function TeacherGroupsPage() {
   async function createGroup() {
     if (!name.trim()) { toast.error(t.teacher.grp.enterName); return; }
     setCreating(true);
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { setCreating(false); return; }
 
     const { error } = await supabase.from("teacher_groups").insert({
@@ -111,7 +112,7 @@ export default function TeacherGroupsPage() {
 
   async function removeStudent(s: Student) {
     if (!confirm(`${s.full_name} ro'yxatdan chiqarilsinmi?`)) return;
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) return;
     await supabase.from("teacher_students").delete()
       .eq("teacher_id", user.id).eq("student_id", s.student_id);

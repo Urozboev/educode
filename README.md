@@ -1,4 +1,4 @@
-# EduCode — Raqamli intellektual ta'lim platformasi
+# MirAcademy — Raqamli intellektual ta'lim platformasi
 
 Dasturlashni interaktiv kurslar, brauzerda ishlaydigan kod muhiti, AI-mentor va
 gamifikatsiya orqali o'rgatuvchi veb-platforma. O'zbek, qoraqalpoq, rus va ingliz
@@ -9,7 +9,7 @@ chiqilgan: uning markazida **kognitiv avtonomiya** g'oyasi turadi — sun'iy int
 o'quvchi o'rniga masalani yechib bermaydi, balki uning mustaqil fikrlashini
 o'lchaydi va qo'llab-quvvatlaydi.
 
-**Demo:** [malla.uz](https://malla.uz)
+**Demo:** [miracademy.uz](https://miracademy.uz)
 
 ---
 
@@ -34,7 +34,7 @@ duch keladi: kontent asosan rus yoki ingliz tilida; mashq qilish uchun kompyuter
 dastur o'rnatish kerak; va sun'iy intellekt davrida tayyor javob olish shu qadar
 oson bo'ldiki, mustaqil fikrlash ko'nikmasi shakllanmay qolmoqda.
 
-EduCode uchalasiga ham javob beradi:
+MirAcademy uchalasiga ham javob beradi:
 
 - **Ona tilida ta'lim** — kurslar, topshiriqlar va interfeys o'zbek va qoraqalpoq
   tillarida.
@@ -142,8 +142,8 @@ atomar tarzda bajariladi — mijoz tomonidan to'g'ridan-to'g'ri yozish yo'q.
 ### 1. Klonlash va o'rnatish
 
 ```bash
-git clone https://github.com/Urozboev/educode.git
-cd educode
+git clone https://github.com/Urozboev/miracademy.git
+cd miracademy
 npm install
 ```
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, getInitials } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -31,7 +32,7 @@ export default function ParentControlSection() {
   const [copied, setCopied] = useState(false);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) return;
 
     // Linklar
@@ -75,7 +76,7 @@ export default function ParentControlSection() {
 
   async function generateCode() {
     setGenerating(true);
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { setGenerating(false); return; }
     // Eski faol kodlarni o'chirish (bitta faol kod bo'lsin)
     await supabase.from("parent_link_codes").delete().eq("child_id", user.id).is("used_at", null);

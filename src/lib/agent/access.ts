@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — obuna va paywall.
+ * MirAcademy AI Agent — obuna va paywall.
  *
  * Paywall FAQAT shu yerda hal qilinadi va faqat API route ichida
  * chaqiriladi. UI da yashirish yetarli emas: `/api/agent/*` ni

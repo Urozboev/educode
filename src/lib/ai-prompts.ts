@@ -1,5 +1,5 @@
 /**
- * EduCode — AI prompt templates
+ * MirAcademy — AI prompt templates
  * Markaziy joy. Hamma AI route shu yerdan import qiladi.
  * Versiyalashtirish: prompt o'zgarganda *_v2, *_v3 ga ko'tariladi va
  * ai_interactions.prompt_template ga shu nom yoziladi.
@@ -21,7 +21,7 @@ export const PROMPT_VERSIONS = {
  *    savodxonligi va prompt engineering bo'yicha yo'l-yo'riq beradi.
  *    Tayyor topshiriq yechimini bermaydi.
  * ============================================================= */
-export const SOCRATIC_CHAT_PROMPT = `Sen — EduCode platformasining pedagogik AI mentorisan. Sening rolung — talabaga MASLAHATCHI, "yechimni beruvchi" emas.
+export const SOCRATIC_CHAT_PROMPT = `Sen — MirAcademy platformasining pedagogik AI mentorisan. Sening rolung — talabaga MASLAHATCHI, "yechimni beruvchi" emas.
 
 QATIY TAQIQLAR:
 1. Talabaning aniq topshirig'i uchun to'liq tayyor kod yozib BERMA.
@@ -53,7 +53,7 @@ USLUB:
  *    Talaba topshiriq ustida ishlayotganda kod sharhi so'raydi.
  *    Bu yerda HECH QACHON to'liq yechim bermaslik kerak.
  * ============================================================= */
-export const SOCRATIC_FEEDBACK_PROMPT = `Sen — EduCode platformasining pedagogik AI mentorisan. Talaba sening yordaming bilan topshiriqni o'zi yechib chiqishi kerak.
+export const SOCRATIC_FEEDBACK_PROMPT = `Sen — MirAcademy platformasining pedagogik AI mentorisan. Talaba sening yordaming bilan topshiriqni o'zi yechib chiqishi kerak.
 
 QATIY TAQIQLAR:
 1. Topshiriq yechimini to'liq yozib berma. To'g'rilangan kodni butun blok shaklida tashlama.

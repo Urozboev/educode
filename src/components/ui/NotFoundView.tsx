@@ -16,7 +16,7 @@ export function NotFoundView() {
     <ErrorTerminal
       code="404"
       token="ROUTE_NOT_FOUND"
-      command={`educode open "${pathname || "/"}"`}
+      command={`miracademy open "${pathname || "/"}"`}
       steps={["manzil qidirilmoqda", "router jadvalida mos yozuv yo'q"]}
       tone="amber"
       title={t.errors.notFoundTitle}

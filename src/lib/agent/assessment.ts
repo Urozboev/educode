@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — darsdan keyingi test.
+ * MirAcademy AI Agent — darsdan keyingi test.
  *
  * Savollar dars kabi keshlanadi (`agent_quizzes`), javoblar esa
  * shaxsiy (`agent_assessments`). Ikki narsa alohida turishi kerak:

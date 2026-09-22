@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
@@ -61,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (user) { const p = await getOrCreateProfile(supabase, user.id); if (p) setProfile(p as Profile); }
     })();
   }, []);

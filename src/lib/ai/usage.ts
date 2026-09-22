@@ -1,5 +1,5 @@
 /**
- * EduCode — AI usage helpers (server-side)
+ * MirAcademy — AI usage helpers (server-side)
  * Kunlik limit, cooldown, va `ai_interactions` log.
  */
 

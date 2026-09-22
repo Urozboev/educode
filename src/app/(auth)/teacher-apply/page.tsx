@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import type { TeacherApplication } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -44,7 +45,7 @@ export default function TeacherApplyPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) { router.push("/login?redirect=/teacher-apply"); return; }
       setUserId(user.id);
 

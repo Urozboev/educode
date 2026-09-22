@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import {
   getInitials, getLevelLabel, getLevelColor, cn, formatRelativeDate,
@@ -46,7 +47,7 @@ export default function TeacherDashboardPage() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { setLoading(false); return; }
 
     const profile = await getOrCreateProfile(supabase, user.id);

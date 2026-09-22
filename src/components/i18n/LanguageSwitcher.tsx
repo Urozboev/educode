@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn } from "@/lib/utils";
 import { Globe, Check, ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -49,7 +50,7 @@ export function LanguageSwitcher({ compact }: { compact?: boolean }) {
     // Profilga ham yozamiz, lekin javobini kutmaymiz: til darhol
     // almashishi kerak, tarmoq sekin bo'lsa ham
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    getCurrentUser(supabase).then((user) => {
       if (user) supabase.from("profiles").update({ preferred_language: next }).eq("id", user.id);
     });
 

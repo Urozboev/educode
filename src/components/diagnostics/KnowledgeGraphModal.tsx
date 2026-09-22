@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import {
   KNOWLEDGE_GRAPH_NODES,
   computeNodeStatuses,
@@ -42,7 +43,7 @@ export default function KnowledgeGraphModal({ open, onClose }: KnowledgeGraphMod
       setLoading(true);
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = await getCurrentUser(supabase);
         if (!user) { if (!bekor) { setStatuses(EMPTY_STATUSES); setLoaded(true); } return; }
 
         const slugs = [...new Set(KNOWLEDGE_GRAPH_NODES.flatMap((n) => n.topicSlugs))];

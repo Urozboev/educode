@@ -32,7 +32,7 @@ export default function AdminSettingsPage() {
     price_per_coin: 100,
     packages: [{ coins: 100, uzs: 10000 }, { coins: 500, uzs: 45000 }, { coins: 1000, uzs: 80000 }],
     card_number: "8600 0000 0000 0000",
-    card_owner: "EduCode Admin",
+    card_owner: "MirAcademy Admin",
   });
 
   // Coin/XP settings

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, getInitials, getLevelLabel, getLevelColor } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Trophy, Medal, Flame, Zap, Crown } from "lucide-react";
@@ -16,7 +17,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (user) setMyId(user.id);
       const { data } = await supabase.from("profiles").select("id, full_name, avatar_url, xp, coins, streak_days, level")
         .eq("role", "student").eq("is_blocked", false).order("xp", { ascending: false }).limit(50);

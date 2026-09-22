@@ -3,6 +3,7 @@ import { ItemListJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl, SITE_NAME } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getServerDictionary } from "@/lib/i18n/server";
+import { cached, CACHE_TAGS } from "@/lib/cache";
 
 export const revalidate = 1800; // 30 daqiqada yangilanadi
 
@@ -29,20 +30,24 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-async function fetchCourses() {
-  try {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("courses")
-      .select("title, slug")
-      .eq("is_published", true)
-      .order("order_index")
-      .limit(50);
-    return data ?? [];
-  } catch {
-    return [];
-  }
-}
+const fetchCourses = cached(
+  async () => {
+    try {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("courses")
+        .select("title, slug")
+        .eq("is_published", true)
+        .order("order_index")
+        .limit(50);
+      return data ?? [];
+    } catch {
+      return [];
+    }
+  },
+  "course-list",
+  { revalidate: 1800, tags: [CACHE_TAGS.courses] },
+);
 
 export default async function ExploreCoursesLayout({ children }: { children: React.ReactNode }) {
   const t = await getServerDictionary();

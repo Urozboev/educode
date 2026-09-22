@@ -48,7 +48,7 @@ export default function LiveJoinPage() {
           <Code2 className="w-5 h-5 text-white" />
         </span>
         <span className="font-display font-bold text-xl">
-          Edu<span className="gradient-text">Code</span>
+          Mir<span className="gradient-text">Academy</span>
         </span>
       </Link>
 

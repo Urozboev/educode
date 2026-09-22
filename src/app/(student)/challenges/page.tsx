@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 import { withTranslations } from "@/lib/i18n/content";
 import { cn, getDifficultyConfig, getCategoryLabel } from "@/lib/utils";
@@ -46,7 +47,7 @@ export default function ChallengesPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       const { data } = await supabase.from("challenges").select("*").eq("is_published", true).order("difficulty");
       if (data) setChallenges(await withTranslations(supabase, "challenges", data as Challenge[], locale));
       if (user) {

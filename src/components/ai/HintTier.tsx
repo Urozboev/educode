@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, Lock, Loader2, Coins, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
@@ -47,7 +48,7 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) return;
       const { data: prof } = await supabase.from('profiles').select('coins').eq('id', user.id).single();
       if (prof) setCoins(prof.coins);
@@ -66,7 +67,7 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
   }, [taskId, taskType, supabase]);
 
   async function handleUnlock(level: number, cost: number) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { toast.error("Tizimga kiring"); return; }
 
     const why = (reasoning[level] || "").trim();

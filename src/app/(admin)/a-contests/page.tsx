@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import type { Contest, Challenge } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -55,7 +56,7 @@ export default function AdminContestsPage() {
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
   async function load() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     setUserId(user?.id ?? null);
 
     const [{ data: cs }, { data: chs }, { data: parts }] = await Promise.all([

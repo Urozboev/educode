@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { motion, Reorder } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 // Three.js og'ir — faqat o'yin ochilganda yuklanadi
 function Loading3D({ title }: { title: string }) {
@@ -1729,8 +1730,7 @@ function BinaryGame() {
       toast.success(`To'g'ri! Ikkilik ko'prik qurildi! +${bonus} coin 🎉`);
 
       try {
-        supabase.auth.getUser().then((res: any) => {
-          const user = res?.data?.user;
+        getCurrentUser(supabase).then((user: any) => {
           if (user) {
             supabase.rpc("increment_coins", {
               user_id: user.id,

@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — matnni ovozga aylantirish.
+ * MirAcademy AI Agent — matnni ovozga aylantirish.
  *
  * Mijoz oqim davomida tugagan gaplarni shu yerga yuboradi, javobdagi
  * URL'larni navbat bilan o'ynatadi. Shu tufayli ovoz butun javob

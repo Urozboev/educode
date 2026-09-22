@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — dars.
+ * MirAcademy AI Agent — dars.
  *
  * POST  { moduleId }                        → dars matni (keshdan yoki yangi)
  * PATCH { lessonId, status, secondsSpent }  → o'qish progressi

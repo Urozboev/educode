@@ -1,5 +1,5 @@
 /**
- * EduCode — kod ijrosi (Judge0, Piston fallback bilan).
+ * MirAcademy — kod ijrosi (Judge0, Piston fallback bilan).
  *
  * Ilgari bu mantiq `/api/playground/execute` route ichida yozilgan
  * edi. Agent ham kod topshiriqlarini tekshirishi kerak bo'lgani

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import type {
   LessonGame, LessonGameType, LessonGameContent, CourseDifficulty,
   QuizRaceContent, JeopardyContent, MatchPairsContent, CrosswordContent,
@@ -80,7 +81,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
   useEffect(() => { load(); }, []);
 
   async function load() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     setUserId(user?.id ?? null);
 
     /**
@@ -145,12 +146,14 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success(editId ? t.admin.common.saved : t.admin.common.created);
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
     setShowForm(false);
     load();
   }
 
   async function togglePublish(g: LessonGame) {
     await supabase.from("lesson_games").update({ is_published: !g.is_published }).eq("id", g.id);
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
     load();
   }
 
@@ -158,6 +161,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
     if (!confirm(t.lg.confirmDeleteGame.replace("{name}", g.title))) return;
     await supabase.from("lesson_games").delete().eq("id", g.id);
     toast.success("O'chirildi");
+    fetch("/api/revalidate", { method: "POST" }).catch(() => {});
     load();
   }
 

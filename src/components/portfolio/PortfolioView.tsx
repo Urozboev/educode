@@ -324,7 +324,7 @@ export function PortfolioView({ username }: { username: string }) {
 
       <footer className="pt-8 border-t border-border/50 flex items-center justify-between gap-4 flex-wrap">
         <p className="text-sm text-muted-foreground">
-          {t.cabinet.portfolioView.builtOn} <Link href="/" className="text-neon-purple hover:underline">EduCode</Link> {t.cabinet.portfolioView.builtOnTail}
+          {t.cabinet.portfolioView.builtOn} <Link href="/" className="text-neon-purple hover:underline">MirAcademy</Link> {t.cabinet.portfolioView.builtOnTail}
         </p>
         {p.longest_streak > 0 && (
           <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">

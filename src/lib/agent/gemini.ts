@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — Gemini'dan tuzilgan (JSON) javob olish.
+ * MirAcademy AI Agent — Gemini'dan tuzilgan (JSON) javob olish.
  *
  * Chat route oqim bilan ishlaydi, planner esa yo'q: unga to'liq va
  * tekshirilgan JSON kerak. `responseMimeType: application/json` bilan

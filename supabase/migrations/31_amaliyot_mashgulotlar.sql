@@ -219,7 +219,7 @@ if yil % 4 == 0 and (yil % 100 != 0 or yil % 400 == 0):
     print("Kabisa")
 else:
     print("Kabisa emas")</code></pre>
-<p>Qavs shart — usiz <code>and</code> va <code>or</code> tartibi natijani buzadi.</p>
+<p>Bu yerda qavs natijani o'zgartirmaydi — qavssiz variant ham xuddi shu javobni beradi, chunki 400 ga bo'linadigan son 4 ga ham bo'linadi. Lekin qavsni yozish kerak: u <code>and</code> va <code>or</code> aralashganda niyatni aniq ko'rsatadi va kodni o'qishni osonlashtiradi.</p>
 
 <h3>Xatolardan saqlanish</h3>
 <ul>

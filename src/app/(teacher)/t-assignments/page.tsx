@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { formatDate, cn, formatRelativeDate } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -37,7 +38,7 @@ export default function TeacherAssignmentsPage() {
   useEffect(() => { load(); }, []);
 
   async function load() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) return;
     setUserId(user.id);
 

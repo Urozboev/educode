@@ -1,5 +1,5 @@
 /**
- * EduCode — to'lov buyurtmasi abstraksiyasi.
+ * MirAcademy — to'lov buyurtmasi abstraksiyasi.
  *
  * Platformada ikki xil to'lov bor:
  *   - coin xaridi        → `coin_purchase_requests`

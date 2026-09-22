@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import type { PortfolioProject } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -53,7 +54,7 @@ export function PortfolioEditor() {
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
   async function load() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) { setLoading(false); return; }
     setUserId(user.id);
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { completeTopic } from "@/lib/course-completion";
 import { TopicNotes } from "@/components/courses/TopicNotes";
 import { useI18n } from "@/lib/i18n";
@@ -27,6 +28,7 @@ import { cn, formatDuration } from "@/lib/utils";
 import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
 import ProtectedVideoPlayer from "@/components/video/ProtectedVideoPlayer";
 import TopicAudioPlayer from "@/components/courses/TopicAudioPlayer";
+import LabVisual, { hasLabVisual } from "@/components/labs/lessons/LabVisual";
 
 export default function TopicPage() {
   const { slug, topicSlug } = useParams<{ slug: string; topicSlug: string }>();
@@ -55,9 +57,7 @@ export default function TopicPage() {
 
   async function loadTopic() {
     setLoading(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (user) setUserId(user.id);
 
     const { data: courseData } = await supabase
@@ -299,17 +299,20 @@ export default function TopicPage() {
               href={`/register?redirect=/courses/${slug}`}
               className="px-6 py-2.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition"
             >
-              Bepul ro'yxatdan o'tish
+              {t.courses.topic.freeRegister}
             </Link>
             <Link
               href={`/login?redirect=/courses/${slug}`}
               className="px-6 py-2.5 rounded-xl border border-border/60 text-sm font-medium hover:bg-surface/50 transition"
             >
-              Kirish
+              {t.courses.topic.loginShort}
             </Link>
           </div>
         </motion.div>
       )}
+
+      {/* Laboratoriya darslari: matndan oldin interaktiv vizual tajriba */}
+      {hasLabVisual(topic.slug) && <LabVisual topicSlug={topic.slug} />}
 
       {/* Content */}
       {topic.content_html && (
@@ -351,7 +354,7 @@ export default function TopicPage() {
           transition={{ delay: 0.25 }}
         >
           <div className="px-5 py-3 border-b border-border/50 inline-flex items-center gap-2 text-sm font-semibold">
-            <FileText className="w-4 h-4 text-neon-yellow" /> Taqdimot
+            <FileText className="w-4 h-4 text-neon-yellow" /> {t.courses.topic.presentation}
           </div>
           <div className="aspect-[16/10]">
             <iframe src={topic.presentation_url} className="w-full h-full" />
@@ -403,7 +406,7 @@ export default function TopicPage() {
                   : "bg-neon-blue/10 text-neon-blue border-neon-blue/20 hover:bg-neon-blue/15"
               )}
             >
-              <ClipboardList className="w-4 h-4" /> {progress?.quiz_passed ? "Test o'tildi" : "Testni yechish"}
+              <ClipboardList className="w-4 h-4" /> {progress?.quiz_passed ? t.courses.topic.quizPassedBtn : t.courses.topic.stepQuiz}
               {progress?.quiz_passed && <CheckCircle2 className="w-3.5 h-3.5" />}
             </Link>
             <Link
@@ -434,7 +437,7 @@ export default function TopicPage() {
           >
             <ArrowLeft className="w-4 h-4" />{" "}
             <span className="hidden sm:inline">{prevTopic.title}</span>
-            <span className="sm:hidden">Oldingi</span>
+            <span className="sm:hidden">{t.courses.topic.prevShort}</span>
           </Link>
         ) : (
           <div />
@@ -445,7 +448,7 @@ export default function TopicPage() {
             className="inline-flex items-center gap-2 py-2.5 px-5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition"
           >
             <span className="hidden sm:inline">{nextTopic.title}</span>
-            <span className="sm:hidden">Keyingi</span> <ArrowRight className="w-4 h-4" />
+            <span className="sm:hidden">{t.courses.topic.nextShort}</span> <ArrowRight className="w-4 h-4" />
           </Link>
         ) : (
           <Link

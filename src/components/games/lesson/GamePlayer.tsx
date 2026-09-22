@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 import { withTranslation } from "@/lib/i18n/content";
 import type {
@@ -58,7 +59,7 @@ export function GamePlayer({ slug }: { slug: string }) {
 
     // Natija faqat login qilganlar uchun saqlanadi — o'qituvchi darsda
     // proyektorda login'siz ham o'ynay olishi kerak
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user || !game) {
       setSaving(false);
       setOutcome("guest");

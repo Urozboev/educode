@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { formatNumber, cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { BarChart3, Users, Target, TrendingUp, Brain, Activity, ShieldAlert, BookOpen, ClipboardCheck } from "lucide-react";
@@ -26,7 +27,7 @@ export default function TeacherAnalyticsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) return;
 
       const { data: ts } = await supabase.from("teacher_students").select("student_id").eq("teacher_id", user.id);

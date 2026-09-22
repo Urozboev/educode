@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — dars generatsiyasi va keshi.
+ * MirAcademy AI Agent — dars generatsiyasi va keshi.
  *
  * Bu modulning butun mohiyati keshda. Dars kontenti foydalanuvchiga
  * bog'liq emas: "Python sikllari, boshlang'ich daraja, o'zbekcha"

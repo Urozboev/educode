@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 import {
   LOCALES, DEFAULT_LOCALE, LOCALE_COOKIE, isLocalizedPath,
 } from '@/lib/i18n/config';
+import {
+  ROLE_COOKIE, ROLE_COOKIE_MAX_AGE, buildRoleCookie, parseRoleCookie,
+  isPathAllowedForRole, roleHome, normalizeRole, type AppRole,
+} from '@/lib/auth/roles';
 
 export async function middleware(request: NextRequest) {
   let pathname = request.nextUrl.pathname;
@@ -204,55 +208,55 @@ export async function middleware(request: NextRequest) {
   //
   // Admin bundan mustasno — u barcha kabinetlarni ko'ra oladi.
   // ============================================
-  const isAdminPath = pathname.startsWith('/a-');
-  const isTeacherPath = pathname.startsWith('/t-');
-  const isParentPath = pathname.startsWith('/p-');
-  const isStudentPath = !isAdminPath && !isTeacherPath && !isParentPath;
+  const cookieOpts = {
+    httpOnly: true,
+    sameSite: 'lax' as const,
+    maxAge: ROLE_COOKIE_MAX_AGE,
+    path: '/',
+  };
 
-  // Cookie dan rolni o'qish, bo'lmasa DB dan.
-  //
-  // Cookie qiymati "<user_id>:<role>" ko'rinishida saqlanadi va faqat
-  // joriy sessiya egasiga tegishli bo'lsa ishlatiladi. Cookie httpOnly
-  // bo'lgani uchun chiqishdagi document.cookie orqali o'chirish ishlamaydi
-  // — ID ga bog'lash esa bitta brauzerda boshqa hisobga kirgan odam eski
-  // rolni meros qilib olishining oldini oladi.
-  const cached = request.cookies.get('user-role')?.value;
-  const [cachedUid, cachedRole] = cached?.includes(':')
-    ? cached.split(':') : [null, null];
-  let role = cachedUid === session.user.id ? cachedRole : undefined;
+  const rememberRole = (r: AppRole) => {
+    const value = buildRoleCookie(session.user.id, r);
+    response.cookies.set(ROLE_COOKIE, value, cookieOpts);
+    cookiesToSet.push({ name: ROLE_COOKIE, value, options: cookieOpts });
+  };
 
-  if (!role) {
+  const fetchRole = async (): Promise<AppRole> => {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
       .single();
+    return normalizeRole(profile?.role);
+  };
 
-    role = profile?.role || 'student';
+  // Cookie dan rolni o'qish, bo'lmasa DB dan. Kesh har bir so'rovda
+  // profiles jadvaliga borishning oldini oladi.
+  let role = parseRoleCookie(request.cookies.get(ROLE_COOKIE)?.value, session.user.id);
+  let roleFromDb = false;
 
-    const cookieOpts = {
-      httpOnly: true,
-      sameSite: 'lax' as const,
-      maxAge: 3600,
-      path: '/',
-    };
-    const cookieValue = `${session.user.id}:${role}`;
-    response.cookies.set('user-role', cookieValue, cookieOpts);
-    cookiesToSet.push({ name: 'user-role', value: cookieValue, options: cookieOpts });
+  if (!role) {
+    role = await fetchRole();
+    roleFromDb = true;
+    rememberRole(role);
   }
 
-  if (role !== 'admin') {
-    const allowed =
-      role === 'teacher' ? isTeacherPath
-        : role === 'parent' ? isParentPath
-          : isStudentPath;
+  if (!isPathAllowedForRole(role, pathname)) {
+    // Keshdagi rol yo'l bermayapti — lekin u eskirgan bo'lishi mumkin.
+    // Admin rolni o'zgartirganda cookie httpOnly bo'lgani uchun brauzer
+    // tomonidan o'chirib bo'lmaydi va foydalanuvchi eski kabinetda
+    // qamalib qolardi. Shuning uchun RAD ETISHDAN OLDIN bazadan bir
+    // marta qayta o'qiymiz — narx faqat mos kelmagan holatda to'lanadi.
+    if (!roleFromDb) {
+      const fresh = await fetchRole();
+      if (fresh !== role) {
+        role = fresh;
+        rememberRole(fresh);
+      }
+    }
 
-    if (!allowed) {
-      const home =
-        role === 'teacher' ? '/t-dashboard'
-          : role === 'parent' ? '/p-dashboard'
-            : '/dashboard';
-      return redirectTo(home);
+    if (!isPathAllowedForRole(role, pathname)) {
+      return redirectTo(roleHome(role));
     }
   }
 

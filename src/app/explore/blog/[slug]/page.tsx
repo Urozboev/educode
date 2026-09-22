@@ -1,29 +1,35 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { serverHref, getServerDictionary } from "@/lib/i18n/server";
+import { serverHref, getServerDictionary, getServerLocale } from "@/lib/i18n/server";
+import { formatDate } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { SITE_URL, SITE_NAME, absUrl, ogImageUrl } from "@/lib/seo";
 import { ArrowLeft, Clock, Eye, Calendar } from "lucide-react";
 import { BlogViewCounter } from "./view-counter";
+import { cached, CACHE_TAGS } from "@/lib/cache";
 
 export const revalidate = 300;
 
 interface Params { params: { slug: string }; }
 
-async function fetchPost(slug: string) {
-  try {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("blog_posts")
-      .select("*")
-      .eq("slug", slug)
-      .eq("is_published", true)
-      .maybeSingle();
-    return data as any;
-  } catch { return null; }
-}
+const fetchPost = cached(
+  async (slug: string) => {
+    try {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .maybeSingle();
+      return data as any;
+    } catch { return null; }
+  },
+  "blog-post",
+  { revalidate: 300, tags: [CACHE_TAGS.blog] },
+);
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const post = await fetchPost(params.slug);
@@ -48,13 +54,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-function fmtDate(d: string | null) {
-  if (!d) return "";
-  return new Date(d).toLocaleDateString("uz-UZ", { day: "numeric", month: "long", year: "numeric" });
-}
-
 export default async function BlogPostPage({ params }: Params) {
   const t = await getServerDictionary();
+  const locale = await getServerLocale();
+  const fmtDate = (d: string | null) => (d ? formatDate(d, locale) : "");
   const href = await serverHref();
   const post = await fetchPost(params.slug);
   if (!post) notFound();

@@ -3,6 +3,7 @@ import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ogImageUrl, absUrl, SITE_NAME } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getServerDictionary } from "@/lib/i18n/server";
+import { cached, CACHE_TAGS } from "@/lib/cache";
 
 export const revalidate = 1800;
 
@@ -10,20 +11,24 @@ interface Params {
   params: { slug: string };
 }
 
-async function fetchChallenge(slug: string) {
-  try {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("challenges")
-      .select("title, slug, description, category, difficulty, languages, coin_reward, created_at, updated_at")
-      .eq("slug", slug)
-      .eq("is_published", true)
-      .maybeSingle();
-    return data ?? null;
-  } catch {
-    return null;
-  }
-}
+const fetchChallenge = cached(
+  async (slug: string) => {
+    try {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("challenges")
+        .select("title, slug, description, category, difficulty, languages, coin_reward, created_at, updated_at")
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .maybeSingle();
+      return data ?? null;
+    } catch {
+      return null;
+    }
+  },
+  "challenge-meta",
+  { revalidate: 1800, tags: [CACHE_TAGS.challenges] },
+);
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const ch = await fetchChallenge(params.slug);

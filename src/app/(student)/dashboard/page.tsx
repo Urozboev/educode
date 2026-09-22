@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import { getResumePoint, type ResumePoint } from "@/lib/resume";
 import { cn, formatNumber, getLevelLabel, getLevelColor, calculateXpLevel } from "@/lib/utils";
@@ -43,7 +44,7 @@ export default function DashboardPage() {
   }, []);
 
   async function loadDashboard() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) return;
 
     // Barcha so'rovlar PARALLEL — 7 ta ketma-ket roundtrip o'rniga bitta to'lqin

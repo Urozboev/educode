@@ -1,6 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
+import {
+  ROLE_COOKIE, ROLE_COOKIE_MAX_AGE, buildRoleCookie,
+  normalizeRole, roleHome, needsPlacement, isPathAllowedForRole,
+} from '@/lib/auth/roles';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,28 +43,38 @@ export async function GET(request: NextRequest) {
           .eq('id', user.id)
           .maybeSingle();
 
+        let role = normalizeRole(profile?.role);
+
         // OAuth orqali parent ro'yxatdan o'tgan bo'lsa, rolni to'g'rilash
         // (trigger Google metadata'da role topmaydi — default 'student' bo'ladi)
-        if (roleParam === 'parent' && profile?.role === 'student') {
+        if (roleParam === 'parent' && role === 'student') {
           await supabase.from('profiles').update({ role: 'parent' }).eq('id', user.id);
-          return NextResponse.redirect(`${origin}/p-dashboard`);
+          role = 'parent';
         }
 
-        // Ota-ona placement test topshirmaydi
-        if (profile?.role === 'parent') {
-          return NextResponse.redirect(`${origin}/p-dashboard`);
+        // Darajani aniqlash testi faqat o'quvchiga tegishli. Ilgari bu
+        // yerda faqat 'parent' tekshirilardi — shuning uchun o'qituvchi
+        // ham testga tushib, undan keyin o'quvchi kabinetiga o'tardi.
+        let target = roleHome(role);
+        if (needsPlacement(role)) {
+          const { data: placement } = await supabase
+            .from('placement_results')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          if (!placement) target = '/placement-test';
+          else if (next && isPathAllowedForRole(role, next)) target = next;
+        } else if (next && isPathAllowedForRole(role, next)) {
+          target = next;
         }
 
-        // Talaba — placement test tekshiruvi
-        const { data: placement } = await supabase
-          .from('placement_results')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (!placement) {
-          return NextResponse.redirect(`${origin}/placement-test`);
-        }
+        const res = NextResponse.redirect(`${origin}${target}`);
+        // Middleware keshini darhol yangilaymiz, aks holda birinchi
+        // navigatsiya eski rol bilan qaytarib yuborilardi.
+        res.cookies.set(ROLE_COOKIE, buildRoleCookie(user.id, role), {
+          httpOnly: true, sameSite: 'lax', maxAge: ROLE_COOKIE_MAX_AGE, path: '/',
+        });
+        return res;
       }
       return NextResponse.redirect(`${origin}${next}`);
     }

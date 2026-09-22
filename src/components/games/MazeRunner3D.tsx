@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import * as THREE from "three";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { toast } from "sonner";
 import {
   RotateCcw,
@@ -317,7 +318,7 @@ export default function MazeRunner3D() {
         toast.success(`Bosqich yakunlandi! +${bonus} coin 🎉`);
 
         try {
-          supabase.auth.getUser().then(({ data: { user } }) => {
+          getCurrentUser(supabase).then((user) => {
             if (user) {
               supabase.rpc("increment_coins", {
                 user_id: user.id,

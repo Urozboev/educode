@@ -25,7 +25,7 @@ export default function Error({
     <ErrorTerminal
       code="500"
       token="INTERNAL_ERROR"
-      command={`educode render "${pathname || "/"}"`}
+      command={`miracademy render "${pathname || "/"}"`}
       steps={["sahifa tayyorlanmoqda", "bajarilish to'xtadi"]}
       detail={error.digest ? `digest: ${error.digest}` : undefined}
       tone="coral"

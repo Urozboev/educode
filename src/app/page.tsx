@@ -25,7 +25,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 /**
  * Kreativ "spreadsheet" uslubidagi hero mosaic — har bir katak kod/rasm/statistika.
- * Googlesheet.uz hero'dan ilhomlanib, EduCode uchun moslandi.
+ * Googlesheet.uz hero'dan ilhomlanib, MirAcademy uchun moslandi.
  * Bitta CSS grid ichida 6 ustun × 6 qator — markazda 2×2 "big" cell.
  */
 type MosaicCell =
@@ -567,17 +567,17 @@ export default function LandingPage() {
       {/* ========== NAVBAR ========== */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-2xl border-b border-border/40">
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20 group-hover:shadow-neon-purple/40 transition-shadow">
               <Code2 className="w-5 h-5 text-white" />
             </div>
-            <span className="font-display font-bold text-xl tracking-tight">Edu<span className="gradient-text">Code</span></span>
+            <span className="font-display font-bold text-xl tracking-tight">Mir<span className="gradient-text">Academy</span></span>
           </Link>
 
           {/* Menyu explore layout'idagi bilan bir xil — manba: lib/nav.ts */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden xl:flex items-center gap-1">
             {nav.map(l => (
-              <Link key={l.href} href={l.href} className="px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
+              <Link key={l.href} href={l.href} className="px-3 py-2 rounded-lg text-[0.9rem] whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
             ))}
 
             <div
@@ -588,7 +588,7 @@ export default function LandingPage() {
               <button
                 onClick={() => setResourcesOpen(o => !o)}
                 aria-expanded={resourcesOpen}
-                className="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-[0.9rem] whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
               >
                 {t.nav.resources}
                 <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? "rotate-180" : ""}`} />
@@ -622,7 +622,7 @@ export default function LandingPage() {
             </div>
 
             {navTail.map(l => (
-              <Link key={l.href} href={l.href} className="px-3.5 py-2 rounded-lg text-[0.9rem] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
+              <Link key={l.href} href={l.href} className="px-3 py-2 rounded-lg text-[0.9rem] whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{l.label}</Link>
             ))}
           </div>
 
@@ -646,8 +646,8 @@ export default function LandingPage() {
                 {menuOpen && (<>
                   <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                   <div className="absolute right-0 top-12 w-52 glass-card p-1.5 shadow-2xl z-50 border border-border/60">
-                    <Link href={dUrl} onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm hover:bg-accent transition-colors"><LayoutDashboard className="w-4 h-4 text-muted-foreground" /> Dashboard</Link>
-                    <button onClick={handleLogout} className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-neon-red hover:bg-neon-red/8 w-full transition-colors"><LogOut className="w-4 h-4" /> Chiqish</button>
+                    <Link href={dUrl} onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm hover:bg-accent transition-colors"><LayoutDashboard className="w-4 h-4 text-muted-foreground" /> {t.nav.dashboard}</Link>
+                    <button onClick={handleLogout} className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-neon-red hover:bg-neon-red/8 w-full transition-colors"><LogOut className="w-4 h-4" /> {t.nav.logout}</button>
                   </div>
                 </>)}
               </div>
@@ -658,14 +658,14 @@ export default function LandingPage() {
               </div>
             )}
 
-            <button onClick={() => setMobileNav(!mobileNav)} className="lg:hidden p-2.5 hover:bg-accent rounded-xl">
+            <button onClick={() => setMobileNav(!mobileNav)} className="xl:hidden p-2.5 hover:bg-accent rounded-xl">
               {mobileNav ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
         <AnimatePresence>{mobileNav && (
-          <motion.div className="lg:hidden bg-card/95 backdrop-blur-xl border-b border-border px-5 py-4 space-y-1"
+          <motion.div className="xl:hidden bg-card/95 backdrop-blur-xl border-b border-border px-5 py-4 space-y-1"
             initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
             {navAll.map(l => <Link key={l.href} href={l.href} onClick={() => setMobileNav(false)} className="block py-3 px-3 rounded-xl text-[0.95rem] hover:bg-accent/50 transition-colors">{l.label}</Link>)}
             {!user && (
@@ -763,7 +763,7 @@ export default function LandingPage() {
               variants={fadeUp(0.05)}
               className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-4"
             >
-              {t.home.whyTitle} <span className="gradient-text">EduCode</span>?
+              {t.home.whyTitle} <span className="gradient-text">MirAcademy</span>?
             </motion.h2>
             <motion.p variants={fadeUp(0.1)} className="text-[15px] md:text-base text-muted-foreground">
               Har bir blok — aniq bir imkoniyat. Yig&apos;ilganda u butun boshli o&apos;qitish tizimini beradi.
@@ -913,7 +913,7 @@ export default function LandingPage() {
               <div className="absolute -bottom-6 -right-4 rotate-[-8deg] opacity-40">
                 <div className="px-3 py-2 rounded-lg border-2 border-neon-pink/40 bg-card">
                   <div className="text-[8px] font-mono text-muted-foreground">CERTIFICATE</div>
-                  <div className="text-[10px] font-bold text-neon-pink">EduCode</div>
+                  <div className="text-[10px] font-bold text-neon-pink">MirAcademy</div>
                 </div>
               </div>
               <div className="relative">
@@ -1202,7 +1202,7 @@ export default function LandingPage() {
             <div className="md:col-span-2">
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center"><Code2 className="w-4 h-4 text-white" /></div>
-                <span className="font-display font-bold text-lg">EduCode</span>
+                <span className="font-display font-bold text-lg">MirAcademy</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
                 {t.home.footerAbout2}
@@ -1223,7 +1223,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">© 2026 EduCode. {t.home.footerRights}.</p>
+            <p className="text-xs text-muted-foreground">© 2026 MirAcademy. {t.home.footerRights}.</p>
             <p className="text-xs text-muted-foreground">
               <a href="https://t.me/MirjalolUrozboev">MirjalolUrozboev</a>
             </p>

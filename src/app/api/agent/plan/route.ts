@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — o'quv reja.
+ * MirAcademy AI Agent — o'quv reja.
  *
  * GET                       → faol reja va modullar
  * POST  { direction, ... }  → yangi reja tuzish

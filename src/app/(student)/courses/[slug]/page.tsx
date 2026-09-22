@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, formatDuration, getLevelLabel } from "@/lib/utils";
 import { LevelBadge } from "@/components/ui/LevelBadge";
 import { ResumeCard } from "@/components/courses/ResumeCard";
@@ -47,7 +48,7 @@ export default function CourseDetailPage() {
   }, [slug, locale]);
 
   async function loadCourse() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (user) {
       setUserId(user.id);
       const { data: profile } = await supabase.from("profiles").select("coins").eq("id", user.id).single();

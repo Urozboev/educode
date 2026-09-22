@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, getInitials, formatNumber, getLevelLabel } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -38,7 +39,7 @@ export default function ParentDashboard() {
 
   const load = useCallback(async () => {
     setLoadError(null);
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     // Sessiya yo'q — layout /login ga yo'naltiradi, lekin skelet abadiy
     // aylanib qolmasligi uchun yuklanish shu yerda ham tugatiladi.
     if (!user) { setLoading(false); return; }

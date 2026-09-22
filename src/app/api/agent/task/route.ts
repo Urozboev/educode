@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — amaliy kod topshirig'i.
+ * MirAcademy AI Agent — amaliy kod topshirig'i.
  *
  * POST { action: "start",  moduleId }                → topshiriq
  * POST { action: "run",    taskId, code, stdin }     → bir marta ishga tushirish

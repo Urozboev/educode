@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { formatNumber, formatDate, getLevelLabel, getLevelColor, cn } from "@/lib/utils";
 import type { Profile, Enrollment, Course, Certificate, CoinTransaction } from "@/types";
 import { motion } from "framer-motion";
@@ -24,7 +25,7 @@ export default function MyResultsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) return;
 
       const { data: p } = await supabase.from("profiles").select("*").eq("id", user.id).single();

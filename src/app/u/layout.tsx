@@ -18,7 +18,7 @@ export default async function PublicProfileLayout({ children }: { children: Reac
               <Code2 className="w-4 h-4 text-white" />
             </span>
             <span className="font-display font-bold">
-              Edu<span className="gradient-text">Code</span>
+              Mir<span className="gradient-text">Academy</span>
             </span>
           </Link>
         </div>

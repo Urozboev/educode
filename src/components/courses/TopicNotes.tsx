@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { NotebookPen, Check, Loader2, ChevronDown, Trash2 } from "lucide-react";
@@ -35,7 +36,7 @@ export function TopicNotes({ topicId }: { topicId: string }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) { setLoaded(true); return; }
       const { data } = await supabase
         .from("topic_notes")

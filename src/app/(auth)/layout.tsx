@@ -25,7 +25,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
             <Code2 className="w-5 h-5 text-white" />
           </div>
           <span className="font-display font-bold text-xl">
-            Edu<span className="gradient-text">Code</span>
+            Mir<span className="gradient-text">Academy</span>
           </span>
         </Link>
       </header>

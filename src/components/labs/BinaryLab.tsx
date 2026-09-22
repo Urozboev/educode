@@ -65,8 +65,8 @@ export function BinaryLab() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="inline-flex rounded-xl border border-border p-1 bg-surface/40">
           {([
-            { v: "explore", label: "Erkin" },
-            { v: "practice", label: "Mashq" },
+            { v: "explore", label: t.labViz.labModeExplore },
+            { v: "practice", label: t.labViz.labModePractice },
           ] as const).map(m => (
             <button
               key={m.v}
@@ -175,7 +175,7 @@ export function BinaryLab() {
             className="flex items-center justify-center gap-2 p-4 rounded-xl bg-neon-green/[0.07] border border-neon-green/25"
           >
             <Check className="w-5 h-5 text-neon-green" />
-            <span className="font-semibold text-neon-green">To&apos;g&apos;ri! Keyingi son tayyorlanmoqda</span>
+            <span className="font-semibold text-neon-green">{t.labViz.labCorrectNext}</span>
           </motion.div>
         )}
       </AnimatePresence>

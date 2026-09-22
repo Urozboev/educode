@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MirAcademy">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#6C5CE7"/>
@@ -6,9 +6,12 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#g)"/>
-  <g fill="none" stroke="#fff" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M192 168 L112 256 L192 344"/>
-    <path d="M320 168 L400 256 L320 344"/>
-    <path d="M288 144 L224 368"/>
+  <!-- Kod qavslari orasidagi "M" — MirAcademy monogrammasi -->
+  <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke-width="26" opacity="0.85">
+      <path d="M152 176 L96 256 L152 336"/>
+      <path d="M360 176 L416 256 L360 336"/>
+    </g>
+    <path stroke-width="38" d="M196 340 L196 172 L256 268 L316 172 L316 340"/>
   </g>
 </svg>

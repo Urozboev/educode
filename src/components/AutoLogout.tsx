@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useRouter } from "next/navigation";
 
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 daqiqa
@@ -21,7 +22,7 @@ export default function AutoLogout() {
 
     // Session ID saqlash (single session)
     const saveSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (user) {
         await supabase.from("profiles").update({
           last_active_session: sessionId.current,
@@ -42,7 +43,7 @@ export default function AutoLogout() {
       }
 
       // 2. Single session — boshqa qurilmadan login qilinganmi?
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")

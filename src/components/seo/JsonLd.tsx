@@ -24,7 +24,7 @@ export function OrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     name: SITE_NAME,
-    alternateName: "EduCode malla.uz",
+    alternateName: "MirAcademy miracademy.uz",
     url: SITE_URL,
     logo: absUrl("/icon-512.png"),
     description: SITE_DESCRIPTION,

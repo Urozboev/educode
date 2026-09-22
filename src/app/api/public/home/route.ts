@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { cached, CACHE_TAGS } from '@/lib/cache';
 
 export const runtime = 'nodejs';
 // 60s server cache — bitta so'rov 6 ta alohida client-side roundtrip
@@ -15,8 +16,13 @@ function anonClient() {
   );
 }
 
-export async function GET() {
-  try {
+/**
+ * Bosh sahifa ma'lumoti ma'lumotlar keshida saqlanadi. Route'dagi
+ * `revalidate` dev rejimda ishlamaydi, shuning uchun ilgari har bir
+ * ochilishda 6 ta so'rov Supabase'ga ketardi.
+ */
+const loadHome = cached(
+  async () => {
     const supabase = anonClient();
 
     const [users, courses, challenges, submissions, courseList, testimonials] = await Promise.all([
@@ -38,18 +44,24 @@ export async function GET() {
         .limit(10),
     ]);
 
-    return NextResponse.json(
-      {
-        stats: {
-          users: users.count || 0,
-          courses: courses.count || 0,
-          challenges: challenges.count || 0,
-          submissions: submissions.count || 0,
-        },
-        courses: courseList.data || [],
-        testimonials: testimonials.data || [],
+    return {
+      stats: {
+        users: users.count || 0,
+        courses: courses.count || 0,
+        challenges: challenges.count || 0,
+        submissions: submissions.count || 0,
       },
-    );
+      courses: courseList.data || [],
+      testimonials: testimonials.data || [],
+    };
+  },
+  'home',
+  { revalidate: 60, tags: [CACHE_TAGS.home, CACHE_TAGS.courses] },
+);
+
+export async function GET() {
+  try {
+    return NextResponse.json(await loadHome());
   } catch (error: any) {
     console.error('public/home error:', error);
     return NextResponse.json({ stats: null, courses: [], testimonials: [] }, { status: 500 });

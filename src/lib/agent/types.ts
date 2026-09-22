@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — umumiy tiplar.
+ * MirAcademy AI Agent — umumiy tiplar.
  *
  * Agent alohida modul: bu yerdagi tiplar `@/types` dagi platforma
  * tiplariga bog'lanmaydi. Shunda agentni platformadan ajratib

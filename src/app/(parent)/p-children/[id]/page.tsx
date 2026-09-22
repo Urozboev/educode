@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, getInitials, formatNumber, getLevelLabel } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -39,7 +40,7 @@ export default function ChildDetailPage() {
   const [myCoins, setMyCoins] = useState(0);
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
     if (!user) return;
 
     // Bog'lanish tekshiruvi

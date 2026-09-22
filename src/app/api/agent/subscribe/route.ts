@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — obuna to'lovini boshlash.
+ * MirAcademy AI Agent — obuna to'lovini boshlash.
  *
  * POST { plan, months, provider } → provayder to'lov sahifasi URL'i
  * GET                             → hozirgi obuna holati

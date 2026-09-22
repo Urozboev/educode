@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Download, Loader2, Users, Target, ClipboardList } from "lucide-react";
@@ -16,7 +17,7 @@ export default function TeacherExportPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) return;
       const { data } = await supabase.from("teacher_students").select("student_id").eq("teacher_id", user.id);
       if (data) setStudentIds(data.map(d => d.student_id));

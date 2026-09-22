@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — kod topshiriqlari.
+ * MirAcademy AI Agent — kod topshiriqlari.
  *
  * Dars va test kabi keshlanadi. Farqi: topshiriq javobini model
  * emas, KOD IJROSI baholaydi — o'quvchi kodi test kirishlari bilan

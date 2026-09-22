@@ -7,7 +7,7 @@ import { absUrl } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Sertifikatni tekshirish",
   description:
-    "EduCode sertifikatining haqiqiyligini raqami yoki QR kodi orqali tekshiring. Ro'yxatdan o'tish talab qilinmaydi.",
+    "MirAcademy sertifikatining haqiqiyligini raqami yoki QR kodi orqali tekshiring. Ro'yxatdan o'tish talab qilinmaydi.",
   alternates: { canonical: absUrl("/sertifikat") },
   robots: { index: false, follow: true },
 };
@@ -27,7 +27,7 @@ export default async function VerifyLayout({ children }: { children: React.React
               <Code2 className="w-4 h-4 text-white" />
             </span>
             <span className="font-display font-bold">
-              Edu<span className="gradient-text">Code</span>
+              Mir<span className="gradient-text">Academy</span>
             </span>
           </Link>
         </div>

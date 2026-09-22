@@ -1,31 +1,39 @@
 import Link from "next/link";
-import { serverHref, getServerDictionary } from "@/lib/i18n/server";
+import { serverHref, getServerDictionary, getServerLocale } from "@/lib/i18n/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ItemListJsonLd } from "@/components/seo/JsonLd";
 import { Clock, Eye, ArrowRight, Newspaper } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
+import { formatDate } from "@/lib/utils";
+import { cached, CACHE_TAGS } from "@/lib/cache";
 
 export const revalidate = 300;
 
-function fmtDate(d: string | null) {
-  if (!d) return "";
-  return new Date(d).toLocaleDateString("uz-UZ", { day: "numeric", month: "long", year: "numeric" });
-}
+/** Nashr qilingan maqolalar — keshlanadi (qarang: lib/cache.ts) */
+const fetchPosts = cached(
+  async () => {
+    try {
+      const supabase = createAdminClient();
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("title, slug, excerpt, cover_url, tags, category, reading_minutes, views, published_at")
+        .eq("is_published", true)
+        .order("published_at", { ascending: false })
+        .limit(50);
+      return data || [];
+    } catch {
+      return [];
+    }
+  },
+  "blog-list",
+  { revalidate: 300, tags: [CACHE_TAGS.blog] },
+);
 
 export default async function BlogListPage() {
   const t = await getServerDictionary();
   const href = await serverHref();
-  let posts: any[] = [];
-  try {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("blog_posts")
-      .select("title, slug, excerpt, cover_url, tags, category, reading_minutes, views, published_at")
-      .eq("is_published", true)
-      .order("published_at", { ascending: false })
-      .limit(50);
-    posts = data || [];
-  } catch { /* bo'sh */ }
+  const locale = await getServerLocale();
+  const posts: any[] = await fetchPosts();
+  const fmtDate = (d: string | null) => (d ? formatDate(d, locale) : "");
 
   const featured = posts[0];
   const rest = posts.slice(1);
@@ -33,8 +41,8 @@ export default async function BlogListPage() {
   return (
     <div className="space-y-8">
       <ItemListJsonLd
-        name="EduCode Blog"
-        description="{t.explore.blogEyebrow} maqolalari"
+        name="MirAcademy Blog"
+        description={t.explore.blogEyebrow}
         items={posts.map(p => ({ name: p.title, url: `/blog/${p.slug}` }))}
       />
 

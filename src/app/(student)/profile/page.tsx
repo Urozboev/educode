@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials, getLevelLabel, getLevelColor, calculateXpLevel, formatDate } from "@/lib/utils";
 import type { Profile, UserAchievement, Achievement } from "@/types";
@@ -30,7 +31,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) return;
       setEmail(user.email || "");
       const p = await getOrCreateProfile(supabase, user.id);

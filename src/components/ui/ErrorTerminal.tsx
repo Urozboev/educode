@@ -90,7 +90,7 @@ export function ErrorTerminal({
             <span className="w-3 h-3 rounded-full bg-[#febc2e]" />
             <span className="w-3 h-3 rounded-full bg-[#28c840]" />
             <span className="ml-3 font-mono text-xs text-[#7d8590]">
-              educode — bash
+              miracademy — bash
             </span>
             <span
               className={`ml-auto font-mono text-xs font-semibold ${t.text}`}

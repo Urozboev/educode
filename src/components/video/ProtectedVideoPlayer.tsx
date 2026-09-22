@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "@/components/i18n/Link";
 import { Loader2, Lock, Video as VideoIcon, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 
 interface Props {
@@ -98,7 +99,7 @@ export default function ProtectedVideoPlayer({ topicId, redirectPath, className,
   useEffect(() => {
     fetchToken();
     // Foydalanuvchi email'ini watermark uchun olish
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    getCurrentUser(supabase).then((user) => {
       if (user?.email) setWatermark(user.email);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

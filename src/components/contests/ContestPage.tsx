@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "@/components/i18n/Link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 import { withTranslation, withTranslations } from "@/lib/i18n/content";
 import type { ContestOverview, ContestStanding } from "@/types";
@@ -78,7 +79,7 @@ export function ContestPage({
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       setMe(user?.id ?? null);
       await loadOverview();
       await loadStandings();

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { CACHE_TAGS } from '@/lib/cache';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -19,7 +20,8 @@ export async function POST() {
     .select('role')
     .eq('id', user.id)
     .single();
-  if (profile?.role !== 'admin') {
+  // O'qituvchi ham dars o'yinlarini tahrirlaydi — keshni tozalash xavfsiz amal
+  if (profile?.role !== 'admin' && profile?.role !== 'teacher') {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   }
 
@@ -27,5 +29,9 @@ export async function POST() {
   revalidatePath('/');
   revalidatePath('/explore/courses');
 
-  return NextResponse.json({ ok: true, revalidated: ['/api/public/home', '/', '/explore/courses'] });
+  // Ma'lumotlar keshi (lib/cache.ts) teg bo'yicha tozalanadi — aks holda
+  // kurs yoki blog saqlangandan keyin 5-30 daqiqa eski matn ko'rinardi.
+  for (const tag of Object.values(CACHE_TAGS)) revalidateTag(tag);
+
+  return NextResponse.json({ ok: true, revalidated: ['/api/public/home', '/', '/explore/courses'], tags: Object.values(CACHE_TAGS) });
 }

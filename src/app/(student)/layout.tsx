@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "@/components/i18n/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials, getLevelLabel, getLevelColor } from "@/lib/utils";
 import type { Profile } from "@/types";
@@ -73,8 +74,8 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   const loadProfile = useCallback(async () => {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) {
+      const user = await getCurrentUser(supabase);
+      if (!user) {
         // Public preview sahifasida login majburiy emas
         if (isPublicPreview) {
           setLoading(false);
@@ -136,7 +137,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           </div>
           {!collapsed && (
             <span className="font-display font-bold text-lg">
-              Edu<span className="gradient-text">Code</span>
+              Mir<span className="gradient-text">Academy</span>
             </span>
           )}
         </Link>
@@ -157,7 +158,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <div className="min-w-0">
                 <p className="font-semibold text-sm truncate">{profile.full_name}</p>
                 <p className={cn("text-xs font-medium", getLevelColor(profile.level))}>
-                  {getLevelLabel(profile.level)}
+                  {getLevelLabel(profile.level, t)}
                 </p>
               </div>
             )}
@@ -250,15 +251,15 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <div className="min-h-screen bg-background overflow-x-hidden">
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center gap-2.5 shrink-0">
               <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20">
                 <Code2 className="w-5 h-5 text-white" />
               </div>
               <span className="font-display font-bold text-xl tracking-tight">
-                Edu<span className="gradient-text">Code</span>
+                Mir<span className="gradient-text">Academy</span>
               </span>
             </Link>
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden xl:flex items-center gap-1">
               <Link href="/explore/courses" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.courses}</Link>
               <Link href="/explore/challenges" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.challenges}</Link>
               <Link href="/playground" className="px-3.5 py-2 rounded-lg text-[15px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.cabinet.playground}</Link>
@@ -278,7 +279,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <Link href="/login" className="hidden md:block px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all">{t.nav.login}</Link>
               <Link href="/register" className="hidden md:block px-4 py-2 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.getStarted}</Link>
               {/* Mobil menyu tugmasi */}
-              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 hover:bg-accent rounded-lg" aria-label={t.nav.menu}>
+              <button onClick={() => setMobileOpen(!mobileOpen)} className="xl:hidden p-2 hover:bg-accent rounded-lg" aria-label={t.nav.menu}>
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
@@ -288,7 +289,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               havolalarga yetib bo'lmasdi — ichidan aylantiriladi. */}
           <AnimatePresence>
             {mobileOpen && (
-              <motion.div className="md:hidden bg-card border-b border-border overflow-hidden"
+              <motion.div className="xl:hidden bg-card border-b border-border overflow-hidden"
                 initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
                 {/* Balandlik animatsiyasi TASHQI qavatda, aylantirish ICHKIDA */}
                 <div className="px-4 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
@@ -365,7 +366,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           <div className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center">
             <Code2 className="w-4 h-4 text-white" />
           </div>
-          <span className="font-display font-bold">EduCode</span>
+          <span className="font-display font-bold">MirAcademy</span>
         </Link>
 
         {/* Mobil user menu */}
@@ -403,7 +404,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 {profile && (
                   <div className="px-3 py-2 border-b border-border/50 mb-1">
                     <p className="font-semibold text-sm">{profile.full_name}</p>
-                    <p className={cn("text-xs", getLevelColor(profile.level))}>{getLevelLabel(profile.level)}</p>
+                    <p className={cn("text-xs", getLevelColor(profile.level))}>{getLevelLabel(profile.level, t)}</p>
                   </div>
                 )}
                 <Link href="/profile" onClick={() => setUserMenuOpen(false)}

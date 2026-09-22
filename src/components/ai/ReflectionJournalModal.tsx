@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, X, Loader2, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 
@@ -45,7 +46,7 @@ export default function ReflectionJournalModal({
     }
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (!user) { toast.error(t.nav.login); setSaving(false); return; }
       const { error } = await supabase.from("reflection_journals").insert({
         user_id: user.id,

@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — kirish testi.
+ * MirAcademy AI Agent — kirish testi.
  *
  * POST { action: "generate", direction }  → savollar
  * POST { action: "submit", assessmentId, answers } → daraja va zaif mavzular

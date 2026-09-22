@@ -1,16 +1,16 @@
 /**
- * EduCode — SEO konstantalar va yordamchilar.
+ * MirAcademy — SEO konstantalar va yordamchilar.
  * Markaziy joy: site URL, brand info, default'lar.
  */
 
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_APP_URL ||
   process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://malla.uz"
+  "https://miracademy.uz"
 ).replace(/\/$/, "");
 
-export const SITE_NAME = "EduCode";
-export const SITE_BRAND_FULL = "EduCode (malla.uz)";
+export const SITE_NAME = "MirAcademy";
+export const SITE_BRAND_FULL = "MirAcademy (miracademy.uz)";
 export const SITE_TAGLINE = "Dasturlashni o'ynab o'rgan";
 export const SITE_DESCRIPTION =
   "Raqamli intellektual ta'lim platformasi. Dasturlash tillarini interaktiv kurslar, AI Sokratik mentor va gamifikatsiya orqali o'rganing. Python, JavaScript, HTML/CSS, algoritmlar — o'zbek tilida bepul.";
@@ -25,20 +25,20 @@ export const DEFAULT_KEYWORDS = [
   "kompyuter savodxonligi",
   "prompt engineering",
   "AI bilan dasturlash",
-  "EduCode",
-  "malla.uz",
+  "MirAcademy",
+  "miracademy.uz",
   "ta'lim platformasi",
   "IT kurslari O'zbekistonda",
   "bepul dasturlash",
   "interaktiv ta'lim",
 ];
 
-export const SUPPORTED_LOCALES = ["uz", "en", "ru"] as const;
+export const SUPPORTED_LOCALES = ["uz", "ru", "en", "kaa"] as const;
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 export const ORG_SOCIAL = {
-  twitter: "@educode_uz",
-  telegram: "https://t.me/educode_uz",
+  twitter: "@miracademy_uz",
+  telegram: "https://t.me/miracademy_uz",
   // boshqa social havolalar bo'lsa, qo'shing
 };
 
@@ -62,15 +62,23 @@ export function ogImageUrl(opts: {
   return `${SITE_URL}/api/og?${params.toString()}`;
 }
 
-/** Hreflang — ko'p tilli URL'lar uchun yordamchi. */
+/**
+ * Hreflang — ko'p tilli URL'lar uchun yordamchi.
+ *
+ * O'zbekcha prefikssiz ochiladi (`/kurslar`), qolgan tillar prefiks
+ * bilan (`/ru/kurslar`). Middleware ham aynan shunday ishlaydi.
+ */
 export function localesAlternates(path: string) {
   const clean = path.startsWith("/") ? path : `/${path}`;
   return {
     canonical: absUrl(clean),
     languages: {
       "uz-UZ": absUrl(clean),
+      "ru-RU": absUrl(`/ru${clean}`),
+      "en-US": absUrl(`/en${clean}`),
+      // Qoraqalpoq tili uchun ISO 639-1 kodi yo'q — 639-3 ishlatiladi
+      "kaa": absUrl(`/kaa${clean}`),
       "x-default": absUrl(clean),
-      // Kelajakda i18n routing kiritilsa: 'en-US': absUrl(`/en${clean}`), ...
     },
   };
 }

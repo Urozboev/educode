@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser } from "@/lib/supabase/user";
 import { useI18n } from "@/lib/i18n";
 import { withTranslations } from "@/lib/i18n/content";
 import { completeTopic } from "@/lib/course-completion";
@@ -36,7 +37,7 @@ export default function TaskPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser(supabase);
       if (user) setUserId(user.id);
       const { data: course } = await supabase.from("courses").select("id").eq("slug", slug).single();
       if (course) setCourseId(course.id);

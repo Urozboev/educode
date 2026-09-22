@@ -1,5 +1,5 @@
 /**
- * EduCode AI Agent — Tracker.
+ * MirAcademy AI Agent — Tracker.
  *
  * Agentning "o'zi progressni kuzatadi va rejani o'zgartiradi" degan
  * qismi shu yerda. Test natijasiga qarab uch yo'ldan biri tanlanadi:
