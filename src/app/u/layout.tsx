@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { serverHref } from "@/lib/i18n/server";
-import { Code2 } from "lucide-react";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 /**
  * Portfolio ataylab sodda layout'da: bu sahifa tashqariga ulashiladi
@@ -15,7 +15,7 @@ export default async function PublicProfileLayout({ children }: { children: Reac
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center">
           <Link href={href("/")} className="flex items-center gap-2.5">
             <span className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center">
-              <Code2 className="w-4 h-4 text-white" />
+              <BrandMark className="w-4 h-4 text-white" />
             </span>
             <span className="font-display font-bold">
               Mir<span className="gradient-text">Academy</span>

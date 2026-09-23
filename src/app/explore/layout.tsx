@@ -5,13 +5,14 @@ import Link from "@/components/i18n/Link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
-import { Code2, LayoutDashboard, Menu, X, Moon, Sun, LogOut, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Menu, X, Moon, Sun, LogOut, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
 import { primaryLinks, resourceLinks, tailLinks, allGuestLinks } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 export default function ExploreLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
@@ -45,7 +46,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20"><Code2 className="w-5 h-5 text-white" /></div>
+            <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20"><BrandMark className="w-5 h-5 text-white" /></div>
             <span className="font-display font-bold text-xl tracking-tight">Mir<span className="gradient-text">Academy</span></span>
           </Link>
 

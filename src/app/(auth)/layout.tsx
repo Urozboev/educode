@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { serverHref } from "@/lib/i18n/server";
-import { Code2 } from "lucide-react";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 export const metadata: Metadata = {
   // Auth sahifalari Google'da chiqishi shart emas
@@ -22,7 +22,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       <header className="relative z-10 p-6">
         <Link href={href("/")} className="inline-flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center">
-            <Code2 className="w-5 h-5 text-white" />
+            <BrandMark className="w-5 h-5 text-white" />
           </div>
           <span className="font-display font-bold text-xl">
             Mir<span className="gradient-text">Academy</span>

@@ -19,6 +19,7 @@ import { primaryLinks, resourceLinks, tailLinks, allGuestLinks } from "@/lib/nav
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -569,7 +570,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20 group-hover:shadow-neon-purple/40 transition-shadow">
-              <Code2 className="w-5 h-5 text-white" />
+              <BrandMark className="w-5 h-5 text-white" />
             </div>
             <span className="font-display font-bold text-xl tracking-tight">Mir<span className="gradient-text">Academy</span></span>
           </Link>
@@ -1201,7 +1202,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center"><Code2 className="w-4 h-4 text-white" /></div>
+                <div className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center"><BrandMark className="w-4 h-4 text-white" /></div>
                 <span className="font-display font-bold text-lg">MirAcademy</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">

@@ -8,13 +8,13 @@ import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
-import {
-  Code2, LayoutDashboard, Coins, LogOut, Moon, Sun, ChevronLeft, Menu,
+import { LayoutDashboard, Coins, LogOut, Moon, Sun, ChevronLeft, Menu,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 // "Farzandlarim" alohida sahifa emas — /p-children faqat /p-dashboard ga
 // qaytaruvchi redirect. Menyuda turgani foydalanuvchini chalg'itardi:
@@ -54,7 +54,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
     <div className="flex flex-col h-full">
       <div className={cn("flex items-center px-5 h-16 border-b border-border/50", collapsed && "justify-center px-3")}>
         <Link href="/p-dashboard" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
-          <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center"><Code2 className="w-5 h-5 text-white" /></div>
+          <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center"><BrandMark className="w-5 h-5 text-white" /></div>
           {!collapsed && <span className="font-display font-bold text-lg">Mir<span className="gradient-text">Academy</span></span>}
         </Link>
       </div>

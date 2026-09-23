@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     course: { label: "KURS", color: "#8A7BF7", emoji: "📚" },
     challenge: { label: "TOPSHIRIQ", color: "#4FC3F7", emoji: "⚡" },
     topic: { label: "MAVZU", color: "#3DD9AC", emoji: "🎯" },
-    default: { label: "EDUCODE", color: "#8A7BF7", emoji: "🚀" },
+    default: { label: "TA'LIM PLATFORMASI", color: "#8A7BF7", emoji: "🚀" },
   };
   const badge = typeBadge[type] || typeBadge.default;
 
@@ -73,10 +73,16 @@ export async function GET(req: NextRequest) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 32,
             }}
           >
-            🚀
+            {/* Brend belgisi — public/icon.svg bilan bir xil shakl */}
+            <svg width="34" height="34" viewBox="0 0 512 512" fill="none" stroke="#ffffff" strokeLinecap="round" strokeLinejoin="round">
+              <g strokeWidth={34} opacity={0.85}>
+                <path d="M152 176 L96 256 L152 336" />
+                <path d="M360 176 L416 256 L360 336" />
+              </g>
+              <path strokeWidth={46} d="M196 340 L196 172 L256 268 L316 172 L316 340" />
+            </svg>
           </div>
           <span style={{ display: "flex", color: "#fff" }}>MirAcademy</span>
           <span style={{ display: "flex", color: "#7a7a8a", fontWeight: 400, fontSize: 22 }}>

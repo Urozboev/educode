@@ -21,6 +21,7 @@ import { allGuestLinks } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 /**
  * Yorliqlar lug'atdan olinadi, shuning uchun bu massiv — funksiya.
@@ -133,7 +134,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <div className={cn("flex items-center px-5 h-16 border-b border-border/50", collapsed && "justify-center px-3")}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center flex-shrink-0">
-            <Code2 className="w-5 h-5 text-white" />
+            <BrandMark className="w-5 h-5 text-white" />
           </div>
           {!collapsed && (
             <span className="font-display font-bold text-lg">
@@ -253,7 +254,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
               <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20">
-                <Code2 className="w-5 h-5 text-white" />
+                <BrandMark className="w-5 h-5 text-white" />
               </div>
               <span className="font-display font-bold text-xl tracking-tight">
                 Mir<span className="gradient-text">Academy</span>
@@ -364,7 +365,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         </button>
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center">
-            <Code2 className="w-4 h-4 text-white" />
+            <BrandMark className="w-4 h-4 text-white" />
           </div>
           <span className="font-display font-bold">MirAcademy</span>
         </Link>

@@ -93,8 +93,16 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  // SVG — zamonaviy brauzerlar uchun (har o'lchamda tiniq), PNG esa
+  // uni qo'llab-quvvatlamaydigan joylar uchun: Safari'ning "Bosh ekranga
+  // qo'shish"i, Android launcher va ijtimoiy tarmoq avatarlari.
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
   },
   manifest: "/manifest.webmanifest",
   formatDetection: {

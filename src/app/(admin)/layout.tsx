@@ -21,6 +21,7 @@ import AutoLogout from "@/components/AutoLogout";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { useI18n } from "@/lib/i18n";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 const adminLinks = (t: Dictionary) => [
   { href: "/a-dashboard", label: t.cabinet.dashboard, icon: LayoutDashboard },
@@ -78,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className={cn("flex items-center px-5 h-16 border-b border-border/50", collapsed && "justify-center px-3")}>
         <Link href="/a-dashboard" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-neon-red to-neon-yellow flex items-center justify-center">
-            <Code2 className="w-5 h-5 text-white" />
+            <BrandMark className="w-5 h-5 text-white" />
           </div>
           {!collapsed && <span className="font-display font-bold text-lg">{t.admin.short}</span>}
         </Link>

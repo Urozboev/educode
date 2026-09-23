@@ -7,8 +7,9 @@ import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { savePlayer } from "@/lib/liveGame";
-import { Code2, Loader2, LogIn } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { BrandMark } from "@/components/brand/BrandMark";
 
 /**
  * PIN bilan o'yinga kirish.
@@ -45,7 +46,7 @@ export default function LiveJoinPage() {
     <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6">
       <Link href="/" className="flex items-center gap-2.5 mb-10">
         <span className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center">
-          <Code2 className="w-5 h-5 text-white" />
+          <BrandMark className="w-5 h-5 text-white" />
         </span>
         <span className="font-display font-bold text-xl">
           Mir<span className="gradient-text">Academy</span>
