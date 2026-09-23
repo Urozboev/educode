@@ -6,7 +6,10 @@
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_APP_URL ||
   process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://miracademy.uz"
+  // Domen www bilan xizmat qiladi: apex (miracademy.uz) unga
+  // 308 bilan yo'naltiradi. Manzil yakuniy shaklda bo'lishi kerak,
+  // aks holda har bir OG rasm so'rovi ortiqcha yo'naltirishdan o'tadi.
+  "https://www.miracademy.uz"
 ).replace(/\/$/, "");
 
 export const SITE_NAME = "MirAcademy";
@@ -49,6 +52,16 @@ export function absUrl(path: string): string {
   return SITE_URL + (path.startsWith("/") ? path : `/${path}`);
 }
 
+/**
+ * Brend versiyasi — OG rasm manziliga qo'shiladi.
+ *
+ * Telegram, WhatsApp va ijtimoiy tarmoqlar rasmni MANZIL bo'yicha
+ * keshlaydi. Logotip yoki nom o'zgarganda manzil o'zgarmasa, ular eski
+ * rasmni ko'rsatishda davom etadi. Brend yangilanganda shu raqamni
+ * oshirish kifoya — manzil yangi bo'ladi va kesh chetlab o'tiladi.
+ */
+export const OG_VERSION = "2";
+
 /** Dynamic OG image URL — har sahifa uchun avtomatik chiroyli rasm. */
 export function ogImageUrl(opts: {
   title: string;
@@ -59,6 +72,7 @@ export function ogImageUrl(opts: {
   params.set("title", opts.title.slice(0, 80));
   if (opts.subtitle) params.set("subtitle", opts.subtitle.slice(0, 100));
   if (opts.type) params.set("type", opts.type);
+  params.set("v", OG_VERSION);
   return `${SITE_URL}/api/og?${params.toString()}`;
 }
 
