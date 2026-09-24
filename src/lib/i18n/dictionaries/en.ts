@@ -764,6 +764,7 @@ export const en: Dictionary = {
       quizResults: "Quiz results",
     },
     usr: {
+      updateFailed: "Could not change it: no permission to write to the database. Check that migration 64 has been run.",
       detached: "Learner detached",
       attached: "Learner attached",
       attaching: "Attaching a learner...",

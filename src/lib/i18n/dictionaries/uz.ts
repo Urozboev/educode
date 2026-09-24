@@ -774,6 +774,7 @@ export const uz = {
       quizResults: "Test natijalari",
     },
     usr: {
+      updateFailed: "O'zgartirib bo'lmadi: bazaga yozishga ruxsat yo'q. 64-migratsiya ishga tushirilganini tekshiring.",
       detached: "Talaba ajratildi",
       attached: "Talaba biriktirildi",
       attaching: "Talaba biriktirish...",

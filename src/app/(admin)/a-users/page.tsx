@@ -34,14 +34,36 @@ export default function AdminUsersPage() {
     setLoading(false);
   }
 
+  /**
+   * Profilga yozish va NATIJANI TEKSHIRISH.
+   *
+   * `update()` ning o'zi yetarli emas: RLS qatorni ko'rsatmasa, u 0 ta
+   * qatorni o'zgartiradi-yu, xato qaytarmaydi. Ilgari shu sababli
+   * interfeys "o'zgartirildi" deb yozar, baza esa o'zgarmasdi.
+   * `.select()` qaytargan qatorlar soni — yagona ishonchli dalil.
+   */
+  async function updateProfile(userId: string, patch: Record<string, unknown>) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update(patch)
+      .eq("id", userId)
+      .select("id");
+
+    if (error || !data || data.length === 0) {
+      toast.error(error?.message || t.admin.usr.updateFailed);
+      return false;
+    }
+    return true;
+  }
+
   async function changeRole(userId: string, newRole: string) {
-    await supabase.from("profiles").update({ role: newRole }).eq("id", userId);
+    if (!(await updateProfile(userId, { role: newRole }))) return;
     toast.success(`Rol "${newRole}" ga o'zgartirildi`);
     load();
   }
 
   async function toggleBlock(user: Profile) {
-    await supabase.from("profiles").update({ is_blocked: !user.is_blocked }).eq("id", user.id);
+    if (!(await updateProfile(user.id, { is_blocked: !user.is_blocked }))) return;
     toast.success(user.is_blocked ? "Aktivlashtirildi" : "Bloklandi");
     load();
   }
@@ -59,7 +81,9 @@ export default function AdminUsersPage() {
     if (isNaN(amount) || amount === 0) { toast.error(t.admin.usr.enterNumber); return; }
     const newBalance = user.coins + amount;
     if (newBalance < 0) { toast.error(`Yetarli coin yo'q! Hozirgi: ${user.coins}, ayirish: ${Math.abs(amount)}`); return; }
-    await supabase.from("profiles").update({ coins: newBalance }).eq("id", userId);
+    // Balans yozilmasa, tranzaksiya ham yozilmasligi kerak — aks holda
+    // tarixda bo'lmagan o'zgarish qolib ketadi
+    if (!(await updateProfile(userId, { coins: newBalance }))) return;
     await supabase.from("coin_transactions").insert({
       user_id: userId, amount, type: "admin_adjustment",
       description: `Admin: ${amount > 0 ? '+' : ''}${amount} coin`, balance_after: newBalance,

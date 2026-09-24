@@ -772,6 +772,7 @@ export const kaa: Dictionary = {
       quizResults: "Test nátiyjeleri",
     },
     usr: {
+      updateFailed: "Ózgertip bolmadı: bazaǵa jazıwǵa ruqsat joq. 64-migraciya iske túsirilgenin tekseriń.",
       detached: "Student ajıratıldı",
       attached: "Student biriktirildi",
       attaching: "Student biriktiriw...",
