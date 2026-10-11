@@ -58,6 +58,8 @@ oldingisiga tayanadi.
 | 68 | `68_maruza_mavzular_15_20.sql` | Ma'ruza: 6 yangi mavzu (kortej, istisnolar, fayllar, rekursiya, saralash, OOP) + 30 test + 18 topshiriq |
 | 69 | `69_amaliyot_mashgulotlar_7_12.sql` | Amaliyot: 7-12 mashg'ulotlar + 30 test + 19 topshiriq |
 | 70 | `70_laboratoriya_ishlar_7_12.sql` | Laboratoriya: 7-12 ishlar + 24 test + 18 topshiriq |
+| 71 | `71_kurs_mavzular_soni_trigger.sql` | Kurs kartasidagi "N dars" trigger orqali avtomatik sanaladi + mavjud sonlar tiklanadi |
+| 72 | `72_about_muallif_rasmi.sql` | "Biz haqimizda" muallif rasmi `/images/about/muallif.jpg` ga ulanadi (deploy'dan KEYIN) |
 
 > 61-64 raqamlari ikki marta ishlatilgan (tarjimalar va tuzatishlar). Ular
 > bir-biriga bog'liq emas — qaysi tartibda ishga tushirilsa ham bo'ladi.

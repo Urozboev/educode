@@ -203,7 +203,7 @@ export default function AdminTopicsPage() {
     } else {
       const { error } = await supabase.from("topics").insert({ ...payload, order_index: topics.length });
       if (error) { toast.error(error.message); setSavingTopic(false); return; }
-      await supabase.from("courses").update({ total_topics: topics.length + 1 }).eq("id", courseId);
+      // courses.total_topics ni bazadagi trigger o'zi yangilaydi (71-migratsiya)
       toast.success("Yangi mavzu qo'shildi");
     }
     setShowTopicForm(false); setSavingTopic(false); loadData();
@@ -212,7 +212,6 @@ export default function AdminTopicsPage() {
   async function deleteTopic(topic: Topic) {
     if (!confirm(`"${topic.title}" mavzusini o'chirish?`)) return;
     await supabase.from("topics").delete().eq("id", topic.id);
-    await supabase.from("courses").update({ total_topics: Math.max(0, topics.length - 1) }).eq("id", courseId);
     toast.success(t.admin.common.deleted); loadData();
   }
 

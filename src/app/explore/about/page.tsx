@@ -61,7 +61,8 @@ export default function AboutPage() {
         transition={{ delay: 0.1 }}
       >
         <div className="w-28 h-28 rounded-2xl bg-hero-gradient flex items-center justify-center flex-shrink-0 overflow-hidden shadow-lg shadow-neon-purple/20">
-          {data.author_image ? (
+          {/* blob: manzil faqat yuklagan odamning brauzerida ishlaydi — boshqalarga singan rasm ko'rinmasin */}
+          {data.author_image && /^(https?:\/\/|\/)/i.test(data.author_image) ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={data.author_image} alt={data.author_name} className="w-full h-full object-cover" />
           ) : (
