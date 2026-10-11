@@ -1,12 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import { getCurrentUser } from "@/lib/supabase/user";
 import { cn, getInitials, getLevelLabel, getLevelColor } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Trophy, Medal, Flame, Zap, Crown } from "lucide-react";
+import { Flame } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+
+/**
+ * Karta faqat qatorga bosilganda kerak — uni sahifa bilan birga
+ * yuklash shart emas. Reyting ro'yxati tezroq ochiladi.
+ */
+const StudentCardModal = dynamic(() => import("@/components/leaderboard/StudentCardModal"), {
+  ssr: false,
+});
 
 export default function LeaderboardPage() {
   const { t } = useI18n();
@@ -14,6 +23,7 @@ export default function LeaderboardPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [myId, setMyId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -42,7 +52,8 @@ export default function LeaderboardPage() {
             const u = users[idx];
             if (!u) return null;
             return (
-              <motion.div key={u.id} className={cn("glass-card p-5 text-center", idx === 0 && "ring-2 ring-neon-yellow/30")}
+              <motion.button key={u.id} type="button" onClick={() => setOpenId(u.id)}
+                className={cn("glass-card p-5 text-center hover:border-neon-purple/40 transition-colors", idx === 0 && "ring-2 ring-neon-yellow/30")}
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}>
                 <div className="text-3xl mb-2">{medals[idx]}</div>
                 <div className="w-14 h-14 rounded-full bg-hero-gradient flex items-center justify-center text-white font-bold mx-auto mb-2">
@@ -50,7 +61,7 @@ export default function LeaderboardPage() {
                 </div>
                 <p className="font-semibold text-sm truncate">{u.full_name}</p>
                 <p className="text-xs text-neon-yellow font-mono mt-1">{u.xp} XP</p>
-              </motion.div>
+              </motion.button>
             );
           })}
         </div>
@@ -64,8 +75,9 @@ export default function LeaderboardPage() {
         {loading ? <div className="p-8 text-center text-muted-foreground">{t.common.loading}</div> : (
           <div>
             {users.map((u, i) => (
-              <motion.div key={u.id} className={cn("grid grid-cols-[3rem,1fr,5rem,5rem,5rem] gap-4 px-5 py-3 items-center text-sm border-b border-border/30 last:border-0 transition-colors",
-                u.id === myId && "bg-neon-purple/5")}
+              <motion.button key={u.id} type="button" onClick={() => setOpenId(u.id)}
+                className={cn("w-full text-left grid grid-cols-[3rem,1fr,5rem,5rem,5rem] gap-4 px-5 py-3 items-center text-sm border-b border-border/30 last:border-0 transition-colors hover:bg-surface/60",
+                  u.id === myId && "bg-neon-purple/5")}
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}>
                 <span className="font-mono text-muted-foreground font-bold">{i < 3 ? medals[i] : i + 1}</span>
                 <div className="flex items-center gap-3 min-w-0">
@@ -77,11 +89,17 @@ export default function LeaderboardPage() {
                 <span className="text-center font-mono text-neon-yellow">{u.xp}</span>
                 <span className="text-center">{u.streak_days > 0 && <span className="inline-flex items-center gap-1 text-neon-red text-xs"><Flame className="w-3 h-3" />{u.streak_days}</span>}</span>
                 <span className={cn("text-center text-xs font-medium", getLevelColor(u.level))}>{getLevelLabel(u.level, t)}</span>
-              </motion.div>
+              </motion.button>
             ))}
           </div>
         )}
       </div>
+
+      {!loading && users.length > 0 && (
+        <p className="text-xs text-muted-foreground text-center">{t.cabinet.board.openCard}</p>
+      )}
+
+      <StudentCardModal userId={openId} onClose={() => setOpenId(null)} />
     </div>
   );
 }

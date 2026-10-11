@@ -48,6 +48,20 @@ oldingisiga tayanadi.
 | 62 | `62_tarjimalar_dars_oyinlari_kontenti.sql` | 12 ta o'yin to'liq kontenti: savollar, juftliklar, krossvord, taxta (ru, en, kaa) |
 | 63 | `63_tarjimalar_topshiriqlar_toliq.sql` | Mavzulardagi amaliy topshiriqlar nomlari va shartlari (ru, en, kaa) |
 | 64 | `64_tarjimalar_testlar_toliq.sql` | Mavzulardagi test savollari, JSONB variantlari va tushuntirishlari (ru, en, kaa) |
+| 61 | `61_unumdorlik_rls_va_indekslar.sql` | RLS siyosatlari tezlashtiriladi, `is_admin()`/`is_staff()`, indekslar |
+| 62 | `62_blog_it_ai_yangiliklari_sentyabr.sql` | Blogga 9 ta IT/AI yangiligi, muallif nomi MirAcademy |
+| 63 | `63_kontent_tuzatish_qavslar.sql` | `amaliy-4-shartlar` dagi qavslar haqidagi noto'g'ri da'vo tuzatildi |
+| 64 | `64_admin_profiles_yozish_huquqi.sql` | Admin boshqa foydalanuvchining rolini, blokini, coinini o'zgartira oladi |
+| 65 | `65_kunlik_xizmat_cron.sql` | `run_daily_maintenance()`: streak hisoblash va yutuqlar berish (Vercel Cron chaqiradi) |
+| 66 | `66_reyting_talaba_kartasi.sql` | `get_student_card()`: reytingda boshqa talabaning natijalari kartasi |
+| 67 | `67_topshiriqlar_yangi_20ta.sql` | 20 ta yangi mustaqil topshiriq (8 oson / 8 o'rta / 4 qiyin) |
+| 68 | `68_maruza_mavzular_15_20.sql` | Ma'ruza: 6 yangi mavzu (kortej, istisnolar, fayllar, rekursiya, saralash, OOP) + 30 test + 18 topshiriq |
+| 69 | `69_amaliyot_mashgulotlar_7_12.sql` | Amaliyot: 7-12 mashg'ulotlar + 30 test + 19 topshiriq |
+| 70 | `70_laboratoriya_ishlar_7_12.sql` | Laboratoriya: 7-12 ishlar + 24 test + 18 topshiriq |
+
+> 61-64 raqamlari ikki marta ishlatilgan (tarjimalar va tuzatishlar). Ular
+> bir-biriga bog'liq emas — qaysi tartibda ishga tushirilsa ham bo'ladi.
+> 65-70 lar ham mustaqil, faqat 68 → 27-30, 69 → 31, 70 → 32 dan keyin.
 
 ## Har biridan keyin nima tekshirish kerak
 

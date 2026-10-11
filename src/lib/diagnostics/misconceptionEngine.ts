@@ -373,16 +373,16 @@ export const KNOWLEDGE_GRAPH_NODES: KnowledgeGraphNode[] = [
   { id: "loops_for", label: { uz: "For Sikllari", ru: "Циклы For", en: "For Loops & Range", kaa: "For Ciklları" }, category: "flow", x: 400, y: 220, prerequisites: ["conditions"], topicSlugs: ["royxatlar-va-for", "amaliy-3-sikllar", "lab-3-royxatlar-for"] },
   { id: "loops_while", label: { uz: "While Sikli", ru: "Цикл While", en: "While Loops", kaa: "While Cikli" }, category: "flow", x: 600, y: 220, prerequisites: ["loops_for"], topicSlugs: ["while-sikli", "amaliy-5-while", "lab-5-while"] },
 
-  { id: "lists", label: { uz: "Ro'yxatlar (Lists)", ru: "Списки (Lists)", en: "Lists & Arrays", kaa: "Dizimler (Lists)" }, category: "structures", x: 260, y: 360, prerequisites: ["loops_for"], topicSlugs: ["royxatlar-va-for", "lab-3-royxatlar-for"] },
-  { id: "strings_methods", label: { uz: "Satrlar Metodlari", ru: "Методы строк", en: "String Methods", kaa: "Qatarlar Metodları" }, category: "structures", x: 460, y: 360, prerequisites: ["lists"], topicSlugs: ["matnlar-va-sonlar", "lab-2-matnlar"] },
-  { id: "dicts_sets", label: { uz: "Lug'atlar (Dicts)", ru: "Словари и Множества", en: "Dicts & Sets", kaa: "Sózlikler hám Kóplikler" }, category: "structures", x: 660, y: 360, prerequisites: ["lists"], topicSlugs: ["lugat-va-toplam"] },
+  { id: "lists", label: { uz: "Ro'yxatlar (Lists)", ru: "Списки (Lists)", en: "Lists & Arrays", kaa: "Dizimler (Lists)" }, category: "structures", x: 260, y: 360, prerequisites: ["loops_for"], topicSlugs: ["royxatlar-va-for", "lab-3-royxatlar-for", "kortej-va-ichma-ich-tuzilmalar", "amaliy-9-matritsa", "lab-8-kortej-matritsa"] },
+  { id: "strings_methods", label: { uz: "Satrlar Metodlari", ru: "Методы строк", en: "String Methods", kaa: "Qatarlar Metodları" }, category: "structures", x: 460, y: 360, prerequisites: ["lists"], topicSlugs: ["matnlar-va-sonlar", "lab-2-matnlar", "amaliy-8-matnlar"] },
+  { id: "dicts_sets", label: { uz: "Lug'atlar (Dicts)", ru: "Словари и Множества", en: "Dicts & Sets", kaa: "Sózlikler hám Kóplikler" }, category: "structures", x: 660, y: 360, prerequisites: ["lists"], topicSlugs: ["lugat-va-toplam", "amaliy-7-royxat-lugat", "lab-7-lugat-toplam"] },
 
   { id: "functions_basic", label: { uz: "Funksiyalar (def)", ru: "Функции (def/return)", en: "Functions & Scope", kaa: "Funktsiyalar (def/return)" }, category: "functions", x: 340, y: 500, prerequisites: ["lists", "loops_while"], topicSlugs: ["funksiyalar", "amaliy-6-funksiyalar", "lab-6-funksiyalar"] },
   { id: "modules", label: { uz: "Standart Modullar", ru: "Модули (math, random)", en: "Standard Modules", kaa: "Standart Moduller" }, category: "functions", x: 540, y: 500, prerequisites: ["functions_basic"], topicSlugs: ["modullar"] },
 
-  // Bu ikkisiga hozircha platformada dars yo'q — shuning uchun slug'lar bo'sh
-  { id: "recursion", label: { uz: "Rekursiya va Stek", ru: "Рекурсия и Стек", en: "Recursion & Stack", kaa: "Rekursiya hám Stek" }, category: "algorithms", x: 280, y: 640, prerequisites: ["functions_basic"], topicSlugs: [] },
-  { id: "binary_search", label: { uz: "Ikkilik Qidiruv", ru: "Бинарный поиск", en: "Binary Search", kaa: "Ekilik Izlew" }, category: "algorithms", x: 480, y: 640, prerequisites: ["lists", "functions_basic"], topicSlugs: [] },
+  // Rekursiya va saralash/qidiruv darslari 68-70 migratsiyalarda qo'shilgan
+  { id: "recursion", label: { uz: "Rekursiya va Stek", ru: "Рекурсия и Стек", en: "Recursion & Stack", kaa: "Rekursiya hám Stek" }, category: "algorithms", x: 280, y: 640, prerequisites: ["functions_basic"], topicSlugs: ["rekursiya", "amaliy-10-rekursiya", "lab-10-rekursiya"] },
+  { id: "binary_search", label: { uz: "Ikkilik Qidiruv", ru: "Бинарный поиск", en: "Binary Search", kaa: "Ekilik Izlew" }, category: "algorithms", x: 480, y: 640, prerequisites: ["lists", "functions_basic"], topicSlugs: ["saralash-va-qidiruv", "amaliy-11-algoritmlar", "lab-11-saralash"] },
 ];
 
 /** Bitta mavzu bo'yicha foydalanuvchi progressi (topic_progress qatori). */
