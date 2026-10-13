@@ -13,7 +13,7 @@ import {
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
   ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins, Newspaper,
   Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy, ShieldCheck, Languages,
-  Sparkles
+  Sparkles, LifeBuoy
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,6 +47,7 @@ const adminLinks = (t: Dictionary) => [
   { href: "/a-methods", label: t.nav.methods, icon: Lightbulb },
   { href: "/a-analytics", label: t.teacher.analytics, icon: BarChart3 },
   { href: "/a-about", label: t.nav.about, icon: Info },
+  { href: "/a-guide", label: t.admin.guideVideos, icon: LifeBuoy },
   { href: "/a-settings", label: t.admin.settings, icon: Settings },
   { href: "/a-export", label: t.teacher.export, icon: Download },
 ];

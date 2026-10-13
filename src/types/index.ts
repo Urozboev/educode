@@ -100,6 +100,8 @@ export interface Topic {
   video_id: string | null;
   video_duration_seconds: number | null;
   presentation_url: string | null;
+  /** Ichki taqdimot (73-migratsiya). Bo'lsa, presentation_url o'rniga ko'rsatiladi. */
+  slides?: Slide[] | null;
   order_index: number;
   coin_reward: number;
   xp_reward: number;
@@ -109,6 +111,30 @@ export interface Topic {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * Taqdimot slaydlari — `topics.slides` JSONB ustunida saqlanadi.
+ *
+ * Matn maydonlarida HTML yo'q: `kod` va **qalin** belgilashlari
+ * SlideDeck ichida xavfsiz tarzda React elementlariga aylantiriladi.
+ * Kod slaydlaridagi `output` qo'lda yozilmagan — generator kodni
+ * Python'da ishga tushirib qo'ygan.
+ */
+export type Slide =
+  | { t: "title"; title: string; subtitle?: string; emoji?: string }
+  | { t: "idea"; title: string; text: string; emoji?: string }
+  | { t: "points"; title: string; items: { e?: string; text: string }[] }
+  | { t: "code"; title: string; code: string; output?: string; input?: string; note?: string }
+  | {
+      t: "compare";
+      title: string;
+      left: { label: string; code?: string; text?: string };
+      right: { label: string; code?: string; text?: string };
+    }
+  | { t: "table"; title: string; head: string[]; rows: string[][]; note?: string }
+  | { t: "quiz"; title?: string; question: string; code?: string; options: string[]; answer: number; explain: string }
+  | { t: "task"; title: string; text: string; starter?: string; hint?: string }
+  | { t: "summary"; title: string; items: string[] };
 
 /** Public mundarija (topics_toc view) — kontent ustunlarisiz */
 export interface TopicTocEntry {

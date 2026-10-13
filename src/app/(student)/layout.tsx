@@ -12,7 +12,7 @@ import {
   Code2, LayoutDashboard, BookOpen, Swords, Gamepad2, Medal,
   BarChart3, Trophy, Store, User, LogOut, ChevronLeft,
   Menu, X, Moon, Sun, Flame, Coins, ChevronDown, MessageCircle,
-  Library, BookMarked, Puzzle, Briefcase, School, Sparkles
+  Library, BookMarked, Puzzle, Briefcase, School, Sparkles, LifeBuoy
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -48,6 +48,7 @@ const studentLinks = (t: Dictionary) => [
   { href: "/store", label: t.cabinet.store, icon: Store },
   { href: "/portfolio", label: t.cabinet.portfolio, icon: Briefcase },
   { href: "/profile", label: t.cabinet.profile, icon: User },
+  { href: "/explore/guide", label: t.nav.guide, icon: LifeBuoy },
 ];
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
@@ -249,7 +250,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   // student sidebar o'rniga oddiy katalog navbar ko'rsatamiz.
   if (!loading && !profile && isPublicPreview) {
     return (
-      <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="min-h-screen bg-background overflow-x-hidden supports-[overflow:clip]:overflow-x-clip">
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
@@ -315,7 +316,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           </main>
         ) : (
           <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6">
-            <div className="max-w-6xl mx-auto overflow-x-hidden">{children}</div>
+            <div className="max-w-6xl mx-auto overflow-x-hidden supports-[overflow:clip]:overflow-x-clip">{children}</div>
           </main>
         )}
       </div>

@@ -15,7 +15,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 export type NavKey =
   | "courses" | "challenges" | "playground" | "contests"
   | "books" | "glossary" | "labs" | "lessonGames" | "games" | "methods" | "portfolios"
-  | "blog" | "about";
+  | "blog" | "about" | "guide";
 
 export type NavLink = { href: string; label: string };
 export type ResourceLink = NavLink & { hint: string };
@@ -27,7 +27,7 @@ const PRIMARY: { href: string; key: NavKey }[] = [
   { href: "/explore/contests", key: "contests" },
 ];
 
-const RESOURCES: { href: string; key: Exclude<NavKey, "courses" | "challenges" | "playground" | "contests" | "blog" | "about"> }[] = [
+const RESOURCES: { href: string; key: Exclude<NavKey, "courses" | "challenges" | "playground" | "contests" | "about" | "guide"> }[] = [
   { href: "/explore/books", key: "books" },
   { href: "/explore/glossary", key: "glossary" },
   { href: "/explore/labs", key: "labs" },
@@ -35,9 +35,15 @@ const RESOURCES: { href: string; key: Exclude<NavKey, "courses" | "challenges" |
   { href: "/explore/games", key: "games" },
   { href: "/explore/methods", key: "methods" },
   { href: "/explore/portfolios", key: "portfolios" },
+  // Blog ilgari yuqori panelda alohida turardi. Yo'riqnoma qo'shilgach
+  // panel 1280–1440px ekranlarda sig'may qoldi — blog shu ro'yxatga o'tdi.
+  { href: "/blog", key: "blog" },
 ];
 
-const TAIL: { href: string; key: NavKey }[] = [{ href: "/blog", key: "blog" }];
+// Yo'riqnoma yuqori panelda doim ko'rinadi — yangi foydalanuvchi uni birinchi qidiradi
+const TAIL: { href: string; key: NavKey }[] = [
+  { href: "/explore/guide", key: "guide" },
+];
 const EXTRA: { href: string; key: NavKey }[] = [{ href: "/explore/about", key: "about" }];
 
 /** Yuqori panelda doim ko'rinadigan asosiy bosqichlar */

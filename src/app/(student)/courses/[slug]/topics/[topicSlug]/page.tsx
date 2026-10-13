@@ -23,12 +23,22 @@ import {
   Clock,
   Coins,
   Lock,
+  Presentation,
 } from "lucide-react";
 import { cn, formatDuration } from "@/lib/utils";
 import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
 import ProtectedVideoPlayer from "@/components/video/ProtectedVideoPlayer";
 import TopicAudioPlayer from "@/components/courses/TopicAudioPlayer";
 import LabVisual, { hasLabVisual } from "@/components/labs/lessons/LabVisual";
+import dynamic from "next/dynamic";
+
+// Taqdimot faqat "Taqdimot" tabi ochilganda yuklanadi
+const SlideDeck = dynamic(() => import("@/components/courses/SlideDeck"), {
+  ssr: false,
+  loading: () => <div className="aspect-[16/10] rounded-3xl border border-border/60 bg-card/40 animate-pulse" />,
+});
+
+type LessonTab = "lesson" | "deck";
 
 export default function TopicPage() {
   const { slug, topicSlug } = useParams<{ slug: string; topicSlug: string }>();
@@ -45,6 +55,9 @@ export default function TopicPage() {
   const [showReflection, setShowReflection] = useState(false);
   const [reflectionDone, setReflectionDone] = useState(false);
   const [watchFrac, setWatchFrac] = useState(0); // video ko'rish ulushi (0–1)
+  const [tab, setTab] = useState<LessonTab>(() =>
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "taqdimot"
+      ? "deck" : "lesson");
 
   // Video bor va yetarlicha ko'rilganmi (90%+)? — "Ko'rdim" tugmasi shunga bog'liq
   const hasVideo = !!(topic?.video_url || topic?.video_id);
@@ -182,6 +195,21 @@ export default function TopicPage() {
   ].filter(s => s.has);
   const doneSteps = steps.filter(s => s.done).length;
 
+  // Taqdimot: ichki slaydlar ustun, bo'lmasa admin qo'ygan tashqi havola
+  const hasDeck = Array.isArray(topic.slides) && topic.slides.length > 0;
+  const hasPresentation = hasDeck || !!topic.presentation_url;
+  const hasLesson = !!topic.content_html || hasLabVisual(topic.slug);
+  const shownTab: LessonTab = !hasPresentation ? "lesson" : !hasLesson ? "deck" : tab;
+
+  function switchTab(next: LessonTab) {
+    setTab(next);
+    // Havola ulashilsa, o'sha tab ochilsin
+    const url = new URL(window.location.href);
+    if (next === "deck") url.searchParams.set("tab", "taqdimot");
+    else url.searchParams.delete("tab");
+    window.history.replaceState(null, "", url);
+  }
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Breadcrumb + progress tracker */}
@@ -311,11 +339,48 @@ export default function TopicPage() {
         </motion.div>
       )}
 
+      {/* Dars matni / Taqdimot — ikkalasi bo'lsagina tanlov ko'rinadi */}
+      {hasPresentation && hasLesson && (
+        <div role="tablist" aria-label={topic.title} className="inline-flex p-1 rounded-2xl border border-border/60 bg-card/40">
+          {([
+            ["lesson", t.courses.topic.lessonTab, FileText],
+            ["deck", t.courses.topic.presentation, Presentation],
+          ] as const).map(([key, label, Icon]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={shownTab === key}
+              onClick={() => switchTab(key)}
+              className={cn(
+                "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors",
+                shownTab === key ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Icon className="w-4 h-4" /> {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Taqdimot */}
+      {shownTab === "deck" && (
+        hasDeck ? (
+          <SlideDeck slides={topic.slides!} title={topic.title} />
+        ) : (
+          <div className="rounded-3xl border border-border/60 bg-card/40 overflow-hidden">
+            <div className="aspect-[16/10]">
+              <iframe src={topic.presentation_url!} className="w-full h-full" title={topic.title} />
+            </div>
+          </div>
+        )
+      )}
+
       {/* Laboratoriya darslari: matndan oldin interaktiv vizual tajriba */}
-      {hasLabVisual(topic.slug) && <LabVisual topicSlug={topic.slug} />}
+      {shownTab === "lesson" && hasLabVisual(topic.slug) && <LabVisual topicSlug={topic.slug} />}
 
       {/* Content */}
-      {topic.content_html && (
+      {shownTab === "lesson" && topic.content_html && (
         <motion.div
           className="rounded-3xl border border-border/60 bg-card/40 p-6 md:p-10"
           initial={{ opacity: 0, y: 20 }}
@@ -342,23 +407,6 @@ export default function TopicPage() {
               prose-hr:border-border/60"
             dangerouslySetInnerHTML={{ __html: topic.content_html }}
           />
-        </motion.div>
-      )}
-
-      {/* Presentation */}
-      {topic.presentation_url && (
-        <motion.div
-          className="rounded-3xl border border-border/60 bg-card/40 overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
-          <div className="px-5 py-3 border-b border-border/50 inline-flex items-center gap-2 text-sm font-semibold">
-            <FileText className="w-4 h-4 text-neon-yellow" /> {t.courses.topic.presentation}
-          </div>
-          <div className="aspect-[16/10]">
-            <iframe src={topic.presentation_url} className="w-full h-full" />
-          </div>
         </motion.div>
       )}
 

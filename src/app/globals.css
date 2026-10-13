@@ -331,8 +331,17 @@
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Global overflow fix */
+/* Global overflow fix
+ *
+ * `hidden` gorizontal toshishni yashiradi, lekin elementni aylantirish
+ * konteyneriga aylantiradi — natijada sahifadagi hamma `position: sticky`
+ * (yo'riqnoma mundarijasi, jadval sarlavhalari) ishlamay qolardi.
+ * `clip` xuddi shunday kesadi, lekin aylantirish konteyneri yaratmaydi.
+ * `clip` ni bilmaydigan eski brauzerlarda (Safari < 16) `hidden` qoladi. */
 html, body { overflow-x: hidden; max-width: 100vw; }
+@supports (overflow: clip) {
+  html, body { overflow-x: clip; }
+}
 
 /* ===== Mobil moslashuv ===== */
 @media (max-width: 640px) {
@@ -348,9 +357,137 @@ html, body { overflow-x: hidden; max-width: 100vw; }
   }
 }
 
-/* Prose ichidagi rasmlar/jadvallar (dars matni) toshib ketmasin */
-.prose img { height: auto; }
-.prose table { display: block; overflow-x: auto; }
+/* ===== Taqdimot varag'i (SlideDeck) =====
+ * Katak daftar: 24px katakli nozik to'r. Chiziqlar tema chegarasi
+ * rangidan olinadi — yorug' rejimda qog'oz, qorong'ida doska kabi. */
+.deck-paper {
+  background-color: hsl(var(--card));
+  background-image:
+    linear-gradient(hsl(var(--border) / 0.55) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.55) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+
+/* ===== Dars matni tipografiyasi (.prose) =====
+ *
+ * Komponentlarda `prose prose-invert prose-headings:...` klasslari bor,
+ * lekin @tailwindcss/typography plagini loyihada O'RNATILMAGAN — ular
+ * hech narsa qilmasdi va bazadagi HTML (dars matni, blog, olimpiada
+ * shartlari) brauzerning xom uslubida chiqardi: jadvalda chiziq yo'q,
+ * kod blokida fon yo'q, sarlavhalar matnga yopishib turadi.
+ *
+ * Plaginni o'rnatish yechim emas: `prose-invert` hamma joyda qotirilgan
+ * va yorug' rejimda matnni oqartirib yuborardi. Shuning uchun uslub shu
+ * yerda, tema tokenlari orqali — light va dark'da avtomatik moslashadi.
+ */
+.prose { color: hsl(var(--foreground) / 0.88); line-height: 1.75; font-size: 1rem; }
+.prose > :first-child { margin-top: 0; }
+.prose > :last-child { margin-bottom: 0; }
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: var(--font-display), Sora, system-ui, sans-serif;
+  color: hsl(var(--foreground));
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+.prose h1 { font-size: 1.85rem; margin: 2rem 0 1rem; }
+.prose h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem; padding-bottom: 0.45rem; border-bottom: 1px solid hsl(var(--border)); }
+.prose h3 { font-size: 1.15rem; margin: 1.8rem 0 0.6rem; }
+.prose h4 { font-size: 1rem; margin: 1.4rem 0 0.5rem; }
+
+.prose p { margin: 0.85rem 0; }
+.prose strong, .prose b { color: hsl(var(--foreground)); font-weight: 650; }
+.prose a { color: hsl(var(--brand-purple)); font-weight: 500; text-underline-offset: 3px; }
+.prose a:hover { text-decoration: underline; }
+
+.prose ul, .prose ol { margin: 0.85rem 0; padding-left: 1.4rem; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li { margin: 0.35rem 0; padding-left: 0.2rem; }
+.prose li::marker { color: hsl(var(--brand-purple) / 0.7); font-weight: 600; }
+.prose li > ul, .prose li > ol { margin: 0.3rem 0; }
+
+/* Satr ichidagi kod */
+.prose :not(pre) > code {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.875em;
+  color: hsl(var(--brand-green));
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  padding: 0.1em 0.4em;
+  border-radius: 0.375rem;
+  white-space: nowrap;
+}
+
+/* Kod bloki — har ikki rejimda ham qorong'i, kod muharririga o'xshab */
+.prose pre {
+  margin: 1.1rem 0;
+  padding: 1rem 1.15rem;
+  background: #0f1420;
+  color: #e6edf3;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.875rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+.prose pre code {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  background: none; border: 0; padding: 0; color: inherit; white-space: pre;
+}
+
+/* Jadval: chiziqli, sarlavha qatori ajralib turadi, satrlar navbatma-navbat.
+ * display:block — tor ekranda jadval sahifani emas, o'zini aylantiradi.
+ * Shu sabab border-collapse ishlamaydi: chiziqlar katakchalarga beriladi. */
+.prose table {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1.2rem 0;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  border-spacing: 0;
+  font-size: 0.925rem;
+  line-height: 1.5;
+}
+.prose th, .prose td {
+  padding: 0.55rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid hsl(var(--border));
+  border-right: 1px solid hsl(var(--border));
+}
+.prose tr > :last-child { border-right: 0; }
+.prose tr:last-child > * { border-bottom: 0; }
+.prose th {
+  background: hsl(var(--surface));
+  color: hsl(var(--foreground));
+  font-weight: 650;
+  white-space: nowrap;
+}
+.prose td { color: hsl(var(--foreground) / 0.85); }
+.prose tr:nth-child(even) > td { background: hsl(var(--surface) / 0.55); }
+.prose td code, .prose th code { white-space: nowrap; }
+
+.prose blockquote {
+  margin: 1.1rem 0;
+  padding: 0.6rem 1rem;
+  border-left: 3px solid hsl(var(--brand-purple));
+  background: hsl(var(--brand-purple) / 0.05);
+  border-radius: 0 0.75rem 0.75rem 0;
+  color: hsl(var(--foreground) / 0.8);
+}
+.prose hr { margin: 2rem 0; border: 0; border-top: 1px solid hsl(var(--border)); }
+.prose img { height: auto; border-radius: 1rem; border: 1px solid hsl(var(--border)); margin: 1.2rem auto; }
+
+@media (max-width: 640px) {
+  .prose h2 { font-size: 1.25rem; }
+  .prose h3 { font-size: 1.06rem; }
+  .prose pre { font-size: 0.8rem; padding: 0.85rem; }
+}
 
 /* Harakatni kamaytirish sozlamasi hurmat qilinadi */
 @media (prefers-reduced-motion: reduce) {

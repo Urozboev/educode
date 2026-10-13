@@ -42,7 +42,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
   const dashboardUrl = user?.role === "admin" ? "/a-dashboard" : user?.role === "teacher" ? "/t-dashboard" : "/dashboard";
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background overflow-x-hidden supports-[overflow:clip]:overflow-x-clip">
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
@@ -161,7 +161,7 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
           )}
         </AnimatePresence>
       </nav>
-      <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6"><div className="max-w-6xl mx-auto overflow-x-hidden">{children}</div></main>
+      <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6"><div className="max-w-6xl mx-auto overflow-x-hidden supports-[overflow:clip]:overflow-x-clip">{children}</div></main>
     </div>
   );
 }

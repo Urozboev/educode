@@ -60,6 +60,11 @@ oldingisiga tayanadi.
 | 70 | `70_laboratoriya_ishlar_7_12.sql` | Laboratoriya: 7-12 ishlar + 24 test + 18 topshiriq |
 | 71 | `71_kurs_mavzular_soni_trigger.sql` | Kurs kartasidagi "N dars" trigger orqali avtomatik sanaladi + mavjud sonlar tiklanadi |
 | 72 | `72_about_muallif_rasmi.sql` | "Biz haqimizda" muallif rasmi `/images/about/muallif.jpg` ga ulanadi (deploy'dan KEYIN) |
+| 73 | `73_mavzu_taqdimotlari.sql` | `topics.slides` ustuni — mavzu sahifasidagi "Taqdimot" tabi uchun |
+| 74 | `74_taqdimotlar_maruza.sql` | Ma'ruza: 20 ta mavzu taqdimoti (203 slayd) — 73 dan keyin |
+| 75 | `75_taqdimotlar_amaliyot.sql` | Amaliyot: 12 ta taqdimot (111 slayd) — 73 dan keyin |
+| 76 | `76_taqdimotlar_lab.sql` | Laboratoriya: 12 ta taqdimot (99 slayd) — 73 dan keyin |
+| 77 | `77_maruza_kirish_mavzulari.sql` | Ma'ruzaning 1-2 kirish mavzulari: to'liq matn, 12 test, 6 topshiriq |
 
 > 61-64 raqamlari ikki marta ishlatilgan (tarjimalar va tuzatishlar). Ular
 > bir-biriga bog'liq emas — qaysi tartibda ishga tushirilsa ham bo'ladi.

@@ -10,7 +10,7 @@ import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
 import { LayoutDashboard, Users, ClipboardList, BarChart3,
   Download, LogOut, Moon, Sun, ChevronLeft, Menu,
-  Library, BookMarked, Lightbulb, Gamepad2, School, Gift
+  Library, BookMarked, Lightbulb, Gamepad2, School, Gift, LifeBuoy
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,6 +31,7 @@ const teacherLinks = (t: Dictionary) => [
   { href: "/t-books", label: t.nav.books, icon: Library },
   { href: "/t-glossary", label: t.nav.glossary, icon: BookMarked },
   { href: "/t-export", label: t.teacher.export, icon: Download },
+  { href: "/explore/guide", label: t.nav.guide, icon: LifeBuoy },
 ];
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {

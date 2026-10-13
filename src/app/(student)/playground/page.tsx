@@ -188,6 +188,8 @@ function fixPyLineNumbers(stderr: string): string {
   return stderr.replace(/line (\d+)/g, (_, n) => `line ${Math.max(1, parseInt(n) - 1)}`);
 }
 
+const PLAYGROUND_PREFILL_KEY = "playground:prefill";
+
 export default function PlaygroundPage() {
   const { t } = useI18n();
   // Namunalar lug'atdan yasaladi. `useMemo` — har render'da yangi
@@ -234,6 +236,26 @@ export default function PlaygroundPage() {
     if (mos && mos !== lang) setLang(mos);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [languages]);
+
+  /**
+   * Taqdimotdagi "Playground'da sinash" tugmasi kodni shu kalit orqali
+   * uzatadi (src/components/courses/SlideDeck.tsx). Bir marta o'qiladi va
+   * o'chiriladi — sahifa yangilanganda foydalanuvchi yozgani ustiga
+   * yozilib ketmasligi uchun.
+   */
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(PLAYGROUND_PREFILL_KEY);
+      if (!raw) return;
+      sessionStorage.removeItem(PLAYGROUND_PREFILL_KEY);
+      const python = languages.find((l) => l.id === "python");
+      if (python) setLang(python);
+      setCode(raw);
+    } catch {
+      /* sessionStorage yopiq bo'lsa — oddiy namuna bilan ochiladi */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Inline input paydo bo'lganda avtofokus + scroll
   useEffect(() => {

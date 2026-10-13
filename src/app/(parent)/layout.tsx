@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/lib/supabase/user";
 import { getOrCreateProfile } from "@/lib/profile";
 import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
-import { LayoutDashboard, Coins, LogOut, Moon, Sun, ChevronLeft, Menu,
+import { LayoutDashboard, Coins, LogOut, Moon, Sun, ChevronLeft, Menu, LifeBuoy,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +22,7 @@ import { BrandMark } from "@/components/brand/BrandMark";
 const parentLinks = (t: Dictionary) => [
   { href: "/p-dashboard", label: t.cabinet.dashboard, icon: LayoutDashboard },
   { href: "/p-coins", label: t.parent.coins, icon: Coins },
+  { href: "/explore/guide", label: t.nav.guide, icon: LifeBuoy },
 ];
 
 export default function ParentLayout({ children }: { children: React.ReactNode }) {

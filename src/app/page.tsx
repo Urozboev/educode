@@ -20,6 +20,7 @@ import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { BrandMark } from "@/components/brand/BrandMark";
+import HomeGuideSection from "@/components/guide/HomeGuideSection";
 
 const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -567,7 +568,8 @@ export default function LandingPage() {
 
       {/* ========== NAVBAR ========== */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-2xl border-b border-border/40">
-        <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+        {/* Kenglik explore va kabinet navbar'lari bilan bir xil (max-w-7xl) — 6xl da menyu sig'mas edi */}
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="w-9 h-9 rounded-xl bg-hero-gradient flex items-center justify-center shadow-lg shadow-neon-purple/20 group-hover:shadow-neon-purple/40 transition-shadow">
               <BrandMark className="w-5 h-5 text-white" />
@@ -743,6 +745,9 @@ export default function LandingPage() {
 
       {/* ========== TIL LOGOLARI MARQUEE ========== */}
       <LangMarquee />
+
+      {/* ========== YO'RIQNOMA — tanishtiruv videosi va mavzular ========== */}
+      <HomeGuideSection />
 
       {/* ========== FEATURES — BENTO GRID ========== */}
       <section className="py-20 px-5">
