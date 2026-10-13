@@ -1435,6 +1435,9 @@ export const ru: Dictionary = {
   },
 
   misc: {
+    restoredAccepted: "Загружено ваше принятое решение",
+    restoredLast: "Загружена ваша последняя попытка",
+    restoreReset: "Вернуть исходный код",
     aiWarning: "AI иногда ошибается — проверяйте ответ самостоятельно.",
     balanceTitle: "Здоровый баланс с AI",
     todayAiQuestions: "Вопросов к AI сегодня",

@@ -1443,6 +1443,9 @@ export const kaa: Dictionary = {
   },
 
   misc: {
+    restoredAccepted: "Qabıl etilgen sheshimińiz júklendi",
+    restoredLast: "Aqırǵı urınıwıńız júklendi",
+    restoreReset: "Baslanǵısh kodqa qaytarıw",
     aiWarning: "AI geyde qátelesiwi múmkin — juwaptı ózińiz tekseriń.",
     balanceTitle: "AI menen saw teńsalmaqlıq",
     todayAiQuestions: "Búgingi AI sorawları",

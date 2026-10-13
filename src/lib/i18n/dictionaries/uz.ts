@@ -1454,6 +1454,9 @@ export const uz = {
 
   /** AI halolligi, kod muharriri, kutubxona, video — qolgan komponentlar */
   misc: {
+    restoredAccepted: "Qabul qilingan yechimingiz yuklandi",
+    restoredLast: "Oxirgi urinishingiz yuklandi",
+    restoreReset: "Boshlang'ich kodga qaytarish",
     aiWarning: "AI ba'zan xato qilishi mumkin — javobni mustaqil tekshiring.",
     balanceTitle: "AI bilan sog'lom muvozanat",
     todayAiQuestions: "Bugun AI savollari",

@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import type { TopicTask, SubmissionTestResult } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, CheckCircle2 } from "lucide-react";
 import { cn, getDifficultyConfig } from "@/lib/utils";
 import { AILabel, AIDisclaimer } from "@/components/ai/AILabel";
 import HintTier from "@/components/ai/HintTier";
@@ -33,6 +33,12 @@ export default function TaskPage() {
   const [topicId, setTopicId] = useState("");
   const [courseId, setCourseId] = useState("");
   const [userId, setUserId] = useState("");
+  /**
+   * Allaqachon qabul qilingan topshiriqlar. Ularda "avval reja yozing"
+   * bosqichi qayta so'ralmaydi — talaba yechimini ko'rish yoki
+   * yaxshilash uchun qaytgan, rejani esa birinchi safar yozgan.
+   */
+  const [solved, setSolved] = useState<Set<string>>(new Set());
   const { locale, t } = useI18n();
 
   useEffect(() => {
@@ -48,6 +54,16 @@ export default function TaskPage() {
       if (data && data.length > 0) {
         const tr = await withTranslations(supabase, "topic_tasks", data as TopicTask[], locale);
         setTasks(tr); setCurrentTask(tr[0]);
+        if (user) {
+          const { data: subs } = await supabase
+            .from("submissions")
+            .select("task_id")
+            .eq("user_id", user.id)
+            .eq("task_type", "topic_task")
+            .eq("status", "accepted")
+            .in("task_id", tr.map((x) => x.id));
+          if (subs) setSolved(new Set(subs.map((s) => s.task_id as string)));
+        }
       }
       setLoading(false);
     })();
@@ -56,6 +72,7 @@ export default function TaskPage() {
   async function handleSubmit(code: string, results: SubmissionTestResult[]) {
     const allPassed = results.every(r => r.passed);
     if (allPassed) {
+      if (currentTask) setSolved((s) => new Set(s).add(currentTask.id));
       await supabase.from("topic_progress").update({ tasks_completed: true }).eq("user_id", userId).eq("topic_id", topicId);
       // Tugatishni tekshirish
       const { data: prog } = await supabase.from("topic_progress").select("*").eq("user_id", userId).eq("topic_id", topicId).single();
@@ -108,17 +125,21 @@ export default function TaskPage() {
           <div className="flex gap-2">
             {tasks.map((t, i) => (
               <button key={t.id} onClick={() => { setCurrentTask(t); setAiFeedback(""); setAiFeedbackMeta(null); setCodeUnlocked(t.difficulty === 'easy'); }}
-                className={cn("w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center transition-all",
+                title={solved.has(t.id) ? `${t.title} ✓` : t.title}
+                className={cn("relative w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center transition-all",
                   currentTask.id === t.id ? "bg-neon-purple text-white" : "bg-surface text-muted-foreground hover:bg-surface-hover")}>
                 {i + 1}
+                {solved.has(t.id) && (
+                  <CheckCircle2 className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 text-neon-green bg-background rounded-full" />
+                )}
               </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* Plan-First flow (medium/hard uchun majburiy, easy uchun yashirin) */}
-      {currentTask.difficulty !== 'easy' && (
+      {/* Plan-First flow (medium/hard uchun majburiy, easy va yechilganlar uchun yashirin) */}
+      {currentTask.difficulty !== 'easy' && !solved.has(currentTask.id) && (
         <PlanFirstFlow
           key={currentTask.id}
           taskId={currentTask.id}
@@ -167,7 +188,7 @@ export default function TaskPage() {
 
         {/* Right: Code Editor */}
         <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-          {currentTask.difficulty !== 'easy' && !codeUnlocked ? (
+          {currentTask.difficulty !== 'easy' && !codeUnlocked && !solved.has(currentTask.id) ? (
             <div className="glass-card flex flex-col items-center justify-center text-center p-8 h-[460px]">
               <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center mb-3">
                 <Sparkles className="w-6 h-6 text-neon-purple" />

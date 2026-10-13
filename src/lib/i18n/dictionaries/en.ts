@@ -1435,6 +1435,9 @@ export const en: Dictionary = {
   },
 
   misc: {
+    restoredAccepted: "Your accepted solution is loaded",
+    restoredLast: "Your last attempt is loaded",
+    restoreReset: "Back to starter code",
     aiWarning: "The AI can be wrong — check its answer yourself.",
     balanceTitle: "A healthy balance with AI",
     todayAiQuestions: "AI questions today",

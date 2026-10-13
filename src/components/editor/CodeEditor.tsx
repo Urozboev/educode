@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Editor from "@monaco-editor/react";
-import { cn } from "@/lib/utils";
+import { cn, formatDateTime } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { getCurrentUser } from "@/lib/supabase/user";
 import type { SupportedLanguage, TestCase, SubmissionTestResult } from "@/types";
@@ -33,7 +33,7 @@ export default function CodeEditor({
   language, starterCode = "", testCases = [], taskId, taskType,
   onSubmit, onAIFeedback, readOnly = false, height = "400px",
 }: CodeEditorProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const supabase = createClient();
   const [code, setCode] = useState(starterCode);
   const [output, setOutput] = useState("");
@@ -66,6 +66,59 @@ export default function CodeEditor({
   useEffect(() => { if (language === "python") loadPyodide(); }, [language]);
 
   /**
+   * Avvalgi yechimni tiklash.
+   *
+   * Talaba topshiriqni yechib, tizimdan chiqib, keyin qaytsa — muharrirda
+   * yana boshlang'ich kod turardi va yozgani "yo'qolgandek" ko'rinardi.
+   * Kod `submissions` da saqlanadi, shu yerdan o'qiymiz: avval oxirgi
+   * qabul qilingan yechim, u bo'lmasa — oxirgi urinish. Til bo'yicha
+   * filtrlanadi: JavaScript yechimi Python muharririga tushmasin.
+   *
+   * Talaba yuklanish tugashidan oldin yozishni boshlagan bo'lsa, uning
+   * kodi ustiga yozilmaydi.
+   */
+  const edited = useRef(false);
+  const [restored, setRestored] = useState<{ accepted: boolean; at: string } | null>(null);
+
+  // `starterCode` ni ref'da ushlaymiz: effekt faqat topshiriq yoki til
+  // almashganda ishlasin, ota komponent har render'da yangi satr bersa ham
+  const starterRef = useRef(starterCode);
+  starterRef.current = starterCode;
+
+  useEffect(() => {
+    edited.current = false;
+    setRestored(null);
+    // Komponent topshiriqlar orasida qayta yaratilmaydi — avvalgi
+    // topshiriqning kodi va natijalari yangisida qolib ketmasin
+    setCode(starterRef.current);
+    setOutput("");
+    setTestResults([]);
+    if (!taskId || readOnly) return;
+    let bekor = false;
+    (async () => {
+      const user = await getCurrentUser(supabase);
+      if (!user || bekor) return;
+      const base = () => supabase
+        .from("submissions")
+        .select("code, status, created_at")
+        .eq("user_id", user.id)
+        .eq("task_id", taskId)
+        .eq("task_type", taskType || "topic_task")
+        .eq("language", language)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      let { data } = await base().eq("status", "accepted");
+      if (!data?.length) ({ data } = await base());
+      const sub = data?.[0];
+      if (bekor || !sub?.code || edited.current) return;
+      setCode(sub.code);
+      setRestored({ accepted: sub.status === "accepted", at: sub.created_at });
+    })();
+    return () => { bekor = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId, taskType, language, readOnly]);
+
+  /**
    * Masala almashganda paste sanog'ini nolga tushiramiz.
    *
    * Olimpiadada A masaladan B ga o'tilganda marshrut o'zgaradi, lekin
@@ -81,7 +134,8 @@ export default function CodeEditor({
   useEffect(() => {
     if (!taskId) return;
     const interval = setInterval(async () => {
-      if (!code || code === starterCode) return;
+      // Faqat talaba haqiqatan yozganda — tiklangan yoki boshlang'ich kod snapshot qilinmaydi
+      if (!code || code === starterCode || !edited.current) return;
       try {
         const user = await getCurrentUser(supabase);
         if (!user) return;
@@ -434,7 +488,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
   }
 
   function handleCopy() { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); }
-  function handleReset() { setCode(starterCode); setOutput(""); setTestResults([]); }
+  function handleReset() { setCode(starterCode); setOutput(""); setTestResults([]); setRestored(null); edited.current = true; }
 
   const passedCount = testResults.filter(r => r.passed).length;
   const allPassed = testResults.length > 0 && passedCount === testResults.length;
@@ -454,6 +508,23 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         </div>
       </div>
 
+      {/* Avvalgi yechim tiklandi */}
+      {restored && (
+        <div className={cn(
+          "px-4 py-2 border-b flex flex-wrap items-center justify-between gap-2 text-xs",
+          restored.accepted ? "bg-neon-green/[0.07] border-neon-green/20" : "bg-neon-blue/[0.06] border-neon-blue/20",
+        )}>
+          <span className={cn("inline-flex items-center gap-1.5 font-medium", restored.accepted ? "text-neon-green" : "text-neon-blue")}>
+            {restored.accepted ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
+            {restored.accepted ? t.misc.restoredAccepted : t.misc.restoredLast}
+            <span className="text-muted-foreground font-normal">· {formatDateTime(restored.at, locale)}</span>
+          </span>
+          <button onClick={handleReset} className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
+            <RotateCcw className="w-3 h-3" /> {t.misc.restoreReset}
+          </button>
+        </div>
+      )}
+
       {/* stdin ko'rsatma */}
       {testCases.length > 0 && (
         <div className="px-4 py-1.5 bg-neon-yellow/5 border-b border-neon-yellow/10 flex items-center gap-2">
@@ -469,7 +540,7 @@ catch(e){parent.postMessage({type:'exec_done',r:{stdout:_o.join('\\n'),stderr:e.
         height={height}
         language={language === "python" ? "python" : "javascript"}
         value={code}
-        onChange={val => setCode(val || "")}
+        onChange={val => { edited.current = true; setCode(val || ""); }}
         onMount={(editor) => {
           editor.onDidPaste(async (e: any) => {
             const pastedText = editor.getModel()?.getValueInRange(e.range) || "";
