@@ -4,7 +4,9 @@
  * Har bir page'ga qo'shiladi va Google "rich result" beradi.
  */
 
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, ORG_SOCIAL, absUrl } from "@/lib/seo";
+import {
+  SITE_URL, SITE_NAME, SITE_DESCRIPTION, ORG_SOCIAL, BRAND_ALIASES, absUrl,
+} from "@/lib/seo";
 
 function Json({ data }: { data: object }) {
   return (
@@ -24,7 +26,10 @@ export function OrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     name: SITE_NAME,
-    alternateName: "MirAcademy miracademy.uz",
+    // Massiv shaklida: har bir variant alohida nom sifatida o'qiladi.
+    // Ilgari hammasi bitta satrda edi ("MirAcademy miracademy.uz") —
+    // Google buni bitta g'alati nom deb qabul qilardi.
+    alternateName: BRAND_ALIASES,
     url: SITE_URL,
     logo: absUrl("/icon-512.png"),
     description: SITE_DESCRIPTION,
@@ -33,7 +38,7 @@ export function OrganizationJsonLd() {
       "@type": "PostalAddress",
       addressCountry: "UZ",
     },
-    inLanguage: ["uz", "en"],
+    inLanguage: ["uz", "ru", "en", "kaa"],
   };
   return <Json data={data} />;
 }
@@ -46,6 +51,7 @@ export function WebsiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
+    alternateName: BRAND_ALIASES,
     url: SITE_URL,
     inLanguage: "uz-UZ",
     potentialAction: {

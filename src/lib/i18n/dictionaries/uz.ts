@@ -1866,6 +1866,7 @@ export const uz = {
     view: "Ko'rish",
     tryPlayground: "Playground sinab ko'rish",
     footerAbout2: "Raqamli intellektual ta'lim platformasi. Dasturlash tillarini interaktiv kurslar, AI yordamchi va o'yinlar orqali o'rganing.",
+    footerBrandAliases: "MirAcademy platformasi Mir Akademiya, MirAkademiy va Miracademiy nomlari bilan ham qidiriladi.",
     coinsGifts: "Coin va sovg'alar",
     proCertificate: "Professional sertifikat",
     sevenGames3d: "7 ta interaktiv o'yin (3D bilan)",

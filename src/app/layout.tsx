@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import {
   SITE_URL,
   SITE_NAME,
+  SITE_TITLE,
   SITE_TAGLINE,
   SITE_DESCRIPTION,
   DEFAULT_KEYWORDS,
@@ -47,7 +48,10 @@ const fontMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    // Qidiruv natijasidagi sarlavha brend variantini ham o'z ichiga oladi,
+    // chunki foydalanuvchilar nomni "mirakademiy"/"mir akademiya" shaklida
+    // ham qidiradi. Ijtimoiy tarmoqlar uchun quyida shior saqlanadi.
+    default: SITE_TITLE,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,

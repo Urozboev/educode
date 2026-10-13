@@ -15,21 +15,62 @@ export const SITE_URL = (
 export const SITE_NAME = "MirAcademy";
 export const SITE_BRAND_FULL = "MirAcademy (miracademy.uz)";
 export const SITE_TAGLINE = "Dasturlashni o'ynab o'rgan";
-export const SITE_DESCRIPTION =
-  "Raqamli intellektual ta'lim platformasi. Dasturlash tillarini interaktiv kurslar, AI Sokratik mentor va gamifikatsiya orqali o'rganing. Python, JavaScript, HTML/CSS, algoritmlar — o'zbek tilida bepul.";
 
+/**
+ * Brend nomining boshqa yozilish shakllari.
+ *
+ * Foydalanuvchilar nomni turlicha qidiradi: "mirakademiy", "mir akademiya",
+ * "мир академия". Google bu shakllarni bitta brendga bog'lashi uchun ular
+ * Organization sxemasidagi `alternateName` da sanab o'tiladi — bu rasmiy
+ * signal. Faqat meta keywords yetarli emas: Google uni 2009-yildan beri
+ * hisobga olmaydi.
+ *
+ * Ro'yxat tabiiy yozilish shakllari bilan cheklangan. Mavjud bo'lmagan
+ * variantlarni to'plash spam sifatida baholanishi mumkin.
+ */
+export const BRAND_ALIASES = [
+  "Mir Academy",
+  "MirAkademiy",
+  "Mir Akademiy",
+  "Miracademiy",
+  "Mir Akademiya",
+  "MirAkademiya",
+  "Мир Академия",
+  "МирАкадемия",
+  "Мир Академи",
+  "miracademy.uz",
+];
+
+/** Qidiruv natijasida ko'rinadigan asosiy sarlavha. */
+export const SITE_TITLE = `${SITE_NAME} (Mir Akademiya) — onlayn ta'lim platformasi`;
+
+/**
+ * Meta description. Google taxminan 160 belgini ko'rsatadi, shuning uchun
+ * eng muhim so'zlar — brend nomi va uning varianti — boshida turadi.
+ */
+export const SITE_DESCRIPTION =
+  "MirAcademy (Mir Akademiya) — onlayn ta'lim va dasturlash kurslari. Python, JavaScript, HTML/CSS va algoritmlarni AI mentor bilan o'zbek tilida o'rganing.";
+
+/**
+ * Meta keywords. Google buni reyting omili sifatida ishlatmaydi, lekin
+ * Yandex va ba'zi mahalliy qidiruv tizimlari hali hisobga oladi —
+ * shuning uchun brend variantlari shu yerda ham saqlanadi.
+ */
 export const DEFAULT_KEYWORDS = [
+  // Brend va uning yozilish shakllari
+  "MirAcademy",
+  ...BRAND_ALIASES,
+  // Yo'nalish
   "dasturlash",
   "dasturlash kurslari",
   "online dasturlash",
+  "onlayn ta'lim",
   "python o'rganish",
   "javascript o'rganish",
   "html css o'zbek tilida",
   "kompyuter savodxonligi",
   "prompt engineering",
   "AI bilan dasturlash",
-  "MirAcademy",
-  "miracademy.uz",
   "ta'lim platformasi",
   "IT kurslari O'zbekistonda",
   "bepul dasturlash",

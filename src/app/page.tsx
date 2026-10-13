@@ -1213,6 +1213,12 @@ export default function LandingPage() {
               <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
                 {t.home.footerAbout2}
               </p>
+              {/* Brend nomining boshqa yozilish shakllari — qidiruv tizimlari
+                  ularni bitta brendga bog'lashi uchun tabiiy matnda ham
+                  uchrashi kerak (JsonLd dagi alternateName ni to'ldiradi). */}
+              <p className="text-xs text-muted-foreground/70 leading-relaxed max-w-sm mt-2">
+                {t.home.footerBrandAliases}
+              </p>
             </div>
             <div>
               <h4 className="font-semibold text-sm mb-3">{t.home.footerPlatform}</h4>

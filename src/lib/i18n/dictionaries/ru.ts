@@ -1844,6 +1844,7 @@ export const ru: Dictionary = {
     view: "Открыть",
     tryPlayground: "Попробовать песочницу",
     footerAbout2: "Цифровая образовательная платформа. Изучайте языки программирования через интерактивные курсы, AI-помощника и игры.",
+    footerBrandAliases: "Платформу MirAcademy также ищут как Мир Академия, МирАкадемия и Miracademiy.",
     coinsGifts: "Монеты и подарки",
     proCertificate: "Профессиональный сертификат",
     sevenGames3d: "7 интерактивных игр (включая 3D)",

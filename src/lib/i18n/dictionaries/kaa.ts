@@ -1852,6 +1852,7 @@ export const kaa: Dictionary = {
     view: "Kóriw",
     tryPlayground: "Playground sınap kóriw",
     footerAbout2: "Sanlı intellektual bilimlendiriw platforması. Programmalastırıw tillerin interaktiv kurslar, AI járdemshi hám oyınlar arqalı úyreniń.",
+    footerBrandAliases: "MirAcademy platforması Mir Akademiya, MirAkademiy hám Miracademiy atları menen de izlenedi.",
     coinsGifts: "Coin hám sıylıqlar",
     proCertificate: "Kásiplik sertifikat",
     sevenGames3d: "7 interaktiv oyın (3D menen)",

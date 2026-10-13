@@ -1844,6 +1844,7 @@ export const en: Dictionary = {
     view: "Open",
     tryPlayground: "Try the playground",
     footerAbout2: "A digital learning platform. Learn programming languages through interactive courses, an AI assistant and games.",
+    footerBrandAliases: "MirAcademy is also known as Mir Academy, MirAkademiy and Mir Akademiya.",
     coinsGifts: "Coins and rewards",
     proCertificate: "A professional certificate",
     sevenGames3d: "7 interactive games (including 3D)",
