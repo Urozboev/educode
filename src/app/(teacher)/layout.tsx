@@ -10,7 +10,7 @@ import { cn, getInitials } from "@/lib/utils";
 import type { Profile } from "@/types";
 import { LayoutDashboard, Users, ClipboardList, BarChart3,
   Download, LogOut, Moon, Sun, ChevronLeft, Menu,
-  Library, BookMarked, Lightbulb, Gamepad2, School, Gift, LifeBuoy
+  Library, BookMarked, Lightbulb, Gamepad2, School, Gift, LifeBuoy, FileCheck2
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +24,7 @@ const teacherLinks = (t: Dictionary) => [
   { href: "/t-groups", label: t.teacher.groups, icon: School },
   { href: "/t-students", label: t.teacher.myStudents, icon: Users },
   { href: "/t-assignments", label: t.nav.challenges, icon: ClipboardList },
+  { href: "/t-reports", label: t.teacher.reports, icon: FileCheck2 },
   { href: "/t-analytics", label: t.teacher.analytics, icon: BarChart3 },
   { href: "/t-lesson-games", label: t.nav.lessonGames, icon: Gamepad2 },
   { href: "/t-store", label: t.teacher.myGifts, icon: Gift },

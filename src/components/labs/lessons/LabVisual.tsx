@@ -6,6 +6,7 @@ import { FlaskConical, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { NET_VISUALS } from "../net/registry";
 
 /**
  * Laboratoriya darslari uchun interaktiv vizual tajriba.
@@ -27,6 +28,8 @@ const LAB_VISUALS: Record<string, React.ComponentType> = {
   "lab-4-shartlar": dynamic(() => import("./ConditionsViz"), { ssr: false, loading }),
   "lab-5-while": dynamic(() => import("./WhileViz"), { ssr: false, loading }),
   "lab-6-funksiyalar": dynamic(() => import("./FunctionsViz"), { ssr: false, loading }),
+  // "Kompyuter tarmoqlari" fanining 44 ta mavzusi — net/registry.tsx da
+  ...NET_VISUALS,
 };
 
 export function hasLabVisual(topicSlug: string): boolean {

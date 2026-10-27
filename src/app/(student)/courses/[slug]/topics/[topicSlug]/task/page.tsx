@@ -12,13 +12,18 @@ import dynamic from "next/dynamic";
 import type { TopicTask, SubmissionTestResult } from "@/types";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Sparkles, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, CheckCircle2, Clock } from "lucide-react";
 import { cn, getDifficultyConfig } from "@/lib/utils";
 import { AILabel, AIDisclaimer } from "@/components/ai/AILabel";
 import HintTier from "@/components/ai/HintTier";
 import PlanFirstFlow from "@/components/ai/PlanFirstFlow";
+import AnswerTask from "@/components/tasks/AnswerTask";
+import ReportTask from "@/components/tasks/ReportTask";
 
 const CodeEditor = dynamic(() => import("@/components/editor/CodeEditor"), { ssr: false });
+
+/** Eski yozuvlarda `task_kind` bo'lmaydi — ular kod topshirig'i. */
+const kindOf = (task: TopicTask) => task.task_kind ?? "code";
 
 export default function TaskPage() {
   const { slug, topicSlug } = useParams<{ slug: string; topicSlug: string }>();
@@ -39,6 +44,8 @@ export default function TaskPage() {
    * yaxshilash uchun qaytgan, rejani esa birinchi safar yozgan.
    */
   const [solved, setSolved] = useState<Set<string>>(new Set());
+  /** Yuborilgan, lekin o'qituvchi hali tekshirmagan hisobotlar. */
+  const [pending, setPending] = useState<Set<string>>(new Set());
   const { locale, t } = useI18n();
 
   useEffect(() => {
@@ -57,31 +64,44 @@ export default function TaskPage() {
         if (user) {
           const { data: subs } = await supabase
             .from("submissions")
-            .select("task_id")
+            .select("task_id, status, language")
             .eq("user_id", user.id)
             .eq("task_type", "topic_task")
-            .eq("status", "accepted")
+            .in("status", ["accepted", "pending"])
             .in("task_id", tr.map((x) => x.id));
-          if (subs) setSolved(new Set(subs.map((s) => s.task_id as string)));
+          if (subs) {
+            setSolved(new Set(subs.filter((s) => s.status === "accepted").map((s) => s.task_id as string)));
+            setPending(new Set(
+              subs.filter((s) => s.status === "pending" && s.language === "report").map((s) => s.task_id as string),
+            ));
+          }
         }
       }
       setLoading(false);
     })();
   }, []);
 
+  /**
+   * Topshiriq bajarildi: mavzu progressi belgilanadi, qolgan bosqichlar
+   * ham tugagan bo'lsa mavzu yopiladi. Uchala tur (kod, javob, hisobot)
+   * shu yerdan o'tadi.
+   */
+  async function markTaskDone(message?: string) {
+    await supabase.from("topic_progress").update({ tasks_completed: true }).eq("user_id", userId).eq("topic_id", topicId);
+    const { data: prog } = await supabase.from("topic_progress").select("*").eq("user_id", userId).eq("topic_id", topicId).single();
+    if (prog && prog.content_read && prog.quiz_passed) {
+      await completeTopic(supabase, userId, topicId, courseId);
+      toast.success(t.courses.topic.topicDoneToast + " 🎉");
+    } else if (message !== "") {
+      toast.success((message ?? t.courses.topic.taskDoneToast) + " ✅");
+    }
+  }
+
   async function handleSubmit(code: string, results: SubmissionTestResult[]) {
     const allPassed = results.every(r => r.passed);
     if (allPassed) {
       if (currentTask) setSolved((s) => new Set(s).add(currentTask.id));
-      await supabase.from("topic_progress").update({ tasks_completed: true }).eq("user_id", userId).eq("topic_id", topicId);
-      // Tugatishni tekshirish
-      const { data: prog } = await supabase.from("topic_progress").select("*").eq("user_id", userId).eq("topic_id", topicId).single();
-      if (prog && prog.content_read && prog.quiz_passed) {
-        await completeTopic(supabase, userId, topicId, courseId);
-        toast.success(t.courses.topic.topicDoneToast + " 🎉");
-      } else {
-        toast.success(t.courses.topic.taskDoneToast + " ✅");
-      }
+      await markTaskDone();
     }
   }
 
@@ -129,9 +149,11 @@ export default function TaskPage() {
                 className={cn("relative w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center transition-all",
                   currentTask.id === t.id ? "bg-neon-purple text-white" : "bg-surface text-muted-foreground hover:bg-surface-hover")}>
                 {i + 1}
-                {solved.has(t.id) && (
+                {solved.has(t.id) ? (
                   <CheckCircle2 className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 text-neon-green bg-background rounded-full" />
-                )}
+                ) : pending.has(t.id) ? (
+                  <Clock className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 text-amber-500 bg-background rounded-full" />
+                ) : null}
               </button>
             ))}
           </div>
@@ -139,7 +161,7 @@ export default function TaskPage() {
       </div>
 
       {/* Plan-First flow (medium/hard uchun majburiy, easy va yechilganlar uchun yashirin) */}
-      {currentTask.difficulty !== 'easy' && !solved.has(currentTask.id) && (
+      {kindOf(currentTask) === "code" && currentTask.difficulty !== 'easy' && !solved.has(currentTask.id) && (
         <PlanFirstFlow
           key={currentTask.id}
           taskId={currentTask.id}
@@ -163,16 +185,18 @@ export default function TaskPage() {
             <div className="text-sm prose prose-invert prose-sm max-w-none mb-4" dangerouslySetInnerHTML={{ __html: currentTask.instruction_html }} />
           )}
 
-          {/* Test cases */}
-          <div className="border-t border-border/50 pt-3">
-            <p className="text-xs font-semibold text-muted-foreground mb-2">Misol testlar:</p>
-            {currentTask.test_cases.filter(tc => !tc.is_hidden).slice(0, 3).map((tc, i) => (
-              <div key={i} className="flex gap-4 text-xs font-mono bg-surface rounded-lg px-3 py-2 mb-1.5">
-                <span className="text-muted-foreground">Kirish: <span className="text-foreground">{tc.input}</span></span>
-                <span className="text-muted-foreground">Kutilgan: <span className="text-neon-green">{tc.expected_output}</span></span>
-              </div>
-            ))}
-          </div>
+          {/* Test cases — faqat kod topshirig'ida */}
+          {kindOf(currentTask) === "code" && (
+            <div className="border-t border-border/50 pt-3">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Misol testlar:</p>
+              {currentTask.test_cases.filter(tc => !tc.is_hidden).slice(0, 3).map((tc, i) => (
+                <div key={i} className="flex gap-4 text-xs font-mono bg-surface rounded-lg px-3 py-2 mb-1.5">
+                  <span className="text-muted-foreground">Kirish: <span className="text-foreground">{tc.input}</span></span>
+                  <span className="text-muted-foreground">Kutilgan: <span className="text-neon-green">{tc.expected_output}</span></span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Tiered Hints */}
           {currentTask.hints && currentTask.hints.length > 0 && (
@@ -186,9 +210,29 @@ export default function TaskPage() {
           )}
         </motion.div>
 
-        {/* Right: Code Editor */}
+        {/* Right: topshiriq turiga qarab — kod muharriri, javob yoki hisobot */}
         <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-          {currentTask.difficulty !== 'easy' && !codeUnlocked && !solved.has(currentTask.id) ? (
+          {kindOf(currentTask) === "answer" ? (
+            <AnswerTask
+              key={currentTask.id}
+              task={currentTask}
+              solved={solved.has(currentTask.id)}
+              onSolved={() => {
+                setSolved((s) => new Set(s).add(currentTask.id));
+                markTaskDone();
+              }}
+            />
+          ) : kindOf(currentTask) === "report" ? (
+            <ReportTask
+              key={currentTask.id}
+              task={currentTask}
+              onSubmitted={() => {
+                setPending((s) => new Set(s).add(currentTask.id));
+                // ReportTask o'zi xabar chiqaradi — takrorlamaymiz
+                markTaskDone("");
+              }}
+            />
+          ) : currentTask.difficulty !== 'easy' && !codeUnlocked && !solved.has(currentTask.id) ? (
             <div className="glass-card flex flex-col items-center justify-center text-center p-8 h-[460px]">
               <div className="w-12 h-12 rounded-xl bg-neon-purple/10 flex items-center justify-center mb-3">
                 <Sparkles className="w-6 h-6 text-neon-purple" />

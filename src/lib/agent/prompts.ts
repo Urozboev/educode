@@ -130,7 +130,7 @@ export function buildTutorPrompt(ctx: TutorPromptContext): string {
  * ============================================================= */
 
 /**
- * Dars kontenti KESHLANADI va boshqa o'quvchilarga ham beriladi.
+ * Dars kontenti KESHLANADI va boshqa talabalarga ham beriladi.
  *
  * Shu sababli promptga foydalanuvchi ismi, maqsadi yoki xotirasi
  * QO'SHILMAYDI — aks holda kesh buzilardi: bir odamga atalgan matn
@@ -153,7 +153,7 @@ MAZMUN QOIDALARI:
    - "Tez-tez qilinadigan xato" — kamida 2 ta xato va nima uchun bo'lishi
    Har bo'limda kamida 2 ta to'liq abzats bo'lsin. Bir gaplik bo'lim yozma.
 3. Berilgan darajaga qat'iy mos bo'l. "zero" darajada atama ishlatsang, darrov sodda tilda izohla.
-4. Hajm: KAMIDA 450 so'z, ko'pi bilan 700 so'z. Qisqa dars mavzuni ochmaydi — o'quvchi tushunmay qoladi va savol berishga ham bilimi yetmaydi. Har bo'limni to'liq yoz, sanab o'tish bilan cheklanma.
+4. Hajm: KAMIDA 450 so'z, ko'pi bilan 700 so'z. Qisqa dars mavzuni ochmaydi — talaba tushunmay qoladi va savol berishga ham bilimi yetmaydi. Har bo'limni to'liq yoz, sanab o'tish bilan cheklanma.
 5. Faqat shu mavzu doirasida qol. Keyingi mavzularga o'tib ketma.
 
 content_html QOIDALARI:
@@ -172,7 +172,7 @@ examples QOIDALARI:
 - code — ishlaydigan, to'liq kod. Qisqartma va "..." ishlatma.
 - explanation — bir-ikki gap.
 
-TAQIQ: o'quvchining ismi, maqsadi yoki shaxsiy holatiga murojaat qilma. Bu dars hammaga bir xil beriladi.`;
+TAQIQ: talabaning ismi, maqsadi yoki shaxsiy holatiga murojaat qilma. Bu dars hammaga bir xil beriladi.`;
 
 export interface LessonPromptInput {
   topicTitle: string;
@@ -209,7 +209,7 @@ export function buildLessonPrompt(input: LessonPromptInput): string {
  *
  * "Bilmayman" varianti bu yerda ham bor. Kirish testidagidan ham
  * muhimroq: tavakkal topilgan javob mavzuni "o'zlashtirilgan" deb
- * belgilaydi va agent oldinga o'tib ketadi — o'quvchi esa asosni
+ * belgilaydi va agent oldinga o'tib ketadi — talaba esa asosni
  * bilmay qoladi. Bilmaganini ayta olish keyingi darslarni saqlaydi.
  */
 export const AGENT_QUIZ_PROMPT = `Sen dars materialini tekshiruvchi testni tuzuvchi metodistsan. Faqat JSON qaytar.
@@ -221,7 +221,7 @@ QOIDALAR:
 1. Aniq 5 ta savol: 2 ta easy, 2 ta medium, 1 ta hard.
 2. Har savolda 4 ta variant. OXIRGI variant aynan "Bilmayman" bo'lsin va hech qachon to'g'ri javob bo'lmasin.
 3. Savollar TUSHUNISHNI tekshirsin: ta'rifni yodlaganini emas, qo'llay olishini. "X nima?" o'rniga "Bu kod nima qaytaradi?" turidagi savol yaxshiroq.
-4. \`explanation\` — o'quvchi javobdan keyin o'qiydi. Nega to'g'ri javob to'g'ri ekanini tushuntir, bir-ikki gap.
+4. \`explanation\` — talaba javobdan keyin o'qiydi. Nega to'g'ri javob to'g'ri ekanini tushuntir, bir-ikki gap.
 5. Savol matni 200 belgidan, variant 80 belgidan oshmasin.
 6. Faqat berilgan mavzu doirasida. Keyingi mavzular bilimini talab qilma.`;
 
@@ -247,7 +247,7 @@ QOIDALAR:
 1. Topshiriq berilgan mavzu doirasida va berilgan darajaga mos bo'lsin. "zero" yoki "beginner" darajada 5-10 satrlik yechim yetarli.
 2. Dastur stdin dan \`input()\` bilan o'qisin va natijani \`print()\` bilan chiqarsin. Funksiya qaytaruvchi yechim EMAS — chiqish tekshiriladi.
 3. \`description\` da kirish formati va chiqish formati ANIQ yozilsin: nechta satr keladi, nima chiqishi kerak. Noaniq shart eng ko'p uchraydigan xato sababi.
-4. \`test_cases\`: aniq 5 ta. Birinchi 2 tasi \`is_hidden: false\` (o'quvchi ko'radi va misol sifatida ishlatadi), qolgan 3 tasi \`is_hidden: true\`.
+4. \`test_cases\`: aniq 5 ta. Birinchi 2 tasi \`is_hidden: false\` (talaba ko'radi va misol sifatida ishlatadi), qolgan 3 tasi \`is_hidden: true\`.
 5. Yashirin testlar chegara holatlarni tekshirsin: nol, manfiy son, bo'sh satr, eng katta qiymat — mavzuga qarab.
 6. \`expected_output\` — aynan \`print()\` chiqaradigan matn. Ortiqcha bo'shliq yoki tinish belgisi qo'shma.
 7. \`starter_code\` — bo'sh qolip: input o'qish satri va izoh. To'liq yechim BERMA.
@@ -283,14 +283,14 @@ export function buildTaskPrompt(input: TaskPromptInput): string {
  * ko'rinadigan joyi: reja o'zgarmas ro'yxat emas, natijaga javob
  * beradi.
  */
-export const AGENT_REMEDIAL_PROMPT = `Sen o'quvchiga qiyin kelgan mavzuni boshqacha yo'l bilan tushuntirishni rejalashtiruvchi metodistsan. Faqat JSON qaytar.
+export const AGENT_REMEDIAL_PROMPT = `Sen talabaga qiyin kelgan mavzuni boshqacha yo'l bilan tushuntirishni rejalashtiruvchi metodistsan. Faqat JSON qaytar.
 
 FORMAT:
 {"title":"...","summary":"bir gap","topic_key":"...","estimated_minutes":25}
 
 QOIDALAR:
 1. Bu asl mavzuning TAKRORI emas — boshqa tomondan yondashuv bo'lsin: ko'proq amaliyot, soddaroq misollar, mayda qadamlar.
-2. Sarlavhada "takrorlash" so'zini ishlatma — o'quvchini tushkunlikka soladi. "Amaliyot", "Mustahkamlash" kabi so'zlar yaxshiroq.
+2. Sarlavhada "takrorlash" so'zini ishlatma — talabani tushkunlikka soladi. "Amaliyot", "Mustahkamlash" kabi so'zlar yaxshiroq.
 3. \`topic_key\` asl mavzu kalitiga yaqin bo'lsin, oxiriga ".practice" qo'sh. Masalan: "python.loops.for" → "python.loops.practice".
 4. \`estimated_minutes\` — 15 dan 40 gacha.`;
 
@@ -333,11 +333,11 @@ FORMAT:
 QOIDALAR:
 1. 12 dan 20 gacha modul. Kamrog'i yo'lni tugallamaydi, ko'prog'i qo'rqitadi.
 2. Tartib qat'iy: har modul faqat oldingilariga tayansin. Oldinga havola qilma.
-3. Birinchi modul o'quvchining HOZIRGI darajasidan boshlansin — u bilgan narsani qayta o'rgatma.
+3. Birinchi modul talabaning HOZIRGI darajasidan boshlansin — u bilgan narsani qayta o'rgatma.
 4. Oxirgi 2-3 modul amaliy loyiha bo'lsin: o'rganilganini birlashtirsin.
 5. \`topic_key\` — barqaror lotin slug (kichik harf, nuqta bilan, uch bo'lakdan oshmasin). Bu kalit dars keshi uchun ishlatiladi, shuning uchun umumiy va tushunarli bo'lsin: "python.loops.for" — ha, "modul-7-sikllar" — yo'q.
 6. \`estimated_minutes\` — real baho: 20 dan 90 gacha.
-7. Modul nomi o'quvchi tilida bo'lsin, texnik jargon minimal.
+7. Modul nomi talaba tilida bo'lsin, texnik jargon minimal.
 8. Zaif mavzular ro'yxati berilsa, ularni boshiga qo'y va ularga qo'shimcha modul ajrat.`;
 
 export interface PlannerInput {
@@ -371,7 +371,7 @@ export function buildPlannerPrompt(input: PlannerInput): string {
  * Alohida, arzon chaqiruv sifatida ishlaydi (har xabarda emas —
  * har N xabarda bir marta).
  */
-export const AGENT_MEMORY_EXTRACT_PROMPT = `Quyidagi suhbatdan o'quvchi haqida uzoq muddatga eslab qolishga ARZIYDIGAN faktlarni ajrat.
+export const AGENT_MEMORY_EXTRACT_PROMPT = `Quyidagi suhbatdan talaba haqida uzoq muddatga eslab qolishga ARZIYDIGAN faktlarni ajrat.
 
 Faqat JSON array qaytar, boshqa hech narsa yozma:
 [{"kind":"fact|goal|preference|weakness|strength","content":"qisqa bir gap"}]

@@ -266,7 +266,7 @@ export const MISCONCEPTION_RULES: MisconceptionRule[] = [
       kaa: "Ruchka menen jazılǵan háripti óshirip bolmaydı, biraq jańa qaǵazǵa durıslap jazıw múmkin.",
     },
     whyItHappens: {
-      uz: "Ro'yxat (list) va satr (str) sintaksisi o'xshash bo'lgani uchun o'quvchilar satrni ham ro'yxatdek o'zgaruvchan deb o'ylashadi.",
+      uz: "Ro'yxat (list) va satr (str) sintaksisi o'xshash bo'lgani uchun talabalar satrni ham ro'yxatdek o'zgaruvchan deb o'ylashadi.",
       ru: "Сходство синтаксиса списков и строк вводит в заблуждение: строки кажутся изменяемыми.",
       en: "Similar indexing syntax leads beginners to assume strings are mutable like lists.",
       kaa: "Dizim hám qatar sintaksisi uqsas bolǵanlıqtan, qatardı da dizimdey ózgeriwshi dep oylaw boladı.",
@@ -306,7 +306,7 @@ export const MISCONCEPTION_RULES: MisconceptionRule[] = [
       kaa: "Eger siz bólmeden shıǵıp esikti japsańız, bólme ishindegi jumıstı dawam ettire alasızba?",
     },
     whyItHappens: {
-      uz: "O'quvchi `return` ni shunchaki bitta o'zgaruvchini saqlash amali deb tasavvur qiladi.",
+      uz: "Talaba `return` ni shunchaki bitta o'zgaruvchini saqlash amali deb tasavvur qiladi.",
       ru: "Ученик воспринимает `return` как простое сохранение значения, а не выход из подпрограммы.",
       en: "Beginners often mistake `return` for a variable assignment rather than an exit point.",
       kaa: "Oqıwshı `return` di tek mánisti saqlaw dep oylaydı hám funktsiyadan shıǵıwdı túsine almaydı.",

@@ -9,7 +9,7 @@
  *   < 40   → o'zlashtira olmadi: rejaga qo'shimcha amaliyot moduli QO'SHILADI
  *
  * Uchinchi holat muhim: bu yerda reja o'zgarmas ro'yxatdan
- * o'quvchiga javob beradigan narsaga aylanadi.
+ * talabaga javob beradigan narsaga aylanadi.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -96,7 +96,7 @@ export async function applyAssessmentResult(
 
   /* ---------- 40-69 : yarim ---------- */
   if (score >= MASTERY_PARTIAL) {
-    // Modul ochiq qoladi — o'quvchi darsni qayta o'qib, testni
+    // Modul ochiq qoladi — talaba darsni qayta o'qib, testni
     // qayta topshira oladi. Rejaga aralashmaymiz: bir marta
     // o'rtacha natija ko'rsatish hali qo'shimcha modul talab qilmaydi.
     return {
@@ -114,7 +114,7 @@ export async function applyAssessmentResult(
   const remedial = await generateRemedialModule(mod, lang);
 
   // Modul "done" bo'ladi — dars o'qilgan, endi navbat amaliyotga.
-  // Aks holda ikkita "active" modul paydo bo'lib, o'quvchi qaysi
+  // Aks holda ikkita "active" modul paydo bo'lib, talaba qaysi
   // biridan davom etishni bilmay qolardi.
   await supabase.from('agent_modules').update({ status: 'done' }).eq('id', mod.id);
 
@@ -130,7 +130,7 @@ export async function applyAssessmentResult(
 
   if (error) {
     console.error('[agent/tracker] qo\'shimcha modul qo\'shilmadi:', error.message);
-    // Reja o'zgarmadi, lekin baho yozildi — o'quvchi baribir
+    // Reja o'zgarmadi, lekin baho yozildi — talaba baribir
     // qayta urinishi mumkin
     return {
       outcome: 'retry',
@@ -180,7 +180,7 @@ async function generateRemedialModule(
     AGENT_REMEDIAL_PROMPT,
     `Mavzu: ${mod.title}\nMavzu kaliti: ${mod.topic_key}\nDaraja: ${mod.level}\nTil: ${
       lang === 'ru' ? 'rus' : lang === 'en' ? 'ingliz' : "o'zbek"
-    }\n\nO'quvchi bu mavzuni o'zlashtira olmadi. Qo'shimcha modul tavsifini yoz.`,
+    }\n\nTalaba bu mavzuni o'zlashtira olmadi. Qo'shimcha modul tavsifini yoz.`,
     { temperature: 0.7, maxOutputTokens: 1024 },
   );
 

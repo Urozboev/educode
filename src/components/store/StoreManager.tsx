@@ -30,7 +30,7 @@ const DELIVERY_ICON: Record<StoreDeliveryType, typeof Truck> = {
  *   admin   — barcha sovg'a va buyurtmalarni ko'radi, platforma sovg'asini
  *             yaratadi (owner_id NULL)
  *   teacher — faqat o'zining sovg'alarini va o'z sovg'asiga kelgan
- *             buyurtmalarni ko'radi; sovg'asi faqat o'z o'quvchilariga chiqadi
+ *             buyurtmalarni ko'radi; sovg'asi faqat o'z talabalariga chiqadi
  *
  * Ro'yxatlarni RLS filtrlaydi, shuning uchun bu komponent qo'shimcha
  * xavfsizlik qatlami emas — u faqat interfeysni moslashtiradi.
@@ -108,7 +108,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
       category: form.category,
       stock: form.stock,
       delivery_type: form.delivery_type,
-      // O'qituvchi sovg'asi har doim o'ziniki va faqat o'z o'quvchilariga
+      // O'qituvchi sovg'asi har doim o'ziniki va faqat o'z talabalariga
       owner_id: scope === "teacher" ? userId : null,
       audience: scope === "teacher" ? "my_students" : form.audience,
     };
@@ -225,7 +225,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
                   <span className="flex items-center gap-1"><DIcon className="w-3.5 h-3.5" /> {deliveryLabel(item.delivery_type)}</span>
                   <span className="flex items-center gap-1">
                     {item.audience === "my_students" ? <Users className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
-                    {item.audience === "my_students" ? "O'quvchilarim" : "Hammaga"}
+                    {item.audience === "my_students" ? "Talabalarim" : "Hammaga"}
                   </span>
                   <span className={cn(item.stock <= 0 && "text-neon-red")}>{item.stock} ta</span>
                 </div>
@@ -484,7 +484,7 @@ function OrderList({ orders, buyers, onChanged }: {
 
                     {o.tracking_note && <p className="text-xs text-muted-foreground">Oxirgi izoh: {o.tracking_note}</p>}
                     {o.reject_reason && <p className="text-xs text-neon-red">Rad sababi: {o.reject_reason}</p>}
-                    {o.refunded && <p className="text-xs text-neon-green">{o.price_coins} coin o'quvchiga qaytarilgan</p>}
+                    {o.refunded && <p className="text-xs text-neon-green">{o.price_coins} coin talabaga qaytarilgan</p>}
 
                     {/* Harakatlar */}
                     {actions.length > 0 ? (

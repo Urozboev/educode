@@ -104,7 +104,7 @@ export default function TeacherGroupsPage() {
   }
 
   async function delGroup(g: Group) {
-    if (!confirm(`"${g.name}" guruhi o'chirilsinmi? O'quvchilar bog'lanishi ham uziladi.`)) return;
+    if (!confirm(`"${g.name}" guruhi o'chirilsinmi? Talabalar bog'lanishi ham uziladi.`)) return;
     await supabase.from("teacher_groups").delete().eq("id", g.id);
     toast.success(t.teacher.grp.deleted);
     load();

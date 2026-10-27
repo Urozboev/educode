@@ -189,6 +189,48 @@ export interface TopicTask {
   memory_limit_kb: number;
   order_index: number;
   created_at: string;
+  /**
+   * Topshiriq turi (78-migr.): `code` — kod muharriri, `answer` — javobni
+   * kiritish (darhol tekshiriladi), `report` — skrinshot + xulosa,
+   * o'qituvchi tekshiradi. Eski yozuvlarda maydon bo'lmasa — `code`.
+   */
+  task_kind?: TaskKind;
+  answer_spec?: AnswerSpec | null;
+  report_spec?: ReportSpec | null;
+}
+
+export type TaskKind = "code" | "answer" | "report";
+
+/** `answer` topshirig'idagi bitta javob maydoni. */
+export interface AnswerField {
+  label: string;
+  /**
+   * Taqqoslash usuli:
+   *  text   — katta-kichik harf, ortiqcha bo'shliq hisobga olinmaydi
+   *  number — son sifatida, `tol` aniqlik bilan
+   *  ip     — bo'shliqlarsiz, nuqtali yozuv (prefiks bo'lsa ham)
+   *  choice — `options` dan bittasini tanlash
+   */
+  type: "text" | "number" | "ip" | "choice";
+  accept: string[];
+  tol?: number;
+  options?: string[];
+  placeholder?: string;
+  unit?: string;
+}
+
+export interface AnswerSpec {
+  fields: AnswerField[];
+}
+
+export interface ReportSpec {
+  /** Bajariladigan qadamlar — talaba belgilab boradi. */
+  steps: string[];
+  /** Xulosa uchun savol yoki ko'rsatma. */
+  prompt: string;
+  min_images: number;
+  max_images: number;
+  min_chars: number;
 }
 
 export interface TestCase {

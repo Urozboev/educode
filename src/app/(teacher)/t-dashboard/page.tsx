@@ -147,7 +147,7 @@ export default function TeacherDashboardPage() {
     { label: t.teacher.export, href: "/t-export", Icon: Download },
   ];
 
-  /* ===== Hali o'quvchi yo'q — nima qilish kerakligini aytamiz ===== */
+  /* ===== Hali talaba yo'q — nima qilish kerakligini aytamiz ===== */
   const isEmpty = !loading && stats.totalStudents === 0;
 
   return (
@@ -176,7 +176,7 @@ export default function TeacherDashboardPage() {
           <ol className="space-y-3 mb-7">
             {[
               { n: "01", t: "Guruh yarating", d: "Masalan “9-A sinf”" },
-              { n: "02", t: "Kodni o'quvchilarga ayting", d: "Doskaga yozing yoki guruhga tashlang" },
+              { n: "02", t: "Kodni talabalarga ayting", d: "Doskaga yozing yoki guruhga tashlang" },
               { n: "03", t: "Dars o'yinini boshlang", d: "Tayyor o'yinlardan foydalaning yoki o'zingiz tuzing" },
             ].map(s => (
               <li key={s.n} className="flex gap-3">
@@ -281,7 +281,7 @@ export default function TeacherDashboardPage() {
 
       {!isEmpty && (
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* O'quvchilar */}
+          {/* Talabalar */}
           <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display font-semibold text-lg">{t.teacher.students}</h2>
