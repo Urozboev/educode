@@ -126,8 +126,8 @@ export default function CourseDetailPage() {
 
     if (error) { toast.error("Xatolik yuz berdi"); setEnrolling(false); return; }
 
-    await supabase.from("courses").update({ total_enrolled: (course.total_enrolled || 0) + 1 }).eq("id", course.id);
-
+    // courses.total_enrolled ni bazadagi trigger yangilaydi (88-migratsiya):
+    // talaba courses jadvaliga yoza olmaydi, bu yerdan +1 qilish jimgina rad etilardi
     setEnrollment(data as Enrollment);
     toast.success(t.courses.enrolled);
     setEnrolling(false);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Link from "@/components/i18n/Link";
 import { cn, getInitials, getLevelLabel, getLevelColor, formatDate } from "@/lib/utils";
 import type { Profile } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -265,7 +266,9 @@ export default function AdminUsersPage() {
                       <div className="w-8 h-8 rounded-full bg-hero-gradient flex items-center justify-center text-white font-bold text-xs">
                         {u.avatar_url ? <img src={u.avatar_url} className="w-full h-full rounded-full object-cover" /> : getInitials(u.full_name)}
                       </div>
-                      <div><p className="font-medium text-sm">{u.full_name}</p>
+                      <div>{u.role === "student"
+                        ? <Link href={`/a-students/${u.id}`} className="font-medium text-sm hover:text-neon-purple hover:underline">{u.full_name}</Link>
+                        : <p className="font-medium text-sm">{u.full_name}</p>}
                         {u.username && <p className="text-[10px] text-muted-foreground">@{u.username}</p>}</div>
                     </div></td>
                   <td className="px-5 py-3 text-center">

@@ -734,6 +734,7 @@ export const en: Dictionary = {
     teacherApplications: "Teacher applications",
     coinRequests: "Coin requests",
     agentCost: "Agent cost",
+    studentStats: "Student statistics",
     achievements: "Achievements",
     certificates: "Certificates",
     testimonials: "Testimonials",

@@ -742,6 +742,7 @@ export const kaa: Dictionary = {
     teacherApplications: "Muǵallim arzaları",
     coinRequests: "Coin soraw'ları",
     agentCost: "Agent tannarxı",
+    studentStats: "Studentler statistikası",
     achievements: "Jetiskenlikler",
     certificates: "Sertifikatlar",
     testimonials: "Pikirler",

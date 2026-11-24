@@ -734,6 +734,7 @@ export const ru: Dictionary = {
     teacherApplications: "Заявки преподавателей",
     coinRequests: "Запросы монет",
     agentCost: "Себестоимость агента",
+    studentStats: "Статистика студентов",
     achievements: "Достижения",
     certificates: "Сертификаты",
     testimonials: "Отзывы",

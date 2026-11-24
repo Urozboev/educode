@@ -744,6 +744,7 @@ export const uz = {
     teacherApplications: "O'qituvchi arizalari",
     coinRequests: "Coin so'rovlari",
     agentCost: "Agent tannarxi",
+    studentStats: "Talabalar statistikasi",
     achievements: "Yutuqlar",
     certificates: "Sertifikatlar",
     testimonials: "Izohlar",
