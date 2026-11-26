@@ -12,6 +12,8 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   meta?: { model?: string; prompt_template?: string; generated_at?: string };
+  /** Talaba savolining kodi bo'yicha eslatma: tayyor yechim so'radi yoki o'z fikriga qaytdi */
+  nudge?: "offload" | "recovery";
 }
 
 
@@ -31,6 +33,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [quota, setQuota] = useState<QuotaInfo | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const lastKind = useRef<string | null>(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
@@ -85,11 +88,18 @@ export default function ChatPage() {
         return;
       }
 
+      const kind: string | undefined = data.engagement?.kind;
+      const nudge: Message["nudge"] =
+        kind === "CO" && data.engagement?.code !== "CO4" ? "offload"
+        : kind === "AL" && lastKind.current === "CO" ? "recovery" : undefined;
+      if (kind && kind !== "N") lastKind.current = kind;
+
       setMessages(prev => [
         ...prev,
         {
           role: "assistant",
           content: data.reply,
+          nudge,
           meta: {
             model: data.meta?.model,
             prompt_template: data.meta?.prompt_template,
@@ -159,7 +169,7 @@ export default function ChatPage() {
             </div>
           )}
           {messages.length > 0 && (
-            <button onClick={() => setMessages([])} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1">
+            <button onClick={() => { setMessages([]); lastKind.current = null; }} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1">
               <Trash2 className="w-3.5 h-3.5" /> {t.cabinet.chat.clear}
             </button>
           )}
@@ -218,6 +228,16 @@ export default function ChatPage() {
                   : "bg-surface border border-border rounded-bl-md")}>
                 {msg.role === "assistant" ? formatContent(msg.content) : msg.content}
               </div>
+              {msg.nudge === "offload" && (
+                <p className="text-xs rounded-xl px-3 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300">
+                  🧭 Siz tayyor yechim so&apos;radingiz. Ko&apos;proq o&apos;rganasiz, agar o&apos;z fikringizni yozsangiz: nimani sinab ko&apos;rdingiz va xato qayerda deb o&apos;ylaysiz?
+                </p>
+              )}
+              {msg.nudge === "recovery" && (
+                <p className="text-xs rounded-xl px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+                  ✨ Zo&apos;r — o&apos;z fikringiz bilan qaytdingiz. Aynan shu odat natijani eng ko&apos;p oshiradi.
+                </p>
+              )}
               {msg.role === "assistant" && (
                 <div className="flex flex-col gap-1 w-full">
                   <AILabel

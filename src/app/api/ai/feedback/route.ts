@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SOCRATIC_FEEDBACK_PROMPT, PROMPT_VERSIONS } from '@/lib/ai-prompts';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { checkAIQuota, logAIInteraction } from '@/lib/ai/usage';
+import { checkAIQuota, logAIInteraction, getSupportState } from '@/lib/ai/usage';
+import { SUPPORT_LEVELS } from '@/lib/ai/engagement';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,12 +38,35 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Moslashuvchan ko'mak (89-migratsiya): bog'liqlik yuqori bo'lsa SI izohi
+    // kamayadi. Testlardan o'tgan kodga sifat izohi (vazni 0) cheklanmaydi.
+    const allPassed = Array.isArray(test_results) && test_results.length > 0 && test_results.every((r: any) => r.passed);
+    const support = user && quotaApplies ? await getSupportState(supabase, user.id) : { level: 0 as const };
+    if (user && quotaApplies && !allPassed && support.level >= 2) {
+      let attempted = false;
+      if (task_id) {
+        const { count } = await supabase.from('submissions').select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id).eq('task_id', task_id);
+        attempted = (count ?? 0) > 0;
+      }
+      if (support.level === 3 || !attempted) {
+        return NextResponse.json({
+          feedback: support.level === 3
+            ? `🧭 ${SUPPORT_LEVELS[3].name}: ${SUPPORT_LEVELS[3].short}`
+            : `🧭 ${SUPPORT_LEVELS[2].name}: avval o'z yechimingizni bir marta yuboring — keyin SI izoh beradi.`,
+          blocked: true,
+          supportLevel: support.level,
+        }, { status: 403 });
+      }
+    }
+
     let systemPrompt = "Sen dasturlash o'qituvchisisan. O'zbek tilida javob ber. Qisqa va aniq bo'l.";
     let userPrompt = '';
     let promptTemplate: string = PROMPT_VERSIONS.socraticFeedback;
 
     if (feedback_type === 'code_review') {
-      systemPrompt = SOCRATIC_FEEDBACK_PROMPT + `\n\nTalaba darajasi: ${user_level || 'beginner'}.`;
+      systemPrompt = SOCRATIC_FEEDBACK_PROMPT + `\n\nTalaba darajasi: ${user_level || 'beginner'}.`
+        + (support.level > 0 && !allPassed ? `\n\nQO'SHIMCHA KO'RSATMA: ${SUPPORT_LEVELS[support.level].rule}` : '');
       userPrompt = `Topshiriq: ${task_description || 'Dasturlash topshiriqni bajarish'}
 Til: ${language || 'python'}
 Talabaning kodi:
@@ -119,9 +143,13 @@ ${cats.map((c: any) => `${c.name}: ${c.correct}/${c.total} (${c.percentage}%)`).
         tokens_input,
         tokens_output,
         code_snapshot: code,
-        error_snapshot: Array.isArray(test_results)
-          ? test_results.find((r: any) => !r.passed)?.error
+        // (2.1) formulada o'tmagan kodga izoh 0,25, o'tgan kodga 0 vaznli —
+        // farq shu maydon bo'yicha ajratiladi, shuning uchun xato matni
+        // bo'lmasa ham o'tmagan test bo'lsa belgi qo'yiladi
+        error_snapshot: Array.isArray(test_results) && !allPassed
+          ? (test_results.find((r: any) => !r.passed)?.error || 'tests_failed')
           : undefined,
+        support_level: support.level,
       });
       cooldownTriggered = r.cooldownTriggered;
     }

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Brain, TrendingUp, Clock, Activity } from "lucide-react";
+import { Brain, TrendingUp, Clock, Activity, Compass, Gauge, MessageCircleQuestion } from "lucide-react";
+import { SUPPORT_LEVELS, type SupportState } from "@/lib/ai/engagement";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
@@ -13,6 +14,10 @@ interface AIStats {
   autonomousToday: number;
   dependencyScore: number;
   trend: { date: string; total_queries: number }[];
+  /** 89-migratsiya: haftalik (2.1) ko'rsatkich va ko'mak darajasi */
+  support?: SupportState | null;
+  calibration?: { resolved: number; brier: number | null; bias: number | null } | null;
+  engagement?: { turns: number; co_share: number | null; recovery: number | null } | null;
 }
 
 function getZone(score: number, t: Dictionary): { label: string; emoji: string; cls: string; tip: string } {
@@ -89,7 +94,9 @@ export default function CognitiveHealthCard({ className }: { className?: string 
       {/* Dependency score bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[11px] text-muted-foreground">AI bog'liqlik indeksi</span>
+          <span className="text-[11px] text-muted-foreground">
+            AI bog'liqlik indeksi{stats.support?.interpretable ? " (7 kun)" : ""}
+          </span>
           <span className="text-xs font-mono font-semibold">{stats.dependencyScore}%</span>
         </div>
         <div className="w-full h-2 bg-surface rounded-full overflow-hidden">
@@ -132,6 +139,39 @@ export default function CognitiveHealthCard({ className }: { className?: string 
           </div>
         </div>
       </div>
+
+      {/* Kognitiv avtonomiya: ko'mak darajasi, kalibrlash, muloqot sifati */}
+      {stats.support && !stats.support.staff && (
+        <div className="space-y-2 mb-3">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-muted-foreground flex items-center gap-1"><Compass className="w-3 h-3" /> SI ko&apos;magi</span>
+            <span className="font-semibold">{SUPPORT_LEVELS[stats.support.level].name}</span>
+          </div>
+          {!stats.support.interpretable && (
+            <p className="text-[10px] text-muted-foreground">Haftalik ko&apos;rsatkich uchun hali ma&apos;lumot yetarli emas (kamida 3 ta hodisa kerak).</p>
+          )}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-surface/40 rounded-lg p-2.5" title="Topshiriqdan oldingi bashoratingiz natija bilan qanchalik mos keldi (Brier bali asosida)">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1"><Gauge className="w-3 h-3" /> O&apos;zini baholash aniqligi</div>
+              <div className="text-sm font-semibold font-mono">
+                {stats.calibration?.brier != null ? `${Math.round((1 - Number(stats.calibration.brier)) * 100)}%` : "—"}
+              </div>
+              <div className="text-[9px] text-muted-foreground mt-0.5">
+                {stats.calibration?.bias == null ? `${stats.calibration?.resolved ?? 0} ta bashorat`
+                  : Number(stats.calibration.bias) > 0.15 ? "o'zingizni ortiqcha baholaysiz"
+                  : Number(stats.calibration.bias) < -0.15 ? "o'zingizni kam baholaysiz" : "muvozanatli"}
+              </div>
+            </div>
+            <div className="bg-surface/40 rounded-lg p-2.5" title="SI bilan muloqotingizda o'z fikringizni bildirgan savollar ulushi (30 kun)">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1"><MessageCircleQuestion className="w-3 h-3" /> Fikrlab so&apos;rash</div>
+              <div className="text-sm font-semibold font-mono">
+                {stats.engagement?.co_share != null ? `${100 - stats.engagement.co_share}%` : "—"}
+              </div>
+              <div className="text-[9px] text-muted-foreground mt-0.5">{stats.engagement?.turns ?? 0} ta savol</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cooldown */}
       {stats.daily.cooldownUntil && (

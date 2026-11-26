@@ -13,7 +13,7 @@ import {
   GraduationCap, BarChart3, Settings, Download, LogOut, Moon, Sun,
   ChevronLeft, Menu, X, ShoppingBag, MessageSquare, Info, Coins, Newspaper,
   Library, BookMarked, Lightbulb, Presentation, Gamepad2, Trophy, ShieldCheck, Languages,
-  Sparkles, LifeBuoy, FileCheck2, ClipboardList
+  Sparkles, LifeBuoy, FileCheck2, ClipboardList, Brain
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +27,7 @@ const adminLinks = (t: Dictionary) => [
   { href: "/a-dashboard", label: t.cabinet.dashboard, icon: LayoutDashboard },
   { href: "/a-courses", label: t.nav.courses, icon: BookOpen },
   { href: "/a-students", label: t.admin.studentStats, icon: ClipboardList },
+  { href: "/a-cognitive", label: t.admin.cognitiveAutonomy, icon: Brain },
   { href: "/a-challenges", label: t.nav.challenges, icon: Swords },
   { href: "/a-games", label: t.nav.lessonGames, icon: Gamepad2 },
   { href: "/a-contests", label: t.contests.title, icon: Trophy },
