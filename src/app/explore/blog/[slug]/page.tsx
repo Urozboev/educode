@@ -79,11 +79,11 @@ export default async function BlogPostPage({ params }: Params) {
   return (
     <article className="max-w-3xl mx-auto">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd).replace(/</g, "\\u003c") }} />
-      <BreadcrumbJsonLd items={[{ name: "Bosh sahifa", url: "/" }, { name: "Blog", url: "/blog" }, { name: post.title, url: `/blog/${post.slug}` }]} />
+      <BreadcrumbJsonLd items={[{ name: "Boş sahifa", url: "/" }, { name: "Blog", url: "/blog" }, { name: post.title, url: `/blog/${post.slug}` }]} />
       <BlogViewCounter slug={post.slug} />
 
       <Link href={href("/blog")} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-5 transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Blogga qaytish
+        <ArrowLeft className="w-4 h-4" /> Blogga qaytiş
       </Link>
 
       {/* Category + meta */}
@@ -131,10 +131,10 @@ export default async function BlogPostPage({ params }: Params) {
 
       {/* CTA */}
       <div className="mt-10 rounded-2xl border border-neon-purple/20 bg-gradient-to-br from-neon-purple/[0.08] to-neon-blue/[0.05] p-6 text-center">
-        <p className="font-display font-bold text-lg mb-1">Dasturlashni o'rganishni boshlang</p>
+        <p className="font-display font-bold text-lg mb-1">Dasturlaşni örganişni boşlang</p>
         <p className="text-sm text-muted-foreground mb-4">{t.explore.blogCta}</p>
         <Link href="/register" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition">
-          Bepul boshlash
+          Bepul boşlaş
         </Link>
       </div>
     </article>

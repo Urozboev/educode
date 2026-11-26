@@ -139,7 +139,7 @@ export default function RegisterPage() {
             href="/login"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-medium text-sm transition-all"
           >
-            Kirish sahifasiga qaytish
+            Kiriş sahifasiga qaytiş
           </Link>
         </div>
       </motion.div>
@@ -160,7 +160,7 @@ export default function RegisterPage() {
           </h1>
           <p className="text-muted-foreground text-base">
             {role === "parent"
-              ? "Farzandingiz o'quv jarayonini kuzating."
+              ? "Farzandingiz öquv jarayonini kuzating."
               : role === "teacher"
               ? t.auth.teacherNoteShort
               : t.auth.registerSubtitle}
@@ -181,7 +181,7 @@ export default function RegisterPage() {
           >
             <GraduationCap className={`w-6 h-6 ${role === "student" ? "text-neon-purple" : "text-muted-foreground"}`} />
             <span className="text-sm font-semibold">{t.auth.roleStudent}</span>
-            <span className="text-[11px] text-muted-foreground text-center leading-tight">O'rganaman</span>
+            <span className="text-[11px] text-muted-foreground text-center leading-tight">Örganaman</span>
           </button>
           <button
             type="button"
@@ -207,7 +207,7 @@ export default function RegisterPage() {
           >
             <Presentation className={`w-6 h-6 ${role === "teacher" ? "text-neon-green" : "text-muted-foreground"}`} />
             <span className="text-sm font-semibold">{t.auth.roleTeacher}</span>
-            <span className="text-[11px] text-muted-foreground text-center leading-tight">O&apos;rgataman</span>
+            <span className="text-[11px] text-muted-foreground text-center leading-tight">Örgataman</span>
           </button>
         </div>
 
@@ -340,7 +340,7 @@ export default function RegisterPage() {
               </>
             ) : (
               <>
-                Hisob yaratish <ArrowRight className="w-4 h-4" />
+                Hisob yaratiş <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>

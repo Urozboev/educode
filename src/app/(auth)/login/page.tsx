@@ -83,8 +83,8 @@ function LoginForm() {
         error.message === "Invalid login credentials"
           ? t.auth.wrongCredentials
           : error.message === "Email not confirmed"
-          ? "Email tasdiqlanmagan. Pochtangizni tekshiring."
-          : "Kirish xatoligi."
+          ? "Email tasdiqlanmagan. Poçtangizni tekşiring."
+          : "Kiriş xatoligi."
       );
       setLoading(false);
       return;
@@ -221,11 +221,11 @@ function LoginForm() {
           >
             {loading ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Kirish...
+                <Loader2 className="w-5 h-5 animate-spin" /> Kiriş...
               </>
             ) : (
               <>
-                Kirish <ArrowRight className="w-4 h-4" />
+                Kiriş <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>

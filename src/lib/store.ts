@@ -61,20 +61,20 @@ export const DELIVERY_TYPES: {
 }[] = [
   {
     value: "delivery",
-    label: "Yetkazib berish",
-    hint: "Pochta yoki kuryer orqali. Manzil so'raladi.",
+    label: "Yetkazib beriş",
+    hint: "Poçta yoki kuryer orqali. Manzil söraladi.",
     needsAddress: true,
   },
   {
     value: "pickup",
-    label: "Qo'lda topshiriladi",
+    label: "Qölda topşiriladi",
     hint: "Darsda yoki institutda beriladi. Manzil kerak emas.",
     needsAddress: false,
   },
   {
     value: "digital",
     label: "Raqamli",
-    hint: "Havola, kod yoki tizim ichidagi imtiyoz. Faqat aloqa kerak.",
+    hint: "Havola, kod yoki tizim içidagi imtiyoz. Faqat aloqa kerak.",
     needsAddress: false,
   },
 ];
@@ -122,7 +122,7 @@ export const ORDER_STATUS: Record<StoreOrderStatus, {
 }> = {
   pending: {
     label: "Kutilmoqda",
-    hint: "Buyurtma qabul qilindi, ko'rib chiqilmoqda",
+    hint: "Buyurtma qabul qilindi, körib çiqilmoqda",
     color: "text-neon-yellow bg-neon-yellow/10 border-neon-yellow/30",
     next: ["approved", "rejected"],
   },
@@ -133,8 +133,8 @@ export const ORDER_STATUS: Record<StoreOrderStatus, {
     next: ["shipped", "delivered", "rejected"],
   },
   shipped: {
-    label: "Jo'natildi",
-    hint: "Yo'lda — yetkazib berilmoqda",
+    label: "Jönatildi",
+    hint: "Yölda — yetkazib berilmoqda",
     color: "text-neon-purple bg-neon-purple/10 border-neon-purple/30",
     next: ["delivered", "rejected"],
   },
@@ -211,29 +211,29 @@ export function validateOrderForm(
   dict?: Dictionary,
 ): string | null {
   const v = dict?.store.validate;
-  if (!f.full_name.trim()) return v?.nameRequired ?? "To'liq ismingizni kiriting";
+  if (!f.full_name.trim()) return v?.nameRequired ?? "Töliq ismingizni kiriting";
   if (f.full_name.trim().length < 3) return v?.nameShort ?? "Ism juda qisqa";
   if (!f.phone.trim()) return v?.phoneRequired ?? "Telefon raqamini kiriting";
   // O'zbekiston raqami: +998 XX XXX XX XX yoki 9 ta raqamli qisqa shakl
   const digits = f.phone.replace(/\D/g, "");
-  if (digits.length < 9) return v?.phoneShort ?? "Telefon raqami to'liq emas";
+  if (digits.length < 9) return v?.phoneShort ?? "Telefon raqami töliq emas";
   if (f.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) {
-    return v?.emailBad ?? "Pochta manzili noto'g'ri";
+    return v?.emailBad ?? "Poçta manzili notöğri";
   }
   if (needsAddress(delivery)) {
     if (!f.region.trim()) return v?.regionRequired ?? "Viloyatni tanlang";
     if (!f.address.trim()) return v?.addressRequired ?? "Manzilni kiriting";
     if (f.address.trim().length < 10) {
-      return v?.addressShort ?? "Manzilni to'liqroq yozing (ko'cha, uy raqami)";
+      return v?.addressShort ?? "Manzilni töliqroq yozing (köça, uy raqami)";
     }
   }
   return null;
 }
 
 export const UZ_REGIONS = [
-  "Toshkent shahri", "Toshkent viloyati", "Andijon", "Buxoro", "Farg'ona",
+  "Toşkent şahri", "Toşkent viloyati", "Andijon", "Buxoro", "Farg'ona",
   "Jizzax", "Xorazm", "Namangan", "Navoiy", "Qashqadaryo",
-  "Qoraqalpog'iston Respublikasi", "Samarqand", "Sirdaryo", "Surxondaryo",
+  "Qoraqalpoğiston Respublikasi", "Samarqand", "Sirdaryo", "Surxondaryo",
 ];
 
 /** Buyurtma holatining tarjima qilingan nomi */

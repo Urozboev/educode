@@ -35,27 +35,27 @@ function Wave({ bits, code, caption }: { bits: string; code: "nrz" | "manchester
 
 const nodes: SceneNode[] = [
   { id: "A", kind: "pc", x: 100, y: 150, label: "Yuboruvchi" },
-  { id: "B", kind: "pc", x: 660, y: 150, label: "Qabul qiluvchi" },
+  { id: "B", kind: "pc", x: 660, y: 150, label: "Qabul qiluvçi" },
 ];
 const links: SceneLink[] = [{ a: "A", b: "B", label: "mis kabel" }];
 
 const CODING: Step[] = [
-  { say: "Kompyuter 10110010 bitlarini yubormoqchi. Kabelda bit yo'q — faqat elektr kuchlanishi bor. Eng sodda kod (NRZ): 1 — yuqori kuchlanish, 0 — past.", panel: <Wave bits="10110010" code="nrz" caption="NRZ: 1 — yuqori, 0 — past" /> },
-  { say: "Signal kabel bo'ylab ketdi. Qabul qiluvchi har bit vaqtida kuchlanishni o'lchab, bitlarni tiklaydi.", flights: [{ from: "A", to: "B", label: "10110010" }], marks: { B: { text: "10110010 — oldim", tone: "ok" } } },
+  { say: "Kompyuter 10110010 bitlarini yubormoqçi. Kabelda bit yöq — faqat elektr kuçlanişi bor. Eng sodda kod (NRZ): 1 — yuqori kuçlaniş, 0 — past.", panel: <Wave bits="10110010" code="nrz" caption="NRZ: 1 — yuqori, 0 — past" /> },
+  { say: "Signal kabel böylab ketdi. Qabul qiluvçi har bit vaqtida kuçlanişni ölçab, bitlarni tiklaydi.", flights: [{ from: "A", to: "B", label: "10110010" }], marks: { B: { text: "10110010 — oldim", tone: "ok" } } },
   {
-    say: "Endi sakkizta nol ketma-ket. NRZ da signal butun vaqt bir xil — tekis chiziq. Qabul qiluvchi soati sal shoshsa yoki kechiksa, nechta nol kelganini adashib sanaydi.",
-    panel: <Wave bits="00000000" code="nrz" caption="NRZ: 00000000 — tekis chiziq" />,
-    ask: { q: "Uzun 00000000 ketma-ketlikda NRZ kodining muammosi nimada?", options: ["Signal tezlashib ketadi", "Signal o'zgarmaydi — bitlarni sanashda adashish mumkin", "Kabel qiziydi"], answer: 1, explain: "Signalda o'zgarish bo'lmasa, qabul qiluvchi bit chegaralarini yo'qotadi (sinxronizatsiya buziladi)." },
+    say: "Endi sakkizta nol ketma-ket. NRZ da signal butun vaqt bir xil — tekis çiziq. Qabul qiluvçi soati sal şoşsa yoki keçiksa, neçta nol kelganini adaşib sanaydi.",
+    panel: <Wave bits="00000000" code="nrz" caption="NRZ: 00000000 — tekis çiziq" />,
+    ask: { q: "Uzun 00000000 ketma-ketlikda NRZ kodining muammosi nimada?", options: ["Signal tezlaşib ketadi", "Signal özgarmaydi — bitlarni sanaşda adaşiş mumkin", "Kabel qiziydi"], answer: 1, explain: "Signalda özgariş bölmasa, qabul qiluvçi bit çegaralarini yöqotadi (sinxronizatsiya buziladi)." },
   },
-  { say: "Manchester kodi buni hal qiladi: har bit o'rtasida signal albatta o'zgaradi (0 — yuqoridan pastga, 1 — pastdan yuqoriga). Signal o'z «soati»ni o'zi olib yuradi. 10 Mbit/s Ethernet aynan shu kodni ishlatgan.", panel: <Wave bits="00000000" code="manchester" caption="Manchester: 00000000 — har bitda o'tish bor" /> },
+  { say: "Manchester kodi buni hal qiladi: har bit örtasida signal albatta özgaradi (0 — yuqoridan pastga, 1 — pastdan yuqoriga). Signal öz «soati»ni özi olib yuradi. 10 Mbit/s Ethernet aynan şu kodni işlatgan.", panel: <Wave bits="00000000" code="manchester" caption="Manchester: 00000000 — har bitda ötiş bor" /> },
   {
-    say: "Yo'lda elektromagnit xalaqit bitta bitni buzdi: 10110010 o'rniga 10100010 yetib keldi. Qabul qiluvchi kadr oxiridagi tekshiruv qiymatini (FCS, CRC asosida) qayta hisobladi — mos kelmadi. Kadr tashlab yuborildi.",
+    say: "Yölda elektromagnit xalaqit bitta bitni buzdi: 10110010 örniga 10100010 yetib keldi. Qabul qiluvçi kadr oxiridagi tekşiruv qiymatini (FCS, CRC asosida) qayta hisobladi — mos kelmadi. Kadr taşlab yuborildi.",
     flights: [{ from: "A", to: "B", label: "10100010 ⚡", tone: "red" }],
-    marks: { B: { text: "FCS mos emas — tashladim", tone: "drop" } },
-    ask: { q: "Qabul qiluvchi kadr buzilganini qanday biladi?", options: ["IP manzildan", "Kadr oxiridagi tekshiruv qiymati (FCS/CRC) mos kelmaydi", "Kabel rangi o'zgaradi"], answer: 1, explain: "Yuboruvchi kadr bitlaridan CRC hisoblab, oxiriga qo'shadi. Qabul qiluvchi qayta hisoblaydi: mos kelmasa — kadr buzilgan." },
+    marks: { B: { text: "FCS mos emas — taşladim", tone: "drop" } },
+    ask: { q: "Qabul qiluvçi kadr buzilganini qanday biladi?", options: ["IP manzildan", "Kadr oxiridagi tekşiruv qiymati (FCS/CRC) mos kelmaydi", "Kabel rangi özgaradi"], answer: 1, explain: "Yuboruvçi kadr bitlaridan CRC hisoblab, oxiriga qöşadi. Qabul qiluvçi qayta hisoblaydi: mos kelmasa — kadr buzilgan." },
   },
-  { say: "Buzilgan kadr yo'qoldi, lekin yuqori pog'ona (TCP) tasdiq kelmaganini sezib, ma'lumotni qayta yubordi. Bu safar to'g'ri yetib keldi.", flights: [{ from: "A", to: "B", label: "10110010 (qayta)", tone: "green" }], marks: { B: { text: "FCS to'g'ri — qabul qildim", tone: "ok" } } },
-  { say: "Xulosa: bitlar kod qoidasi bilan signalga aylanadi (NRZ, Manchester…). Xalaqit bitlarni buzishi mumkin — CRC buni aniqlaydi, buzilgan kadr tashlanadi va qayta yuboriladi." },
+  { say: "Buzilgan kadr yöqoldi, lekin yuqori poğona (TCP) tasdiq kelmaganini sezib, maʼlumotni qayta yubordi. Bu safar töğri yetib keldi.", flights: [{ from: "A", to: "B", label: "10110010 (qayta)", tone: "green" }], marks: { B: { text: "FCS töğri — qabul qildim", tone: "ok" } } },
+  { say: "Xulosa: bitlar kod qoidasi bilan signalga aylanadi (NRZ, Manchester…). Xalaqit bitlarni buzişi mumkin — CRC buni aniqlaydi, buzilgan kadr taşlanadi va qayta yuboriladi." },
 ];
 
 // ---------- Muhitlar ----------
@@ -65,29 +65,29 @@ const MN: SceneNode[] = [
   { id: "a3", kind: "laptop", x: 90, y: 320, label: "Wi-Fi" }, { id: "ap", kind: "ap", x: 670, y: 320 },
 ];
 const ML: SceneLink[] = [
-  { a: "a1", b: "b1", label: "Cat6: 1 Gbit/s, 100 m gacha" },
-  { a: "a2", b: "b2", label: "Optika: 10–100 Gbit/s, o'nlab km" },
+  { a: "a1", b: "b1", label: "Cat6: 1 Gbit/s, 100 m gaça" },
+  { a: "a2", b: "b2", label: "Optika: 10–100 Gbit/s, önlab km" },
   { a: "a3", b: "ap", wireless: true, label: "Radio: yuzlab Mbit/s, ~30 m" },
 ];
 const MEDIA: Step[] = [
-  { say: "Uch xil yo'l: mis kabel (elektr), optik tola (yorug'lik) va Wi-Fi (radioto'lqin). Har biri o'z tezligi va masofasiga ega.", flights: [{ from: "a1", to: "b1", label: "elektr" }, { from: "a2", to: "b2", label: "yorug'lik", tone: "amber" }, { from: "a3", to: "ap", label: "radio", tone: "green" }] },
+  { say: "Uç xil yöl: mis kabel (elektr), optik tola (yoruğlik) va Wi-Fi (radiotölqin). Har biri öz tezligi va masofasiga ega.", flights: [{ from: "a1", to: "b1", label: "elektr" }, { from: "a2", to: "b2", label: "yoruğlik", tone: "amber" }, { from: "a3", to: "ap", label: "radio", tone: "green" }] },
   {
-    say: "Yaqin atrofda kuchli elektr dvigatel ishga tushdi. Mis kabel va Wi-Fi da xalaqit paydo bo'ldi, optik tolaga esa hech narsa bo'lmadi — unda elektr signali yo'q, yorug'lik bor.",
-    flights: [{ from: "a1", to: "b1", label: "elektr", lostAt: "b1" }, { from: "a2", to: "b2", label: "yorug'lik", tone: "amber" }, { from: "a3", to: "ap", label: "radio", tone: "green", lostAt: "ap" }],
+    say: "Yaqin atrofda kuçli elektr dvigatel işga tuşdi. Mis kabel va Wi-Fi da xalaqit paydo böldi, optik tolaga esa heç narsa bölmadi — unda elektr signali yöq, yoruğlik bor.",
+    flights: [{ from: "a1", to: "b1", label: "elektr", lostAt: "b1" }, { from: "a2", to: "b2", label: "yoruğlik", tone: "amber" }, { from: "a3", to: "ap", label: "radio", tone: "green", lostAt: "ap" }],
     marks: { b2: { text: "Toza keldi", tone: "ok" } },
-    ask: { q: "Qaysi muhit elektromagnit xalaqitga befarq? Qabul qiluvchi qurilmasini bosing.", pick: "b2", hint: "Qaysi yo'lda elektr emas, yorug'lik ketadi?", explain: "Optik tola — unda yorug'lik uzatiladi, elektr xalaqit ta'sir qilmaydi. Shuning uchun uzoq masofa va magistrallar optikada." },
+    ask: { q: "Qaysi muhit elektromagnit xalaqitga befarq? Qabul qiluvçi qurilmasini bosing.", pick: "b2", hint: "Qaysi yölda elektr emas, yoruğlik ketadi?", explain: "Optik tola — unda yoruğlik uzatiladi, elektr xalaqit taʼsir qilmaydi. Şuning uçun uzoq masofa va magistrallar optikada." },
   },
   {
-    say: "Bino ichida kompyuterni kommutatorgacha 100 metrgacha mis kabel bilan ulash arzon va qulay. Shaharlar orasida esa faqat optika.",
-    ask: { q: "Ikki bino orasidagi 2 km masofaga qaysi muhitni tanlaysiz?", options: ["Mis kabel (Cat6)", "Optik tola", "Wi-Fi"], answer: 1, explain: "Mis kabel segmenti 100 m gacha, Wi-Fi ~30 m bino ichida. 2 km uchun optik tola kerak." },
+    say: "Bino içida kompyuterni kommutatorgaça 100 metrgaça mis kabel bilan ulaş arzon va qulay. Şaharlar orasida esa faqat optika.",
+    ask: { q: "Ikki bino orasidagi 2 km masofaga qaysi muhitni tanlaysiz?", options: ["Mis kabel (Cat6)", "Optik tola", "Wi-Fi"], answer: 1, explain: "Mis kabel segmenti 100 m gaça, Wi-Fi ~30 m bino içida. 2 km uçun optik tola kerak." },
   },
 ];
 
 export default function SignalStory({ initial = "coding" }: { initial?: string }) {
   return (
     <StoryTabs initial={initial} tabs={[
-      { key: "coding", label: "Kodlash va xatolar", render: () => <Story nodes={nodes} links={links} steps={CODING} height={260} title="Bitlar kabelda qanday yuradi?" /> },
-      { key: "media", label: "Uzatish muhitlari", render: () => <Story nodes={MN} links={ML} steps={MEDIA} height={400} title="Mis, optika va radio" /> },
+      { key: "coding", label: "Kodlaş va xatolar", render: () => <Story nodes={nodes} links={links} steps={CODING} height={260} title="Bitlar kabelda qanday yuradi?" /> },
+      { key: "media", label: "Uzatiş muhitlari", render: () => <Story nodes={MN} links={ML} steps={MEDIA} height={400} title="Mis, optika va radio" /> },
     ]} />
   );
 }

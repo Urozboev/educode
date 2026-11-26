@@ -111,7 +111,7 @@ export default function AboutPage() {
           <div className="w-10 h-10 rounded-xl bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center">
             <Layers className="w-5 h-5 text-neon-blue" />
           </div>
-          <h2 className="font-display font-bold text-xl">Ishlatilgan texnologiyalar</h2>
+          <h2 className="font-display font-bold text-xl">Işlatilgan texnologiyalar</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {[
@@ -120,7 +120,7 @@ export default function AboutPage() {
             { name: "Claude AI", desc: "Kod tahlili", color: "#FF6B9D" },
             { name: "Gemini AI", desc: "Chatbot", color: "#FFD600" },
             { name: "Monaco Editor", desc: "Kod muharriri", color: "#00E676" },
-            { name: "Judge0", desc: "Kod bajarish", color: "#FF5252" },
+            { name: "Judge0", desc: "Kod bajariş", color: "#FF5252" },
           ].map((t) => (
             <div
               key={t.name}

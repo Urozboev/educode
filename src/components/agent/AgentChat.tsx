@@ -217,7 +217,7 @@ export default function AgentChat({ lang, startTopic = null }: Props) {
           <Link
             href="/agent/reja"
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-            title="O'quv reja"
+            title="Öquv reja"
           >
             <ListChecks className="h-5 w-5" />
             <span className="hidden sm:inline">Reja</span>
@@ -226,7 +226,7 @@ export default function AgentChat({ lang, startTopic = null }: Props) {
           <button
             onClick={() => { setVoiceOn((v) => !v); if (voiceOn) stopSpeaking(); }}
             className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
-            title={voiceOn ? "Ovozni o'chirish" : "Ovozni yoqish"}
+            title={voiceOn ? "Ovozni öçiriş" : "Ovozni yoqiş"}
           >
             {voiceOn ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
           </button>
@@ -242,7 +242,7 @@ export default function AgentChat({ lang, startTopic = null }: Props) {
             </div>
 
             <h2 className="font-display text-2xl font-bold leading-[1.15] tracking-tight sm:text-3xl">
-              Nimani o'rganmoqchisiz?
+              Nimani örganmoqçisiz?
             </h2>
 
             <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
@@ -251,10 +251,10 @@ export default function AgentChat({ lang, startTopic = null }: Props) {
 
             {startTopic ? (
               <button
-                onClick={() => void send(`"${startTopic}" mavzusini boshlaymiz. Menga shu mavzuni tushuntiring.`)}
+                onClick={() => void send(`"${startTopic}" mavzusini boşlaymiz. Menga şu mavzuni tuşuntiring.`)}
                 className="mt-6 rounded-xl bg-neon-purple px-5 py-2.5 text-sm font-medium text-white"
               >
-                &quot;{startTopic}&quot; mavzusini boshlash
+                &quot;{startTopic}&quot; mavzusini boşlaş
               </button>
             ) : (
               <>
@@ -309,7 +309,7 @@ export default function AgentChat({ lang, startTopic = null }: Props) {
                   {m.content || (
                     <span className="inline-flex items-center gap-1.5 text-muted-foreground">
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      <span className="font-mono text-xs">o'ylayapti</span>
+                      <span className="font-mono text-xs">öylayapti</span>
                     </span>
                   )}
                 </div>

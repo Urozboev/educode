@@ -105,7 +105,7 @@ export default function SubscribeView({
         body: JSON.stringify({ plan, months, provider }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "To'lov boshlanmadi");
+      if (!res.ok) throw new Error(data.error || "Tölov boşlanmadi");
 
       window.location.href = data.url;
     } catch (e: any) {
@@ -122,7 +122,7 @@ export default function SubscribeView({
     return (
       <div className="py-24 text-center">
         <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-primary" />
-        <h2 className="mb-2 text-lg font-semibold">To'lov tekshirilmoqda...</h2>
+        <h2 className="mb-2 text-lg font-semibold">Tölov tekşirilmoqda...</h2>
         <p className="mx-auto max-w-sm text-sm text-muted-foreground">
           {t.agent.subWait}
         </p>
@@ -144,7 +144,7 @@ export default function SubscribeView({
 
         {access.expiresAt && (
           <p className="mb-8 text-sm text-muted-foreground">
-            Amal qilish muddati:{" "}
+            Amal qiliş muddati:{" "}
             {new Date(access.expiresAt).toLocaleDateString("uz-UZ", {
               day: "numeric", month: "long", year: "numeric",
             })}
@@ -165,7 +165,7 @@ export default function SubscribeView({
             onClick={() => setAccess({ ...access, allowed: false })}
             className="rounded-xl border border-border px-5 py-3 text-sm font-medium hover:bg-muted"
           >
-            Obunani uzaytirish
+            Obunani uzaytiriş
           </button>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function SubscribeView({
 
             <div className="mb-4 text-2xl font-bold">
               {PLAN_PRICES_UZS[p].toLocaleString("uz-UZ")}
-              <span className="text-sm font-normal text-muted-foreground"> so'm / oy</span>
+              <span className="text-sm font-normal text-muted-foreground"> söm / oy</span>
             </div>
 
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -242,7 +242,7 @@ export default function SubscribeView({
               >
                 <div className="font-medium">{m} oy</div>
                 <div className="mt-0.5 text-xs text-muted-foreground">
-                  {subscriptionAmount(plan, m).toLocaleString("uz-UZ")} so'm
+                  {subscriptionAmount(plan, m).toLocaleString("uz-UZ")} söm
                 </div>
                 {discount > 0 && (
                   <span className="absolute -top-2 right-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
@@ -263,7 +263,7 @@ export default function SubscribeView({
           </span>
           <span className="text-2xl font-bold">
             {amount.toLocaleString("uz-UZ")}{" "}
-            <span className="text-sm font-normal text-muted-foreground">so'm</span>
+            <span className="text-sm font-normal text-muted-foreground">söm</span>
           </span>
         </div>
 
@@ -280,7 +280,7 @@ export default function SubscribeView({
             className="flex items-center justify-center gap-2 rounded-xl bg-[#00CCCC] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
           >
             {loading === "payme" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Payme orqali to'lash
+            Payme orqali tölaş
           </button>
 
           <button
@@ -289,13 +289,13 @@ export default function SubscribeView({
             className="flex items-center justify-center gap-2 rounded-xl bg-[#00A3E0] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
           >
             {loading === "click" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Click orqali to'lash
+            Click orqali tölaş
           </button>
         </div>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          To'lov tasdiqlangach obuna avtomatik yoqiladi. Muddati tugamagan
-          obunani uzaytirsangiz, qolgan kunlar yo'qolmaydi.
+          Tölov tasdiqlangaç obuna avtomatik yoqiladi. Muddati tugamagan
+          obunani uzaytirsangiz, qolgan kunlar yöqolmaydi.
         </p>
       </div>
     </div>

@@ -172,7 +172,7 @@ export default function ReportReview({ mode }: { mode: "admin" | "teacher" }) {
             <FileCheck2 className="w-7 h-7 text-neon-purple" /> Hisobotlar
           </h1>
           <p className="text-muted-foreground text-sm max-w-xl">
-            Talabalar laboratoriya va amaliy ishlar bo&apos;yicha yuborgan skrinshot va xulosalar. Qabul qiling yoki nimani tuzatish kerakligini yozib qaytaring.
+            Talabalar laboratoriya va amaliy işlar böyiça yuborgan skrinşot va xulosalar. Qabul qiling yoki nimani tuzatiş kerakligini yozib qaytaring.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -208,7 +208,7 @@ export default function ReportReview({ mode }: { mode: "admin" | "teacher" }) {
         <div className="glass-card p-12 text-center">
           <CheckCircle2 className="w-12 h-12 text-neon-green/40 mx-auto mb-3" />
           <p className="text-muted-foreground">
-            {filter === "pending" ? "Tekshiruvni kutayotgan hisobot yo'q." : "Hali hisobot yuborilmagan."}
+            {filter === "pending" ? "Tekşiruvni kutayotgan hisobot yöq." : "Hali hisobot yuborilmagan."}
           </p>
         </div>
       ) : (
@@ -263,7 +263,7 @@ export default function ReportReview({ mode }: { mode: "admin" | "teacher" }) {
                     onChange={(e) => setNotes((n) => ({ ...n, [r.id]: e.target.value }))}
                     rows={2}
                     className="input-field text-sm resize-y"
-                    placeholder="Izoh (qaytarishda majburiy): nimani qayta bajarish kerak?"
+                    placeholder="Izoh (qaytarişda majburiy): nimani qayta bajariş kerak?"
                   />
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -272,14 +272,14 @@ export default function ReportReview({ mode }: { mode: "admin" | "teacher" }) {
                       className="btn-primary py-2 px-4 text-sm flex items-center gap-2 disabled:opacity-50"
                     >
                       {acting === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                      Qabul qilish
+                      Qabul qiliş
                     </button>
                     <button
                       onClick={() => review(r.id, false)}
                       disabled={acting === r.id}
                       className="btn-ghost py-2 px-4 text-sm flex items-center gap-2 text-neon-red disabled:opacity-50"
                     >
-                      <RotateCcw className="w-4 h-4" /> Qaytarish
+                      <RotateCcw className="w-4 h-4" /> Qaytariş
                     </button>
                   </div>
                 </div>
@@ -300,18 +300,18 @@ export default function ReportReview({ mode }: { mode: "admin" | "teacher" }) {
           onClick={() => setLightbox(null)}
           role="dialog"
           aria-modal="true"
-          aria-label="Skrinshot"
+          aria-label="Skrinşot"
         >
           <button
             type="button"
             onClick={() => setLightbox(null)}
-            aria-label="Yopish"
+            aria-label="Yopiş"
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20"
           >
             <X className="w-5 h-5" />
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={lightbox} alt="Skrinshot" className="max-w-full max-h-full rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
+          <img src={lightbox} alt="Skrinşot" className="max-w-full max-h-full rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </div>

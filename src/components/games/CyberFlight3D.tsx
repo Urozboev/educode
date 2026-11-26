@@ -188,7 +188,7 @@ export default function CyberFlight3D() {
         setScore((s) => s + 50 * (streak + 1));
         setStreak((st) => st + 1);
         setCoinsEarned((c) => c + 3);
-        toast.success("To'g'ri darvoza! +50 ball");
+        toast.success("Töğri darvoza! +50 ball");
       } else {
         // Crash / Wrong gate
         setStreak(0);
@@ -243,7 +243,7 @@ export default function CyberFlight3D() {
             </h3>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            To&apos;g&apos;ri (True) shart yozilgan darvoza tomonga buriling (Chap / O&apos;ng)
+            Töğri (True) şart yozilgan darvoza tomonga buriling (Çap / Öng)
           </p>
         </div>
 
@@ -297,8 +297,8 @@ export default function CyberFlight3D() {
             </h3>
             <p className="text-sm text-muted-foreground max-w-md mb-6">
               {gameState === "gameover"
-                ? `Siz to'plagan yakuniy ball: ${score} ball va ${coinsEarned} coin!`
-                : "Dronni boshqaring: har safar ekranda ikkita dasturlash sharti chiqadi. Shulardan qaysi biri True bo'lsa, o'sha darvoza tomonga o'ting!"}
+                ? `Siz töplagan yakuniy ball: ${score} ball va ${coinsEarned} coin!`
+                : "Dronni boşqaring: har safar ekranda ikkita dasturlaş şarti çiqadi. Şulardan qaysi biri True bölsa, öşa darvoza tomonga öting!"}
             </p>
 
             <button
@@ -306,7 +306,7 @@ export default function CyberFlight3D() {
               className="btn-primary py-3 px-8 text-sm font-bold flex items-center gap-2 shadow-xl shadow-neon-cyan/30"
             >
               <Play className="w-4 h-4 fill-current" />
-              {gameState === "gameover" ? "Qayta Uchish" : "Boshlash"}
+              {gameState === "gameover" ? "Qayta Uçiş" : "Boshlash"}
             </button>
           </div>
         )}
@@ -323,7 +323,7 @@ export default function CyberFlight3D() {
                   : "bg-black/60 border-white/10 text-white/70 hover:bg-black/80"
               )}
             >
-              <ArrowLeft className="w-4 h-4" /> Chap Darvoza (A)
+              <ArrowLeft className="w-4 h-4" /> Çap Darvoza (A)
             </button>
 
             <button
@@ -335,7 +335,7 @@ export default function CyberFlight3D() {
                   : "bg-black/60 border-white/10 text-white/70 hover:bg-black/80"
               )}
             >
-              O&apos;ng Darvoza (D) <ArrowRight className="w-4 h-4" />
+              Öng Darvoza (D) <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}

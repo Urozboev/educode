@@ -113,7 +113,7 @@ const gameCards = (t: Dictionary) => [
   {
     type: "binary" as const,
     title: "Binary Bridge",
-    desc: "Ikkilik sanoq sistemasida bitlarni yoqib berilgan sonlarni hosil qiling va ko'prik quring.",
+    desc: "Ikkilik sanoq sistemasida bitlarni yoqib berilgan sonlarni hosil qiling va köprik quring.",
     Icon: Binary,
     color: "#00E676",
     diff: t.difficulty.medium,
@@ -219,7 +219,7 @@ export default function GamesPage() {
                   : "bg-surface border border-border text-muted-foreground hover:text-foreground"
               )}
             >
-              {t.cabinet.gamesPage.filterAll || "Barcha o'yinlar"}
+              {t.cabinet.gamesPage.filterAll || "Barça öyinlar"}
             </button>
             <button
               onClick={() => setCategoryFilter("3d")}
@@ -231,7 +231,7 @@ export default function GamesPage() {
               )}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              {t.cabinet.gamesPage.filter3d || "3D O'yinlar"}
+              {t.cabinet.gamesPage.filter3d || "3D Öyinlar"}
             </button>
             <button
               onClick={() => setCategoryFilter("classic")}
@@ -288,7 +288,7 @@ export default function GamesPage() {
                   <p className="text-[15px] text-muted-foreground leading-relaxed">{g.desc}</p>
 
                   <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-foreground/70 group-hover:text-neon-purple transition-colors">
-                    O&apos;ynash
+                    Öynaş
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </div>
@@ -302,7 +302,7 @@ export default function GamesPage() {
             onClick={() => setGame(null)}
             className="inline-flex items-center gap-2 text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
-            <ArrowLeft className="w-4 h-4" /> O&apos;yinlarga qaytish
+            <ArrowLeft className="w-4 h-4" /> Öyinlarga qaytiş
           </button>
           {game === "quiz3d" && <QuizBattle3D />}
           {game === "maze3d" && <MazeRunner3D />}
@@ -349,11 +349,11 @@ const puzzles = [
   { title: "Eng katta element", lines: ["def max_el(arr):", "    m = arr[0]", "    for x in arr:", "        if x > m:", "            m = x", "    return m"] },
   { title: "Teskari satr", lines: ["def reverse(s):", "    result = ''", "    for c in s:", "        result = c + result", "    return result"] },
   { title: "Faktorial", lines: ["def factorial(n):", "    if n == 0:", "        return 1", "    return n * factorial(n-1)"] },
-  { title: "Sonlar yig'indisi", lines: ["total = 0", "for i in range(1, 11):", "    total += i", "print(total)"] },
+  { title: "Sonlar yiğindisi", lines: ["total = 0", "for i in range(1, 11):", "    total += i", "print(total)"] },
   { title: "Bubble Sort", lines: ["for i in range(len(arr)):", "    for j in range(len(arr)-i-1):", "        if arr[j] > arr[j+1]:", "            arr[j], arr[j+1] = arr[j+1], arr[j]"] },
   { title: "Binary Search", lines: ["def search(arr, x):", "    lo, hi = 0, len(arr)-1", "    while lo <= hi:", "        mid = (lo + hi) // 2", "        if arr[mid] == x: return mid", "        elif arr[mid] < x: lo = mid + 1", "        else: hi = mid - 1", "    return -1"] },
   { title: "Juft sonlar filtri", lines: ["numbers = [1, 2, 3, 4, 5, 6]", "evens = []", "for n in numbers:", "    if n % 2 == 0:", "        evens.append(n)", "print(evens)"] },
-  { title: "Lug'at yaratish", lines: ["students = {}", "students['Ali'] = 90", "students['Vali'] = 85", "for name, score in students.items():", "    print(f'{name}: {score}')"] },
+  { title: "Luğat yaratiş", lines: ["students = {}", "students['Ali'] = 90", "students['Vali'] = 85", "for name, score in students.items():", "    print(f'{name}: {score}')"] },
 ];
 
 function PuzzleGame() {
@@ -384,7 +384,7 @@ function PuzzleGame() {
         }
       />
       <p className="text-[15px] text-muted-foreground">
-        Qatorlarni surib to'g'ri tartibga qo'ying, so'ng tekshiring.
+        Qatorlarni surib töğri tartibga qöying, söng tekşiring.
       </p>
 
       <Reorder.Group
@@ -430,7 +430,7 @@ function PuzzleGame() {
           disabled={checked}
           className="py-2.5 px-5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50"
         >
-          Tekshirish
+          Tekşiriş
         </button>
         <button
           onClick={() => {
@@ -439,7 +439,7 @@ function PuzzleGame() {
           }}
           className="py-2.5 px-5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition inline-flex items-center gap-2"
         >
-          <RotateCcw className="w-4 h-4" /> Aralashtirish
+          <RotateCcw className="w-4 h-4" /> Aralaştiriş
         </button>
         {checked && (
           <button
@@ -477,16 +477,16 @@ function PuzzleGame() {
 
 // ===== 2. BUG FIX =====
 const bugs = [
-  { title: "Taqqoslash operatori", code: "x = 10\nif x % 2 = 0:\n    print('Juft')", fixed: "if x % 2 == 0:", bugLine: 1, hint: "'=' o'rniga '==' kerak" },
-  { title: "Index xatosi", code: "arr = [1, 2, 3]\nfor i in range(len(arr)):\n    print(arr[i + 1])", fixed: "    print(arr[i])", bugLine: 2, hint: "i+1 chegaradan chiqadi" },
+  { title: "Taqqoslaş operatori", code: "x = 10\nif x % 2 = 0:\n    print('Juft')", fixed: "if x % 2 == 0:", bugLine: 1, hint: "'=' örniga '==' kerak" },
+  { title: "Index xatosi", code: "arr = [1, 2, 3]\nfor i in range(len(arr)):\n    print(arr[i + 1])", fixed: "    print(arr[i])", bugLine: 2, hint: "i+1 çegaradan çiqadi" },
   { title: "Faktorial", code: "def factorial(n):\n    if n == 0:\n        return 0\n    return n * factorial(n-1)", fixed: "        return 1", bugLine: 2, hint: "0! = 1, 0 emas" },
-  { title: "Cheksiz tsikl", code: "i = 0\nwhile i < 10:\n    print(i)", fixed: "    print(i)\n    i += 1", bugLine: 2, hint: "i qiymati o'zgarmaydi" },
-  { title: "Return xatosi", code: "def add(a, b):\n    result = a + b\n\nprint(add(3, 5))", fixed: "    return result", bugLine: 2, hint: "Funksiya hech narsa qaytarmaydi" },
-  { title: "String + int", code: "name = 'Ali'\nage = 25\nprint('Yosh: ' + age)", fixed: "print('Yosh: ' + str(age))", bugLine: 2, hint: "str va int ni qo'shib bo'lmaydi" },
+  { title: "Çeksiz tsikl", code: "i = 0\nwhile i < 10:\n    print(i)", fixed: "    print(i)\n    i += 1", bugLine: 2, hint: "i qiymati özgarmaydi" },
+  { title: "Return xatosi", code: "def add(a, b):\n    result = a + b\n\nprint(add(3, 5))", fixed: "    return result", bugLine: 2, hint: "Funksiya heç narsa qaytarmaydi" },
+  { title: "String + int", code: "name = 'Ali'\nage = 25\nprint('Yosh: ' + age)", fixed: "print('Yosh: ' + str(age))", bugLine: 2, hint: "str va int ni qöşib bölmaydi" },
   { title: "List append", code: "fruits = ['olma']\nfruits = fruits.append('banan')\nprint(fruits)", fixed: "fruits.append('banan')", bugLine: 1, hint: "append() None qaytaradi" },
-  { title: "Scope xatosi", code: "def greet():\n    msg = 'Salom'\ngreet()\nprint(msg)", fixed: "    return msg\nresult = greet()\nprint(result)", bugLine: 3, hint: "msg faqat funksiya ichida" },
-  { title: "Ro'yxat nusxasi", code: "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)", fixed: "b = a.copy()", bugLine: 1, hint: "b = a nusxa emas, havola" },
-  { title: "F-string xato", code: "name = 'Ali'\nprint(f'Salom {name!}')", fixed: "print(f'Salom {name}!')", bugLine: 1, hint: "! belgisi {} ichida emas tashqarida" },
+  { title: "Scope xatosi", code: "def greet():\n    msg = 'Salom'\ngreet()\nprint(msg)", fixed: "    return msg\nresult = greet()\nprint(result)", bugLine: 3, hint: "msg faqat funksiya içida" },
+  { title: "Röyxat nusxasi", code: "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)", fixed: "b = a.copy()", bugLine: 1, hint: "b = a nusxa emas, havola" },
+  { title: "F-string xato", code: "name = 'Ali'\nprint(f'Salom {name!}')", fixed: "print(f'Salom {name}!')", bugLine: 1, hint: "! belgisi {} içida emas taşqarida" },
 ];
 
 function BugFixGame() {
@@ -525,7 +525,7 @@ function BugFixGame() {
         }
       />
       <p className="text-[15px] text-muted-foreground">
-        Xato qatorni topib, to'g'ri variantini yozing.
+        Xato qatorni topib, töğri variantini yozing.
       </p>
 
       <div className="rounded-2xl border border-border/60 bg-card/40 overflow-hidden">
@@ -577,7 +577,7 @@ function BugFixGame() {
             disabled={!answer.trim()}
             className="py-2.5 px-5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50"
           >
-            Tekshirish
+            Tekşiriş
           </button>
         )}
         <button
@@ -777,16 +777,16 @@ function TypingGame() {
 
 // ===== 4. CODE BATTLE =====
 const battleProblems = [
-  { title: "Ikki sonni qo'shish", desc: "a + b = ?", input: "5 3", expected: "8", hint: "a, b = map(int, input().split())" },
-  { title: "Juft/Toq", desc: "Son juft bo'lsa 'Juft', toq bo'lsa 'Toq'", input: "4", expected: "Juft", hint: "n % 2 == 0" },
+  { title: "Ikki sonni qöşiş", desc: "a + b = ?", input: "5 3", expected: "8", hint: "a, b = map(int, input().split())" },
+  { title: "Juft/Toq", desc: "Son juft bölsa 'Juft', toq bölsa 'Toq'", input: "4", expected: "Juft", hint: "n % 2 == 0" },
   { title: "Eng katta son", desc: "3 ta sondan eng kattasi", input: "3 7 5", expected: "7", hint: "max()" },
-  { title: "Satr uzunligi", desc: "So'z uzunligi", input: "salom", expected: "5", hint: "len()" },
+  { title: "Satr uzunligi", desc: "Söz uzunligi", input: "salom", expected: "5", hint: "len()" },
   { title: "Teskari son", desc: "Sonni teskari yozing", input: "123", expected: "321", hint: "str[::-1]" },
-  { title: "Harflar soni", desc: "'a' harfi nechta?", input: "banana", expected: "3", hint: ".count('a')" },
-  { title: "Kattaharf", desc: "So'zni kattaharfga", input: "salom", expected: "SALOM", hint: ".upper()" },
-  { title: "Yig'indi 1..n", desc: "1 dan n gacha yig'indi", input: "5", expected: "15", hint: "n*(n+1)//2" },
+  { title: "Harflar soni", desc: "'a' harfi neçta?", input: "banana", expected: "3", hint: ".count('a')" },
+  { title: "Kattaharf", desc: "Sözni kattaharfga", input: "salom", expected: "SALOM", hint: ".upper()" },
+  { title: "Yiğindi 1..n", desc: "1 dan n gaça yiğindi", input: "5", expected: "15", hint: "n*(n+1)//2" },
   { title: "Absolut qiymat", desc: "|n| ni toping", input: "-7", expected: "7", hint: "abs()" },
-  { title: "Min element", desc: "Ro'yxatdagi eng kichik", input: "4 1 7 2", expected: "1", hint: "min()" },
+  { title: "Min element", desc: "Röyxatdagi eng kiçik", input: "4 1 7 2", expected: "1", hint: "min()" },
 ];
 
 function BattleGame() {
@@ -895,7 +895,7 @@ function BattleGame() {
             <p className="text-[15px] text-muted-foreground mb-4">{prob.desc}</p>
             <div className="flex gap-4 font-mono bg-surface/60 rounded-xl px-4 py-3 mb-3 text-sm">
               <span>
-                Kirish: <strong>{prob.input}</strong>
+                Kiriş: <strong>{prob.input}</strong>
               </span>
               <span>
                 Kutilgan: <strong className="text-neon-green">{prob.expected}</strong>
@@ -979,7 +979,7 @@ const DIR_BLOCKS = [
   { id: "up", label: "Yuqori", Icon: ArrowUp, dx: -1, dy: 0, color: "#6C5CE7" },
   { id: "down", label: "Pastga", Icon: ArrowDown, dx: 1, dy: 0, color: "#00E676" },
   { id: "left", label: "Chapga", Icon: ALeft, dx: 0, dy: -1, color: "#00D2FF" },
-  { id: "right", label: "O'ngga", Icon: ARight, dx: 0, dy: 1, color: "#FFD600" },
+  { id: "right", label: "Öngga", Icon: ARight, dx: 0, dy: 1, color: "#FFD600" },
 ];
 
 function RobotSprite({ x, y, size = 28 }: { x: number; y: number; size?: number }) {
@@ -1083,11 +1083,11 @@ function MazeGame() {
     <div className="max-w-3xl space-y-5">
       <GameHeader
         Icon={Map}
-        title={`Maze Runner — ${level + 1}-bosqich`}
+        title={`Maze Runner — ${level + 1}-bosqiç`}
         meta={<span>{maze.desc}</span>}
       />
       <p className="text-[15px] text-muted-foreground">
-        Buyruq bloklarini joylashtirib robotni sariq maqsadga yetkazing.
+        Buyruq bloklarini joylaştirib robotni sariq maqsadga yetkazing.
       </p>
 
       <div className="grid lg:grid-cols-[1fr,240px] gap-5">
@@ -1273,7 +1273,7 @@ function MazeGame() {
               disabled={won || animating || commands.length === 0}
               className="flex-1 py-2 px-4 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
             >
-              <Play className="w-4 h-4" /> {animating ? "..." : "Ishga tushirish"}
+              <Play className="w-4 h-4" /> {animating ? "..." : "Işga tuşiriş"}
             </button>
             <button
               onClick={reset}
@@ -1299,7 +1299,7 @@ function MazeGame() {
             onClick={nextLevel}
             className="py-2.5 px-8 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition mt-3 inline-flex items-center gap-2"
           >
-            Keyingi bosqich <ArrowRight className="w-4 h-4" />
+            Keyingi bosqiç <ArrowRight className="w-4 h-4" />
           </button>
         </motion.div>
       )}
@@ -1312,18 +1312,18 @@ function MazeGame() {
 // yetib boriladigan grid nuqtalarida bo'lishi shart:
 // x ∈ {40,120,200,280,360}, y ∈ {70,150,230}
 const birdLevels = [
-  { level: 1, targets: [[200, 150]] as number[][], obstacles: [] as number[][], desc: "Qushni yulduzga olib boring (2 ta o'ngga)" },
-  { level: 2, targets: [[360, 150]] as number[][], obstacles: [[200, 60, 20, 130]] as number[][], desc: "To'siqdan aylanib yulduzga yeting" },
-  { level: 3, targets: [[200, 70], [360, 230]] as number[][], obstacles: [[120, 100, 160, 16], [240, 180, 16, 100]] as number[][], desc: "2 ta yulduzni yig'ing" },
+  { level: 1, targets: [[200, 150]] as number[][], obstacles: [] as number[][], desc: "Quşni yulduzga olib boring (2 ta öngga)" },
+  { level: 2, targets: [[360, 150]] as number[][], obstacles: [[200, 60, 20, 130]] as number[][], desc: "Tösiqdan aylanib yulduzga yeting" },
+  { level: 3, targets: [[200, 70], [360, 230]] as number[][], obstacles: [[120, 100, 160, 16], [240, 180, 16, 100]] as number[][], desc: "2 ta yulduzni yiğing" },
 ];
 
 const BIRD_MOVES = [
-  { id: "right", label: "O'ngga", Icon: ARight, dx: 80, dy: 0, color: "#FFD600" },
+  { id: "right", label: "Öngga", Icon: ARight, dx: 80, dy: 0, color: "#FFD600" },
   { id: "left", label: "Chapga", Icon: ALeft, dx: -80, dy: 0, color: "#00D2FF" },
   { id: "up", label: "Yuqori", Icon: ArrowUp, dx: 0, dy: -80, color: "#6C5CE7" },
   { id: "down", label: "Pastga", Icon: ArrowDown, dx: 0, dy: 80, color: "#00E676" },
-  { id: "diag_ru", label: "O'ng-yuqori", Icon: ARight, dx: 80, dy: -80, color: "#FF6B9D" },
-  { id: "diag_rd", label: "O'ng-past", Icon: ARight, dx: 80, dy: 80, color: "#FF5252" },
+  { id: "diag_ru", label: "Öng-yuqori", Icon: ARight, dx: 80, dy: -80, color: "#FF6B9D" },
+  { id: "diag_rd", label: "Öng-past", Icon: ARight, dx: 80, dy: 80, color: "#FF5252" },
 ];
 
 function BirdSprite({ x, y, crashed }: { x: number; y: number; crashed: boolean }) {
@@ -1683,7 +1683,7 @@ function BirdGame() {
             onClick={nextLevel}
             className="py-2.5 px-8 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition mt-3 inline-flex items-center gap-2"
           >
-            Keyingi bosqich <ArrowRight className="w-4 h-4" />
+            Keyingi bosqiç <ArrowRight className="w-4 h-4" />
           </button>
         </motion.div>
       )}
@@ -1727,7 +1727,7 @@ function BinaryGame() {
       const bonus = 10;
       setScore((s) => s + 100);
       setCoins((c) => c + bonus);
-      toast.success(`To'g'ri! Ikkilik ko'prik qurildi! +${bonus} coin 🎉`);
+      toast.success(`Töğri! Ikkilik köprik qurildi! +${bonus} coin 🎉`);
 
       try {
         getCurrentUser(supabase).then((user: any) => {
@@ -1786,19 +1786,19 @@ function BinaryGame() {
       />
 
       <p className="text-[15px] text-muted-foreground">
-        Bitlarni yoqib-o&apos;chirish (<code className="text-neon-cyan font-bold">1</code> / <code className="text-muted-foreground font-bold">0</code>) orqali berilgan o&apos;nlik songa tenglang va ko&apos;prikni quring.
+        Bitlarni yoqib-öçiriş (<code className="text-neon-cyan font-bold">1</code> / <code className="text-muted-foreground font-bold">0</code>) orqali berilgan önlik songa tenglang va köprikni quring.
       </p>
 
       {/* Target Mission Card */}
       <div className="p-6 rounded-3xl bg-surface/60 border border-border flex items-center justify-between flex-wrap gap-4">
         <div>
           <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-            Hosil qilinishi kerak bo&apos;lgan son (Target):
+            Hosil qilinişi kerak bölgan son (Target):
           </span>
           <div className="font-display font-extrabold text-3xl text-foreground flex items-baseline gap-2 mt-1">
             <span>{target}</span>
             <span className="text-xs font-mono text-neon-purple font-semibold">
-              ({levelIdx + 1}/{BINARY_TARGETS.length}-bosqich)
+              ({levelIdx + 1}/{BINARY_TARGETS.length}-bosqiç)
             </span>
           </div>
         </div>
@@ -1861,7 +1861,7 @@ function BinaryGame() {
         <button
           onClick={resetBits}
           className="text-muted-foreground hover:text-foreground p-1 rounded transition"
-          title="Tozalash"
+          title="Tozalaş"
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
@@ -1878,10 +1878,10 @@ function BinaryGame() {
             <Trophy className="w-7 h-7 text-neon-green" />
           </div>
           <p className="font-display font-bold text-neon-green text-xl">
-            Ajoyib! Ko&apos;prik Muvaffaqiyatli Qurildi!
+            Ajoyib! Köprik Muvaffaqiyatli Qurildi!
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Ikkilik sanoq sistemasida son to&apos;g&apos;ri terildi.
+            Ikkilik sanoq sistemasida son töğri terildi.
           </p>
           <button
             onClick={nextLevel}

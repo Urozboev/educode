@@ -36,7 +36,7 @@ export const LOCALE_META: Record<Locale, {
    */
   code: string;
 }> = {
-  uz:  { label: "O'zbekcha",     native: "O'zbekcha",     htmlLang: "uz",  code: "UZ" },
+  uz:  { label: "Özbekça",     native: "Özbekça",     htmlLang: "uz",  code: "UZ" },
   ru:  { label: "Ruscha",        native: "Русский",       htmlLang: "ru",  code: "RU" },
   en:  { label: "Inglizcha",     native: "English",       htmlLang: "en",  code: "EN" },
   kaa: { label: "Qoraqalpoqcha", native: "Qaraqalpaqsha", htmlLang: "kaa", code: "QQ" },

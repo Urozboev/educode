@@ -103,7 +103,7 @@ export function HardwareLab() {
       const right = PORTS(t).find(p => p.type === device.port);
       setFeedback({
         ok: false,
-        text: `${device.name} bu portga ulanmaydi. ${port.purpose} ${device.name} uchun ${right?.label} kerak.`,
+        text: `${device.name} bu portga ulanmaydi. ${port.purpose} ${device.name} uçun ${right?.label} kerak.`,
       });
     }
   }
@@ -138,7 +138,7 @@ export function HardwareLab() {
             </span>
           )}
           <button onClick={reset} className="btn-ghost py-2 px-4 text-sm inline-flex items-center gap-2">
-            <RotateCcw className="w-4 h-4" /> Boshidan
+            <RotateCcw className="w-4 h-4" /> Boşidan
           </button>
         </div>
       </div>
@@ -272,12 +272,12 @@ export function HardwareLab() {
             className="p-5 rounded-xl bg-neon-green/[0.06] border border-neon-green/25 text-center"
           >
             <p className="font-display font-bold text-neon-green mb-1">
-              Kompyuter to&apos;liq yig&apos;ildi
+              Kompyuter töliq yiğildi
             </p>
             <p className="text-sm text-muted-foreground">
               {mistakes === 0
                 ? t.labs.noMistakes
-                : `${mistakes} ta xato bilan yakunladingiz — qaytadan urinib ko'ring.`}
+                : `${mistakes} ta xato bilan yakunladingiz — qaytadan urinib köring.`}
             </p>
           </motion.div>
         )}

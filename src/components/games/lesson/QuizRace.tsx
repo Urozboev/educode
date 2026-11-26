@@ -217,9 +217,9 @@ export function QuizRace({
               {picked === null ? (
                 <span className="text-muted-foreground">Vaqt tugadi</span>
               ) : q.options[picked]?.correct ? (
-                <span className="text-neon-green">To&apos;g&apos;ri! +{BASE_POINTS + Math.round((left / (q.seconds || 1)) * SPEED_BONUS)} ball</span>
+                <span className="text-neon-green">Töğri! +{BASE_POINTS + Math.round((left / (q.seconds || 1)) * SPEED_BONUS)} ball</span>
               ) : (
-                <span className="text-neon-red">Noto&apos;g&apos;ri</span>
+                <span className="text-neon-red">Notöğri</span>
               )}
             </p>
             <button onClick={next} className="btn-primary py-2.5 px-6 text-sm inline-flex items-center gap-2">

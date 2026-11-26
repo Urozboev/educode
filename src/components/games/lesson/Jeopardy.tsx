@@ -161,7 +161,7 @@ export function Jeopardy({
       {/* Hisob */}
       <div className="flex items-center justify-between gap-4 mb-5">
         <span className="eyebrow">
-          Ochilgan <span className="numeric">{answered}</span>/<span className="numeric">{total}</span>
+          Oçilgan <span className="numeric">{answered}</span>/<span className="numeric">{total}</span>
         </span>
         <div className="flex items-center gap-3">
           {lastMove && (
@@ -239,7 +239,7 @@ export function Jeopardy({
           disabled={answered === 0}
           className="btn-primary py-2.5 px-6 text-sm disabled:opacity-40"
         >
-          Yakunlash
+          Yakunlaş
         </button>
       </div>
 
@@ -250,7 +250,7 @@ export function Jeopardy({
           animate={{ opacity: 1, y: 0 }}
           className="mt-4 text-center font-display font-bold text-lg text-neon-green"
         >
-          G&apos;olib: Jamoa {scores.slice(0, teamCount).indexOf(Math.max(...scores.slice(0, teamCount))) + 1}
+          Ğolib: Jamoa {scores.slice(0, teamCount).indexOf(Math.max(...scores.slice(0, teamCount))) + 1}
         </motion.p>
       )}
 
@@ -298,7 +298,7 @@ export function Jeopardy({
                           onClick={() => mark(0)}
                           className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold border border-neon-green/30 text-neon-green bg-neon-green/[0.06] hover:bg-neon-green/[0.12] transition-colors"
                         >
-                          <Check className="w-4 h-4" /> To&apos;g&apos;ri
+                          <Check className="w-4 h-4" /> Töğri
                         </button>
                       ) : (
                         Array.from({ length: teamCount }).map((_, i) => (
@@ -330,7 +330,7 @@ export function Jeopardy({
                     onClick={() => setRevealed(true)}
                     className="btn-primary w-full flex items-center justify-center gap-2"
                   >
-                    <Eye className="w-4 h-4" /> {t.lg.answer}ni ko&apos;rsatish
+                    <Eye className="w-4 h-4" /> {t.lg.answer}ni körsatiş
                   </motion.button>
                 )}
               </AnimatePresence>

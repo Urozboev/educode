@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser();
       return NextResponse.json(
         {
-          error: user ? 'Bu darsni ko\'rish uchun kursga yoziling' : 'Tizimga kiring',
+          error: user ? 'Bu darsni ko\'riş uçun kursga yoziling' : 'Tizimga kiring',
           requires: user ? 'enrollment' : 'auth',
         },
         { status: 403 },
@@ -139,10 +139,10 @@ export async function GET() {
   return NextResponse.json({
     route: '/api/video/token',
     bunny: {
-      library_id: libraryId ? `OK (${libraryId})` : "YO'Q — BUNNY_STREAM_LIBRARY_ID .env.local da kiritilmagan",
-      token_key: tokenKey ? `OK (${tokenKey.slice(0, 6)}...)` : "YO'Q — BUNNY_STREAM_TOKEN_KEY .env.local da kiritilmagan",
+      library_id: libraryId ? `OK (${libraryId})` : "YÖQ — BUNNY_STREAM_LIBRARY_ID .env.local da kiritilmagan",
+      token_key: tokenKey ? `OK (${tokenKey.slice(0, 6)}...)` : "YÖQ — BUNNY_STREAM_TOKEN_KEY .env.local da kiritilmagan",
       ready: !!(libraryId && tokenKey),
     },
-    eslatma: "Kalitlarni kiritgach dev serverni qayta ishga tushiring (Ctrl+C -> npm run dev)",
+    eslatma: "Kalitlarni kiritgaç dev serverni qayta işga tuşiring (Ctrl+C -> npm run dev)",
   });
 }

@@ -98,9 +98,9 @@ const ifElse = (t: Dictionary): Program => ({
   code: [
     "baho = 85",
     "if baho >= 90:",
-    "    natija = \"A'lo\"",
+    "    natija = \"Aʼlo\"",
     "elif baho >= 70:",
-    "    natija = \"Yaxshi\"",
+    "    natija = \"Yaxşi\"",
     "else:",
     "    natija = \"Qoniqarli\"",
     "print(natija)",
@@ -111,7 +111,7 @@ const ifElse = (t: Dictionary): Program => ({
       { line: 1, vars: { baho }, output: [], note: t.labs.noteGrade },
       { line: 2, vars: { baho }, output: [], note: t.labs.noteGradeFalse },
       { line: 4, vars: { baho }, output: [], note: t.labs.noteGradeTrue },
-      { line: 5, vars: { baho, natija: "Yaxshi" }, output: [], note: "natija = \"Yaxshi\"" },
+      { line: 5, vars: { baho, natija: "Yaxshi" }, output: [], note: "natija = \"Yaxşi\"" },
       { line: 8, vars: { baho, natija: "Yaxshi" }, output: ["Yaxshi"], note: t.labs.noteElseSkipped },
     ];
   },
@@ -147,7 +147,7 @@ const PROGRAMS = (t: Dictionary) => [forSum(t), whileCount(t), ifElse(t), nested
 
 const SPEEDS = [
   { label: "Sekin", ms: 1400, Icon: Turtle },
-  { label: "O'rta", ms: 700, Icon: Rabbit },
+  { label: "Örta", ms: 700, Icon: Rabbit },
   { label: "Tez", ms: 300, Icon: Rabbit },
 ];
 
@@ -244,7 +244,7 @@ export function LoopsLab() {
         <div className="flex flex-col gap-4">
           {/* O'zgaruvchilar jadvali */}
           <div className="rounded-xl border border-border bg-card p-4 flex-1">
-            <p className="eyebrow mb-3">O&apos;zgaruvchilar</p>
+            <p className="eyebrow mb-3">Özgaruvçilar</p>
             {varEntries.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">{t.labs.noVars}</p>
             ) : (

@@ -86,7 +86,7 @@ export default function IntegrityPage() {
         <div>
           <h1 className="font-display font-bold text-3xl">{t.admin.integrity}</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Kod muharririga nusxa qo&apos;yilgan yechimlar
+            Kod muharririga nusxa qöyilgan yeçimlar
           </p>
         </div>
         <button
@@ -95,7 +95,7 @@ export default function IntegrityPage() {
           className="btn-ghost px-4 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          Yangilash
+          Yangilaş
         </button>
       </div>
 
@@ -103,14 +103,14 @@ export default function IntegrityPage() {
         <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-neon-blue" />
         <span className="leading-relaxed text-muted-foreground">
           {t.admin.intg.notice}
-          muharrirdan yoki telefonidan ko&apos;chirgan bo&apos;lishi mumkin. Xulosa
-          chiqarishdan oldin yechim matnini ochib ko&apos;ring.
+          muharrirdan yoki telefonidan köçirgan bölişi mumkin. Xulosa
+          çiqarişdan oldin yeçim matnini oçib köring.
         </span>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <Stat label="Belgilangan yechim" value={rows.length} />
-        <Stat label="80% dan ko'p" value={high} accent="text-neon-red" />
+        <Stat label="Belgilangan yeçim" value={rows.length} />
+        <Stat label="80% dan köp" value={high} accent="text-neon-red" />
         <Stat label={t.admin.intg.inContest} value={contest} accent="text-neon-yellow" />
       </div>
 
@@ -168,7 +168,7 @@ export default function IntegrityPage() {
                       <span className="inline-flex items-center gap-1">
                         {r.contest_title
                           ? <><Trophy className="w-3 h-3 text-neon-yellow" /> {r.contest_title}</>
-                          : <><Code2 className="w-3 h-3" /> {r.task_type === "challenge" ? t.admin.common.task : "Mavzu topshirig'i"}</>}
+                          : <><Code2 className="w-3 h-3" /> {r.task_type === "challenge" ? t.admin.common.task : "Mavzu topşiriği"}</>}
                       </span>
                       <span>{formatDateTime(r.created_at)}</span>
                       <span className={r.status === "accepted" ? "text-neon-green" : "text-neon-red"}>
@@ -194,7 +194,7 @@ export default function IntegrityPage() {
                   <div className="border-t border-border/60 p-4 space-y-2">
                     <p className="text-[11px] text-muted-foreground">
                       Kod uzunligi <span className="numeric">{r.code_length}</span> belgi,
-                      shundan <span className="numeric">{r.pasted_chars}</span> tasi ko&apos;chirilgan · {r.language}
+                      şundan <span className="numeric">{r.pasted_chars}</span> tasi köçirilgan · {r.language}
                     </p>
                     <pre className="text-xs font-mono bg-[#0d1117] border border-border rounded-xl p-4 overflow-x-auto max-h-80 overflow-y-auto">
                       {code[r.submission_id] ?? "Yuklanmoqda..."}

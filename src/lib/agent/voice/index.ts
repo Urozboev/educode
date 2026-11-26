@@ -17,6 +17,7 @@ import { createAdminClient, hasServiceRole } from '@/lib/supabase/server';
 import type { TTSResult, TTSProviderName } from '../types';
 import { synthesizeAisha, type RawAudio } from './providers/aisha';
 import { synthesizeGemini, GEMINI_TTS_LANGS } from './providers/gemini';
+import { toOldUz } from '@/lib/uz-alphabet';
 
 const BUCKET = 'agent-audio';
 
@@ -52,7 +53,11 @@ export function voiceCacheKey(text: string, lang: string, provider: string): str
  * agent butunlay soqov bo'lib qolgandan ko'ra yaxshi.
  */
 export async function synthesize(text: string, lang = 'uz'): Promise<TTSResult> {
-  const clean = text.trim();
+  // Ovoz modellari yangi alifbodagi ş, ç, ğ, ö ni ishonchli o'qimaydi —
+  // eski lotin yozuvida yuboramiz. O'girish yo'qotishsiz, ma'no o'zgarmaydi.
+  // Kesh kaliti ham shu matndan olinadi: ikkala yozuvdagi bir xil gap
+  // bitta audio faylni ishlatadi.
+  const clean = (lang === 'uz' ? toOldUz(text) : text).trim();
   if (!clean) {
     return { provider: 'browser', audioUrl: null, cached: false, charCount: 0 };
   }

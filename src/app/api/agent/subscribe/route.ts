@@ -52,13 +52,13 @@ export async function POST(req: NextRequest) {
   const provider = body.provider as 'payme' | 'click';
 
   if (!PAID_PLANS.includes(plan)) {
-    return Response.json({ error: "Noto'g'ri tarif" }, { status: 400 });
+    return Response.json({ error: "Notöğri tarif" }, { status: 400 });
   }
   if (!(MONTH_OPTIONS as readonly number[]).includes(months)) {
-    return Response.json({ error: "Noto'g'ri muddat" }, { status: 400 });
+    return Response.json({ error: "Notöğri muddat" }, { status: 400 });
   }
   if (!['payme', 'click'].includes(provider)) {
-    return Response.json({ error: "Noto'g'ri to'lov usuli" }, { status: 400 });
+    return Response.json({ error: "Notöğri tölov usuli" }, { status: 400 });
   }
 
   // Summani server hisoblaydi — mijozdan kelgan qiymat ishlatilmaydi

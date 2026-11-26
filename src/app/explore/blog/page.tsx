@@ -86,7 +86,7 @@ export default async function BlogListPage() {
                 </div>
                 <h2 className="font-display font-extrabold text-2xl leading-tight mb-3 group-hover:text-neon-purple transition-colors">{featured.title}</h2>
                 <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{featured.excerpt}</p>
-                <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple">O'qish <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
+                <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple">Öqiş <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
               </div>
             </Link>
           )}

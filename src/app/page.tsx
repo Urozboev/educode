@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
-import { getInitials, formatNumber } from "@/lib/utils";
+import { getInitials } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import {
-  Code2, Brain, Trophy, Gamepad2, Users, ChevronRight, ChevronLeft,
-  BookOpen, Terminal, Shield, Globe, ArrowRight, ArrowUpRight,
-  LayoutDashboard, LogOut, Menu, X, Star, Quote, Moon, Sun,
-  Sparkles, Play, CheckCircle2, GraduationCap, MessageCircle,
-  Cpu, Layers, Binary, Zap, Monitor, Plus, Clock, ChevronDown
+  Code2, Brain, Binary, BookOpen, Monitor, ArrowRight, ArrowUpRight,
+  LayoutDashboard, LogOut, Menu, X, Star, Moon, Sun, Plus, Clock, ChevronDown, Users,
 } from "lucide-react";
 import { LanguageLogo } from "@/components/icons/LanguageLogo";
 import { OrganizationJsonLd, WebsiteJsonLd, FaqJsonLd } from "@/components/seo/JsonLd";
@@ -21,402 +18,10 @@ import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 import { BrandMark } from "@/components/brand/BrandMark";
 import HomeGuideSection from "@/components/guide/HomeGuideSection";
-
-const fadeUp = (delay = 0) => ({ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } } });
-const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
-
-/**
- * Kreativ "spreadsheet" uslubidagi hero mosaic — har bir katak kod/rasm/statistika.
- * Googlesheet.uz hero'dan ilhomlanib, MirAcademy uchun moslandi.
- * Bitta CSS grid ichida 6 ustun × 6 qator — markazda 2×2 "big" cell.
- */
-type MosaicCell =
-  | { kind: "empty"; tone?: "plain" | "purple" | "blue" | "green" | "yellow" | "pink" }
-  | { kind: "lang"; lang: "python" | "javascript" | "typescript" | "react" | "c++" | "java" | "csharp" | "html" }
-  | { kind: "snippet"; text: string; color?: string }
-  | { kind: "stat"; value: string; label: string; color: string }
-  | { kind: "icon"; Icon: any; color: string; badge?: string }
-  | { kind: "progress"; value: number; color: string; label: string }
-  | { kind: "check"; label: string };
-
-const TONE_BG: Record<string, string> = {
-  plain: "bg-surface/40",
-  purple: "bg-neon-purple/[0.08] border-neon-purple/15",
-  blue: "bg-neon-blue/[0.08] border-neon-blue/15",
-  green: "bg-neon-green/[0.08] border-neon-green/15",
-  yellow: "bg-neon-yellow/[0.08] border-neon-yellow/15",
-  pink: "bg-neon-pink/[0.08] border-neon-pink/15",
-};
-
-function MosaicCellView({ c, delay, idx, active }: { c: MosaicCell; delay: number; idx: number; active: boolean }) {
-  const base =
-    "relative aspect-square rounded-xl border flex items-center justify-center overflow-hidden transition-all duration-500 hover:scale-[1.06] hover:border-border hover:shadow-lg hover:shadow-black/5 hover:z-10 " +
-    (active
-      ? "border-neon-purple/50 bg-neon-purple/[0.08] shadow-[0_0_24px_rgba(108,92,231,0.25)] scale-[1.03] z-10"
-      : "border-border/50 bg-card/40");
-
-  // Har katak uchun deterministik "tasodifiy" suzish parametrlari
-  // (Math.random emas — hydration mos bo'lishi uchun index'dan)
-  const floatDur = 3.2 + ((idx * 37) % 17) / 10;      // 3.2s – 4.9s
-  const floatDelay = ((idx * 53) % 20) / 10;           // 0 – 2s
-  const floatAmp = 2.5 + ((idx * 29) % 3);             // 2.5 – 4.5px
-
-  const inner = (() => {
-    switch (c.kind) {
-      case "empty":
-        return <div className={`w-full h-full ${TONE_BG[c.tone || "plain"]}`} />;
-      case "lang":
-        return <LanguageLogo lang={c.lang as any} size={28} />;
-      case "snippet":
-        return (
-          <code
-            className="text-[10px] md:text-[11px] font-mono font-semibold truncate px-1.5"
-            style={{ color: c.color || "currentColor" }}
-          >
-            {c.text}
-            <span className="animate-pulse opacity-70">▍</span>
-          </code>
-        );
-      case "stat":
-        return (
-          <div className="text-center leading-none">
-            <div
-              className="font-display font-extrabold text-lg tracking-tight"
-              style={{ color: c.color }}
-            >
-              {c.value}
-            </div>
-            <div className="text-[9px] font-medium text-muted-foreground mt-0.5">{c.label}</div>
-          </div>
-        );
-      case "icon":
-        return (
-          <div className="flex flex-col items-center">
-            <c.Icon className="w-5 h-5" style={{ color: c.color }} />
-            {c.badge && (
-              <span className="text-[8px] font-bold mt-1" style={{ color: c.color }}>
-                {c.badge}
-              </span>
-            )}
-          </div>
-        );
-      case "progress":
-        return (
-          <div className="w-full px-2">
-            <div className="text-[9px] font-mono font-semibold mb-1" style={{ color: c.color }}>
-              {c.label}
-            </div>
-            <div className="h-1.5 rounded-full bg-surface overflow-hidden">
-              <motion.div
-                className="h-full rounded-full"
-                style={{ backgroundColor: c.color }}
-                initial={{ width: 0 }}
-                animate={{ width: `${c.value}%` }}
-                transition={{ duration: 1.2, delay: delay + 0.3 }}
-              />
-            </div>
-            <div className="text-[9px] text-muted-foreground mt-1 text-right">{c.value}%</div>
-          </div>
-        );
-      case "check":
-        return (
-          <div className="flex flex-col items-center">
-            <CheckCircle2 className="w-4 h-4 text-neon-green" />
-            <span className="text-[9px] font-semibold text-neon-green mt-0.5">{c.label}</span>
-          </div>
-        );
-      default:
-        return null;
-    }
-  })();
-
-  return (
-    <motion.div
-      className={base}
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {/* Doimiy yumshoq suzish — ichki qatlam (kirish animatsiyasiga xalaqit bermaydi) */}
-      <motion.div
-        className="w-full h-full flex items-center justify-center"
-        animate={{ y: [0, -floatAmp, 0] }}
-        transition={{ repeat: Infinity, duration: floatDur, delay: floatDelay, ease: "easeInOut" }}
-      >
-        {inner}
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function HeroMosaic() {
-  // 6×6 grid + "big" 2×2 cell at rows 2–3, cols 2–3 (center-ish)
-  // Big cell col-start/row-start explicit; qolgan kataklar flow bilan joylanadi.
-  // Har bir katak uchun flow tartibini bilish uchun explicit (col,row) berib ketamiz,
-  // lekin sodda shaklda faqat 6×6 dan big cell joylarini (2,2),(3,2),(2,3),(3,3) chiqarib tashlaymiz.
-
-  const bigSlots = new Set(["2-2", "3-2", "2-3", "3-3"]); // 1-indexed grid-column/row
-
-  // 6×6 = 36 joy bor; big 4 tani oladi → bizga 32 cell kerak.
-  const cells: MosaicCell[] = [
-    // Row 1 (6)
-    { kind: "lang", lang: "python" },
-    { kind: "snippet", text: "print()", color: "hsl(var(--brand-blue))" },
-    { kind: "empty", tone: "purple" },
-    { kind: "icon", Icon: Sparkles, color: "hsl(var(--brand-amber))", badge: "AI" },
-    { kind: "lang", lang: "javascript" },
-    { kind: "stat", value: "7", label: "til", color: "hsl(var(--brand-purple))" },
-    // Row 2 — big at cols 2,3 → normal cells at cols 1,4,5,6 (4 cells)
-    { kind: "empty", tone: "green" },
-    { kind: "icon", Icon: Trophy, color: "hsl(var(--brand-amber))" },
-    { kind: "lang", lang: "typescript" },
-    { kind: "snippet", text: "if x > 0:", color: "hsl(var(--brand-orchid))" },
-    // Row 3 — big continues → 4 cells at cols 1,4,5,6
-    { kind: "stat", value: "+50", label: "XP", color: "hsl(var(--brand-amber))" },
-    { kind: "lang", lang: "react" },
-    { kind: "empty", tone: "blue" },
-    { kind: "snippet", text: "for i in..", color: "hsl(var(--brand-green))" },
-    // Row 4 (6)
-    { kind: "check", label: "4/4" },
-    { kind: "progress", value: 72, color: "hsl(var(--brand-purple))", label: "Py" },
-    { kind: "empty", tone: "yellow" },
-    { kind: "lang", lang: "c++" },
-    { kind: "icon", Icon: Brain, color: "hsl(var(--brand-blue))" },
-    { kind: "snippet", text: "return 0", color: "hsl(var(--brand-coral))" },
-    // Row 5 (6)
-    { kind: "lang", lang: "java" },
-    { kind: "empty", tone: "pink" },
-    { kind: "stat", value: "100+", label: "kurs", color: "hsl(var(--brand-green))" },
-    { kind: "snippet", text: "while..", color: "hsl(var(--brand-blue))" },
-    { kind: "empty", tone: "plain" },
-    { kind: "icon", Icon: Gamepad2, color: "hsl(var(--brand-orchid))" },
-    // Row 6 (6)
-    { kind: "icon", Icon: CheckCircle2, color: "hsl(var(--brand-green))" },
-    { kind: "snippet", text: "=> ok", color: "hsl(var(--brand-green))" },
-    { kind: "lang", lang: "csharp" },
-    { kind: "empty", tone: "purple" },
-    { kind: "progress", value: 45, color: "hsl(var(--brand-blue))", label: "JS" },
-    { kind: "lang", lang: "html" },
-  ];
-
-  // Explicit placement: (col, row) 1-indexed, skipping bigSlots for rows 2-3
-  const placements: { col: number; row: number; cell: MosaicCell }[] = [];
-  let i = 0;
-  for (let row = 1; row <= 6; row++) {
-    for (let col = 1; col <= 6; col++) {
-      if (bigSlots.has(`${col}-${row}`)) continue;
-      if (i < cells.length) {
-        placements.push({ col, row, cell: cells[i] });
-        i++;
-      }
-    }
-  }
-
-  // "Jonli faollik" — har 1.6s da tasodifiy katak yorishadi
-  // (xuddi jadvalda kimdir ishlayotgandek)
-  const [activeIdx, setActiveIdx] = useState(3);
-  useEffect(() => {
-    const t = setInterval(() => {
-      setActiveIdx(prev => {
-        let next = Math.floor(Math.random() * 32);
-        if (next === prev) next = (next + 7) % 32;
-        return next;
-      });
-    }, 1600);
-    return () => clearInterval(t);
-  }, []);
-
-  return (
-    <div className="relative">
-      {/* Soft gradient behind the grid */}
-      <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,rgba(108,92,231,0.14)_0%,transparent_70%)] -z-10" />
-
-      {/* Column labels — like spreadsheet A B C D */}
-      <div className="grid grid-cols-[18px_repeat(6,1fr)] gap-1.5 mb-1.5">
-        <div />
-        {["A", "B", "C", "D", "E", "F"].map((l) => (
-          <div
-            key={l}
-            className="text-center text-[10px] font-mono font-semibold text-muted-foreground/40"
-          >
-            {l}
-          </div>
-        ))}
-      </div>
-
-      {/* Row numbers + single grid */}
-      <div className="grid grid-cols-[18px_repeat(6,1fr)] gap-1.5">
-        {/* Row numbers column */}
-        <div className="grid grid-rows-6 gap-1.5">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div
-              key={n}
-              className="flex items-center justify-end pr-1 text-[10px] font-mono font-semibold text-muted-foreground/40"
-            >
-              {n}
-            </div>
-          ))}
-        </div>
-
-        {/* Actual 6×6 grid cells with explicit placement */}
-        <div
-          className="col-span-6 grid grid-cols-6 grid-rows-6 gap-1.5"
-          style={{ gridAutoFlow: "dense" }}
-        >
-          {/* Big 2×2 cell */}
-          <motion.div
-            style={{
-              gridColumn: "2 / span 2",
-              gridRow: "2 / span 2",
-              boxShadow: "0 0 0 1px rgba(108,92,231,0.2) inset, 0 10px 40px -10px rgba(108,92,231,0.35)",
-            }}
-            className="rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-3 flex flex-col gap-2 relative overflow-hidden hover:scale-[1.02] transition-all"
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="flex items-center gap-1.5">
-              <div className="flex gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-neon-red/60" />
-                <div className="w-1.5 h-1.5 rounded-full bg-neon-yellow/60" />
-                <div className="w-1.5 h-1.5 rounded-full bg-neon-green/60" />
-              </div>
-              <span className="text-[9px] font-mono text-muted-foreground ml-auto">main.py</span>
-            </div>
-            <div className="flex-1 flex flex-col justify-center text-[10px] md:text-[11px] leading-tight font-mono">
-              <div>
-                <span className="text-neon-purple">def</span>{" "}
-                <span className="text-neon-blue">salom</span>
-                (ism):
-              </div>
-              <div className="pl-3">
-                <span className="text-neon-purple">return</span>{" "}
-                <span className="text-neon-green">f&quot;Hi, {"{"}ism{"}"}&quot;</span>
-              </div>
-              <div className="mt-1 text-muted-foreground/50"># AI tahlil</div>
-            </div>
-            <div className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded self-start bg-neon-green/15 text-neon-green">
-              <CheckCircle2 className="w-2.5 h-2.5" /> bajarildi
-            </div>
-          </motion.div>
-
-          {/* All other cells */}
-          {placements.map((p, idx) => (
-            <div
-              key={`${p.col}-${p.row}`}
-              style={{ gridColumn: p.col, gridRow: p.row }}
-            >
-              <MosaicCellView c={p.cell} delay={0.05 + idx * 0.02} idx={idx} active={idx === activeIdx} />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Floating chips over the grid */}
-      <motion.div
-        className="absolute -top-5 left-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-yellow/95 backdrop-blur text-white dark:text-[#1a1a00] text-[11px] font-extrabold shadow-xl shadow-neon-yellow/40 rotate-[-4deg]"
-        animate={{ y: [0, -4, 0] }}
-        transition={{ duration: 3, repeat: Infinity }}
-      >
-        <Trophy className="w-3.5 h-3.5" /> +50 XP
-      </motion.div>
-      <motion.div
-        className="absolute -bottom-4 -right-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-blue/95 backdrop-blur text-white dark:text-[#04202b] text-[11px] font-extrabold shadow-xl shadow-neon-blue/40 rotate-[3deg]"
-        animate={{ y: [0, 4, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity }}
-      >
-        <Brain className="w-3.5 h-3.5" /> AI Tahlil
-      </motion.div>
-      <motion.div
-        className="absolute top-[48%] -left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-green/95 backdrop-blur text-white dark:text-[#001a00] text-[11px] font-extrabold shadow-xl shadow-neon-green/40 rotate-[-6deg]"
-        animate={{ y: [0, -3, 0] }}
-        transition={{ duration: 2.8, repeat: Infinity }}
-      >
-        <CheckCircle2 className="w-3.5 h-3.5" /> 4/4
-      </motion.div>
-    </div>
-  );
-}
-
-/* ============ Hero'da aylanuvchi so'z ============ */
-/** Ranglar kodda, matn lug'atda — tarjimon rang bilan ishlamaydi */
-const ROTATING_COLORS = ["gradient-text", "text-neon-blue", "text-neon-green", "text-neon-yellow"] as const;
-const ROTATING_KEYS = ["modern", "withAi", "playful", "practice"] as const;
-
-function RotatingWord() {
-  const { t } = useI18n();
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const timer = setInterval(() => setIdx(i => (i + 1) % ROTATING_KEYS.length), 2600);
-    return () => clearInterval(timer);
-  }, []);
-  const color = ROTATING_COLORS[idx];
-  const text = t.home.rotating[ROTATING_KEYS[idx]];
-  return (
-    <span className="relative inline-block min-w-[280px] md:min-w-[420px]">
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={idx}
-          className={`inline-block ${color}`}
-          initial={{ opacity: 0, y: 18, rotateX: 45 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          exit={{ opacity: 0, y: -18, rotateX: -45 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {text}
-        </motion.span>
-      </AnimatePresence>
-    </span>
-  );
-}
-
-/* ============ Sanovchi raqam (count-up) ============ */
-function CountUp({ value }: { value: number }) {
-  const [display, setDisplay] = useState(0);
-  useEffect(() => {
-    if (!value) return;
-    const dur = 1200;
-    const t0 = performance.now();
-    let raf: number;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - t0) / dur);
-      // easeOutCubic
-      setDisplay(Math.round(value * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [value]);
-  return <>{formatNumber(display)}</>;
-}
-
-/* ============ Til logolari marquee ============ */
-const MARQUEE_LANGS = ["python", "javascript", "typescript", "react", "html", "java", "c++", "csharp"];
-
-function LangMarquee() {
-  const row = [...MARQUEE_LANGS, ...MARQUEE_LANGS, ...MARQUEE_LANGS];
-  return (
-    <div className="relative overflow-hidden py-6 border-y border-border/30 bg-surface/20">
-      {/* Chekka fade */}
-      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-      <motion.div
-        className="flex items-center gap-12 w-max"
-        animate={{ x: ["0%", "-33.333%"] }}
-        transition={{ repeat: Infinity, duration: 28, ease: "linear" }}
-      >
-        {row.map((l, i) => (
-          <div key={i} className="flex items-center gap-2.5 opacity-50 hover:opacity-100 transition-opacity">
-            <LanguageLogo lang={l as any} size={26} />
-            <span className="text-sm font-medium text-muted-foreground capitalize whitespace-nowrap">
-              {l === "csharp" ? "C#" : l === "c++" ? "C++" : l}
-            </span>
-          </div>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
+import HomeHero from "@/components/home/HomeHero";
+import HomeFeatures from "@/components/home/HomeFeatures";
+import MobileNavSheet from "@/components/nav/MobileNavSheet";
+import { handFont } from "@/components/home/fonts";
 
 /* ============ FAQ (JSON-LD savollariga mos ko'rinadigan qism) ============ */
 /** Savol-javob matni lug'atda — JSON-LD ham shu manbadan oziqlanadi */
@@ -432,28 +37,21 @@ function FaqSection() {
   const { t } = useI18n();
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="py-20 px-5 border-t border-border/30">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">{t.home.faqEyebrow}</p>
-          <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">{t.home.faqTitle}</h2>
-        </div>
-        <div className="space-y-3">
+    <section className="py-20 md:py-24 px-5">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-[1fr,1.6fr] gap-10 md:gap-16">
+        <h2 className="font-display font-extrabold text-4xl md:text-5xl tracking-[-0.04em] leading-[0.95] md:sticky md:top-28 self-start">
+          {t.home.faqTitle}
+        </h2>
+        <div className="divide-y divide-border border-y border-border">
           {FAQ_ITEMS(t).map((item, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className={`rounded-2xl border transition-colors overflow-hidden ${open === i ? "border-neon-purple/30 bg-neon-purple/[0.04]" : "border-border/50 bg-card/30 hover:bg-card/50"}`}
-            >
+            <div key={i}>
               <button
                 onClick={() => setOpen(open === i ? null : i)}
-                className="w-full flex items-center justify-between gap-4 px-5 md:px-6 py-4.5 text-left py-4"
+                aria-expanded={open === i}
+                className="w-full flex items-center justify-between gap-6 py-5 text-left"
               >
-                <span className="font-display font-semibold text-[15px] md:text-base">{item.q}</span>
-                <span className={`w-7 h-7 rounded-full border flex items-center justify-center flex-shrink-0 transition-all ${open === i ? "bg-neon-purple border-neon-purple text-white rotate-45" : "border-border text-muted-foreground"}`}>
+                <span className="font-display font-semibold text-base md:text-lg">{item.q}</span>
+                <span className={`w-8 h-8 rounded-full border flex items-center justify-center flex-shrink-0 transition-transform ${open === i ? "rotate-45 bg-foreground text-background border-foreground" : "border-border"}`}>
                   <Plus className="w-4 h-4" />
                 </span>
               </button>
@@ -463,14 +61,14 @@ function FaqSection() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{ duration: 0.22 }}
                     className="overflow-hidden"
                   >
-                    <p className="px-5 md:px-6 pb-5 text-sm md:text-[15px] text-muted-foreground leading-relaxed">{item.a}</p>
+                    <p className="pb-6 pr-12 text-[0.95rem] md:text-base text-foreground/70 leading-relaxed">{item.a}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -485,6 +83,7 @@ export default function LandingPage() {
   const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const closeMobileNav = useCallback(() => setMobileNav(false), []);
   const { t } = useI18n();
   const nav = primaryLinks(t);
   const navResources = resourceLinks(t);
@@ -661,542 +260,190 @@ export default function LandingPage() {
               </div>
             )}
 
-            <button onClick={() => setMobileNav(!mobileNav)} className="xl:hidden p-2.5 hover:bg-accent rounded-xl">
+            <button onClick={() => setMobileNav(!mobileNav)} aria-expanded={mobileNav} aria-controls="mobile-nav" aria-label="Menu" className="xl:hidden p-2.5 hover:bg-accent rounded-xl">
               {mobileNav ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        <AnimatePresence>{mobileNav && (
-          <motion.div className="xl:hidden bg-card/95 backdrop-blur-xl border-b border-border px-5 py-4 space-y-1"
-            initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-            {navAll.map(l => <Link key={l.href} href={l.href} onClick={() => setMobileNav(false)} className="block py-3 px-3 rounded-xl text-[0.95rem] hover:bg-accent/50 transition-colors">{l.label}</Link>)}
-            {!user && (
-              <div className="flex gap-2 pt-3 mt-2 border-t border-border">
-                <Link href="/login" onClick={() => setMobileNav(false)} className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium bg-surface hover:bg-surface-hover border border-border transition-all">{t.nav.login}</Link>
-                <Link href="/register" onClick={() => setMobileNav(false)} className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all">{t.nav.register}</Link>
-              </div>
-            )}
-          </motion.div>
-        )}</AnimatePresence>
       </nav>
 
-      {/* ========== HERO ========== */}
-      <section className="relative pt-28 pb-16 md:pt-36 md:pb-24 px-5 overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-24 left-[15%] w-[500px] h-[500px] bg-neon-purple/[0.04] rounded-full blur-[120px]" />
-          <div className="absolute top-32 right-[10%] w-[400px] h-[400px] bg-neon-blue/[0.04] rounded-full blur-[100px]" />
-        </div>
+      {/* Mobil menyu — navbar'dan TASHQARIDA (sabab komponent izohida) */}
+      <MobileNavSheet open={mobileNav} onClose={closeMobileNav} dashboardHref={user ? dUrl : null} pathname="/" />
 
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left — Text */}
-            <motion.div initial="hidden" animate="visible" variants={stagger}>
-              <motion.div variants={fadeUp(0)} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-purple/8 border border-neon-purple/15 text-neon-purple text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" /> {t.home.badge}
-              </motion.div>
-
-              <motion.h1 variants={fadeUp(0.05)} className="font-display font-extrabold text-4xl md:text-[3.5rem] leading-[1.1] tracking-tight mb-5">
-                {t.home.heroTitle}<br />
-                <RotatingWord /><br className="md:hidden" /> {t.home.heroTitleEnd}
-              </motion.h1>
-
-              <motion.p variants={fadeUp(0.1)} className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg mb-8">
-                {t.home.heroText}
-              </motion.p>
-
-              <motion.div variants={fadeUp(0.15)} className="flex flex-wrap items-center gap-3">
-                <Link href={user ? dUrl : "/register"} className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-[0.95rem] hover:opacity-90 transition-all shadow-lg shadow-foreground/10">
-                  {user ? t.nav.dashboard : t.home.ctaStart} <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link href="/explore/courses" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-border bg-surface/50 hover:bg-surface font-medium text-[0.95rem] transition-all">
-                  <Play className="w-4 h-4" /> {t.home.ctaCourses}
-                </Link>
-              </motion.div>
-
-              <motion.div variants={fadeUp(0.2)} className="flex items-center gap-6 mt-10 pt-8 border-t border-border/40">
-                {[
-                  { val: stats.users, label: t.home.statUsers },
-                  { val: stats.courses, label: t.home.statCourses },
-                  { val: stats.submissions, label: t.home.statSubmissions },
-                ].map(s => (
-                  <div key={s.label}>
-                    <div className="font-display font-bold text-2xl md:text-3xl">
-                      <CountUp value={Number(s.val)} />+
-                    </div>
-                    <div className="text-sm text-muted-foreground">{s.label}</div>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-
-            {/* Right — Creative spreadsheet-style mosaic */}
-            <motion.div
-              className="hidden md:block"
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <HeroMosaic />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========== TIL LOGOLARI MARQUEE ========== */}
-      <LangMarquee />
+      {/* ========== HERO — daftar varag'i ========== */}
+      <HomeHero
+        ctaHref={user ? dUrl : "/register"}
+        ctaLabel={user ? t.nav.dashboard : t.landing.ctaStart}
+        stats={stats}
+        course={courses[0]}
+        people={testimonials.map((x) => x.full_name).filter(Boolean)}
+      />
 
       {/* ========== YO'RIQNOMA — tanishtiruv videosi va mavzular ========== */}
       <HomeGuideSection />
 
-      {/* ========== FEATURES — BENTO GRID ========== */}
-      <section className="py-20 px-5">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="max-w-2xl mb-12"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={stagger}
-          >
-            <motion.p
-              variants={fadeUp()}
-              className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3"
-            >
-              Imkoniyatlar
-            </motion.p>
-            <motion.h2
-              variants={fadeUp(0.05)}
-              className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-4"
-            >
-              {t.home.whyTitle} <span className="gradient-text">MirAcademy</span>?
-            </motion.h2>
-            <motion.p variants={fadeUp(0.1)} className="text-[15px] md:text-base text-muted-foreground">
-              Har bir blok — aniq bir imkoniyat. Yig&apos;ilganda u butun boshli o&apos;qitish tizimini beradi.
-            </motion.p>
-          </motion.div>
-
-          {/* Bento grid: 6 ustun, turli o'lchamli bloklar */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 auto-rows-auto md:auto-rows-[160px]">
-            {/* 1. AI Tahlil — KATTA (col-span 3, row-span 2) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="col-span-2 md:col-span-3 md:row-span-2 relative p-6 md:p-7 rounded-3xl border border-border/60 bg-gradient-to-br from-neon-blue/[0.07] via-card/40 to-transparent overflow-hidden group hover:border-neon-blue/30 transition-all"
-            >
-              <div className="absolute -top-20 -right-20 w-60 h-60 bg-neon-blue/10 rounded-full blur-3xl" />
-              <div className="relative z-10 h-full flex flex-col justify-between">
-                <div className="w-12 h-12 rounded-xl bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center">
-                  <Brain className="w-6 h-6 text-neon-blue" />
-                </div>
-                <div>
-                  <h3 className="font-display font-extrabold text-2xl md:text-[28px] tracking-tight mb-2">
-                    {t.home.aiReview}
-                  </h3>
-                  <p className="text-[15px] text-muted-foreground leading-relaxed max-w-md">
-                    {t.home.aiReviewText}
-                  </p>
-                  {/* Demo snippet */}
-                  <div className="mt-4 rounded-xl border border-border/60 bg-background/60 p-3 font-mono text-[12px] leading-relaxed max-w-sm">
-                    <div className="text-neon-purple">
-                      def <span className="text-neon-blue">kvadrat</span>(x): <span className="text-muted-foreground">return</span> x*x
-                    </div>
-                    <div className="mt-1.5 pt-1.5 border-t border-border/40 text-neon-blue flex items-start gap-1.5">
-                      <Sparkles className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                      <span className="text-[11px]">Toza funksiya. Type hint qo&apos;shishingiz mumkin.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* 2. Playground — med (col-span 3) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.08 }}
-              className="col-span-2 md:col-span-3 p-6 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all group"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-11 h-11 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center">
-                  <Terminal className="w-5 h-5 text-neon-purple" />
-                </div>
-                <div className="flex -space-x-2">
-                  {(["python", "javascript", "c++", "java", "csharp"] as const).map((lg, i) => (
-                    <div
-                      key={lg}
-                      className="w-8 h-8 rounded-lg border-2 border-card bg-surface flex items-center justify-center"
-                      style={{ zIndex: 10 - i }}
-                    >
-                      <LanguageLogo lang={lg} size={18} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <h3 className="font-display font-extrabold text-xl tracking-tight mb-1.5">{t.home.playgroundTitle}</h3>
-              <p className="text-[14px] text-muted-foreground leading-snug">
-                7 ta tilda kod yozing — Judge0 + Piston orqali real bajarish, stdin qo&apos;llab-quvvatlash.
-              </p>
-            </motion.div>
-
-            {/* 3. Monaco (col-span 2, row-span 1) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.12 }}
-              className="col-span-1 md:col-span-2 p-5 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all"
-            >
-              <div className="w-10 h-10 rounded-lg bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center mb-3">
-                <Code2 className="w-5 h-5 text-neon-purple" />
-              </div>
-              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">{t.home.editorTitle}</h3>
-              <p className="text-[12px] text-muted-foreground leading-snug">{t.home.editorText}</p>
-            </motion.div>
-
-            {/* 4. Gamification (col-span 1) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.16 }}
-              className="col-span-1 p-5 rounded-3xl border border-border/60 bg-gradient-to-br from-neon-yellow/[0.08] to-transparent hover:border-neon-yellow/30 transition-all relative overflow-hidden"
-            >
-              <div className="absolute top-3 right-3 text-[32px] font-display font-extrabold leading-none text-neon-yellow/15">
-                XP
-              </div>
-              <div className="w-10 h-10 rounded-lg bg-neon-yellow/10 border border-neon-yellow/20 flex items-center justify-center mb-3">
-                <Trophy className="w-5 h-5 text-neon-yellow" />
-              </div>
-              <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">{t.home.coinsTitle}</h3>
-              <p className="text-[12px] text-muted-foreground leading-snug">{t.home.coinsText}</p>
-            </motion.div>
-
-            {/* 5. Games (col-span 2) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="col-span-2 md:col-span-2 p-5 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-lg bg-neon-green/10 border border-neon-green/20 flex items-center justify-center flex-shrink-0">
-                  <Gamepad2 className="w-5 h-5 text-neon-green" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-display font-bold text-[15px] tracking-tight truncate">
-                    {t.home.sixGames}
-                  </h3>
-                  <p className="text-[12px] text-muted-foreground leading-snug truncate">
-                    Puzzle, BugFix, Maze, Bird…
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 flex gap-1 flex-wrap">
-                {["Puzzle", "Bug", "Maze", "Bird", "Typing", "Battle"].map((t) => (
-                  <span
-                    key={t}
-                    className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-surface/60 border border-border/50 text-muted-foreground"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* 6. Certificate (col-span 2) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.24 }}
-              className="col-span-2 md:col-span-2 p-5 rounded-3xl border border-border/60 bg-gradient-to-br from-neon-pink/[0.06] to-transparent hover:border-neon-pink/30 transition-all relative overflow-hidden"
-            >
-              <div className="absolute -bottom-6 -right-4 rotate-[-8deg] opacity-40">
-                <div className="px-3 py-2 rounded-lg border-2 border-neon-pink/40 bg-card">
-                  <div className="text-[8px] font-mono text-muted-foreground">CERTIFICATE</div>
-                  <div className="text-[10px] font-bold text-neon-pink">MirAcademy</div>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="w-10 h-10 rounded-lg bg-neon-pink/10 border border-neon-pink/20 flex items-center justify-center mb-3">
-                  <GraduationCap className="w-5 h-5 text-neon-pink" />
-                </div>
-                <h3 className="font-display font-bold text-[15px] tracking-tight mb-1">{t.home.certificateTitle}</h3>
-                <p className="text-[12px] text-muted-foreground leading-snug max-w-[200px]">
-                  {t.home.certificateText}
-                </p>
-              </div>
-            </motion.div>
-
-            {/* 7. Multi-language tag row (col-span 6) */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.28 }}
-              className="col-span-2 md:col-span-6 p-5 md:p-6 rounded-3xl border border-border/60 bg-card/40 hover:bg-card/80 hover:border-border transition-all flex items-center gap-4 md:gap-6 flex-wrap"
-            >
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <div className="w-10 h-10 rounded-lg bg-neon-red/10 border border-neon-red/20 flex items-center justify-center">
-                  <Globe className="w-5 h-5 text-neon-red" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-[15px] tracking-tight">{t.home.sevenLangs}</h3>
-                  <p className="text-[12px] text-muted-foreground leading-tight">
-                    Bir platformada — bir interfeysda
-                  </p>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-wrap gap-2 md:justify-end">
-                {(
-                  [
-                    { k: "python", label: "Python" },
-                    { k: "javascript", label: "JavaScript" },
-                    { k: "typescript", label: "TypeScript" },
-                    { k: "c++", label: "C++" },
-                    { k: "java", label: "Java" },
-                    { k: "csharp", label: "C#" },
-                    { k: "html", label: "HTML/CSS" },
-                  ] as const
-                ).map((l) => (
-                  <div
-                    key={l.k}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface/80 border border-border/60 text-[12px] font-semibold"
-                  >
-                    <LanguageLogo lang={l.k as any} size={14} />
-                    {l.label}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      {/* ========== IMKONIYATLAR — lenta bilan yopishtirilgan kartochkalar ========== */}
+      <HomeFeatures />
 
       {/* ========== COURSES ========== */}
       {courses.length > 0 && (
-        <section className="py-20 px-5 bg-surface/30 border-t border-border/30">
+        <section className="py-20 md:py-24 px-5 border-t border-border/60">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-end justify-between mb-10">
-              <div>
-                <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">{t.nav.courses}</p>
-                <h2 className="font-display font-bold text-3xl tracking-tight">{t.home.popularCourses}</h2>
-              </div>
-              <Link href="/explore/courses" className="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <div className="flex items-end justify-between gap-6 mb-10">
+              <h2 className="font-display font-extrabold text-4xl md:text-5xl tracking-[-0.04em] leading-[0.95]">{t.landing.coursesTitle}</h2>
+              <Link href="/explore/courses" className="hidden md:inline-flex items-center gap-1.5 text-[0.95rem] font-semibold underline decoration-2 underline-offset-[6px] decoration-neon-purple/50 hover:decoration-neon-purple">
                 {t.home.allCourses} <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {courses.map((c, i) => (
-                <motion.div key={c.id} className="h-full" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp(i * 0.05)}>
-                  <Link
-                    href={`/courses/${c.slug}`}
-                    className="relative flex flex-col h-full group rounded-[10px] border border-border/50 bg-card/50 overflow-hidden hover:border-neon-purple/40 hover:shadow-2xl hover:shadow-neon-purple/10 hover:-translate-y-1.5 transition-all duration-300"
-                  >
-                    {/* Cover — rasm yoki gradient (teng balandlik) */}
-                    <div className="relative h-52 flex-shrink-0 overflow-hidden bg-gradient-to-br from-neon-purple/20 via-card/50 to-neon-blue/10">
-                      {c.thumbnail_url ? (
+              {courses.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/courses/${c.slug}`}
+                  className="group flex flex-col h-full rounded-2xl border border-border bg-card p-3 hover:border-foreground/25 transition-colors"
+                >
+                  <div className="relative h-44 rounded-xl overflow-hidden bg-surface">
+                    {c.thumbnail_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={c.thumbnail_url} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                    ) : (
+                      <div className="absolute inset-0 hatch flex items-center justify-center">
+                        <span className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center shadow-sm">
+                          {categoryIcon(c.category, 30)}
+                        </span>
+                      </div>
+                    )}
+                    <span className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-card/95 ${c.is_free ? "text-neon-green" : "text-neon-yellow"}`}>
+                      {c.is_free ? t.landing.free : `${c.price_coins} coin`}
+                    </span>
+                    {/* Reyting: baho bo'lmasa "Yangi" — 0.0 yulduz kursni yomon ko'rsatadi */}
+                    <span className="absolute top-3 right-3 inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-card/95">
+                      {Number(c.rating_count) > 0 ? (
                         <>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={c.thumbnail_url}
-                            alt={c.title}
-                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                          <Star className="w-3.5 h-3.5 text-neon-yellow fill-neon-yellow" />
+                          {Number(c.average_rating).toFixed(1)}
+                          <span className="font-normal text-muted-foreground">({c.rating_count})</span>
                         </>
                       ) : (
-                        <div className="absolute bottom-3 left-5 opacity-90 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300 origin-bottom-left">
-                          {categoryIcon(c.category, 52)}
-                        </div>
+                        <span className="text-neon-purple">{t.landing.newCourse}</span>
                       )}
-                      {/* Shine sweep */}
-                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
-                      {/* Narx badge */}
-                      <div className="absolute top-3 right-3.5">
-                        {c.is_free
-                          ? <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-neon-green/90 text-background shadow-lg shadow-neon-green/30">BEPUL</span>
-                          : <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-neon-yellow/90 text-white dark:text-[#1a1a00] shadow-lg shadow-neon-yellow/30">{c.price_coins} coin</span>}
-                      </div>
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col flex-1 px-2 pt-4 pb-2">
+                    <h3 className="font-display font-bold text-lg leading-snug mb-1.5 line-clamp-2">{c.title}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{c.description}</p>
+                    <div className="flex-1" />
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span className="flex items-center gap-3">
+                        <span className="inline-flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{c.estimated_hours ? `${c.estimated_hours} ${t.landing.hours}` : "—"}</span>
+                        <span className="inline-flex items-center gap-1"><BookOpen className="w-3.5 h-3.5" />{c.total_topics} {t.landing.lessons}</span>
+                        <span className="inline-flex items-center gap-1" title={t.landing.studentsLabel}><Users className="w-3.5 h-3.5" />{Number(c.total_enrolled || 0).toLocaleString("ru-RU")}</span>
+                      </span>
+                      <span className="w-9 h-9 rounded-full border border-border flex items-center justify-center transition-colors group-hover:bg-foreground group-hover:text-background">
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
                     </div>
-
-                    <div className="flex flex-col flex-1 p-5 md:p-6">
-                      {/* Sarlavha va tavsif — teng balandliklar */}
-                      <h3 className="font-display font-bold text-lg leading-snug mb-1.5 group-hover:text-neon-purple transition-colors line-clamp-2 min-h-[3.25rem]">{c.title}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.6rem]">{c.description}</p>
-
-                      {/* Teglar — doim ko'rinadi */}
-                      <div className="flex flex-wrap gap-1.5 mb-4 min-h-[26px]">
-                        {(c.tags?.length ? c.tags : [t.explore.tagFallback, t.explore.tagFallback2]).slice(0, 3).map((tag: string) => (
-                          <span key={tag} className="px-2 py-1 rounded-md text-[10px] font-mono font-semibold bg-surface border border-border/60 text-muted-foreground uppercase tracking-wide">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex-1" />
-
-                      {/* Statistika qatori */}
-                      <div className="flex items-center justify-between py-3 border-t border-border/50 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5" />{c.estimated_hours ? `${c.estimated_hours} soat` : "—"}
-                        </span>
-                        <span>{c.total_topics} dars</span>
-                        <span className="flex items-center gap-1 font-semibold text-foreground">
-                          <Star className="w-3.5 h-3.5 text-neon-yellow fill-neon-yellow" />
-                          {c.average_rating > 0 ? Number(c.average_rating).toFixed(1) : (4.5 + (c.id.charCodeAt(0) % 4) / 10).toFixed(1)}
-                        </span>
-                      </div>
-
-                      {/* Pastki qator */}
-                      <div className="pt-3 border-t border-border/50 flex items-center justify-between">
-                        <span className={`font-display font-bold ${c.is_free ? "text-neon-green" : "text-neon-yellow"}`}>
-                          {c.is_free ? "Bepul" : `${c.price_coins} coin`}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple transition-all group-hover:gap-2.5">
-                          <Play className="w-3.5 h-3.5" /> {t.home.view} <ArrowUpRight className="w-4 h-4" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
+                  </div>
+                </Link>
               ))}
             </div>
 
-            <div className="mt-6 md:hidden text-center">
-              <Link href="/explore/courses" className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground">{t.home.allCourses} <ArrowUpRight className="w-4 h-4" /></Link>
+            <div className="mt-8 md:hidden">
+              <Link href="/explore/courses" className="inline-flex items-center gap-1.5 font-semibold underline decoration-2 underline-offset-[6px] decoration-neon-purple/50">{t.home.allCourses} <ArrowUpRight className="w-4 h-4" /></Link>
             </div>
           </div>
         </section>
       )}
 
-      {/* ========== HOW IT WORKS ========== */}
-      <section className="py-20 px-5 border-t border-border/30">
+      {/* ========== QANDAY BOSHLANADI — qadamlar haqiqiy ketma-ketlik ========== */}
+      <section className={`py-20 md:py-24 px-5 border-t border-border/60 ${handFont.variable}`}>
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Jarayon</p>
-            <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight">{t.home.howItWorks}</h2>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6">
+          <h2 className="font-display font-extrabold text-4xl md:text-5xl tracking-[-0.04em] leading-[0.95] mb-14 max-w-xl">{t.landing.stepsTitle}</h2>
+          <ol className="grid md:grid-cols-4 gap-10 md:gap-8">
             {[
-              // Ranglar brend tokenlaridan olinadi — temaga qarab o'zi moslashadi
-              { step: "01", title: t.home.steps.signupTitle, desc: t.home.steps.signupText, icon: Users, color: "hsl(var(--brand-purple))" },
-              { step: "02", title: t.home.steps.levelTitle, desc: t.home.steps.levelText, icon: Brain, color: "hsl(var(--brand-blue))" },
-              { step: "03", title: t.home.steps.learnTitle, desc: t.home.steps.learnText, icon: Code2, color: "hsl(var(--brand-green))" },
-              { step: "04", title: t.home.steps.certTitle, desc: t.home.steps.certText, icon: GraduationCap, color: "hsl(var(--brand-amber))" },
+              { title: t.home.steps.signupTitle, desc: t.home.steps.signupText },
+              { title: t.home.steps.levelTitle, desc: t.home.steps.levelText },
+              { title: t.home.steps.learnTitle, desc: t.home.steps.learnText },
+              { title: t.home.steps.certTitle, desc: t.home.steps.certText },
             ].map((s, i) => (
-              <motion.div key={s.step} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp(i * 0.08)} className="relative">
-                {/* Ulovchi chiziq: ikonka markazidan (top-6) boshlanib, keyingi
-                    ustun ikonkasigacha boradi. Ustun kengligi 100%, grid oralig'i
-                    24px, ikonka 48px — shuning uchun 56px dan boshlab
-                    (100% + 24px − 8px) gacha, ya'ni kengligi 100% − 40px. */}
-                {i < 3 && <div className="hidden md:block absolute top-6 left-14 w-[calc(100%_-_40px)] h-px bg-border" />}
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 relative z-10"
-                  style={{
-                    backgroundColor: s.color.replace("))", ") / 0.1)"),
-                    border: `1px solid ${s.color.replace("))", ") / 0.22)")}`,
-                  }}
-                >
-                  <s.icon className="w-5 h-5" style={{ color: s.color }} />
-                </div>
-                <div className="numeric text-sm text-muted-foreground/50 mb-1">{s.step}</div>
-                <h3 className="font-display font-bold mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              </motion.div>
+              <li key={s.title} className="relative">
+                <span className="hand block text-6xl text-neon-purple mb-3 -rotate-3 origin-left" aria-hidden>{i + 1}</span>
+                <h3 className="font-display font-bold text-lg mb-2">{s.title}</h3>
+                <p className="text-[0.95rem] text-foreground/70 leading-relaxed">{s.desc}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
       {/* ========== TESTIMONIALS ========== */}
       {testimonials.length > 0 && (
-        <section className="py-20 px-5 bg-surface/30 border-t border-border/30">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-10">
-              <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">Izohlar</p>
-              <h2 className="font-display font-bold text-3xl tracking-tight">{t.home.testimonials}</h2>
-            </div>
-
-            <div className="relative min-h-[180px]">
+        <section className="py-20 md:py-24 px-5 border-t border-border/60">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="sr-only">{t.home.testimonials}</h2>
+            <div className="relative min-h-[170px] md:min-h-[220px]">
               <AnimatePresence mode="wait">
-                <motion.div key={tIdx} className="p-8 md:p-10 rounded-2xl border border-border/50 bg-card/50 text-center"
-                  initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
-                  <Quote className="w-8 h-8 text-neon-purple/15 mx-auto mb-4" />
-                  <p className="text-lg leading-relaxed text-muted-foreground mb-6 italic max-w-xl mx-auto">
+                <motion.figure key={tIdx}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                  <blockquote className="font-display font-semibold text-2xl md:text-[2.1rem] leading-[1.3] tracking-[-0.02em]">
                     &ldquo;{testimonials[tIdx].text}&rdquo;
-                  </p>
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-hero-gradient flex items-center justify-center text-white font-bold text-sm shadow-md">
+                  </blockquote>
+                  <figcaption className="mt-8 flex items-center gap-3">
+                    <span className="w-11 h-11 rounded-full bg-neon-purple text-white flex items-center justify-center font-bold text-sm">
                       {getInitials(testimonials[tIdx].full_name)}
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-sm">{testimonials[tIdx].full_name}</p>
-                      <div className="flex gap-0.5">{Array.from({ length: testimonials[tIdx].rating }).map((_, i) => <Star key={i} className="w-3 h-3 text-neon-yellow fill-neon-yellow" />)}</div>
-                    </div>
-                  </div>
-                </motion.div>
+                    </span>
+                    <span>
+                      <span className="block font-semibold">{testimonials[tIdx].full_name}</span>
+                      <span className="flex gap-0.5 mt-0.5">{Array.from({ length: testimonials[tIdx].rating }).map((_, i) => <Star key={i} className="w-3.5 h-3.5 text-neon-yellow fill-neon-yellow" />)}</span>
+                    </span>
+                  </figcaption>
+                </motion.figure>
               </AnimatePresence>
-
-              {testimonials.length > 1 && (
-                <div className="flex justify-center gap-2 mt-5">
-                  {testimonials.map((_, i) => (
-                    <button key={i} onClick={() => setTIdx(i)} className={`h-1.5 rounded-full transition-all duration-300 ${i === tIdx ? "bg-neon-purple w-6" : "bg-border w-1.5"}`} />
-                  ))}
-                </div>
-              )}
             </div>
+            {testimonials.length > 1 && (
+              <div className="flex mt-6 -ml-1.5">
+                {/*
+                  Tugma o'zi — bosish uchun katta, shaffof maydon (telefonda
+                  globals.css tugmalarga min-height: 40px beradi). Ko'rinadigan
+                  ingichka chiziq — ichidagi span.
+                */}
+                {testimonials.map((_, i) => (
+                  <button key={i} onClick={() => setTIdx(i)} aria-label={`${i + 1}`} aria-current={i === tIdx}
+                    className="group flex items-center h-10 px-1.5">
+                    <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === tIdx ? "bg-foreground w-8" : "bg-border w-3 group-hover:bg-foreground/40"}`} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
 
       {/* ========== FAQ ========== */}
-      <FaqSection />
+      <div className="border-t border-border/60"><FaqSection /></div>
 
-      {/* ========== CTA ========== */}
-      <section className="py-20 px-5 border-t border-border/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="relative rounded-[2rem] border border-neon-purple/20 bg-gradient-to-br from-neon-purple/[0.08] via-card/40 to-neon-blue/[0.06] p-8 md:p-12 overflow-hidden">
-            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-neon-purple/15 blur-[90px] pointer-events-none" />
-            <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-neon-blue/10 blur-[90px] pointer-events-none" />
-          <div className="relative grid md:grid-cols-2 gap-10 items-center">
+      {/* ========== CTA — daftar muqovasi ========== */}
+      <section className={`px-3 md:px-5 pb-16 ${handFont.variable}`}>
+        <div className="relative max-w-7xl mx-auto rounded-[2rem] md:rounded-[2.25rem] bg-foreground text-background overflow-hidden px-6 md:px-16 py-14 md:py-20">
+          <div className="absolute inset-y-0 left-8 md:left-12 w-px bg-neon-red/50" aria-hidden />
+          <div className="relative grid md:grid-cols-[1.4fr,1fr] gap-10 items-end pl-6 md:pl-8">
             <div>
-              <p className="text-sm font-semibold text-neon-purple uppercase tracking-widest mb-3">{t.home.finalEyebrow}</p>
-              <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight mb-4">{t.home.finalTitle}</h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-6">{t.home.finalText}</p>
-              <div className="flex flex-wrap gap-3">
-                <Link href={user ? dUrl : "/register"} className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-[0.95rem] hover:opacity-90 transition-all shadow-lg shadow-foreground/10">
-                  {user ? t.nav.dashboard : t.home.ctaStart} <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link href="/playground" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-border bg-surface/50 hover:bg-surface font-medium text-[0.95rem] transition-all">
-                  <Terminal className="w-4 h-4" /> {t.home.tryPlayground}
-                </Link>
-              </div>
+              <h2 className="font-display font-extrabold text-4xl md:text-6xl tracking-[-0.045em] leading-[0.95] mb-6">{t.landing.ctaTitle}</h2>
+              <p className="text-lg text-background/70 leading-relaxed max-w-xl">{t.landing.ctaText}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: CheckCircle2, text: t.home.sevenLangs, color: "hsl(var(--brand-purple))" },
-                { icon: Brain, text: t.home.aiReview, color: "hsl(var(--brand-blue))" },
-                { icon: Trophy, text: t.home.coinsGifts, color: "hsl(var(--brand-amber))" },
-                { icon: GraduationCap, text: t.home.proCertificate, color: "hsl(var(--brand-green))" },
-                { icon: Gamepad2, text: t.home.sevenGames3d, color: "hsl(var(--brand-orchid))" },
-                { icon: Globe, text: t.home.fourLanguages, color: "hsl(var(--brand-coral))" },
-              ].map(f => (
-                <div key={f.text} className="flex items-center gap-3 p-3.5 rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm hover:border-border transition-colors">
-                  <f.icon className="w-5 h-5 flex-shrink-0" style={{ color: f.color }} />
-                  <span className="text-sm font-medium">{f.text}</span>
-                </div>
-              ))}
+            <div className="flex flex-col items-start md:items-end gap-4">
+              <Link href={user ? dUrl : "/register"}
+                className="group inline-flex items-center gap-3 pl-6 pr-1.5 py-1.5 rounded-full bg-background text-foreground font-display font-semibold">
+                {user ? t.nav.dashboard : t.landing.ctaStart}
+                <span className="w-11 h-11 rounded-full bg-foreground text-background flex items-center justify-center transition-transform group-hover:rotate-45">
+                  <ArrowUpRight className="w-4 h-4" />
+                </span>
+              </Link>
+              <span className="hand text-2xl text-background/60 -rotate-2">{t.landing.ctaNote}</span>
             </div>
-          </div>
           </div>
         </div>
       </section>

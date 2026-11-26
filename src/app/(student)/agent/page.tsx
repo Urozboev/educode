@@ -56,7 +56,7 @@ export default async function AgentPage({
         <div className="border-b border-border bg-primary/5 px-4 py-2 text-center text-xs text-muted-foreground">
           {t.agent.freeTrialLeft} {access.freeRemaining} {t.agent.messagesLeft}{" "}
           <Link href="/agent/obuna" className="font-medium text-primary hover:underline">
-            Pro obunaga o'tish
+            Pro obunaga ötiş
           </Link>
         </div>
       )}
@@ -99,7 +99,7 @@ function Paywall({ reason, t }: { reason?: string; t: Dictionary }) {
           highlighted
           features={[
             "Pro dagi hamma narsa",
-            "Cheksiz yo'nalish",
+            "Çeksiz yönaliş",
             "Kod review",
             "Ota-ona hisoboti",
           ]}

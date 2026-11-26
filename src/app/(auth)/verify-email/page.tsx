@@ -18,10 +18,10 @@ export default function VerifyEmailPage() {
           {t.auth.verifySent}
         </p>
         <p className="text-sm text-muted-foreground mb-6">
-          Email kelmadimi? Spam papkasini ham tekshiring.
+          Email kelmadimi? Spam papkasini ham tekşiring.
         </p>
         <Link href="/login" className="btn-primary inline-flex items-center gap-2 py-3 px-8">
-          Kirish sahifasiga <ArrowRight className="w-4 h-4" />
+          Kiriş sahifasiga <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     </motion.div>

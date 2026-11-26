@@ -179,7 +179,7 @@ export default function AdminBooksPage() {
   }
 
   async function del(b: Book) {
-    if (!confirm(`"${b.title}" o'chirilsinmi?`)) return;
+    if (!confirm(`"${b.title}" öçirilsinmi?`)) return;
     await supabase.from("books").delete().eq("id", b.id);
     toast.success(t.admin.common.deleted);
     load();
@@ -255,7 +255,7 @@ export default function AdminBooksPage() {
             <div className="grid sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2">
                 <label className="text-sm font-medium mb-1 block">{t.admin.common.tags}</label>
-                <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="input-field" placeholder="python, boshlang'ich, amaliyot" />
+                <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="input-field" placeholder="python, boşlanğiç, amaliyot" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">{t.admin.bks.publisher}</label>
@@ -275,7 +275,7 @@ export default function AdminBooksPage() {
                 </div>
                 <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-border hover:border-neon-purple/40 cursor-pointer text-sm text-muted-foreground">
                   {uploadingCover ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                  Muqova tanlash
+                  Muqova tanlaş
                   <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadCover(f); e.target.value = ""; }} />
                 </label>
               </div>
@@ -287,7 +287,7 @@ export default function AdminBooksPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-border hover:border-neon-purple/40 cursor-pointer text-sm text-muted-foreground">
                   {uploadingFile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                  Fayl yuklash (PDF, EPUB — {MAX_FILE_MB} MB gacha)
+                  Fayl yuklaş (PDF, EPUB — {MAX_FILE_MB} MB gaça)
                   <input
                     type="file"
                     accept=".pdf,.epub,.djvu,.doc,.docx"
@@ -320,10 +320,10 @@ export default function AdminBooksPage() {
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={() => save(false)} disabled={saving} className="btn-ghost py-2 px-5 text-sm border border-border flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama saqlash
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama saqlaş
               </button>
               <button onClick={() => save(true)} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Nashr qilish
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Naşr qiliş
               </button>
             </div>
           </motion.div>

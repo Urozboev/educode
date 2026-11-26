@@ -11,35 +11,35 @@ import { Trophy, Zap, RotateCcw, Coins, Play } from "lucide-react";
 /* ================= SAVOLLAR BANKI ================= */
 interface Q { q: string; opts: string[]; correct: number; }
 const QUESTIONS: Q[] = [
-  { q: "Python'da ro'yxat qanday belgilanadi?", opts: ["[1, 2, 3]", "(1, 2, 3)", "{1, 2, 3}", "<1, 2, 3>"], correct: 0 },
+  { q: "Pythonʼda röyxat qanday belgilanadi?", opts: ["[1, 2, 3]", "(1, 2, 3)", "{1, 2, 3}", "<1, 2, 3>"], correct: 0 },
   { q: "HTML nimaning qisqartmasi?", opts: ["HyperText Markup Language", "High Tech Modern Lang", "Home Tool Markup", "Hyperlink Text Mode"], correct: 0 },
-  { q: "5 % 2 natijasi nechchi?", opts: ["1", "2", "2.5", "0"], correct: 0 },
-  { q: "CSS nima uchun ishlatiladi?", opts: ["Sahifa dizayni", "Ma'lumotlar bazasi", "Server logikasi", "Fayl saqlash"], correct: 0 },
-  { q: "Python'da izoh qaysi belgi bilan boshlanadi?", opts: ["#", "//", "/*", "--"], correct: 0 },
+  { q: "5 % 2 natijasi neççi?", opts: ["1", "2", "2.5", "0"], correct: 0 },
+  { q: "CSS nima uçun işlatiladi?", opts: ["Sahifa dizayni", "Maʼlumotlar bazasi", "Server logikasi", "Fayl saqlaş"], correct: 0 },
+  { q: "Pythonʼda izoh qaysi belgi bilan boşlanadi?", opts: ["#", "//", "/*", "--"], correct: 0 },
   { q: "len('salom') nechchi qaytaradi?", opts: ["5", "4", "6", "xato"], correct: 0 },
   { q: "Qaysi biri sikl operatori?", opts: ["for", "if", "def", "try"], correct: 0 },
-  { q: "JavaScript'da o'zgaruvchi qanday e'lon qilinadi?", opts: ["let x = 5", "int x = 5", "var: x = 5", "x := 5"], correct: 0 },
+  { q: "JavaScript'da özgaruvçi qanday eʼlon qilinadi?", opts: ["let x = 5", "int x = 5", "var: x = 5", "x := 5"], correct: 0 },
   { q: "2 ** 3 natijasi (Python)?", opts: ["8", "6", "9", "5"], correct: 0 },
-  { q: "Bool tipida nechta qiymat bor?", opts: ["2", "1", "3", "cheksiz"], correct: 0 },
-  { q: "Qaysi biri ma'lumotlar bazasi?", opts: ["PostgreSQL", "Photoshop", "Chrome", "Figma"], correct: 0 },
+  { q: "Bool tipida neçta qiymat bor?", opts: ["2", "1", "3", "cheksiz"], correct: 0 },
+  { q: "Qaysi biri maʼlumotlar bazasi?", opts: ["PostgreSQL", "Photoshop", "Chrome", "Figma"], correct: 0 },
   { q: "'abc' + 'def' natijasi?", opts: ["'abcdef'", "'abc def'", "xato", "'adbecf'"], correct: 0 },
-  { q: "if x == 5: bu nima?", opts: ["Shart operatori", "Sikl", "Funksiya", "Import"], correct: 0 },
+  { q: "if x == 5: bu nima?", opts: ["Şart operatori", "Sikl", "Funksiya", "Import"], correct: 0 },
   { q: "print(10 // 3) nechchi chiqaradi?", opts: ["3", "3.33", "4", "1"], correct: 0 },
-  { q: "Git nima uchun kerak?", opts: ["Versiya nazorati", "Rasm tahrirlash", "Video montaj", "Musiqa"], correct: 0 },
-  { q: "Qaysi biri to'g'ri funksiya e'loni (Python)?", opts: ["def salom():", "function salom():", "func salom():", "salom() def:"], correct: 0 },
+  { q: "Git nima uçun kerak?", opts: ["Versiya nazorati", "Rasm tahrirlaş", "Video montaj", "Musiqa"], correct: 0 },
+  { q: "Qaysi biri töğri funksiya eʼloni (Python)?", opts: ["def salom():", "function salom():", "func salom():", "salom() def:"], correct: 0 },
   { q: "RAM nima?", opts: ["Operativ xotira", "Doimiy xotira", "Protsessor", "Videokarta"], correct: 0 },
   { q: "range(3) qaysi sonlarni beradi?", opts: ["0, 1, 2", "1, 2, 3", "0, 1, 2, 3", "1, 2"], correct: 0 },
   { q: "Qaysi kengaytma Python fayli?", opts: [".py", ".js", ".html", ".css"], correct: 0 },
   { q: "OS nima?", opts: ["Operatsion tizim", "Ofis dasturi", "Brauzer", "Antivirus"], correct: 0 },
-  { q: "'5' + '5' JavaScript'da nechchi?", opts: ["'55'", "10", "xato", "'10'"], correct: 0 },
+  { q: "'5' + '5' JavaScript'da neççi?", opts: ["'55'", "10", "xato", "'10'"], correct: 0 },
   { q: "Qaysi biri massiv metodi (JS)?", opts: ["push()", "print()", "input()", "len()"], correct: 0 },
   { q: "Ctrl+C nima qiladi?", opts: ["Nusxa oladi", "Kesadi", "Joylaydi", "O'chiradi"], correct: 0 },
-  { q: "URL'da https nimani bildiradi?", opts: ["Xavfsiz protokol", "Sayt nomi", "Server turi", "Fayl format"], correct: 0 },
+  { q: "URLʼda https nimani bildiradi?", opts: ["Xavfsiz protokol", "Sayt nomi", "Server turi", "Fayl format"], correct: 0 },
   { q: "not True natijasi?", opts: ["False", "True", "None", "xato"], correct: 0 },
   { q: "Qaysi biri kompilyatsiya qilinadigan til?", opts: ["C++", "Python", "JavaScript", "HTML"], correct: 0 },
   { q: "dict = {'a': 1} — 'a' bu nima?", opts: ["Kalit (key)", "Qiymat", "Indeks", "Metod"], correct: 0 },
-  { q: "1 KB nechchi bayt?", opts: ["1024", "1000", "100", "512"], correct: 0 },
-  { q: "while True: nima qiladi?", opts: ["Cheksiz sikl", "Bir marta ishlaydi", "Xato beradi", "Hech narsa"], correct: 0 },
+  { q: "1 KB neççi bayt?", opts: ["1024", "1000", "100", "512"], correct: 0 },
+  { q: "while True: nima qiladi?", opts: ["Çeksiz sikl", "Bir marta işlaydi", "Xato beradi", "Heç narsa"], correct: 0 },
   { q: "Qaysi biri IDE?", opts: ["VS Code", "Gmail", "YouTube", "Telegram"], correct: 0 },
 ];
 
@@ -265,7 +265,7 @@ export default function QuizBattle3D() {
       });
       if (error) { setCoinsAwarded(0); return; }
       setCoinsAwarded(data?.coins ?? 0);
-      setRewardNote(data?.reason === "daily_limit" ? "Bugungi mukofot allaqachon olingan" : null);
+      setRewardNote(data?.reason === "daily_limit" ? "Bugungi mukofot allaqaçon olingan" : null);
     } catch {
       // Coin berilmasa ham o'yin natijasi ko'rinadi
       setCoinsAwarded(0);
@@ -339,15 +339,15 @@ export default function QuizBattle3D() {
             <div className="text-6xl">⚔️</div>
             <h2 className="font-display font-extrabold text-3xl text-white">Quiz Battle <span className="text-neon-purple">3D</span></h2>
             <p className="text-white/60 max-w-md text-sm leading-relaxed">
-              {GAME_SECONDS} soniyada maksimal to'g'ri javob bering! 3D kublardan to'g'risini tanlang.
-              Ketma-ket to'g'ri javoblar <span className="text-neon-yellow font-semibold">combo multiplikator</span> beradi.
-              Har 3 to'g'ri javob — 1 coin 🪙
+              {GAME_SECONDS} soniyada maksimal töğri javob bering! 3D kublardan töğrisini tanlang.
+              Ketma-ket töğri javoblar <span className="text-neon-yellow font-semibold">combo multiplikator</span> beradi.
+              Har 3 töğri javob — 1 coin 🪙
             </p>
             <button
               onClick={start}
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-neon-purple text-white font-display font-bold hover:bg-neon-purple/90 shadow-xl shadow-neon-purple/30 transition-all hover:scale-105"
             >
-              <Play className="w-5 h-5" /> Boshlash
+              <Play className="w-5 h-5" /> Boşlaş
             </button>
           </div>
         ) : (
@@ -355,24 +355,24 @@ export default function QuizBattle3D() {
             <div className="text-5xl">{correct >= 10 ? "🏆" : correct >= 5 ? "🎉" : "💪"}</div>
             <h2 className="font-display font-extrabold text-3xl text-white">{score} ball</h2>
             <div className="flex gap-6 text-sm text-white/70">
-              <span>✅ {correct} to'g'ri</span>
+              <span>✅ {correct} töğri</span>
               <span>⚡ eng katta combo: {bestCombo}</span>
             </div>
             {coinsAwarded !== null && coinsAwarded > 0 && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neon-yellow/10 border border-neon-yellow/30 text-neon-yellow font-bold">
-                <Coins className="w-4 h-4" /> +{coinsAwarded} coin qo'shildi!
+                <Coins className="w-4 h-4" /> +{coinsAwarded} coin qöşildi!
               </div>
             )}
             {rewardNote && (
               <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm">
-                {rewardNote} — o'ynash baribir bepul
+                {rewardNote} — öynaş baribir bepul
               </div>
             )}
             <button
               onClick={start}
               className="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-neon-purple text-white font-display font-bold hover:bg-neon-purple/90 shadow-xl shadow-neon-purple/30 transition-all hover:scale-105 mt-2"
             >
-              <RotateCcw className="w-4.5 h-4.5" /> Yana o'ynash
+              <RotateCcw className="w-4.5 h-4.5" /> Yana öynaş
             </button>
           </div>
         )}

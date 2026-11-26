@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const description =
     p.headline ||
     p.bio?.slice(0, 155) ||
-    `${p.full_name}ning ${SITE_NAME} platformasidagi o'quv natijalari, sertifikatlari va loyihalari.`;
+    `${p.full_name}ning ${SITE_NAME} platformasidagi öquv natijalari, sertifikatlari va loyihalari.`;
   const url = absUrl(`/u/${p.username}`);
   const og = ogImageUrl({
     title: p.full_name,

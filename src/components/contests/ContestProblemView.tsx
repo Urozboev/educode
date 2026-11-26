@@ -94,7 +94,7 @@ export function ContestProblemView({ basePath }: { basePath: string }) {
             : t.contests.page.notFound}
         </p>
         <Link href={`${basePath}/${slug}`} className="btn-primary py-2.5 px-5 text-sm">
-          Olimpiadaga qaytish
+          Olimpiadaga qaytiş
         </Link>
       </div>
     );

@@ -73,7 +73,7 @@ export default function AdminAnalyticsPage() {
   }, []);
 
   const mainCards = [
-    { label: "Foydalanuvchilar", value: stats.totalUsers, sub: `+${stats.newUsersThisWeek} shu hafta`, icon: Users, color: "#6C5CE7" },
+    { label: "Foydalanuvchilar", value: stats.totalUsers, sub: `+${stats.newUsersThisWeek} şu hafta`, icon: Users, color: "#6C5CE7" },
     { label: t.admin.ana.acceptRate, value: `${stats.acceptRate}%`, sub: `${stats.totalSubmissions} yuborish`, icon: Target, color: "#00E676" },
     { label: t.admin.ana.courseCompletion, value: stats.completedCourses, sub: `${stats.totalEnrollments} ro'yxat`, icon: BookOpen, color: "#00D2FF" },
     { label: t.admin.ana.avgQuiz, value: `${stats.avgQuizScore}%`, sub: `${stats.totalQuizzes} ta test`, icon: Brain, color: "#FFD600" },
@@ -148,8 +148,8 @@ export default function AdminAnalyticsPage() {
               <div key={ch.id} className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0">
                 <div className={cn("w-2 h-2 rounded-full", ch.difficulty === "easy" ? "bg-neon-green" : ch.difficulty === "medium" ? "bg-neon-yellow" : "bg-neon-red")} />
                 <span className="flex-1 text-sm truncate">{ch.title}</span>
-                <span className="text-xs text-neon-green font-mono">{ch.solved_count} yechdi</span>
-                <span className="text-xs text-muted-foreground font-mono">{ch.attempt_count} urinish</span>
+                <span className="text-xs text-neon-green font-mono">{ch.solved_count} yeçdi</span>
+                <span className="text-xs text-muted-foreground font-mono">{ch.attempt_count} uriniş</span>
               </div>
             ))}
             {challengeStats.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">{t.admin.common.noData}</p>}

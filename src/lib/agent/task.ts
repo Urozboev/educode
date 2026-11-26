@@ -103,7 +103,7 @@ async function generateTask(
   );
 
   if (!data?.description || !Array.isArray(data.test_cases) || !data.test_cases.length) {
-    return { task: null, error: error || 'Topshiriq tuzilmadi', tokensIn, tokensOut };
+    return { task: null, error: error || 'Topşiriq tuzilmadi', tokensIn, tokensOut };
   }
 
   const testCases = data.test_cases
@@ -148,18 +148,18 @@ async function generateTask(
  * yechimidan o'tgan topshiriq yoziladi.
  */
 async function validateTask(task: TaskPayload): Promise<{ ok: boolean; reason?: string }> {
-  if (!task.solution_code.trim()) return { ok: false, reason: "namunaviy yechim yo'q" };
+  if (!task.solution_code.trim()) return { ok: false, reason: "namunaviy yeçim yöq" };
 
   for (const test of task.test_cases) {
     const result = await runCode(task.language, task.solution_code, test.input);
 
     if (result.status !== 'ok') {
-      return { ok: false, reason: `yechim ishlamadi: ${result.stderr.slice(0, 120)}` };
+      return { ok: false, reason: `yeçim işlamadi: ${result.stderr.slice(0, 120)}` };
     }
     if (normalizeOutput(result.stdout) !== normalizeOutput(test.expected_output)) {
       return {
         ok: false,
-        reason: `test mos kelmadi (kirish "${test.input.slice(0, 20)}"): kutilgan "${test.expected_output.slice(0, 30)}", chiqdi "${result.stdout.trim().slice(0, 30)}"`,
+        reason: `test mos kelmadi (kiriş "${test.input.slice(0, 20)}"): kutilgan "${test.expected_output.slice(0, 30)}", çiqdi "${result.stdout.trim().slice(0, 30)}"`,
       };
     }
   }
@@ -215,7 +215,7 @@ export async function getOrCreateTask(
     console.error('[agent/task] tekshiruvdan o\'tmadi:', check.reason);
     return {
       taskId: null, task: null, cached: false,
-      error: `Topshiriq tekshiruvdan o'tmadi (${check.reason})`,
+      error: `Topşiriq tekşiruvdan ötmadi (${check.reason})`,
       tokensIn, tokensOut,
     };
   }

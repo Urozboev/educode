@@ -403,7 +403,7 @@ export default function PlaygroundPage() {
   /** Interaktiv sessiyani bekor qilish */
   function cancelInteractive() {
     setAwaitingInput(false);
-    setOutput(prev => prev + "\n^C (kiritish bekor qilindi)");
+    setOutput(prev => prev + "\n^C (kiritiş bekor qilindi)");
     inputsRef.current = [];
   }
 

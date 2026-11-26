@@ -14,15 +14,15 @@ export async function POST(request: NextRequest) {
     const { type, topic_title, course_title, language, difficulty, task_description, task_solution } = await request.json();
     let systemPrompt = '', userPrompt = '';
 
-    const DOMAIN_RULE = `MUHIM QOIDA: Faqat "${course_title || topic_title}" mavzusi doirasida yoz. Sohadan chiqma. IT, dasturlash, kompyuter savodxonligi va prompt engineering doirasida bo'l.`;
+    const DOMAIN_RULE = `MUHIM QOIDA: Faqat "${course_title || topic_title}" mavzusi doirasida yoz. Sohadan çiqma. IT, dasturlaş, kompyuter savodxonligi va prompt engineering doirasida böl.`;
 
     if (type === 'lecture') {
-      systemPrompt = `Sen tajribali dasturlash o'qituvchisisan. HTML formatda ma'ruza yoz. h2,h3,p,pre,code,ul,ol ishlatib. O'zbek tilida. 500-800 so'z. ${DOMAIN_RULE}`;
-      userPrompt = `Kurs: "${course_title || 'Dasturlash'}". Mavzu: "${topic_title}". Faqat shu mavzu doirasida batafsil ma'ruza yoz.`;
+      systemPrompt = `Sen tajribali dasturlaş öqituvçisisan. HTML formatda maʼruza yoz. h2,h3,p,pre,code,ul,ol işlatib. Özbek tilida. 500-800 söz. ${DOMAIN_RULE}`;
+      userPrompt = `Kurs: "${course_title || 'Dasturlash'}". Mavzu: "${topic_title}". Faqat şu mavzu doirasida batafsil maʼruza yoz.`;
     } else if (type === 'quiz' || type === 'placement_quiz') {
       const count = type === 'placement_quiz' ? 3 : 5;
-      systemPrompt = `Faqat JSON array qaytar. Boshqa hech narsa yozma. O'zbek tilida. ${DOMAIN_RULE}`;
-      userPrompt = `"${topic_title}" mavzusidan ${count} ta test. Faqat shu mavzu doirasida bo'lsin. JSON: [{"question":"...","question_type":"single","options":[{"id":"a","text":"...","is_correct":false},{"id":"b","text":"...","is_correct":true},{"id":"c","text":"...","is_correct":false},{"id":"d","text":"...","is_correct":false}],"explanation":"...","points":1,"order_index":1}]`;
+      systemPrompt = `Faqat JSON array qaytar. Boşqa heç narsa yozma. Özbek tilida. ${DOMAIN_RULE}`;
+      userPrompt = `"${topic_title}" mavzusidan ${count} ta test. Faqat şu mavzu doirasida bölsin. JSON: [{"question":"...","question_type":"single","options":[{"id":"a","text":"...","is_correct":false},{"id":"b","text":"...","is_correct":true},{"id":"c","text":"...","is_correct":false},{"id":"d","text":"...","is_correct":false}],"explanation":"...","points":1,"order_index":1}]`;
     } else if (type === 'task') {
       systemPrompt = `Faqat JSON qaytar. O'zbek tilida. Til: ${language || 'python'}. ${DOMAIN_RULE}
 MUHIM QOIDALAR:
@@ -39,12 +39,12 @@ JSON: {"title":"...","description":"... input() funksiyasidan foydalaning.","sta
     } else if (type === 'hint_tier') {
       // Mavjud topshiriq uchun 4 darajali hint generatsiya qilish
       systemPrompt = HINT_TIER_GENERATION_PROMPT;
-      userPrompt = `Topshiriq tavsifi:
+      userPrompt = `Topşiriq tavsifi:
 ${task_description || topic_title || ''}
 
-${task_solution ? `Yechim (referens uchun, hint'ga to'g'ridan-to'g'ri tushirmang):\n${task_solution}` : ''}
+${task_solution ? `Yeçim (referens uçun, hintʼga töğridan-töğri tuşirmang):\n${task_solution}` : ''}
 
-Yuqoridagi topshiriq uchun 4 daraja maslahat tuzing.`;
+Yuqoridagi topşiriq uçun 4 daraja maslahat tuzing.`;
     } else if (type === 'challenge') {
       systemPrompt = `Faqat JSON qaytar. O'zbek tilida. ${DOMAIN_RULE}
 MUHIM: starter_code da input() ishlatilsin. test_cases da kamida 4 ta har xil qiymatli test bo'lsin.

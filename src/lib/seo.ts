@@ -14,7 +14,7 @@ export const SITE_URL = (
 
 export const SITE_NAME = "MirAcademy";
 export const SITE_BRAND_FULL = "MirAcademy (miracademy.uz)";
-export const SITE_TAGLINE = "Dasturlashni o'ynab o'rgan";
+export const SITE_TAGLINE = "Dasturlaşni öynab örgan";
 
 /**
  * Brend nomining boshqa yozilish shakllari.
@@ -42,14 +42,14 @@ export const BRAND_ALIASES = [
 ];
 
 /** Qidiruv natijasida ko'rinadigan asosiy sarlavha. */
-export const SITE_TITLE = `${SITE_NAME} (Mir Akademiya) — onlayn ta'lim platformasi`;
+export const SITE_TITLE = `${SITE_NAME} (Mir Akademiya) — onlayn taʼlim platformasi`;
 
 /**
  * Meta description. Google taxminan 160 belgini ko'rsatadi, shuning uchun
  * eng muhim so'zlar — brend nomi va uning varianti — boshida turadi.
  */
 export const SITE_DESCRIPTION =
-  "MirAcademy (Mir Akademiya) — onlayn ta'lim va dasturlash kurslari. Python, JavaScript, HTML/CSS va algoritmlarni AI mentor bilan o'zbek tilida o'rganing.";
+  "MirAcademy (Mir Akademiya) — onlayn taʼlim va dasturlaş kurslari. Python, JavaScript, HTML/CSS va algoritmlarni AI mentor bilan özbek tilida örganing.";
 
 /**
  * Meta keywords. Google buni reyting omili sifatida ishlatmaydi, lekin
@@ -62,19 +62,19 @@ export const DEFAULT_KEYWORDS = [
   ...BRAND_ALIASES,
   // Yo'nalish
   "dasturlash",
-  "dasturlash kurslari",
-  "online dasturlash",
-  "onlayn ta'lim",
-  "python o'rganish",
-  "javascript o'rganish",
-  "html css o'zbek tilida",
+  "dasturlaş kurslari",
+  "online dasturlaş",
+  "onlayn taʼlim",
+  "python örganiş",
+  "javascript örganiş",
+  "html css özbek tilida",
   "kompyuter savodxonligi",
   "prompt engineering",
-  "AI bilan dasturlash",
-  "ta'lim platformasi",
-  "IT kurslari O'zbekistonda",
-  "bepul dasturlash",
-  "interaktiv ta'lim",
+  "AI bilan dasturlaş",
+  "taʼlim platformasi",
+  "IT kurslari Özbekistonda",
+  "bepul dasturlaş",
+  "interaktiv taʼlim",
 ];
 
 export const SUPPORTED_LOCALES = ["uz", "ru", "en", "kaa"] as const;

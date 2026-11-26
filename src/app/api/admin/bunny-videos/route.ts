@@ -24,7 +24,7 @@ export async function GET() {
   const apiKey = process.env.BUNNY_API_KEY;
   if (!libraryId || !apiKey) {
     return NextResponse.json({
-      error: "BUNNY_STREAM_LIBRARY_ID yoki BUNNY_API_KEY .env.local da yo'q",
+      error: "BUNNY_STREAM_LIBRARY_ID yoki BUNNY_API_KEY .env.local da yöq",
     }, { status: 500 });
   }
 
@@ -38,7 +38,7 @@ export async function GET() {
     if (!res.ok || !data.items) {
       return NextResponse.json({
         error: res.status === 401
-          ? "Bunny API kaliti noto'g'ri. Kutubxona API kalitini oling: Stream -> kutubxona -> API -> API Key"
+          ? "Bunny API kaliti notöğri. Kutubxona API kalitini oling: Stream -> kutubxona -> API -> API Key"
           : `Bunny xatosi (${res.status})`,
       }, { status: 502 });
     }

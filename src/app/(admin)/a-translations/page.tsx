@@ -14,6 +14,7 @@ import {
   type TranslatableResource, type TranslatableField,
 } from "@/lib/i18n/content";
 import { useI18n } from "@/lib/i18n";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 /**
  * Kontent tarjimasi paneli.
@@ -146,7 +147,7 @@ export default function TranslationsPage() {
 
   const shown = rows.filter(r => {
     const title = String(r[RESOURCE_TITLE_FIELD[resource]] ?? "");
-    return title.toLowerCase().includes(search.toLowerCase());
+    return uzIncludes(title, search);
   });
 
   const pct = (res: string, loc: string) =>
@@ -162,7 +163,7 @@ export default function TranslationsPage() {
           </p>
         </div>
         <button onClick={loadMeta} className="btn-ghost px-4 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" /> Yangilash
+          <RefreshCw className="w-4 h-4" /> Yangilaş
         </button>
       </div>
 
@@ -221,7 +222,7 @@ export default function TranslationsPage() {
             onClick={() => setActive(null)}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
           >
-            <ChevronLeft className="w-4 h-4" /> Ro&apos;yxatga qaytish
+            <ChevronLeft className="w-4 h-4" /> Röyxatga qaytiş
           </button>
 
           <div className="glass-card p-4">
@@ -258,7 +259,7 @@ export default function TranslationsPage() {
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
                     <label className="text-[11px] text-muted-foreground mb-1.5 block">
-                      Asl matn — O&apos;zbekcha
+                      Asl matn — Özbekça
                     </label>
                     <textarea
                       readOnly
@@ -273,7 +274,7 @@ export default function TranslationsPage() {
                     <textarea
                       value={values[f.field] ?? ""}
                       onChange={e => setValues(v => ({ ...v, [f.field]: e.target.value }))}
-                      placeholder={f.kind === "json" ? "JSON ko'rinishida" : t.admin.trn.placeholder}
+                      placeholder={f.kind === "json" ? "JSON körinişida" : t.admin.trn.placeholder}
                       className="input-field w-full text-xs font-mono min-h-[140px] resize-y"
                     />
                   </div>
@@ -281,7 +282,7 @@ export default function TranslationsPage() {
 
                 {!values[f.field] && (
                   <p className="text-[11px] text-muted-foreground">
-                    Bo&apos;sh qoldirilsa foydalanuvchi o&apos;zbekcha matnni ko&apos;radi — sahifa baribir ishlaydi.
+                    Böş qoldirilsa foydalanuvçi özbekça matnni köradi — sahifa baribir işlaydi.
                   </p>
                 )}
               </div>
@@ -296,7 +297,7 @@ export default function TranslationsPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder={`${RESOURCE_LABEL[resource]} ichidan qidirish...`}
+              placeholder={`${RESOURCE_LABEL[resource]} içidan qidiriş...`}
               className="input-field w-full text-sm pl-10"
             />
           </div>

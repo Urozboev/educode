@@ -162,7 +162,7 @@ export default function AdminAboutPage() {
       </div>
 
       <button onClick={handleSave} disabled={saving} className="btn-primary py-3 px-8 flex items-center gap-2 disabled:opacity-50">
-        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlash
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlaş
       </button>
     </div>
   );

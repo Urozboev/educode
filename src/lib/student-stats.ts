@@ -73,7 +73,7 @@ export interface StudentCourseStat {
 /** 5 ballik baho rangi va nomi (OTM shkalasi) */
 export function gradeInfo(grade: number | null | undefined) {
   switch (grade) {
-    case 5: return { label: "A'lo", cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" };
+    case 5: return { label: "Aʼlo", cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" };
     case 4: return { label: "Yaxshi", cls: "bg-sky-500/15 text-sky-600 dark:text-sky-400" };
     case 3: return { label: "Qoniqarli", cls: "bg-amber-500/15 text-amber-600 dark:text-amber-400" };
     case 2: return { label: "Qoniqarsiz", cls: "bg-rose-500/15 text-rose-600 dark:text-rose-400" };
@@ -96,7 +96,7 @@ export function dayKey(d: Date | string) {
 
 /** Faollik holati: bugun / shu hafta / uzoq vaqt */
 export function activityState(iso: string | null) {
-  if (!iso) return { label: "Hali boshlamagan", cls: "bg-surface text-muted-foreground" };
+  if (!iso) return { label: "Hali boşlamagan", cls: "bg-surface text-muted-foreground" };
   const today = dayKey(new Date());
   const k = dayKey(iso);
   if (k === today) return { label: "Bugun faol", cls: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" };

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { toOldUz } from "@/lib/uz-alphabet";
 
 interface TopicAudioPlayerProps {
   contentHtml?: string;
@@ -126,7 +127,8 @@ export default function TopicAudioPlayer({ contentHtml = "", topicTitle }: Topic
 
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(fullText);
+    // Brauzer ovozlari yangi alifbo harflarini (ş, ç, ğ, ö) tanimasligi mumkin
+    const utterance = new SpeechSynthesisUtterance(locale === "uz" ? toOldUz(fullText) : fullText);
     utterance.rate = playbackSpeed;
 
     // Map language tag

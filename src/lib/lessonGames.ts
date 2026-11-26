@@ -18,25 +18,25 @@ export const GAME_TYPES: {
   {
     value: "quiz_race",
     label: "Tezlik viktorinasi",
-    hint: "Vaqtga qarshi savol-javob, ball tezlikka bog'liq",
+    hint: "Vaqtga qarşi savol-javob, ball tezlikka boğliq",
     akin: "Kahoot uslubi",
   },
   {
     value: "jeopardy",
     label: "Jeopardy taxtasi",
-    hint: "Kategoriya × ball kataklari, sinf bilan o'ynash uchun",
+    hint: "Kategoriya × ball kataklari, sinf bilan öynaş uçun",
     akin: "JeopardyLabs uslubi",
   },
   {
     value: "match_pairs",
-    label: "Juftliklarni topish",
-    hint: "Termin va ta'rifni moslashtirish",
+    label: "Juftliklarni topiş",
+    hint: "Termin va taʼrifni moslaştiriş",
     akin: "Wordwall uslubi",
   },
   {
     value: "crossword",
     label: "Krossvord",
-    hint: "So'z va ta'rif kiritasiz, to'r avtomatik quriladi",
+    hint: "Söz va taʼrif kiritasiz, tör avtomatik quriladi",
     akin: "Klassik krossvord",
   },
 ];
@@ -80,26 +80,26 @@ export function emptyContent(type: LessonGameType): LessonGameContent {
 export function validateContent(type: LessonGameType, content: LessonGameContent): string | null {
   if (type === "quiz_race") {
     const c = content as QuizRaceContent;
-    if (!c.questions?.length) return "Kamida bitta savol qo'shing";
+    if (!c.questions?.length) return "Kamida bitta savol qöşing";
     for (let i = 0; i < c.questions.length; i++) {
       const q = c.questions[i];
-      if (!q.text?.trim()) return `${i + 1}-savol matni bo'sh`;
+      if (!q.text?.trim()) return `${i + 1}-savol matni böş`;
       const filled = q.options?.filter(o => o.text?.trim()) ?? [];
       if (filled.length < 2) return `${i + 1}-savolda kamida 2 ta variant kerak`;
-      if (!filled.some(o => o.correct)) return `${i + 1}-savolda to'g'ri javob belgilanmagan`;
+      if (!filled.some(o => o.correct)) return `${i + 1}-savolda töğri javob belgilanmagan`;
     }
     return null;
   }
 
   if (type === "jeopardy") {
     const c = content as JeopardyContent;
-    if (!c.categories?.length) return "Kamida bitta kategoriya qo'shing";
+    if (!c.categories?.length) return "Kamida bitta kategoriya qöşing";
     for (const cat of c.categories) {
-      if (!cat.name?.trim()) return "Kategoriya nomi bo'sh";
-      if (!cat.cells?.length) return `"${cat.name}" kategoriyasida katak yo'q`;
+      if (!cat.name?.trim()) return "Kategoriya nomi böş";
+      if (!cat.cells?.length) return `"${cat.name}" kategoriyasida katak yöq`;
       for (const cell of cat.cells) {
         if (!cell.question?.trim() || !cell.answer?.trim()) {
-          return `"${cat.name}" kategoriyasida savol yoki javob bo'sh`;
+          return `"${cat.name}" kategoriyasida savol yoki javob böş`;
         }
       }
     }
@@ -108,14 +108,14 @@ export function validateContent(type: LessonGameType, content: LessonGameContent
 
   if (type === "crossword") {
     const c = content as CrosswordContent;
-    if (!c.words?.length) return "So'zlarni kiriting va to'rni yarating";
-    if (c.words.length < 2) return "Krossvord uchun kamida 2 ta so'z kerak";
+    if (!c.words?.length) return "Sözlarni kiriting va törni yarating";
+    if (c.words.length < 2) return "Krossvord uçun kamida 2 ta söz kerak";
     return null;
   }
 
   const c = content as MatchPairsContent;
   const pairs = c.pairs?.filter(p => p.left?.trim() && p.right?.trim()) ?? [];
-  if (pairs.length < 2) return "Kamida 2 ta to'liq juftlik kerak";
+  if (pairs.length < 2) return "Kamida 2 ta töliq juftlik kerak";
   return null;
 }
 

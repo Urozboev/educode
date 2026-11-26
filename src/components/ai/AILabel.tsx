@@ -70,7 +70,7 @@ export function AILabel({
       {time && <span className="text-muted-foreground">· {time}</span>}
       {confidence && (
         <span className={cn("font-medium", confidenceColor[confidence])}>
-          · Ishonch: {confidenceLabel[confidence]}
+          · Işonç: {confidenceLabel[confidence]}
         </span>
       )}
       {promptTemplate && (

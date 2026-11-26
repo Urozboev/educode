@@ -104,14 +104,14 @@ export default function TeacherGroupsPage() {
   }
 
   async function delGroup(g: Group) {
-    if (!confirm(`"${g.name}" guruhi o'chirilsinmi? Talabalar bog'lanishi ham uziladi.`)) return;
+    if (!confirm(`"${g.name}" guruhi öçirilsinmi? Talabalar boğlanişi ham uziladi.`)) return;
     await supabase.from("teacher_groups").delete().eq("id", g.id);
     toast.success(t.teacher.grp.deleted);
     load();
   }
 
   async function removeStudent(s: Student) {
-    if (!confirm(`${s.full_name} ro'yxatdan chiqarilsinmi?`)) return;
+    if (!confirm(`${s.full_name} röyxatdan çiqarilsinmi?`)) return;
     const user = await getCurrentUser(supabase);
     if (!user) return;
     await supabase.from("teacher_students").delete()
@@ -181,7 +181,7 @@ export default function TeacherGroupsPage() {
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={createGroup} disabled={creating} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Yaratish
+                {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Yaratiş
               </button>
             </div>
           </motion.div>
@@ -210,14 +210,14 @@ export default function TeacherGroupsPage() {
                     <h3 className="font-display font-bold text-lg">{g.name}</h3>
                     {g.description && <p className="text-sm text-muted-foreground mt-0.5">{g.description}</p>}
                     <p className="text-[11px] text-muted-foreground mt-1">
-                      <span className="numeric">{members.length}</span> o&apos;quvchi · {formatDate(g.created_at)}
+                      <span className="numeric">{members.length}</span> öquvçi · {formatDate(g.created_at)}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleOpen(g)}
-                      title={g.is_open ? "Qo'shilishni yopish" : "Qo'shilishni ochish"}
+                      title={g.is_open ? "Qöşilişni yopiş" : "Qöşilişni oçiş"}
                       className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent"
                     >
                       {g.is_open ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}

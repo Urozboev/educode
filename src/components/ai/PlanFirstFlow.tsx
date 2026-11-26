@@ -43,7 +43,7 @@ const STEP_META = (t: Dictionary): Record<StepKey, { idx: number; label: string;
     idx: 2,
     label: t.misc.planAlgorithm,
     helper: t.misc.planAlgorithmHint,
-    placeholder: "1. ro'yxatdagi har element ko'rib chiqaman\n2. eng katta qiymat va indeksini eslab qolaman\n3. oxirida ikki qiymatni qaytaraman...",
+    placeholder: "1. röyxatdagi har element körib çiqaman\n2. eng katta qiymat va indeksini eslab qolaman\n3. oxirida ikki qiymatni qaytaraman...",
     min: 40,
   },
   pseudocode: {
@@ -173,7 +173,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
         return;
       }
       setRow(upserted as any);
-      toast.success(`Bosqich ${STEP_META(t)[step].idx} tasdiqlandi ✓`);
+      toast.success(`Bosqiç ${STEP_META(t)[step].idx} tasdiqlandi ✓`);
 
       // Keyingi bosqichga avtomatik o'tish
       const idx = STEP_ORDER.indexOf(step);
@@ -182,7 +182,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
       } else {
         // pseudocode tasdiqlandi → kod ochildi
         onCodeUnlocked();
-        toast.success("Endi kod yozish bosqichiga o'tishingiz mumkin! 🎉");
+        toast.success("Endi kod yoziş bosqiçiga ötişingiz mumkin! 🎉");
       }
     } catch (e: any) {
       toast.error(e.message);
@@ -201,7 +201,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
     <div className="glass-card p-4 mb-4">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="w-4 h-4 text-neon-purple" />
-        <h3 className="font-semibold text-sm">Plan-First yondashuvi</h3>
+        <h3 className="font-semibold text-sm">Plan-First yondaşuvi</h3>
         {!isRequired && (
           <span className="text-[10px] text-muted-foreground">{t.misc.optionalRecommended}</span>
         )}
@@ -293,7 +293,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
                           className="btn-primary py-1.5 px-3 text-xs flex items-center gap-1.5 disabled:opacity-50"
                         >
                           {loading === step ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                          AI ga tasdiqlatish
+                          AI ga tasdiqlatiş
                         </button>
                       )}
                     </div>
@@ -313,7 +313,7 @@ export default function PlanFirstFlow({ taskId, taskType, taskDescription, onCod
         >
           {codeUnlocked ? <CheckCircle2 className="w-4 h-4" /> : <Lock className="w-3.5 h-3.5" />}
           <span className="font-medium">
-            {codeUnlocked ? "Kod yozish bosqichi ochildi!" : t.misc.planCodeLast}
+            {codeUnlocked ? "Kod yoziş bosqiçi oçildi!" : t.misc.planCodeLast}
           </span>
         </div>
       </div>

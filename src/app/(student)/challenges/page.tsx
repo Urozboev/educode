@@ -13,6 +13,7 @@ import {
   Search, Swords, Users, Coins, CheckCircle2, Zap, Trophy,
   Flame, ChevronRight, Target,
 } from "lucide-react";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 const categories = [
   { value: "all", label: "Barchasi", icon: "✨" },
@@ -20,12 +21,13 @@ const categories = [
   { value: "math", label: "Matematika", icon: "🔢" },
   { value: "strings", label: "Satrlar", icon: "🔤" },
   { value: "arrays", label: "Massivlar", icon: "📊" },
+  { value: "functions", label: "Funksiyalar", icon: "🧩" },
   { value: "algorithms", label: "Algoritmlar", icon: "🧠" },
 ];
 const difficulties = [
   { value: "all", label: "Barchasi" },
   { value: "easy", label: "Oson" },
-  { value: "medium", label: "O'rta" },
+  { value: "medium", label: "Örta" },
   { value: "hard", label: "Qiyin" },
 ];
 
@@ -61,7 +63,7 @@ export default function ChallengesPage() {
   }, [locale]);
 
   const filtered = challenges.filter(c => {
-    return (c.title.toLowerCase().includes(search.toLowerCase())) &&
+    return (uzIncludes(c.title, search)) &&
       (category === "all" || c.category === category) &&
       (difficulty === "all" || c.difficulty === difficulty);
   });
@@ -116,13 +118,13 @@ export default function ChallengesPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="font-display font-extrabold text-xl leading-none">{totalSolved}</span>
-                <span className="text-[9px] text-muted-foreground">yechilgan</span>
+                <span className="text-[9px] text-muted-foreground">yeçilgan</span>
               </div>
             </div>
             <div className="space-y-1.5 text-xs">
               {[
                 { label: "Oson", ...easy, color: "#00E676" },
-                { label: "O'rta", ...medium, color: "#FFD600" },
+                { label: "Örta", ...medium, color: "#FFD600" },
                 { label: "Qiyin", ...hard, color: "#FF5252" },
               ].map(d => (
                 <div key={d.label} className="flex items-center gap-2">
@@ -208,7 +210,7 @@ export default function ChallengesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-display font-semibold text-[15px] group-hover:text-neon-purple transition-colors truncate">{ch.title}</h3>
-                      {solved && <span className="text-[9px] font-bold text-neon-green bg-neon-green/10 border border-neon-green/20 rounded-full px-2 py-0.5 flex-shrink-0">YECHILGAN</span>}
+                      {solved && <span className="text-[9px] font-bold text-neon-green bg-neon-green/10 border border-neon-green/20 rounded-full px-2 py-0.5 flex-shrink-0">YEÇILGAN</span>}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{ch.description}</p>
                     <div className="flex items-center gap-3 mt-2.5">

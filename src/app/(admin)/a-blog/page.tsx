@@ -17,7 +17,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
 
 const RichTextEditor = dynamic(() => import("@/components/editor/RichTextEditor"), { ssr: false });
 
-const CATEGORIES = ["dasturlash", "kompyuter savodxonligi", "sun'iy intellekt", "IT yangiliklari", "karyera", "umumiy"];
+const CATEGORIES = ["dasturlash", "kompyuter savodxonligi", "sunʼiy intellekt", "IT yangiliklari", "karyera", "umumiy"];
 
 const empty = {
   title: "", excerpt: "", content_html: "", cover_url: "",
@@ -128,7 +128,7 @@ export default function AdminBlogPage() {
   }
 
   async function del(p: BlogPost) {
-    if (!confirm(`"${p.title}" o'chirilsinmi?`)) return;
+    if (!confirm(`"${p.title}" öçirilsinmi?`)) return;
     await supabase.from("blog_posts").delete().eq("id", p.id);
     toast.success(t.admin.common.deleted); load();
   }
@@ -173,7 +173,7 @@ export default function AdminBlogPage() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">{t.admin.common.tags}</label>
-                <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="input-field" placeholder="python, boshlang'ich" />
+                <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="input-field" placeholder="python, boşlanğiç" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">{t.admin.blg.readMinutes}</label>
@@ -193,7 +193,7 @@ export default function AdminBlogPage() {
                 </div>
                 <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-border hover:border-neon-purple/40 cursor-pointer text-sm text-muted-foreground">
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                  Rasm tanlash
+                  Rasm tanlaş
                   <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadCover(f); e.target.value = ""; }} />
                 </label>
               </div>
@@ -205,7 +205,7 @@ export default function AdminBlogPage() {
                 <label className="text-sm font-medium">{t.admin.blg.body}</label>
                 <button onClick={aiWrite} disabled={!form.title || aiGen}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 disabled:opacity-50">
-                  {aiGen ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />} AI bilan yozish
+                  {aiGen ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />} AI bilan yoziş
                 </button>
               </div>
               <RichTextEditor value={form.content_html} onChange={html => setForm(f => ({ ...f, content_html: html }))} placeholder="Maqola matnini yozing..." />
@@ -214,10 +214,10 @@ export default function AdminBlogPage() {
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={() => save(false)} disabled={saving} className="btn-ghost py-2 px-5 text-sm border border-border flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama saqlash
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama saqlaş
               </button>
               <button onClick={() => save(true)} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Nashr qilish
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Naşr qiliş
               </button>
             </div>
           </motion.div>
@@ -245,7 +245,7 @@ export default function AdminBlogPage() {
               <p className="font-medium text-sm truncate">{p.title}</p>
               <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
                 <span className="capitalize">{p.category}</span>
-                <span>· {p.views} ko'rish</span>
+                <span>· {p.views} köriş</span>
                 {p.is_published
                   ? <span className="text-neon-green">· {t.admin.common.published}</span>
                   : <span className="text-neon-yellow">· {t.admin.common.draft}</span>}

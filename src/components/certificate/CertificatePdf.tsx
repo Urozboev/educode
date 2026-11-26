@@ -148,7 +148,7 @@ export function CertificatePdf({
           <Text style={s.title}>SERTIFIKAT</Text>
           <Text style={s.subtitle}>MUVAFFAQIYATLI TUGATGANLIK</Text>
 
-          <Text style={s.lead}>Ushbu sertifikat</Text>
+          <Text style={s.lead}>Uşbu sertifikat</Text>
           <Text style={s.name}>{fullName}</Text>
           <View style={s.rule} />
 
@@ -157,7 +157,7 @@ export function CertificatePdf({
 
           {scorePercentage != null && scorePercentage > 0 && (
             <View style={s.scorePill}>
-              <Text style={s.scoreText}>O&apos;rtacha ball: {Math.round(scorePercentage)}%</Text>
+              <Text style={s.scoreText}>Örtaça ball: {Math.round(scorePercentage)}%</Text>
             </View>
           )}
 
@@ -184,7 +184,7 @@ export function CertificatePdf({
               <View style={s.qrBox}>
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image src={qrDataUrl} style={s.qrImage} />
-                <Text style={s.qrCaption}>Haqiqiyligini tekshirish</Text>
+                <Text style={s.qrCaption}>Haqiqiyligini tekşiriş</Text>
               </View>
             )}
 

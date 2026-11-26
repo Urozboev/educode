@@ -5,9 +5,9 @@ import { absUrl } from "@/lib/seo";
 import { BrandMark } from "@/components/brand/BrandMark";
 
 export const metadata: Metadata = {
-  title: "Sertifikatni tekshirish",
+  title: "Sertifikatni tekşiriş",
   description:
-    "MirAcademy sertifikatining haqiqiyligini raqami yoki QR kodi orqali tekshiring. Ro'yxatdan o'tish talab qilinmaydi.",
+    "MirAcademy sertifikatining haqiqiyligini raqami yoki QR kodi orqali tekşiring. Röyxatdan ötiş talab qilinmaydi.",
   alternates: { canonical: absUrl("/sertifikat") },
   robots: { index: false, follow: true },
 };
@@ -34,7 +34,7 @@ export default async function VerifyLayout({ children }: { children: React.React
       </header>
       <main className="px-4 py-10 sm:py-14">
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-center mb-8">
-          Sertifikatni tekshirish
+          Sertifikatni tekşiriş
         </h1>
         {children}
       </main>

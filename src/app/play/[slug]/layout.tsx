@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   if (!g) {
     return {
-      title: "O'yin topilmadi",
-      description: "Bu o'yin mavjud emas yoki hali nashr qilinmagan.",
+      title: "Öyin topilmadi",
+      description: "Bu öyin mavjud emas yoki hali naşr qilinmagan.",
       robots: { index: false, follow: false },
     };
   }
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const title = `${g.title} — ${kind}`;
   const description =
     g.description ||
-    `${g.title}: ${SITE_NAME} platformasidagi interaktiv dars o'yini. Ro'yxatdan o'tmasdan o'ynash mumkin.`;
+    `${g.title}: ${SITE_NAME} platformasidagi interaktiv dars öyini. Röyxatdan ötmasdan öynaş mumkin.`;
   const url = absUrl(`/play/${g.slug}`);
   const og = ogImageUrl({ title: g.title, subtitle: kind, type: "default" });
 

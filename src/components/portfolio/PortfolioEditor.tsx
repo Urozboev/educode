@@ -152,7 +152,7 @@ export function PortfolioEditor() {
   }
 
   async function delProject(p: PortfolioProject) {
-    if (!confirm(`"${p.title}" o'chirilsinmi?`)) return;
+    if (!confirm(`"${p.title}" öçirilsinmi?`)) return;
     await supabase.from("portfolio_projects").delete().eq("id", p.id);
     toast.success(t.cabinet.portfolioEditor.deleted);
     load();

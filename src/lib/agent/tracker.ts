@@ -89,8 +89,8 @@ export async function applyAssessmentResult(
       remedialTitle: null,
       trackCompleted: !next,
       message: next
-        ? "Ajoyib! Mavzuni o'zlashtirdingiz, keyingi modul ochildi."
-        : "Tabriklaymiz! Butun yo'nalishni tugatdingiz.",
+        ? "Ajoyib! Mavzuni özlaştirdingiz, keyingi modul oçildi."
+        : "Tabriklaymiz! Butun yönalişni tugatdingiz.",
     };
   }
 
@@ -106,7 +106,7 @@ export async function applyAssessmentResult(
       remedialId: null,
       remedialTitle: null,
       trackCompleted: false,
-      message: "Asosini tushundingiz, lekin ba'zi joylari mustahkam emas. Darsni qayta ko'rib, testni yana bir bor topshiring.",
+      message: "Asosini tuşundingiz, lekin baʼzi joylari mustahkam emas. Darsni qayta körib, testni yana bir bor topşiring.",
     };
   }
 
@@ -139,7 +139,7 @@ export async function applyAssessmentResult(
       remedialId: null,
       remedialTitle: null,
       trackCompleted: false,
-      message: "Bu mavzu qiyin keldi. Darsni qayta o'qib, testni yana topshiring.",
+      message: "Bu mavzu qiyin keldi. Darsni qayta öqib, testni yana topşiring.",
     };
   }
 
@@ -155,7 +155,7 @@ export async function applyAssessmentResult(
     remedialId: (remedialId as string) ?? null,
     remedialTitle: remedial.title,
     trackCompleted: false,
-    message: `Bu mavzu qiyin keldi — bu normal holat. Rejangizga qo'shimcha amaliyot moduli qo'shdim: "${remedial.title}".`,
+    message: `Bu mavzu qiyin keldi — bu normal holat. Rejangizga qöşimça amaliyot moduli qöşdim: "${remedial.title}".`,
   };
 }
 
@@ -169,7 +169,7 @@ async function generateRemedialModule(
 ): Promise<{ title: string; summary: string; topicKey: string; minutes: number }> {
   const fallback = {
     title: `${mod.title} — amaliyot`,
-    summary: "Mavzuni mustahkamlash uchun qo'shimcha mashqlar va soddaroq misollar.",
+    summary: "Mavzuni mustahkamlaş uçun qöşimça maşqlar va soddaroq misollar.",
     topicKey: normalizeTopicKey(`${mod.topic_key}.practice`),
     minutes: 25,
   };
@@ -180,7 +180,7 @@ async function generateRemedialModule(
     AGENT_REMEDIAL_PROMPT,
     `Mavzu: ${mod.title}\nMavzu kaliti: ${mod.topic_key}\nDaraja: ${mod.level}\nTil: ${
       lang === 'ru' ? 'rus' : lang === 'en' ? 'ingliz' : "o'zbek"
-    }\n\nTalaba bu mavzuni o'zlashtira olmadi. Qo'shimcha modul tavsifini yoz.`,
+    }\n\nTalaba bu mavzuni özlaştira olmadi. Qöşimça modul tavsifini yoz.`,
     { temperature: 0.7, maxOutputTokens: 1024 },
   );
 

@@ -8,6 +8,7 @@ import { getInitials, getLevelLabel, getLevelColor, cn, formatDate } from "@/lib
 import { motion } from "framer-motion";
 import { Search, Users, Zap, Flame, BookOpen, Target, ChevronRight, BarChart3, Eye } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 export default function TeacherStudentsPage() {
   const { t } = useI18n();
@@ -46,7 +47,7 @@ export default function TeacherStudentsPage() {
   }, []);
 
   const sorted = [...students]
-    .filter(s => s.full_name.toLowerCase().includes(search.toLowerCase()))
+    .filter(s => uzIncludes(s.full_name, search))
     .sort((a, b) => {
       if (sortBy === "xp") return b.xp - a.xp;
       if (sortBy === "streak") return b.streak_days - a.streak_days;
@@ -105,7 +106,7 @@ export default function TeacherStudentsPage() {
                   <span className="flex items-center gap-1 text-neon-yellow font-mono"><Zap className="w-3.5 h-3.5" /> {s.xp}</span>
                   {s.streak_days > 0 && <span className="flex items-center gap-1 text-neon-red"><Flame className="w-3.5 h-3.5" /> {s.streak_days}</span>}
                   <span className="flex items-center gap-1"><BookOpen className="w-3.5 h-3.5" /> {s.enrolled} kurs</span>
-                  <span className="flex items-center gap-1 text-neon-green"><Target className="w-3.5 h-3.5" /> {s.solved} yechim</span>
+                  <span className="flex items-center gap-1 text-neon-green"><Target className="w-3.5 h-3.5" /> {s.solved} yeçim</span>
                   <span className="flex items-center gap-1"><BarChart3 className="w-3.5 h-3.5" /> {s.avgQuiz}% test</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-neon-blue group-hover:translate-x-1 transition-all" />

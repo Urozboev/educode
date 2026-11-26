@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerDictionary();
   return {
-    title: "O'quv reja | Ustoz — MirAcademy",
+    title: "Öquv reja | Ustoz — MirAcademy",
     description: t.agent.seoPlan,
     };
 }
@@ -52,13 +52,13 @@ export default async function AgentPlanPage({
   return (
     <div className="mx-auto max-w-3xl px-4 pb-16">
       <div className="flex items-center justify-between border-b border-border py-4">
-        <span className="text-sm font-medium text-muted-foreground">Ustoz — o'quv reja</span>
+        <span className="text-sm font-medium text-muted-foreground">Ustoz — öquv reja</span>
         <Link
           href="/agent"
           className="flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 text-sm hover:bg-muted"
         >
           <MessageCircle className="h-4 w-4" />
-          Suhbatga qaytish
+          Suhbatga qaytiş
         </Link>
       </div>
 

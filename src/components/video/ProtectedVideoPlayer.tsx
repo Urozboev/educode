@@ -146,7 +146,7 @@ export default function ProtectedVideoPlayer({ topicId, redirectPath, className,
             href={`/register${redirectPath ? `?redirect=${encodeURIComponent(redirectPath)}` : ""}`}
             className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:opacity-90 transition"
           >
-            Bepul ro'yxatdan o'tish
+            Bepul röyxatdan ötiş
           </Link>
         )}
         {data?.requires === "enrollment" && redirectPath && (

@@ -22,7 +22,7 @@ export async function synthesizeGemini(text: string, lang: string): Promise<RawA
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY sozlanmagan');
   if (!GEMINI_TTS_LANGS.includes(lang)) {
-    throw new Error(`Gemini TTS "${lang}" tilini qo'llab-quvvatlamaydi`);
+    throw new Error(`Gemini TTS "${lang}" tilini qöllab-quvvatlamaydi`);
   }
 
   const model = process.env.GEMINI_TTS_MODEL || 'gemini-2.5-flash-preview-tts';

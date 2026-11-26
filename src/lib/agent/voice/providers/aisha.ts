@@ -63,7 +63,7 @@ export async function synthesizeAisha(
 
   // Asinxron rejim (202) — bizga darhol audio kerak, webhook ishlatmaymiz
   if (!data?.audio_path) {
-    throw new Error(`Aisha javobida audio_path yo'q: ${JSON.stringify(data).slice(0, 200)}`);
+    throw new Error(`Aisha javobida audio_path yöq: ${JSON.stringify(data).slice(0, 200)}`);
   }
 
   const audioUrl = data.audio_path.startsWith('http')
@@ -73,7 +73,7 @@ export async function synthesizeAisha(
   // Faylni o'zimizga ko'chirib olamiz: provayder vaqtinchalik fayllarni
   // tozalab yuborsa, keshimizdagi havola o'lik bo'lib qolmasin.
   const audioRes = await fetch(audioUrl);
-  if (!audioRes.ok) throw new Error(`Aisha audio yuklab bo'lmadi: ${audioRes.status}`);
+  if (!audioRes.ok) throw new Error(`Aisha audio yuklab bölmadi: ${audioRes.status}`);
 
   const buffer = Buffer.from(await audioRes.arrayBuffer());
 

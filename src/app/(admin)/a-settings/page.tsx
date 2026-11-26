@@ -139,7 +139,7 @@ export default function AdminSettingsPage() {
     setAiGenerating(true);
     try {
       const categories = [
-        { cat: "basic_programming", title: "Dasturlash asoslari", count: 3, diff: "beginner" },
+        { cat: "basic_programming", title: "Dasturlaş asoslari", count: 3, diff: "beginner" },
         { cat: "computer_literacy", title: "Kompyuter savodxonligi", count: 3, diff: "beginner" },
         { cat: "prompt_engineering", title: "Prompt Engineering", count: 3, diff: "elementary" },
       ];
@@ -209,7 +209,7 @@ export default function AdminSettingsPage() {
         <div className="space-y-6">
           <motion.div className="glass-card p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <h2 className="font-display font-semibold text-lg mb-1 flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-neon-green" /> To'lov kartasi
+              <CreditCard className="w-5 h-5 text-neon-green" /> Tölov kartasi
             </h2>
             <p className="text-xs text-muted-foreground mb-4">{t.admin.set.cardHint}</p>
             <div className="grid md:grid-cols-2 gap-4">
@@ -232,7 +232,7 @@ export default function AdminSettingsPage() {
                 <Coins className="w-5 h-5 text-neon-yellow" /> {t.admin.set.coinPackages}
               </h2>
               <button onClick={addPackage} className="btn-ghost py-1.5 px-3 text-xs flex items-center gap-1 border border-border">
-                <Plus className="w-3.5 h-3.5" /> Paket qo'shish
+                <Plus className="w-3.5 h-3.5" /> Paket qöşiş
               </button>
             </div>
             <div className="space-y-3">
@@ -247,7 +247,7 @@ export default function AdminSettingsPage() {
                     <input type="number" value={pk.uzs} onChange={e => updatePackage(idx, "uzs", +e.target.value)} className="input-field" />
                   </div>
                   <div className="text-xs text-muted-foreground pb-3 whitespace-nowrap">
-                    ={pk.coins > 0 ? Math.round(pk.uzs / pk.coins) : 0} so'm/coin
+                    ={pk.coins > 0 ? Math.round(pk.uzs / pk.coins) : 0} söm/coin
                   </div>
                   <button onClick={() => removePackage(idx)} disabled={pricing.packages.length <= 1}
                     className="p-2.5 rounded-lg hover:bg-neon-red/10 text-muted-foreground hover:text-neon-red disabled:opacity-30 mb-0.5">
@@ -259,7 +259,7 @@ export default function AdminSettingsPage() {
           </motion.div>
 
           <button onClick={handleSavePricing} disabled={saving} className="btn-primary py-3 px-8 flex items-center gap-2 disabled:opacity-50">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Narxlarni saqlash
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Narxlarni saqlaş
           </button>
         </div>
       )}
@@ -288,7 +288,7 @@ export default function AdminSettingsPage() {
           </motion.div>
 
           <button onClick={handleSaveCoinSettings} disabled={saving} className="btn-primary py-3 px-8 flex items-center gap-2 disabled:opacity-50">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlash
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlaş
           </button>
         </div>
       )}
@@ -300,16 +300,16 @@ export default function AdminSettingsPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="font-display font-semibold text-lg">{t.admin.set.placementQuestions}</h2>
-                <p className="text-xs text-muted-foreground">{placementQuestions.length} ta savol · Foydalanuvchi register qilganda ko'rsatiladi</p>
+                <p className="text-xs text-muted-foreground">{placementQuestions.length} ta savol · Foydalanuvçi register qilganda körsatiladi</p>
               </div>
               <div className="flex gap-2">
                 <button onClick={aiGeneratePlacementQuestions} disabled={aiGenerating}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-neon-blue/10 text-neon-blue border border-neon-blue/20 hover:bg-neon-blue/20 disabled:opacity-50 transition-all">
                   {aiGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                  AI: 9 ta savol yaratish
+                  AI: 9 ta savol yaratiş
                 </button>
                 <button onClick={() => setShowQuestionForm(!showQuestionForm)} className="btn-primary py-2 px-4 text-sm flex items-center gap-1.5">
-                  <Plus className="w-4 h-4" /> Qo'lda qo'shish
+                  <Plus className="w-4 h-4" /> Qölda qöşiş
                 </button>
               </div>
             </div>
@@ -330,7 +330,7 @@ export default function AdminSettingsPage() {
             {showQuestionForm && (
               <motion.div className="p-4 rounded-xl bg-surface/50 border border-border mb-4 space-y-3" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
                 <div><label className="text-sm font-medium mb-1 block">{t.admin.set.questionLabel} *</label>
-                  <textarea value={qForm.question} onChange={e => setQForm({ ...qForm, question: e.target.value })} className="input-field min-h-[60px]" placeholder="Dasturlash tili nima vazifa bajaradi?" /></div>
+                  <textarea value={qForm.question} onChange={e => setQForm({ ...qForm, question: e.target.value })} className="input-field min-h-[60px]" placeholder="Dasturlaş tili nima vazifa bajaradi?" /></div>
                 <div className="grid grid-cols-3 gap-3">
                   <div><label className="text-xs font-medium mb-1 block">{t.admin.common.category}</label>
                     <select value={qForm.category} onChange={e => setQForm({ ...qForm, category: e.target.value })} className="input-field text-sm">

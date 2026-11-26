@@ -57,7 +57,7 @@ async function generateQuiz(
     AGENT_QUIZ_PROMPT,
     `Mavzu: ${topicTitle}\nMavzu kaliti: ${topicKey}\nDaraja: ${level}\nTil: savollar ${
       lang === 'ru' ? 'rus' : lang === 'en' ? 'ingliz' : "o'zbek"
-    } tilida.\n\nShu dars bo'yicha test tuz.`,
+    } tilida.\n\nShu dars böyiça test tuz.`,
     { temperature: 0.6, maxOutputTokens: 8192 },
   );
 

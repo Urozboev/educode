@@ -33,37 +33,37 @@ export const ALGOS: {
 }[] = [
   {
     value: "bubble",
-    label: "Bubble (pufakcha)",
+    label: "Bubble (pufakça)",
     complexity: "O(n²)",
     idea:
-      "Qo'shni ikki elementni solishtiradi va noto'g'ri tartibda bo'lsa almashtiradi. Har o'tishda eng katta element oxiriga «suzib» chiqadi.",
+      "Qöşni ikki elementni soliştiradi va notöğri tartibda bölsa almaştiradi. Har ötişda eng katta element oxiriga «suzib» çiqadi.",
     pseudocode: [
       "for i = 0 to n-1:",
       "  for j = 0 to n-i-2:",
       "    if a[j] > a[j+1]:",
-      "      a[j] bilan a[j+1] joyini almashtir",
+      "      a[j] bilan a[j+1] joyini almaştir",
     ],
   },
   {
     value: "selection",
-    label: "Selection (tanlash)",
+    label: "Selection (tanlaş)",
     complexity: "O(n²)",
     idea:
-      "Qolgan qismdan eng kichik elementni topadi va uni joyiga qo'yadi. Almashtirishlar soni kam — har o'tishda ko'pi bilan bitta.",
+      "Qolgan qismdan eng kiçik elementni topadi va uni joyiga qöyadi. Almaştirişlar soni kam — har ötişda köpi bilan bitta.",
     pseudocode: [
       "for i = 0 to n-1:",
       "  min = i",
       "  for j = i+1 to n-1:",
       "    if a[j] < a[min]: min = j",
-      "  a[i] bilan a[min] joyini almashtir",
+      "  a[i] bilan a[min] joyini almaştir",
     ],
   },
   {
     value: "insertion",
-    label: "Insertion (qo'yish)",
+    label: "Insertion (qöyiş)",
     complexity: "O(n²), deyarli saralanganda O(n)",
     idea:
-      "Har bir elementni chap tomondagi saralangan qismga to'g'ri joyiga qo'yadi — qo'lda kartalarni tartiblashga o'xshaydi.",
+      "Har bir elementni çap tomondagi saralangan qismga töğri joyiga qöyadi — qölda kartalarni tartiblaşga öxşaydi.",
     /**
      * Klassik variantda kalit alohida o'zgaruvchida saqlanib, elementlar
      * o'ngga suriladi. Ekranda bu vaqtincha takrorlangan ustun bo'lib
@@ -75,7 +75,7 @@ export const ALGOS: {
       "for i = 1 to n-1:",
       "  j = i",
       "  while j > 0 and a[j-1] > a[j]:",
-      "    a[j-1] bilan a[j] joyini almashtir; j = j-1",
+      "    a[j-1] bilan a[j] joyini almaştir; j = j-1",
     ],
   },
 ];
@@ -106,7 +106,7 @@ export function generateFrames(input: number[], algo: SortAlgo): Frame[] {
   const n = a.length;
   const ctx: Ctx = { frames: [], comparisons: 0, swaps: 0 };
 
-  push(ctx, a, { note: "Boshlang'ich holat" });
+  push(ctx, a, { note: "Boşlanğiç holat" });
   if (n <= 1) {
     push(ctx, a, { sorted: a.map((_, i) => i), note: "Saralandi" });
     return ctx.frames;
@@ -120,13 +120,13 @@ export function generateFrames(input: number[], algo: SortAlgo): Frame[] {
         ctx.comparisons++;
         push(ctx, a, {
           comparing: [j, j + 1], sorted: [...sorted], line: 2,
-          note: `${a[j]} va ${a[j + 1]} solishtirilmoqda`,
+          note: `${a[j]} va ${a[j + 1]} soliştirilmoqda`,
         });
         if (a[j] > a[j + 1]) {
           ctx.swaps++;
           push(ctx, a, {
             swapping: [j, j + 1], sorted: [...sorted], line: 3,
-            note: `${a[j]} > ${a[j + 1]} — joylari almashadi`,
+            note: `${a[j]} > ${a[j + 1]} — joylari almaşadi`,
           });
           [a[j], a[j + 1]] = [a[j + 1], a[j]];
           swappedAny = true;
@@ -136,7 +136,7 @@ export function generateFrames(input: number[], algo: SortAlgo): Frame[] {
       sorted.unshift(n - 1 - i);
       push(ctx, a, {
         sorted: [...sorted], line: 0,
-        note: `${a[n - 1 - i]} o'z o'rnini topdi`,
+        note: `${a[n - 1 - i]} öz örnini topdi`,
       });
       // Bitta ham almashtirish bo'lmasa massiv allaqachon saralangan
       if (!swappedAny) break;
@@ -147,41 +147,41 @@ export function generateFrames(input: number[], algo: SortAlgo): Frame[] {
     const sorted: number[] = [];
     for (let i = 0; i < n - 1; i++) {
       let min = i;
-      push(ctx, a, { comparing: [i, i], sorted: [...sorted], line: 1, note: `${a[i]} eng kichik deb olindi` });
+      push(ctx, a, { comparing: [i, i], sorted: [...sorted], line: 1, note: `${a[i]} eng kiçik deb olindi` });
       for (let j = i + 1; j < n; j++) {
         ctx.comparisons++;
         push(ctx, a, {
           comparing: [min, j], sorted: [...sorted], line: 3,
-          note: `${a[j]} < ${a[min]} ekanini tekshiramiz`,
+          note: `${a[j]} < ${a[min]} ekanini tekşiramiz`,
         });
         if (a[j] < a[min]) {
           min = j;
           push(ctx, a, {
             comparing: [min, min], sorted: [...sorted], line: 3,
-            note: `Yangi eng kichik: ${a[min]}`,
+            note: `Yangi eng kiçik: ${a[min]}`,
           });
         }
       }
       if (min !== i) {
         ctx.swaps++;
-        push(ctx, a, { swapping: [i, min], sorted: [...sorted], line: 4, note: `${a[i]} va ${a[min]} almashadi` });
+        push(ctx, a, { swapping: [i, min], sorted: [...sorted], line: 4, note: `${a[i]} va ${a[min]} almaşadi` });
         [a[i], a[min]] = [a[min], a[i]];
       }
       sorted.push(i);
-      push(ctx, a, { sorted: [...sorted], line: 0, note: `${a[i]} o'z o'rnida` });
+      push(ctx, a, { sorted: [...sorted], line: 0, note: `${a[i]} öz örnida` });
     }
     sorted.push(n - 1);
-    push(ctx, a, { sorted: [...sorted], line: 0, note: "Oxirgi element o'z o'rnida" });
+    push(ctx, a, { sorted: [...sorted], line: 0, note: "Oxirgi element öz örnida" });
   }
 
   if (algo === "insertion") {
     const sortedPrefix = (k: number) => Array.from({ length: k }, (_, i) => i);
-    push(ctx, a, { sorted: [0], line: 0, note: "Birinchi element saralangan hisoblanadi" });
+    push(ctx, a, { sorted: [0], line: 0, note: "Birinçi element saralangan hisoblanadi" });
 
     for (let i = 1; i < n; i++) {
       push(ctx, a, {
         comparing: [i, i], sorted: sortedPrefix(i), line: 1,
-        note: `${a[i]} ni chapdagi saralangan qismga joylashtiramiz`,
+        note: `${a[i]} ni çapdagi saralangan qismga joylaştiramiz`,
       });
 
       let j = i;
@@ -196,20 +196,20 @@ export function generateFrames(input: number[], algo: SortAlgo): Frame[] {
         ctx.swaps++;
         push(ctx, a, {
           swapping: [j - 1, j], sorted: sortedPrefix(i), line: 3,
-          note: `${a[j - 1]} > ${a[j]} — joylari almashadi`,
+          note: `${a[j - 1]} > ${a[j]} — joylari almaşadi`,
         });
         [a[j - 1], a[j]] = [a[j], a[j - 1]];
         j--;
         push(ctx, a, { sorted: sortedPrefix(i), line: 3, note: "Almashtirildi" });
       }
-      push(ctx, a, { sorted: sortedPrefix(i + 1), line: 0, note: `${a[j]} o'z joyiga qo'yildi` });
+      push(ctx, a, { sorted: sortedPrefix(i + 1), line: 0, note: `${a[j]} öz joyiga qöyildi` });
     }
   }
 
   push(ctx, a, {
     sorted: a.map((_, i) => i),
     line: -1,
-    note: "Massiv to'liq saralandi",
+    note: "Massiv töliq saralandi",
   });
 
   return ctx.frames;

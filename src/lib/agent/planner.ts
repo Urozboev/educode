@@ -45,7 +45,7 @@ export async function generatePlacement(
 ): Promise<{ questions: PlacementQuestion[]; error?: string; tokensIn: number; tokensOut: number }> {
   const { data, error, tokensIn, tokensOut } = await geminiJson<{ questions: PlacementQuestion[] }>(
     AGENT_PLACEMENT_PROMPT,
-    `Yo'nalish: ${direction}\nTil: savollar ${lang === 'ru' ? 'rus' : lang === 'en' ? 'ingliz' : "o'zbek"} tilida.\n\nDaraja aniqlash testini tuz.`,
+    `Yönaliş: ${direction}\nTil: savollar ${lang === 'ru' ? 'rus' : lang === 'en' ? 'ingliz' : "o'zbek"} tilida.\n\nDaraja aniqlaş testini tuz.`,
     // 8 ta savol + variantlar + kod parchalari — 3072 token yetmadi
     // va javob yarim JSON bo'lib keldi. Zaxira bilan olamiz.
     { temperature: 0.6, maxOutputTokens: 8192 },
@@ -199,7 +199,7 @@ export async function generatePlan(
     }));
 
   if (modules.length < MIN_MODULES) {
-    return { plan: null, error: `Reja juda qisqa chiqdi (${modules.length} modul)`, tokensIn, tokensOut };
+    return { plan: null, error: `Reja juda qisqa çiqdi (${modules.length} modul)`, tokensIn, tokensOut };
   }
 
   return {

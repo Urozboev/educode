@@ -191,7 +191,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
 
       <div className="flex gap-2">
         <button onClick={() => setTab("items")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all", tab === "items" ? "bg-neon-purple/10 text-neon-purple border border-neon-purple/20" : "bg-surface text-muted-foreground")}>
-          <ShoppingBag className="w-4 h-4 inline mr-1.5" /> Sovg'alar ({items.length})
+          <ShoppingBag className="w-4 h-4 inline mr-1.5" /> Sovğalar ({items.length})
         </button>
         <button onClick={() => setTab("orders")} className={cn("px-5 py-2.5 rounded-xl text-sm font-medium transition-all relative", tab === "orders" ? "bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20" : "bg-surface text-muted-foreground")}>
           <Package className="w-4 h-4 inline mr-1.5" /> Buyurtmalar ({visibleOrders.length})
@@ -232,7 +232,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
 
                 <div className="flex items-center gap-1.5 pt-1">
                   <button onClick={() => openEdit(item)} className="flex-1 py-2 rounded-lg bg-surface hover:bg-surface/70 text-xs font-medium flex items-center justify-center gap-1.5 transition">
-                    <Pencil className="w-3.5 h-3.5" /> Tahrirlash
+                    <Pencil className="w-3.5 h-3.5" /> Tahrirlaş
                   </button>
                   <button onClick={() => toggleActive(item)} title={item.is_active ? "Yashirish" : "Ko'rsatish"} className="p-2 rounded-lg bg-surface hover:bg-surface/70 transition">
                     {item.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4 text-muted-foreground" />}
@@ -285,7 +285,7 @@ export default function StoreManager({ scope }: { scope: "admin" | "teacher" }) 
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{t.store.manage.descLabel}</label>
                   <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                    className="input-field w-full text-sm min-h-[70px] resize-y" placeholder="Nima ekani, o'lchami, ranggi..." />
+                    className="input-field w-full text-sm min-h-[70px] resize-y" placeholder="Nima ekani, ölçami, ranggi..." />
                 </div>
 
                 <div>
@@ -402,7 +402,7 @@ function OrderList({ orders, buyers, onChanged }: {
     });
     setBusy(null);
     if (error || !data?.ok) { toast.error(data?.message || error?.message || "O'zgartirilmadi"); return; }
-    toast.success(data.refunded ? t.misc.statusChanged : "Holat o'zgardi");
+    toast.success(data.refunded ? t.misc.statusChanged : "Holat özgardi");
     setNote("");
     onChanged();
   }
@@ -465,13 +465,13 @@ function OrderList({ orders, buyers, onChanged }: {
                     {(o.region || o.address) && (
                       <div className="bg-surface/60 border border-border/60 rounded-xl p-3 space-y-1">
                         <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5" /> Yetkazib berish manzili
+                          <MapPin className="w-3.5 h-3.5" /> Yetkazib beriş manzili
                         </p>
                         <p className="text-sm">
                           {[o.region, o.district].filter(Boolean).join(", ")}
                         </p>
                         {o.address && <p className="text-sm">{o.address}</p>}
-                        {o.landmark && <p className="text-xs text-muted-foreground">Mo'ljal: {o.landmark}</p>}
+                        {o.landmark && <p className="text-xs text-muted-foreground">Möljal: {o.landmark}</p>}
                       </div>
                     )}
 

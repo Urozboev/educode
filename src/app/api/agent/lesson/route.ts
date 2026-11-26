@@ -20,8 +20,8 @@ import { getOrCreateLesson } from '@/lib/agent/lesson';
  * Kalit yo'q bo'lsa sabab aniq aytiladi.
  */
 const SERVICE_ROLE_HINT =
-  "Server sozlamasi to'liq emas: SUPABASE_SERVICE_ROLE_KEY qo'shilmagan. " +
-  "Vercel > Settings > Environment Variables ga qo'shib, qayta deploy qiling.";
+  "Server sozlamasi töliq emas: SUPABASE_SERVICE_ROLE_KEY qöşilmagan. " +
+  "Vercel > Settings > Environment Variables ga qöşib, qayta deploy qiling.";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
   if (mod.status === 'locked') {
     return Response.json(
-      { error: "Bu modul hali ochilmagan. Avvalgilarini tugating.", code: 'locked' },
+      { error: "Bu modul hali oçilmagan. Avvalgilarini tugating.", code: 'locked' },
       { status: 403 },
     );
   }
@@ -124,7 +124,7 @@ export async function PATCH(req: NextRequest) {
   const allowed = ['started', 'read', 'assessed', 'done'];
 
   if (!lessonId || !allowed.includes(status)) {
-    return Response.json({ error: "Noto'g'ri parametr" }, { status: 400 });
+    return Response.json({ error: "Notöğri parametr" }, { status: 400 });
   }
 
   const patch: Record<string, unknown> = { status };

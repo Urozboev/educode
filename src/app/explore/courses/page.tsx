@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { CategoryIcon } from "@/components/icons/CategoryIcon";
 import { LevelBadge } from "@/components/ui/LevelBadge";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 const categories = [
   { value: "all", label: "Barchasi" },
@@ -78,8 +79,8 @@ export default function ExploreCourses() {
 
   const filtered = courses.filter(
     (c) =>
-      (c.title.toLowerCase().includes(search.toLowerCase()) ||
-        c.description?.toLowerCase().includes(search.toLowerCase())) &&
+      (uzIncludes(c.title, search) ||
+        uzIncludes(c.description, search)) &&
       (category === "all" || c.category === category)
   );
 
@@ -285,7 +286,7 @@ export default function ExploreCourses() {
             href="/register"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-display font-semibold text-sm hover:opacity-90 transition-all"
           >
-            Bepul boshlash <ArrowRight className="w-4 h-4" />
+            Bepul boşlaş <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       )}

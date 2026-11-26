@@ -131,9 +131,9 @@ export function SortingLab() {
 
         {/* Rang izohi */}
         <div className="flex flex-wrap gap-x-4 gap-y-1 mt-4 text-[11px] text-muted-foreground">
-          <Legend cls="bg-neon-yellow" label="solishtirilmoqda" />
-          <Legend cls="bg-neon-red" label="almashtirilmoqda" />
-          <Legend cls="bg-neon-green" label="o'z o'rnida" />
+          <Legend cls="bg-neon-yellow" label="soliştirilmoqda" />
+          <Legend cls="bg-neon-red" label="almaştirilmoqda" />
+          <Legend cls="bg-neon-green" label="öz örnida" />
           <Legend cls="bg-neon-purple/45" label="tegilmagan" />
         </div>
       </div>
@@ -142,8 +142,8 @@ export function SortingLab() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-medium min-h-[1.5em]">{frame.note}</p>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>Solishtirish: <span className="numeric text-foreground">{frame.comparisons}</span></span>
-          <span>Almashtirish: <span className="numeric text-foreground">{frame.swaps}</span></span>
+          <span>Soliştiriş: <span className="numeric text-foreground">{frame.comparisons}</span></span>
+          <span>Almaştiriş: <span className="numeric text-foreground">{frame.swaps}</span></span>
         </div>
       </div>
 
@@ -239,7 +239,7 @@ export function SortingLab() {
 
       {/* Massivni sozlash */}
       <div className="rounded-xl border border-border bg-surface/30 p-4 sm:p-5 space-y-4">
-        <p className="eyebrow">Massivni sozlash</p>
+        <p className="eyebrow">Massivni sozlaş</p>
 
         <div className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-3 flex-1 min-w-[200px]">
@@ -266,7 +266,7 @@ export function SortingLab() {
             onChange={e => setCustomText(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") applyCustom(); }}
             className="input-field flex-1 min-w-[200px] text-sm"
-            placeholder="O'z sonlaringiz: 5, 3, 8, 1 (40 tagacha)"
+            placeholder="Öz sonlaringiz: 5, 3, 8, 1 (40 tagaça)"
             inputMode="numeric"
           />
           <button
@@ -274,7 +274,7 @@ export function SortingLab() {
             disabled={parseArray(customText).length < 2}
             className="btn-ghost py-2.5 px-5 text-sm disabled:opacity-40"
           >
-            Qo&apos;llash
+            Qöllaş
           </button>
         </div>
       </div>

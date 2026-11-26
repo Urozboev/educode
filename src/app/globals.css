@@ -357,6 +357,91 @@ html, body { overflow-x: hidden; max-width: 100vw; }
   }
 }
 
+/* ===== Bosh sahifa: daftar ramkasi =====
+ *
+ * Katta "varaq" ramkasi. Burchaklariga sahifa fonidan o'yiq joylar
+ * (notch) qilingan, ularning ichida tugma va soat turadi. O'yiq bilan
+ * varaq qirrasi uchrashgan joy botiq yoy bo'lishi uchun ikki kichik
+ * bo'lak radial-gradient bilan chiziladi: aylana ichi shaffof (varaq
+ * ko'rinadi), tashqarisi sahifa foni. */
+.home-paper {
+  background-color: hsl(var(--card));
+  background-image:
+    linear-gradient(hsl(var(--border) / 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.6) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+/* Ramka: fon + ichki soya bilan chizilgan chegara (border emas — o'yiq uni toza yopishi uchun).
+ * Yuqori o'ngdan juda yengil yorug'lik: tekis oq maydon "o'lik" ko'rinmasin. */
+.hero-frame {
+  background:
+    radial-gradient(120% 80% at 85% 0%, hsl(var(--brand-purple) / 0.07), transparent 60%),
+    hsl(var(--card));
+  box-shadow: inset 0 0 0 1px hsl(var(--border));
+}
+
+/* Kurs muqovasi bo'lmaganda: nozik diagonal chiziqlar — jiddiy va sokin */
+.hatch {
+  background-color: hsl(var(--surface));
+  background-image: repeating-linear-gradient(135deg, hsl(var(--border)) 0 1px, transparent 1px 11px);
+}
+
+.notch-fillet {
+  --r: 1.75rem;
+  position: absolute;
+  width: var(--r);
+  height: var(--r);
+  pointer-events: none;
+}
+/* Yuqori o'ng o'yiq: fon burchagi bo'lakning yuqori o'ng tomonida */
+/* Rang o'yiq qaysi fon ustida turganiga bog'liq: --notch-fill (masalan, oq ramka) */
+.notch-fillet--tr {
+  background: radial-gradient(circle at 0 100%, transparent calc(var(--r) - 0.5px), var(--notch-fill, hsl(var(--background))) var(--r));
+}
+/* Pastki chap o'yiq: fon burchagi bo'lakning pastki chap tomonida */
+.notch-fillet--bl {
+  background: radial-gradient(circle at 100% 0, transparent calc(var(--r) - 0.5px), var(--notch-fill, hsl(var(--background))) var(--r));
+}
+
+/* Marker chizig'i — sahifa ochilganda bir marta chiziladi */
+.marker-stroke {
+  position: absolute;
+  left: -0.08em;
+  right: -0.08em;
+  bottom: 0.12em;
+  height: 0.38em;
+  background: hsl(var(--brand-amber) / 0.35);
+  border-radius: 0.2em 0.5em 0.3em 0.6em;
+  transform: rotate(-1.2deg) scaleX(0);
+  transform-origin: left center;
+  animation: marker-draw 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: -1;
+}
+@keyframes marker-draw {
+  to { transform: rotate(-1.2deg) scaleX(1); }
+}
+
+/* Qo'lda yozilgan izohlar */
+.hand {
+  font-family: var(--font-hand), "Caveat", cursive;
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+/* Lenta bilan yopishtirilgan kartochka */
+.tape {
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  width: 5.5rem;
+  height: 1.4rem;
+  transform: translateX(-50%) rotate(-2deg);
+  background: hsl(var(--brand-amber) / 0.22);
+  border-left: 1px dashed hsl(var(--brand-amber) / 0.35);
+  border-right: 1px dashed hsl(var(--brand-amber) / 0.35);
+}
+
 /* ===== Taqdimot varag'i (SlideDeck) =====
  * Katak daftar: 24px katakli nozik to'r. Chiziqlar tema chegarasi
  * rangidan olinadi — yorug' rejimda qog'oz, qorong'ida doska kabi. */
@@ -480,6 +565,52 @@ html, body { overflow-x: hidden; max-width: 100vw; }
   border-radius: 0 0.75rem 0.75rem 0;
   color: hsl(var(--foreground) / 0.8);
 }
+/*
+  Dars sahifasi (.lesson-body): matn kengroq maydonga yoyiladi, lekin oddiy
+  matn qatori ~82 belgidan oshmaydi (uzun qatorni ko'z yo'qotadi). Jadval,
+  kod va rasm esa butun kenglikni egallaydi. Sarlavhalar yopishqoq tab
+  qatori ostida qolmasligi uchun scroll-margin.
+*/
+.lesson-body { font-size: 1.0625rem; }
+.lesson-body > p, .lesson-body > ul, .lesson-body > ol, .lesson-body > blockquote,
+.lesson-body > h2, .lesson-body > h3, .lesson-body > h4 { max-width: 82ch; }
+.lesson-body h2, .lesson-body h3 { scroll-margin-top: 8.5rem; }
+
+/* Sig'magan jadval: ustida "suring" yorlig'i, davomi bor tomon xiralashadi
+   (useScrollableTables). Mask fon rangidan qat'i nazar ishlaydi. */
+.table-scroll { margin: 1.2rem 0; }
+.table-scroll .table-scroll__box > table { margin: 0; }
+.table-scroll__hint {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 0; /* globals: telefonda tugmalarga 40px beriladi */
+  width: fit-content;
+  margin: 0 0 0.45rem auto;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: hsl(var(--brand-purple));
+  background: hsl(var(--brand-purple) / 0.08);
+  border: 1px solid hsl(var(--brand-purple) / 0.2);
+}
+.table-scroll__hint span { display: inline-block; animation: table-nudge 1.6s ease-in-out infinite; }
+.table-scroll.is-scrollable:not(.was-scrolled) .table-scroll__hint { display: flex; }
+.table-scroll.can-right .table-scroll__box > table {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+          mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+}
+.table-scroll.can-left .table-scroll__box > table {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent);
+          mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent);
+}
+.table-scroll.can-left.can-right .table-scroll__box > table {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+          mask-image: linear-gradient(to right, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+}
+@keyframes table-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
+@media (prefers-reduced-motion: reduce) { .table-scroll__hint span { animation: none; } }
 .prose hr { margin: 2rem 0; border: 0; border-top: 1px solid hsl(var(--border)); }
 .prose img { height: auto; border-radius: 1rem; border: 1px solid hsl(var(--border)); margin: 1.2rem auto; }
 

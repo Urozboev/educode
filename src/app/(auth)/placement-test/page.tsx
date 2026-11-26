@@ -111,7 +111,7 @@ export default function PlacementTestPage() {
 
     // Kategoriya natijalarini tayyorlash
     const categoryLabels: Record<string, string> = {
-      basic_programming: "Dasturlash asoslari", computer_literacy: "Kompyuter savodxonligi",
+      basic_programming: "Dasturlaş asoslari", computer_literacy: "Kompyuter savodxonligi",
       prompt_engineering: "Prompt Engineering", logic: "Mantiq", algorithms: "Algoritmlar",
     };
 
@@ -179,7 +179,7 @@ export default function PlacementTestPage() {
     (async () => {
       await supabase.from("placement_results").insert({
         user_id: userId, answers: {}, score: 0, total: 0, assigned_level: "beginner",
-        ai_recommendation: "Test topshirilmadi",
+        ai_recommendation: "Test topşirilmadi",
       });
       router.push(home);
     })();
@@ -195,9 +195,9 @@ export default function PlacementTestPage() {
       <motion.div className="w-full max-w-md text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="glass-card p-8">
           <Brain className="w-14 h-14 text-neon-purple mx-auto mb-4" />
-          <h1 className="font-display font-bold text-2xl mb-2">Xush kelibsiz!</h1>
+          <h1 className="font-display font-bold text-2xl mb-2">Xuş kelibsiz!</h1>
           <p className="text-muted-foreground mb-6">{t.auth.placementEmpty}</p>
-          <button onClick={handleSkip} className="btn-primary py-3 px-8">Dashboard ga o'tish</button>
+          <button onClick={handleSkip} className="btn-primary py-3 px-8">Dashboard ga ötiş</button>
         </div>
       </motion.div>
     );
@@ -215,7 +215,7 @@ export default function PlacementTestPage() {
             {getLevelLabel(result.level)}
           </div>
           <p className="text-lg text-muted-foreground mb-2">
-            <span className="font-bold text-foreground">{result.score}</span> / {result.total} to'g'ri javob
+            <span className="font-bold text-foreground">{result.score}</span> / {result.total} töğri javob
             ({Math.round((result.score / result.total) * 100)}%)
           </p>
         </div>
@@ -307,7 +307,7 @@ export default function PlacementTestPage() {
   const current = questions[currentIdx];
   const answeredCount = Object.keys(answers).length;
   const currentCategory: Record<string, string> = {
-    basic_programming: "🖥️ Dasturlash", computer_literacy: "💻 Kompyuter", prompt_engineering: "🤖 Prompt Eng.",
+    basic_programming: "🖥️ Dasturlaş", computer_literacy: "💻 Kompyuter", prompt_engineering: "🤖 Prompt Eng.",
     logic: "🧠 Mantiq", algorithms: "📊 Algoritm",
   };
 
@@ -394,7 +394,7 @@ export default function PlacementTestPage() {
             <button onClick={handleSubmit} disabled={submitting || answeredCount < questions.length}
               className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm disabled:opacity-50">
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-              Tugatish ({answeredCount}/{questions.length})
+              Tugatiş ({answeredCount}/{questions.length})
             </button>
           )}
         </div>

@@ -195,7 +195,7 @@ export default function ReportTask({
     images.forEach((x) => URL.revokeObjectURL(x.preview));
     setImages([]);
     setText("");
-    toast.success("Hisobot yuborildi. O'qituvchi tekshirgach natija shu yerda ko'rinadi.");
+    toast.success("Hisobot yuborildi. Öqituvçi tekşirgaç natija şu yerda körinadi.");
     onSubmitted();
     loadLast(userId);
   }
@@ -214,13 +214,13 @@ export default function ReportTask({
         >
           <div className="flex items-center gap-2 text-sm font-semibold">
             {last.status === "accepted" && <><CheckCircle2 className="w-4 h-4 text-neon-green" /> Hisobot qabul qilingan</>}
-            {last.status === "pending" && <><Clock className="w-4 h-4 text-amber-500" /> Tekshirilmoqda</>}
-            {last.status === "wrong_answer" && <><AlertTriangle className="w-4 h-4 text-neon-red" /> Qayta ishlashga qaytarilgan</>}
+            {last.status === "pending" && <><Clock className="w-4 h-4 text-amber-500" /> Tekşirilmoqda</>}
+            {last.status === "wrong_answer" && <><AlertTriangle className="w-4 h-4 text-neon-red" /> Qayta işlaşga qaytarilgan</>}
             <span className="ml-auto text-xs font-normal text-muted-foreground">{formatDateTime(last.created_at)}</span>
           </div>
           {last.review_note && (
             <p className="text-sm rounded-xl bg-surface/60 px-3 py-2 whitespace-pre-line">
-              <span className="font-semibold">O'qituvchi izohi: </span>{last.review_note}
+              <span className="font-semibold">Öqituvçi izohi: </span>{last.review_note}
             </p>
           )}
           {lastUrls.length > 0 && (
@@ -235,7 +235,7 @@ export default function ReportTask({
           )}
           {!showForm && (
             <button type="button" onClick={() => setShowForm(true)} className="btn-ghost text-sm py-2 px-4">
-              Yangi variant yuborish
+              Yangi variant yuboriş
             </button>
           )}
         </div>
@@ -246,7 +246,7 @@ export default function ReportTask({
           {spec.steps.length > 0 && (
             <div className="space-y-2">
               <p className="text-sm font-semibold flex items-center gap-2">
-                <ListChecks className="w-4 h-4 text-neon-purple" /> Bajarish tartibi
+                <ListChecks className="w-4 h-4 text-neon-purple" /> Bajariş tartibi
               </p>
               <ol className="space-y-1.5">
                 {spec.steps.map((s, i) => (
@@ -276,7 +276,7 @@ export default function ReportTask({
           {/* Rasmlar */}
           <div className="space-y-2">
             <p className="text-sm font-semibold">
-              Skrinshotlar{" "}
+              Skrinşotlar{" "}
               <span className="font-normal text-muted-foreground">
                 ({images.length}/{spec.max_images}, kamida {spec.min_images} ta)
               </span>
@@ -289,7 +289,7 @@ export default function ReportTask({
                   <button
                     type="button"
                     onClick={() => removeImage(i)}
-                    aria-label={`${i + 1}-rasmni olib tashlash`}
+                    aria-label={`${i + 1}-rasmni olib taşlaş`}
                     className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-neon-red text-white flex items-center justify-center shadow"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -309,7 +309,7 @@ export default function ReportTask({
                   className="h-24 w-36 rounded-xl border-2 border-dashed border-border hover:border-neon-purple/60 hover:bg-neon-purple/[0.04] flex flex-col items-center justify-center gap-1 text-xs text-muted-foreground transition-colors disabled:opacity-60"
                 >
                   {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
-                  {uploading ? "Yuklanmoqda…" : "Rasm qo'shish"}
+                  {uploading ? "Yuklanmoqda…" : "Rasm qöşiş"}
                 </button>
               )}
             </div>
@@ -322,7 +322,7 @@ export default function ReportTask({
               onChange={(e) => addFiles(e.target.files)}
             />
             <p className="text-[11px] text-muted-foreground">
-              PNG, JPG yoki WebP. Katta rasmlar avtomatik kichraytiriladi. Skrinshotda parol yoki shaxsiy ma'lumot ko'rinmasin.
+              PNG, JPG yoki WebP. Katta rasmlar avtomatik kiçraytiriladi. Skrinşotda parol yoki şaxsiy maʼlumot körinmasin.
             </p>
           </div>
 
@@ -336,7 +336,7 @@ export default function ReportTask({
               onChange={(e) => setText(e.target.value)}
               rows={5}
               className="input-field text-sm resize-y"
-              placeholder="Nima qildingiz, qanday natija oldingiz va nimani tushundingiz?"
+              placeholder="Nima qildingiz, qanday natija oldingiz va nimani tuşundingiz?"
             />
             <p className={cn("text-[11px] font-mono", textOk ? "text-neon-green" : "text-muted-foreground")}>
               {text.trim().length}/{spec.min_chars} belgi
@@ -350,7 +350,7 @@ export default function ReportTask({
             className="btn-primary py-2.5 px-5 text-sm flex items-center gap-2 disabled:opacity-50"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            Hisobotni yuborish
+            Hisobotni yuboriş
           </button>
         </div>
       )}

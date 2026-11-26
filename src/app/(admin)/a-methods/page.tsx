@@ -114,7 +114,7 @@ export default function AdminMethodsPage() {
   }
 
   async function del(m: TeachingMethod) {
-    if (!confirm(`"${m.title}" o'chirilsinmi?`)) return;
+    if (!confirm(`"${m.title}" öçirilsinmi?`)) return;
     await supabase.from("teaching_methods").delete().eq("id", m.id);
     toast.success(t.admin.common.deleted);
     load();
@@ -125,7 +125,7 @@ export default function AdminMethodsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl flex items-center gap-2">
-            <Lightbulb className="w-6 h-6 text-neon-purple" /> O&apos;qitish metodlari
+            <Lightbulb className="w-6 h-6 text-neon-purple" /> Öqitiş metodlari
           </h1>
           <p className="text-sm text-muted-foreground">{methods.length} ta metod</p>
         </div>
@@ -186,9 +186,9 @@ export default function AdminMethodsPage() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block flex items-center gap-1.5">
-                  <ThumbsDown className="w-4 h-4 text-neon-red" /> Kamchiliklari
+                  <ThumbsDown className="w-4 h-4 text-neon-red" /> Kamçiliklari
                 </label>
-                <textarea value={form.disadvantages} onChange={e => setForm({ ...form, disadvantages: e.target.value })} className="input-field resize-none text-sm" rows={5} placeholder="Har qatorda bitta kamchilik:&#10;Katta sinfda boshqarish qiyin&#10;Vaqt cho'zilib ketishi mumkin" />
+                <textarea value={form.disadvantages} onChange={e => setForm({ ...form, disadvantages: e.target.value })} className="input-field resize-none text-sm" rows={5} placeholder="Har qatorda bitta kamçilik:&#10;Katta sinfda boşqariş qiyin&#10;Vaqt çözilib ketişi mumkin" />
               </div>
             </div>
 
@@ -208,7 +208,7 @@ export default function AdminMethodsPage() {
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama
               </button>
               <button onClick={() => save(true)} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Nashr qilish
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Naşr qiliş
               </button>
             </div>
           </motion.div>

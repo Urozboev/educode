@@ -109,7 +109,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
           <span>haftasiga <span className="text-foreground">{track.weekly_hours}</span> soat</span>
           {addedByUstoz > 0 && (
             <span className="text-neon-yellow">
-              {addedByUstoz} ta modulni Ustoz qo'shgan
+              {addedByUstoz} ta modulni Ustoz qöşgan
             </span>
           )}
         </div>
@@ -117,7 +117,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
         {/* Progress — yo'lning necha foizi bosib o'tilgani */}
         <div className="mt-6">
           <div className="mb-2 flex items-baseline justify-between font-mono text-xs">
-            <span className="text-muted-foreground">{done} / {modules.length} bosib o'tildi</span>
+            <span className="text-muted-foreground">{done} / {modules.length} bosib ötildi</span>
             <span className="text-lg font-bold text-foreground">{percent}%</span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-muted">
@@ -222,7 +222,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
                 {remedial && (
                   <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-neon-yellow">
                     <Sparkles className="h-3 w-3" />
-                    Ustoz qo'shdi
+                    Ustoz qöşdi
                   </div>
                 )}
 
@@ -266,7 +266,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
                       {busyId === m.id
                         ? <Loader2 className="h-3 w-3 animate-spin" />
                         : <ChevronRight className="h-3 w-3" />}
-                      bilaman, o'tkazish
+                      bilaman, ötkaziş
                     </button>
                   </div>
                 )}
@@ -289,7 +289,7 @@ export default function PlanView({ track, modules }: { track: Track; modules: Mo
       <div className="relative mt-2 pl-14">
         <span className="absolute left-[13px] top-1 h-3.5 w-3.5 rounded-full border-2 border-dashed border-border" />
         <span className="font-mono text-xs text-muted-foreground">
-          {percent === 100 ? "yo'l tugadi" : t.agent.pathEndsHere}
+          {percent === 100 ? "yöl tugadi" : t.agent.pathEndsHere}
         </span>
       </div>
     </div>

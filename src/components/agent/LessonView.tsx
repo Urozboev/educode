@@ -126,7 +126,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
       <div className="py-16 text-center">
         <p className="mb-4 text-sm text-destructive">{error || t.agent.lessonNotFound}</p>
         <Link href="/agent/reja" className="text-sm text-primary hover:underline">
-          Rejaga qaytish
+          Rejaga qaytiş
         </Link>
       </div>
     );
@@ -177,7 +177,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
           className="mb-4 inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          yo'lga qaytish
+          yölga qaytiş
         </Link>
 
         <h1 className="font-display text-[26px] font-bold leading-[1.15] tracking-tight sm:text-3xl">
@@ -261,7 +261,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
           className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground disabled:opacity-40"
         >
           {finishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-          Tushundim — testni topshiraman
+          Tuşundim — testni topşiraman
         </button>
 
         <button
@@ -270,7 +270,7 @@ export default function LessonView({ moduleId, lang = "uz" }: { moduleId: string
           className="flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-medium hover:bg-muted disabled:opacity-40"
         >
           {taskLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Code2 className="h-4 w-4" />}
-          Amaliy topshiriq
+          Amaliy topşiriq
         </button>
 
         <Link

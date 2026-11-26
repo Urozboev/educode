@@ -86,17 +86,17 @@ export function CourseReviews({
     });
     setSaving(false);
     if (error || !data?.ok) { toast.error(data?.message || error?.message || t.admin.common.saveFailed); return; }
-    toast.success(myReview ? "Izoh yangilandi" : "Rahmat! Izohingiz qo'shildi");
+    toast.success(myReview ? "Izoh yangilandi" : "Rahmat! Izohingiz qöşildi");
     setEditing(false);
     load();
   }
 
   async function remove() {
-    if (!myReview || !confirm("Izohingizni o'chirasizmi?")) return;
+    if (!myReview || !confirm("Izohingizni öçirasizmi?")) return;
     const { error } = await supabase.from("course_reviews").delete().eq("id", myReview.id);
     if (error) { toast.error(error.message); return; }
     setRating(0); setComment(""); setEditing(false);
-    toast.success("O'chirildi");
+    toast.success("Öçirildi");
     load();
   }
 
@@ -152,11 +152,11 @@ export function CourseReviews({
                 <div className="flex gap-1">
                   <button onClick={() => setEditing(true)}
                     className="text-xs text-muted-foreground hover:text-neon-purple transition inline-flex items-center gap-1.5">
-                    <Pencil className="w-3.5 h-3.5" /> Tahrirlash
+                    <Pencil className="w-3.5 h-3.5" /> Tahrirlaş
                   </button>
                   <button onClick={remove}
                     className="text-xs text-muted-foreground hover:text-neon-red transition inline-flex items-center gap-1.5 ml-3">
-                    <Trash2 className="w-3.5 h-3.5" /> O&apos;chirish
+                    <Trash2 className="w-3.5 h-3.5" /> Öçiriş
                   </button>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export function CourseReviews({
           ) : (
             <div className="p-5 rounded-2xl border border-border/60 bg-card/40 space-y-4">
               <p className="text-sm font-semibold">
-                {myReview ? "Bahoyingizni o'zgartiring" : t.reviews.rateThis}
+                {myReview ? "Bahoyingizni özgartiring" : t.reviews.rateThis}
               </p>
 
               <div onMouseLeave={() => setHover(0)}>
@@ -256,7 +256,7 @@ export function CourseReviews({
                     <Stars value={r.rating} readOnly size="sm" />
                     {r.is_hidden ? (
                       <p className="text-xs text-muted-foreground italic mt-2 inline-flex items-center gap-1.5">
-                        <EyeOff className="w-3.5 h-3.5" /> Izoh matni administrator tomonidan yashirilgan
+                        <EyeOff className="w-3.5 h-3.5" /> Izoh matni administrator tomonidan yaşirilgan
                       </p>
                     ) : r.comment ? (
                       <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line mt-2">

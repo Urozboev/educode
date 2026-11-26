@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { GraduationCap, Search, Download, Trash2, RefreshCw } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 export default function AdminCertificatesPage() {
   const { t } = useI18n();
@@ -26,15 +27,15 @@ export default function AdminCertificatesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Sertifikatni o'chirish?")) return;
+    if (!confirm("Sertifikatni öçiriş?")) return;
     await supabase.from("certificates").delete().eq("id", id);
     toast.success(t.admin.common.deleted); load();
   }
 
   const filtered = certificates.filter(c =>
-    c.full_name.toLowerCase().includes(search.toLowerCase()) ||
-    c.course_title.toLowerCase().includes(search.toLowerCase()) ||
-    c.certificate_number.toLowerCase().includes(search.toLowerCase())
+    uzIncludes(c.full_name, search) ||
+    uzIncludes(c.course_title, search) ||
+    uzIncludes(c.certificate_number, search)
   );
 
   return (

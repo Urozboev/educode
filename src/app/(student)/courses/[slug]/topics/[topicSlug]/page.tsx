@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "@/components/i18n/Link";
 import { createClient } from "@/lib/supabase/client";
@@ -24,7 +24,11 @@ import {
   Coins,
   Lock,
   Presentation,
+  ListTree,
+  ChevronDown,
 } from "lucide-react";
+import LessonToc, { withHeadingIds, useActiveHeading } from "@/components/courses/LessonToc";
+import { useScrollableTables, wrapTables } from "@/components/courses/useScrollableTables";
 import { cn, formatDuration } from "@/lib/utils";
 import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
 import ProtectedVideoPlayer from "@/components/video/ProtectedVideoPlayer";
@@ -174,6 +178,37 @@ export default function TopicPage() {
     setProgress({ ...progress, video_watched: true });
   }
 
+  // Dars matnidagi bo'limlar: sarlavhalarga id, mundarija va o'qilayotgan bo'lim.
+  // Hook'lar yuklanish sharti (early return) dan OLDIN turishi shart.
+  const tableHint = t.courses.topic.tableScrollHint;
+  const lessonDoc = useMemo(
+    () => (topic?.content_html ? withHeadingIds(wrapTables(topic.content_html, tableHint)) : { html: "", toc: [] }),
+    [topic?.content_html, tableHint],
+  );
+  const tocIds = useMemo(() => lessonDoc.toc.map((x) => x.id), [lessonDoc]);
+  const activeHeading = useActiveHeading(tocIds);
+  const mobileTocRef = useRef<HTMLDetailsElement>(null);
+
+  // O'qish ulushi — yopishqoq qator ostidagi ingichka chiziq uchun
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [readFrac, setReadFrac] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const el = contentRef.current;
+      if (!el) return setReadFrac(0);
+      const r = el.getBoundingClientRect();
+      const total = r.height - window.innerHeight * 0.6;
+      setReadFrac(total <= 0 ? 1 : Math.min(1, Math.max(0, -r.top / total)));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [lessonDoc, tab]);
+
+  // Sig'magan jadvallarga "suring" yorlig'i va chetidagi xiralik
+  const lessonBodyRef = useRef<HTMLDivElement>(null);
+  useScrollableTables(lessonBodyRef);
+
   const currentIndex = allTopics.findIndex((t) => t.slug === topicSlug);
   const prevTopic = currentIndex > 0 ? allTopics[currentIndex - 1] : null;
   const nextTopic = currentIndex < allTopics.length - 1 ? allTopics[currentIndex + 1] : null;
@@ -211,7 +246,10 @@ export default function TopicPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    // Kenglik: chap menyudan qolgan joyning deyarli hammasi. Katta ekranda
+    // o'ngda yopishqoq ustun (mundarija + bosqichlar) — talaba qayerdaligini
+    // va keyingi qadamni doim ko'radi.
+    <div className="max-w-[80rem] mx-auto space-y-6">
       {/* Breadcrumb + progress tracker */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <Link
@@ -234,8 +272,9 @@ export default function TopicPage() {
         </h1>
 
         {/* Bosqich tracker */}
+        {/* Katta ekranda bosqichlar o'ng ustunda — bu yerda takrorlanmaydi */}
         {userId && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 xl:hidden">
             {steps.map((s, i) => (
               <div key={s.key} className="flex items-center gap-1.5 flex-1">
                 <div className={cn(
@@ -253,6 +292,9 @@ export default function TopicPage() {
         )}
       </motion.div>
 
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_16.5rem] xl:gap-10 xl:items-start">
+      <div className="min-w-0 space-y-6">
+
       {/* Video — himoyalangan player (signed URL, watermark, nodownload) */}
       {(topic.video_url || topic.video_id) && (
         <motion.div
@@ -268,13 +310,13 @@ export default function TopicPage() {
             {userId && (
               progress?.video_watched ? (
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neon-green">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Ko'rildi
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Körildi
                 </span>
               ) : (
                 <button
                   onClick={markVideoWatched}
                   disabled={watchFrac < 0.9}
-                  title={watchFrac < 0.9 ? "Videoni oxirigacha ko'ring" : undefined}
+                  title={watchFrac < 0.9 ? "Videoni oxirigaça köring" : undefined}
                   className={cn(
                     "inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all",
                     watchFrac < 0.9
@@ -283,7 +325,7 @@ export default function TopicPage() {
                   )}
                 >
                   {watchFrac < 0.9 ? <Lock className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-                  Ko'rdim
+                  Kördim
                 </button>
               )
             )}
@@ -303,7 +345,7 @@ export default function TopicPage() {
                 />
               </div>
               <span className="text-[11px] font-mono text-muted-foreground tabular-nums">
-                {Math.round(watchFrac * 100)}% ko'rildi
+                {Math.round(watchFrac * 100)}% körildi
               </span>
             </div>
           )}
@@ -339,9 +381,14 @@ export default function TopicPage() {
         </motion.div>
       )}
 
-      {/* Dars matni / Taqdimot — ikkalasi bo'lsagina tanlov ko'rinadi */}
+      {/*
+        Yopishqoq qator: Dars matni / Taqdimot tablari va Test, Topshiriq
+        havolalari. Sahifa pastida turib ham tabni almashtirish yoki testga
+        o'tish uchun yuqoriga qaytish shart emas. Ostidagi chiziq — o'qish ulushi.
+      */}
+      <div className={cn("sticky z-20 -mx-3 px-3 py-2.5 bg-background/85 backdrop-blur-md flex items-center gap-2", userId ? "top-16 lg:top-0" : "top-16")}>
       {hasPresentation && hasLesson && (
-        <div role="tablist" aria-label={topic.title} className="inline-flex p-1 rounded-2xl border border-border/60 bg-card/40">
+        <div role="tablist" aria-label={topic.title} className="inline-flex p-1 rounded-2xl border border-border/60 bg-card/60">
           {([
             ["lesson", t.courses.topic.lessonTab, FileText],
             ["deck", t.courses.topic.presentation, Presentation],
@@ -357,11 +404,39 @@ export default function TopicPage() {
                 shownTab === key ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <Icon className="w-4 h-4" /> {label}
+              <Icon className="w-4 h-4" /> <span className="max-[380px]:hidden">{label}</span>
             </button>
           ))}
         </div>
       )}
+      {userId && (
+        <div className="ml-auto flex items-center gap-1.5">
+          {([
+            ["quiz", `/courses/${slug}/topics/${topicSlug}/quiz`, t.courses.topic.stepQuiz, ClipboardList, progress?.quiz_passed],
+            ["task", `/courses/${slug}/topics/${topicSlug}/task`, t.courses.topic.stepTask, Code2, progress?.tasks_completed],
+          ] as const).map(([k, href, label, Icon, done]) => (
+            <Link
+              key={k}
+              href={href}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border transition-colors",
+                done
+                  ? "bg-neon-green/10 text-neon-green border-neon-green/25"
+                  : "bg-card/60 border-border/60 text-foreground hover:bg-surface",
+              )}
+            >
+              {done ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+              <span className="hidden sm:inline">{label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+      {shownTab === "lesson" && topic.content_html && (
+        <span className="absolute left-3 right-3 bottom-0 h-0.5 rounded-full bg-border/60 overflow-hidden" aria-hidden>
+          <span className="block h-full bg-neon-purple transition-[width] duration-150" style={{ width: `${Math.round(readFrac * 100)}%` }} />
+        </span>
+      )}
+      </div>
 
       {/* Taqdimot */}
       {shownTab === "deck" && (
@@ -382,7 +457,8 @@ export default function TopicPage() {
       {/* Content */}
       {shownTab === "lesson" && topic.content_html && (
         <motion.div
-          className="rounded-3xl border border-border/60 bg-card/40 p-6 md:p-10"
+          ref={contentRef}
+          className="rounded-3xl border border-border/60 bg-card/40 p-5 sm:p-7 md:p-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -393,19 +469,28 @@ export default function TopicPage() {
             topicTitle={topic.title}
           />
 
+          {/* Mundarija — katta ekranda o'ng ustunda, kichigida shu yerda ochiluvchi */}
+          {lessonDoc.toc.length > 1 && (
+            <details ref={mobileTocRef} className="xl:hidden group mb-7 rounded-2xl border border-border/60 bg-surface/40">
+              <summary className="flex items-center gap-2 px-4 py-3 cursor-pointer list-none text-sm font-semibold [&::-webkit-details-marker]:hidden">
+                <ListTree className="w-4 h-4 text-neon-purple" />
+                {t.courses.topic.onThisPage}
+                <span className="text-muted-foreground font-normal">· {lessonDoc.toc.filter((x) => x.level === 2).length}</span>
+                <ChevronDown className="w-4 h-4 ml-auto text-muted-foreground transition-transform group-open:rotate-180" />
+              </summary>
+              <LessonToc
+                items={lessonDoc.toc}
+                active={activeHeading}
+                onPick={() => { if (mobileTocRef.current) mobileTocRef.current.open = false; }}
+                className="mx-4 mb-4"
+              />
+            </details>
+          )}
+
           <div
-            className="prose prose-invert prose-purple max-w-none
-              prose-headings:font-display prose-headings:tracking-tight
-              prose-p:text-[16px] prose-p:text-muted-foreground prose-p:leading-relaxed
-              prose-a:text-neon-purple prose-a:font-medium hover:prose-a:underline
-              prose-strong:text-foreground
-              prose-code:text-neon-green prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
-              prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border prose-pre:overflow-x-auto
-              prose-li:text-muted-foreground prose-li:marker:text-neon-purple/60
-              prose-img:rounded-2xl prose-img:border prose-img:border-border/60 prose-img:shadow-lg prose-img:mx-auto
-              prose-blockquote:border-l-neon-purple prose-blockquote:bg-neon-purple/[0.04] prose-blockquote:rounded-r-xl prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:text-muted-foreground
-              prose-hr:border-border/60"
-            dangerouslySetInnerHTML={{ __html: topic.content_html }}
+            ref={lessonBodyRef}
+            className="prose lesson-body max-w-none"
+            dangerouslySetInnerHTML={{ __html: lessonDoc.html }}
           />
         </motion.div>
       )}
@@ -431,7 +516,7 @@ export default function TopicPage() {
               <button
                 onClick={markContentRead}
                 disabled={progress?.content_read || !videoWatched}
-                title={!videoWatched ? "Avval videoni oxirigacha ko'ring" : undefined}
+                title={!videoWatched ? "Avval videoni oxirigaça köring" : undefined}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border",
                   progress?.content_read
@@ -514,9 +599,84 @@ export default function TopicPage() {
           onClick={() => setShowReflection(true)}
           className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neon-green/10 border border-neon-green/30 text-neon-green text-sm hover:bg-neon-green/20 transition"
         >
-          📓 Refleksiya yozish (3 daqiqa)
+          📓 Refleksiya yoziş (3 daqiqa)
         </button>
       )}
+      </div>
+
+      {/* ===== O'ng ustun (xl+): mundarija, bosqichlar, qo'shni darslar ===== */}
+      <aside className={cn("hidden xl:block sticky overflow-y-auto overscroll-contain space-y-7 pb-4", userId ? "top-20 max-h-[calc(100vh-6rem)]" : "top-32 max-h-[calc(100vh-9rem)]")}>
+        {shownTab === "lesson" && lessonDoc.toc.length > 1 && (
+          <section>
+            <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              <ListTree className="w-3.5 h-3.5" /> {t.courses.topic.onThisPage}
+            </p>
+            <LessonToc items={lessonDoc.toc} active={activeHeading} />
+          </section>
+        )}
+
+        {userId && (
+          <section className="rounded-2xl border border-border/60 bg-card/50 p-4">
+            <p className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              {t.courses.topic.lessonSteps}
+              <span className="tabular-nums normal-case tracking-normal">{doneSteps}/{steps.length}</span>
+            </p>
+            <ol className="space-y-1">
+              {steps.map((s) => {
+                const href = s.key === "quiz" ? `/courses/${slug}/topics/${topicSlug}/quiz`
+                  : s.key === "task" ? `/courses/${slug}/topics/${topicSlug}/task` : null;
+                const body = (
+                  <>
+                    <span className={cn(
+                      "w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0",
+                      s.done ? "bg-neon-green/12 text-neon-green" : "bg-surface text-muted-foreground",
+                    )}>
+                      {s.done ? <CheckCircle2 className="w-4 h-4" /> : <s.icon className="w-4 h-4" />}
+                    </span>
+                    <span className={cn("flex-1 text-sm", s.done ? "text-muted-foreground line-through decoration-neon-green/50" : "font-medium")}>{s.label}</span>
+                    {href && !s.done && <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />}
+                  </>
+                );
+                return (
+                  <li key={s.key}>
+                    {href ? (
+                      <Link href={href} className="flex items-center gap-2.5 rounded-xl px-1.5 py-1.5 hover:bg-surface/70 transition-colors">{body}</Link>
+                    ) : s.key === "read" && !s.done ? (
+                      <button
+                        type="button"
+                        onClick={markContentRead}
+                        disabled={!videoWatched}
+                        className="w-full flex items-center gap-2.5 rounded-xl px-1.5 py-1.5 text-left hover:bg-surface/70 transition-colors disabled:opacity-50"
+                        title={t.courses.topic.markRead}
+                      >
+                        {body}
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-2.5 px-1.5 py-1.5">{body}</div>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        )}
+
+        <section className="space-y-2">
+          {prevTopic && (
+            <Link href={`/courses/${slug}/topics/${prevTopic.slug}`} className="group block rounded-xl border border-border/60 px-3.5 py-2.5 hover:bg-surface/60 transition-colors">
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><ArrowLeft className="w-3 h-3" /> {t.courses.topic.prevShort}</span>
+              <span className="block text-sm font-medium leading-snug line-clamp-2">{prevTopic.title}</span>
+            </Link>
+          )}
+          {nextTopic && (
+            <Link href={`/courses/${slug}/topics/${nextTopic.slug}`} className="group block rounded-xl bg-foreground text-background px-3.5 py-2.5 hover:opacity-90 transition-opacity">
+              <span className="flex items-center gap-1 text-[11px] opacity-70">{t.courses.topic.nextShort} <ArrowRight className="w-3 h-3" /></span>
+              <span className="block text-sm font-semibold leading-snug line-clamp-2">{nextTopic.title}</span>
+            </Link>
+          )}
+        </section>
+      </aside>
+      </div>
 
       <ReflectionJournalModal
         open={showReflection}

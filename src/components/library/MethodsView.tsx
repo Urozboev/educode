@@ -79,7 +79,7 @@ export function MethodsView() {
                 : "bg-surface/40 text-muted-foreground border-border/50 hover:border-border hover:text-foreground"
             )}
           >
-            Barchasi
+            Barçasi
           </button>
           {STAGES.map((s, i) => (
             <button
@@ -111,7 +111,7 @@ export function MethodsView() {
         <div className="py-20 text-center">
           <Lightbulb className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {methods.length === 0 ? "Metodlar tez orada qo'shiladi" : t.misc.noResults}
+            {methods.length === 0 ? "Metodlar tez orada qöşiladi" : t.misc.noResults}
           </p>
         </div>
       ) : (
@@ -181,7 +181,7 @@ export function MethodsView() {
                             {m.disadvantages?.length > 0 && (
                               <div>
                                 <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-neon-red mb-2">
-                                  <ThumbsDown className="w-4 h-4" /> Kamchiliklari
+                                  <ThumbsDown className="w-4 h-4" /> Kamçiliklari
                                 </h3>
                                 <ul className="space-y-1.5">
                                   {m.disadvantages.map(d => (

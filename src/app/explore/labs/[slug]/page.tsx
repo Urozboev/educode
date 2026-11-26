@@ -46,7 +46,7 @@ export default function LabPage() {
         <div className="mt-5 p-4 rounded-xl border border-border bg-surface/30 max-w-2xl">
           <div className="flex items-center justify-between gap-4 mb-2">
             <p className="eyebrow inline-flex items-center gap-1.5">
-              <Target className="w-3.5 h-3.5" /> Nimani o&apos;rganasiz
+              <Target className="w-3.5 h-3.5" /> Nimani örganasiz
             </p>
             <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
               <Clock className="w-3 h-3" /> <span className="numeric">{lab.minutes}</span> daqiqa

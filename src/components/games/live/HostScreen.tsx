@@ -134,7 +134,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
   }
 
   async function endNow() {
-    if (!confirm("O'yin to'xtatilsinmi?")) return;
+    if (!confirm("Öyin töxtatilsinmi?")) return;
     await supabase.from("game_sessions")
       .update({ status: "ended", ended_at: new Date().toISOString() }).eq("id", sessionId);
     loadAll();
@@ -156,7 +156,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
       <div className="text-center py-20">
         <Monitor className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
         <p className="text-muted-foreground mb-6">{t.lg.sessionNotFound}</p>
-        <Link href="/t-lesson-games" className="btn-primary py-2.5 px-5 text-sm">O&apos;yinlar</Link>
+        <Link href="/t-lesson-games" className="btn-primary py-2.5 px-5 text-sm">Öyinlar</Link>
       </div>
     );
   }
@@ -166,13 +166,13 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
     return (
       <div className="space-y-8">
         <Link href="/t-lesson-games" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" /> O&apos;yinlar
+          <ArrowLeft className="w-4 h-4" /> Öyinlar
         </Link>
 
         <div className="text-center">
           <p className="eyebrow mb-2">{game.title}</p>
           <h1 className="font-display font-extrabold text-2xl mb-8">
-            O&apos;quvchilar qo&apos;shilishini kuting
+            Öquvçilar qöşilişini kuting
           </h1>
 
           <div className="inline-block p-8 rounded-3xl bg-neon-purple/[0.07] border-2 border-neon-purple/25">
@@ -197,7 +197,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="eyebrow inline-flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5" /> Qo&apos;shilganlar
+              <Users className="w-3.5 h-3.5" /> Qöşilganlar
             </h2>
             <span className="numeric text-2xl font-display font-bold">{players.length}</span>
           </div>
@@ -231,7 +231,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
             className="btn-primary py-3.5 px-10 text-base inline-flex items-center gap-2 disabled:opacity-40"
           >
             {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
-            Boshlash
+            Boşlaş
           </button>
         </div>
         {players.length === 0 && (
@@ -250,7 +250,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
       <div className="space-y-8 text-center">
         <div>
           <Trophy className="w-14 h-14 text-neon-yellow mx-auto mb-4" />
-          <h1 className="font-display font-extrabold text-3xl">O&apos;yin tugadi</h1>
+          <h1 className="font-display font-extrabold text-3xl">Öyin tugadi</h1>
           <p className="text-muted-foreground mt-1">{game.title}</p>
         </div>
 
@@ -279,7 +279,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
         )}
 
         <div className="max-w-lg mx-auto text-left">
-          <h2 className="eyebrow mb-2">To&apos;liq reyting</h2>
+          <h2 className="eyebrow mb-2">Töliq reyting</h2>
           <ul className="space-y-1.5">
             {players.map((p, i) => (
               <li key={p.id} className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card/40">
@@ -295,7 +295,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
         </div>
 
         <Link href="/t-lesson-games" className="btn-primary py-2.5 px-6 text-sm inline-block">
-          O&apos;yinlarga qaytish
+          Öyinlarga qaytiş
         </Link>
       </div>
     );
@@ -359,7 +359,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
         <button onClick={endNow} className="btn-ghost py-2.5 px-5 text-sm inline-flex items-center gap-2">
-          <Square className="w-4 h-4" /> To&apos;xtatish
+          <Square className="w-4 h-4" /> Töxtatiş
         </button>
 
         <div className="flex gap-3">
@@ -378,7 +378,7 @@ export function HostScreen({ sessionId }: { sessionId: string }) {
       {/* Joriy reyting */}
       {players.length > 0 && (
         <div className="pt-4 border-t border-border/50">
-          <h2 className="eyebrow mb-2">Yetakchilar</h2>
+          <h2 className="eyebrow mb-2">Yetakçilar</h2>
           <div className="flex flex-wrap gap-2">
             {players.slice(0, 5).map((p, i) => (
               <span key={p.id} className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border text-sm">

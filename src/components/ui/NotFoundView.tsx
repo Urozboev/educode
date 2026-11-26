@@ -17,7 +17,7 @@ export function NotFoundView() {
       code="404"
       token="ROUTE_NOT_FOUND"
       command={`miracademy open "${pathname || "/"}"`}
-      steps={["manzil qidirilmoqda", "router jadvalida mos yozuv yo'q"]}
+      steps={["manzil qidirilmoqda", "router jadvalida mos yozuv yöq"]}
       tone="amber"
       title={t.errors.notFoundTitle}
       description={t.errors.notFoundText}

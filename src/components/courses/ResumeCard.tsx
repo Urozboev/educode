@@ -50,7 +50,7 @@ export function ResumeCard({ courseSlug, point }: { courseSlug: string; point: R
         href={href}
         className="btn-primary py-2.5 px-5 text-sm inline-flex items-center justify-center gap-2 flex-shrink-0"
       >
-        {point.courseDone ? "Takrorlash" : point.fresh ? "Boshlash" : "Davom ettirish"}
+        {point.courseDone ? "Takrorlash" : point.fresh ? "Boshlash" : "Davom ettiriş"}
         <ArrowRight className="w-4 h-4" />
       </Link>
     </motion.div>

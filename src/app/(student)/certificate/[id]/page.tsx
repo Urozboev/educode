@@ -222,7 +222,7 @@ export default function CertificatePage() {
           <button onClick={handleDownloadPdf} disabled={downloadingPdf || downloading}
             className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm disabled:opacity-50">
             {downloadingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-            PDF yuklab olish
+            PDF yuklab oliş
           </button>
           <button onClick={handleDownload} disabled={downloading || downloadingPdf}
             className="btn-ghost py-2.5 px-5 flex items-center gap-2 text-sm disabled:opacity-50">
@@ -230,7 +230,7 @@ export default function CertificatePage() {
             PNG
           </button>
           <button onClick={handlePrint} className="btn-ghost py-2.5 px-5 flex items-center gap-2 text-sm">
-            <Printer className="w-4 h-4" /> Chop etish
+            <Printer className="w-4 h-4" /> Çop etiş
           </button>
         </div>
       </motion.div>
@@ -307,7 +307,7 @@ export default function CertificatePage() {
             </h1>
             <p style={{ fontSize: "11px", color: "#c9a227", letterSpacing: "4px", fontWeight: 600, marginBottom: "20px" }}>MUVAFFAQIYATLI TUGATGANLIK</p>
 
-            <p style={{ fontSize: "13px", color: "#777", marginBottom: "10px" }}>Ushbu sertifikat</p>
+            <p style={{ fontSize: "13px", color: "#777", marginBottom: "10px" }}>Uşbu sertifikat</p>
 
             {/* Ism */}
             <h2 style={{ fontFamily: "Georgia, serif", fontSize: "34px", fontWeight: "bold", color: "#6C5CE7", marginBottom: "6px", lineHeight: 1.1 }}>
@@ -322,7 +322,7 @@ export default function CertificatePage() {
 
             {cert.score_percentage != null && cert.score_percentage > 0 && (
               <div style={{ background: "linear-gradient(135deg, #6C5CE710, #00A8E810)", border: "1px solid #6C5CE730", borderRadius: "999px", padding: "5px 20px", marginBottom: "auto" }}>
-                <span style={{ fontSize: "13px", color: "#6C5CE7", fontWeight: 700 }}>O&apos;rtacha ball: {cert.score_percentage}%</span>
+                <span style={{ fontSize: "13px", color: "#6C5CE7", fontWeight: 700 }}>Örtaça ball: {cert.score_percentage}%</span>
               </div>
             )}
 
@@ -370,14 +370,14 @@ export default function CertificatePage() {
               {qrDataUrl && (
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={qrDataUrl} alt="Tekshirish QR kodi" style={{ width: "58px", height: "58px" }} />
+                  <img src={qrDataUrl} alt="Tekşiriş QR kodi" style={{ width: "58px", height: "58px" }} />
                   <span style={{ fontSize: "7px", color: "#aaa", marginTop: "2px" }}>
-                    Haqiqiyligini tekshirish
+                    Haqiqiyligini tekşiriş
                   </span>
                 </div>
               )}
 
-              <p style={{ fontSize: "10px", color: "#aaa" }}>miracademy.uz — Raqamli intellektual ta&apos;lim platformasi</p>
+              <p style={{ fontSize: "10px", color: "#aaa" }}>miracademy.uz — Raqamli intellektual taʼlim platformasi</p>
             </div>
           </div>
         </div>

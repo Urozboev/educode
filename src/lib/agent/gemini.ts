@@ -85,7 +85,7 @@ export async function geminiJson<T>(
         body: JSON.stringify({
           contents: [
             { role: 'user', parts: [{ text: systemPrompt }] },
-            { role: 'model', parts: [{ text: 'Tushundim. Faqat JSON qaytaraman.' }] },
+            { role: 'model', parts: [{ text: 'Tuşundim. Faqat JSON qaytaraman.' }] },
             { role: 'user', parts: [{ text: userPrompt }] },
           ],
           generationConfig: {
@@ -119,7 +119,7 @@ export async function geminiJson<T>(
 
     if (!text) {
       // Xavfsizlik filtri yoki bo'sh javob — sababi finishReason da
-      return { data: null, error: `Javob bo'sh (${reason || 'nomalum'})`, tokensIn, tokensOut, model };
+      return { data: null, error: `Javob böş (${reason || 'nomalum'})`, tokensIn, tokensOut, model };
     }
 
     // Chegaraga urilgan javob yarim JSON bo'ladi va `JSON.parse` da
@@ -128,7 +128,7 @@ export async function geminiJson<T>(
     if (reason === 'MAX_TOKENS') {
       return {
         data: null,
-        error: `Javob token chegarasiga urildi (maxOutputTokens=${opts.maxOutputTokens ?? 4096}). Chegarani oshiring yoki so'rovni qisqartiring.`,
+        error: `Javob token çegarasiga urildi (maxOutputTokens=${opts.maxOutputTokens ?? 4096}). Çegarani oşiring yoki sörovni qisqartiring.`,
         tokensIn, tokensOut, model,
       };
     }

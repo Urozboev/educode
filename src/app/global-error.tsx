@@ -84,7 +84,7 @@ export default function GlobalError({
                 <span style={{ color: "#79c0ff" }}>miracademy boot</span>
               </p>
               <p style={{ margin: 0, color: "#7d8590" }}>
-                → ilova ishga tushirilmoqda
+                → ilova işga tuşirilmoqda
               </p>
               <p
                 style={{
@@ -119,7 +119,7 @@ export default function GlobalError({
                 letterSpacing: "-0.02em",
               }}
             >
-              Ilova ishga tushmadi
+              Ilova işga tuşmadi
             </h1>
             <p
               style={{
@@ -147,7 +147,7 @@ export default function GlobalError({
                 cursor: "pointer",
               }}
             >
-              Qayta yuklash
+              Qayta yuklaş
             </button>
           </div>
         </div>

@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
             href="/login"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-medium text-sm transition-all"
           >
-            <ArrowLeft className="w-4 h-4" /> Kirish sahifasiga qaytish
+            <ArrowLeft className="w-4 h-4" /> Kiriş sahifasiga qaytiş
           </Link>
         </div>
       </motion.div>
@@ -63,10 +63,10 @@ export default function ForgotPasswordPage() {
           href="/login"
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-6"
         >
-          <ArrowLeft className="w-4 h-4" /> Kirish sahifasiga qaytish
+          <ArrowLeft className="w-4 h-4" /> Kiriş sahifasiga qaytiş
         </Link>
         <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-2">
-          Parolni tiklash
+          Parolni tiklaş
         </h1>
         <p className="text-base text-muted-foreground mb-7">
           {t.auth.resetHint}

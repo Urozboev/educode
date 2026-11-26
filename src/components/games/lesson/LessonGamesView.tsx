@@ -11,6 +11,7 @@ import { cn, getCategoryLabel } from "@/lib/utils";
 import { GAME_TYPES } from "@/lib/lessonGames";
 import { LevelBadge } from "@/components/ui/LevelBadge";
 import { Gamepad2, Search, Play, Users, Timer, Grid3x3, Link2, Table2 } from "lucide-react";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 const TYPE_ICON: Record<LessonGameType, React.ElementType> = {
   quiz_race: Timer,
@@ -44,8 +45,8 @@ export function LessonGamesView() {
 
   const filtered = useMemo(() => games.filter(g =>
     (type === "all" || g.type === type) &&
-    (g.title.toLowerCase().includes(search.toLowerCase()) ||
-      g.description?.toLowerCase().includes(search.toLowerCase()))
+    (uzIncludes(g.title, search) ||
+      uzIncludes(g.description, search))
   ), [games, search, type]);
 
   return (
@@ -83,7 +84,7 @@ export function LessonGamesView() {
                 : "bg-surface/40 text-muted-foreground border-border/50 hover:border-border hover:text-foreground"
             )}
           >
-            Barchasi
+            Barçasi
           </button>
           {GAME_TYPES.map(t => {
             const Icon = TYPE_ICON[t.value];
@@ -115,7 +116,7 @@ export function LessonGamesView() {
         <div className="py-20 text-center">
           <Gamepad2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {games.length === 0 ? "O'yinlar tez orada qo'shiladi" : t.lg.notFound}
+            {games.length === 0 ? "Öyinlar tez orada qöşiladi" : t.lg.notFound}
           </p>
         </div>
       ) : (
@@ -158,7 +159,7 @@ export function LessonGamesView() {
                       {getCategoryLabel(g.category)}
                     </span>
                     <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple">
-                      <Play className="w-3.5 h-3.5" /> O&apos;ynash
+                      <Play className="w-3.5 h-3.5" /> Öynaş
                     </span>
                   </div>
                 </Link>

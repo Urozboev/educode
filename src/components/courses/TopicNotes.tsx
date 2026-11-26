@@ -84,7 +84,7 @@ export function TopicNotes({ topicId }: { topicId: string }) {
   }, [save]);
 
   async function clearNote() {
-    if (!confirm("Qaydni o'chirasizmi?")) return;
+    if (!confirm("Qaydni öçirasizmi?")) return;
     if (timer.current) clearTimeout(timer.current);
     setValue("");
     await save("");
@@ -134,7 +134,7 @@ export function TopicNotes({ topicId }: { topicId: string }) {
             value={value}
             onChange={e => onChange(e.target.value)}
             placeholder={
-              "Bu yerga o'zingiz uchun yozing: tushunmagan joy, misol, formula...\n\nO'zgarishlar avtomatik saqlanadi."
+              "Bu yerga özingiz uçun yozing: tuşunmagan joy, misol, formula...\n\nO'zgarishlar avtomatik saqlanadi."
             }
             className="input-field w-full text-sm min-h-[160px] resize-y leading-relaxed font-mono"
             spellCheck={false}
@@ -148,7 +148,7 @@ export function TopicNotes({ topicId }: { topicId: string }) {
                 onClick={clearNote}
                 className="text-xs text-muted-foreground hover:text-neon-red transition inline-flex items-center gap-1.5"
               >
-                <Trash2 className="w-3.5 h-3.5" /> O&apos;chirish
+                <Trash2 className="w-3.5 h-3.5" /> Öçiriş
               </button>
             )}
           </div>

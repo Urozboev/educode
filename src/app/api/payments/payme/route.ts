@@ -27,12 +27,12 @@ export const dynamic = 'force-dynamic';
  */
 
 const ERR = {
-  auth: { code: -32504, message: { uz: "Ruxsat yo'q", ru: "Нет доступа", en: "Auth failed" } },
+  auth: { code: -32504, message: { uz: "Ruxsat yöq", ru: "Нет доступа", en: "Auth failed" } },
   method: { code: -32601, message: { uz: "Metod topilmadi", ru: "Метод не найден", en: "Method not found" } },
   order: { code: -31050, message: { uz: "Buyurtma topilmadi", ru: "Заказ не найден", en: "Order not found" } },
-  amount: { code: -31001, message: { uz: "Noto'g'ri summa", ru: "Неверная сумма", en: "Wrong amount" } },
+  amount: { code: -31001, message: { uz: "Notöğri summa", ru: "Неверная сумма", en: "Wrong amount" } },
   txnNotFound: { code: -31003, message: { uz: "Tranzaksiya topilmadi", ru: "Транзакция не найдена", en: "Transaction not found" } },
-  cannotPerform: { code: -31008, message: { uz: "Amalni bajarib bo'lmaydi", ru: "Невозможно", en: "Cannot perform" } },
+  cannotPerform: { code: -31008, message: { uz: "Amalni bajarib bölmaydi", ru: "Невозможно", en: "Cannot perform" } },
 };
 
 function rpc(id: any, result?: any, error?: any) {

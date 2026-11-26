@@ -95,7 +95,7 @@ export default function MisconceptionAlert({ rule, onClose }: MisconceptionAlert
               <div className="grid sm:grid-cols-2 gap-2 mt-2">
                 <div className="p-2.5 rounded-lg bg-black/40 border border-red-500/30">
                   <div className="text-[11px] text-red-400 font-mono mb-1 font-semibold flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" /> Noto&apos;g&apos;ri yondashuv:
+                    <AlertCircle className="w-3 h-3" /> Notöğri yondaşuv:
                   </div>
                   <pre className="font-mono text-[11px] text-red-200/90 overflow-x-auto whitespace-pre-wrap">
                     {rule.badExample}
@@ -104,7 +104,7 @@ export default function MisconceptionAlert({ rule, onClose }: MisconceptionAlert
 
                 <div className="p-2.5 rounded-lg bg-black/40 border border-neon-green/30">
                   <div className="text-[11px] text-neon-green font-mono mb-1 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Tavsiya qilingan yondashuv:
+                    <CheckCircle2 className="w-3 h-3" /> Tavsiya qilingan yondaşuv:
                   </div>
                   <pre className="font-mono text-[11px] text-neon-green/90 overflow-x-auto whitespace-pre-wrap">
                     {rule.goodExample}

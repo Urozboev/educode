@@ -180,13 +180,13 @@ interface MazeLevel {
 const MAZE_LEVELS: MazeLevel[] = [
   {
     title: {
-      uz: "1-bosqich: To'g'ri Yo'l",
+      uz: "1-bosqiç: Töğri Yöl",
       ru: "Уровень 1: Прямой путь",
       en: "Level 1: Straight Walk",
       kaa: "1-basqısh: Tuwrı jol",
     },
     subtitle: {
-      uz: "Klaviatura tugmalari yoki pastdagi ko'rsatkichlar bilan robotni yashil bayroqqa olib boring.",
+      uz: "Klaviatura tugmalari yoki pastdagi körsatkiçlar bilan robotni yaşil bayroqqa olib boring.",
       ru: "Управляйте роботом с клавиатуры или стрелками на экране до зеленого флага.",
       en: "Steer the robot to the green flag using arrow keys or on-screen buttons.",
       kaa: "Klaviatura yamasa tómendegi kórsetkishler menen robotqa jol kórsetiń.",
@@ -200,13 +200,13 @@ const MAZE_LEVELS: MazeLevel[] = [
   },
   {
     title: {
-      uz: "2-bosqich: Burilishli Yo'l",
+      uz: "2-bosqiç: Burilişli Yöl",
       ru: "Уровень 2: Повороты",
       en: "Level 2: Turning Path",
       kaa: "2-basqısh: Burılıslar",
     },
     subtitle: {
-      uz: "Barcha tangalarni yig'ing va marraga yeting.",
+      uz: "Barça tangalarni yiğing va marraga yeting.",
       ru: "Соберите все монеты и доберитесь до финиша.",
       en: "Collect all coins along the way and reach the goal.",
       kaa: "Barlıq teńgelerdi jıynań hám márege jetiń.",
@@ -222,13 +222,13 @@ const MAZE_LEVELS: MazeLevel[] = [
   },
   {
     title: {
-      uz: "3-bosqich: Mini Labirint",
+      uz: "3-bosqiç: Mini Labirint",
       ru: "Уровень 3: Мини-Лабиринт",
       en: "Level 3: Mini Maze",
       kaa: "3-basqısh: Mini Labirint",
     },
     subtitle: {
-      uz: "To'g'ri yo'lni tanlab, devorlar orasidan chiqish eshigini toping.",
+      uz: "Töğri yölni tanlab, devorlar orasidan çiqiş eşigini toping.",
       ru: "Найдите правильный путь через стены к выходу.",
       en: "Find the correct path through the walls to the exit.",
       kaa: "Durıs joldı tańlap, qapıǵa jetip barıń.",
@@ -305,7 +305,7 @@ export default function MazeRunner3D() {
           setCollectedCoins(nextSet);
           setScore((sc) => sc + 25);
           setTotalCoinsEarned((tc) => tc + 1);
-          toast.success("+1 tanga yig'ildi! 🪙");
+          toast.success("+1 tanga yiğildi! 🪙");
         }
       }
 
@@ -315,7 +315,7 @@ export default function MazeRunner3D() {
         const bonus = 10;
         setScore((sc) => sc + 100);
         setTotalCoinsEarned((tc) => tc + bonus);
-        toast.success(`Bosqich yakunlandi! +${bonus} coin 🎉`);
+        toast.success(`Bosqiç yakunlandi! +${bonus} coin 🎉`);
 
         try {
           getCurrentUser(supabase).then((user) => {
@@ -360,7 +360,7 @@ export default function MazeRunner3D() {
     if (levelIdx < MAZE_LEVELS.length - 1) {
       setLevelIdx((i) => i + 1);
     } else {
-      toast.success("Barcha labirint bosqichlari yakunlandi! 🏆");
+      toast.success("Barça labirint bosqiçlari yakunlandi! 🏆");
       setLevelIdx(0);
     }
   };
@@ -400,7 +400,7 @@ export default function MazeRunner3D() {
           <button
             onClick={resetLevel}
             className="p-2 rounded-xl bg-card border border-border hover:bg-surface text-muted-foreground hover:text-foreground transition"
-            title="Qayta boshlash"
+            title="Qayta boşlaş"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -462,10 +462,10 @@ export default function MazeRunner3D() {
                 🎉
               </div>
               <h3 className="font-display font-bold text-2xl text-foreground mb-1">
-                G&apos;alaba! Marraga yetib kelindi!
+                Ğalaba! Marraga yetib kelindi!
               </h3>
               <p className="text-xs text-muted-foreground mb-6">
-                Siz labirintni {stepsCount} ta qadamda bosib o&apos;tdingiz.
+                Siz labirintni {stepsCount} ta qadamda bosib ötdingiz.
               </p>
 
               <button
@@ -473,7 +473,7 @@ export default function MazeRunner3D() {
                 className="btn-primary py-3 px-8 text-sm font-bold flex items-center gap-2 shadow-xl shadow-neon-green/30"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                Keyingi Bosqich
+                Keyingi Bosqiç
               </button>
             </div>
           )}
@@ -483,7 +483,7 @@ export default function MazeRunner3D() {
         <div className="lg:col-span-4 rounded-3xl bg-card border border-border p-5 flex flex-col items-center justify-between">
           <div className="w-full text-center space-y-1">
             <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Boshqaruv tugmalari
+              Boşqaruv tugmalari
             </h4>
             <p className="text-[11px] text-muted-foreground">
               Klaviatura strelkalari yoki ekrandagi tugmalar orqali yuring
@@ -505,7 +505,7 @@ export default function MazeRunner3D() {
             <button
               onClick={() => move(0, -1, -Math.PI / 2)}
               className="w-14 h-14 rounded-2xl bg-surface border border-border hover:border-neon-blue hover:bg-neon-blue/10 flex items-center justify-center text-foreground transition active:scale-90 shadow-md"
-              title="Chapga (A)"
+              title="Çapga (A)"
             >
               <ArrowLeft className="w-6 h-6 text-neon-blue" />
             </button>
@@ -521,7 +521,7 @@ export default function MazeRunner3D() {
             <button
               onClick={() => move(0, 1, Math.PI / 2)}
               className="w-14 h-14 rounded-2xl bg-surface border border-border hover:border-neon-green hover:bg-neon-green/10 flex items-center justify-center text-foreground transition active:scale-90 shadow-md"
-              title="O'ngga (D)"
+              title="Öngga (D)"
             >
               <ArrowRight className="w-6 h-6 text-neon-green" />
             </button>
@@ -531,7 +531,7 @@ export default function MazeRunner3D() {
           <div className="w-full p-3 rounded-xl bg-surface/50 border border-border text-[11px] text-muted-foreground flex items-center justify-between">
             <span>🎯 Maqsad:</span>
             <span className="font-bold text-neon-green flex items-center gap-1">
-              <Flag className="w-3.5 h-3.5" /> Yashil bayroq
+              <Flag className="w-3.5 h-3.5" /> Yaşil bayroq
             </span>
           </div>
         </div>

@@ -129,7 +129,7 @@ export default function ChildDetailPage() {
 
   const statCards = [
     { label: t.cabinet.dash.statCourses, value: stats.coursesCompleted, icon: BookOpen, color: "#6C5CE7" },
-    { label: "O'tilgan testlar", value: stats.quizzesPassed, icon: CheckCircle2, color: "#00E676" },
+    { label: "Ötilgan testlar", value: stats.quizzesPassed, icon: CheckCircle2, color: "#00E676" },
     { label: t.cabinet.dash.statChallenges, value: stats.challengesSolved, icon: Award, color: "#00D2FF" },
     { label: t.parent.reflections, value: stats.reflections, icon: Brain, color: "#FFD600" },
   ];
@@ -137,7 +137,7 @@ export default function ChildDetailPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <Link href="/p-dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="w-4 h-4" /> Panelga qaytish
+        <ArrowLeft className="w-4 h-4" /> Panelga qaytiş
       </Link>
 
       {/* Header */}
@@ -191,9 +191,9 @@ export default function ChildDetailPage() {
                 style={{ width: `${Math.min(100, depScore)}%` }} />
             </div>
             <p className="text-[11px] text-muted-foreground mt-2">
-              {depScore <= 30 ? "Farzandingiz mustaqil ishlayapti — a'lo!"
-                : depScore <= 60 ? "AI yordamini me'yorida ishlatyapti."
-                : "AI ga ko'proq tayanyapti. Mustaqil ishlashga undang."}
+              {depScore <= 30 ? "Farzandingiz mustaqil işlayapti — aʼlo!"
+                : depScore <= 60 ? "AI yordamini meʼyorida işlatyapti."
+                : "AI ga köproq tayanyapti. Mustaqil işlaşga undang."}
             </p>
           </div>
           <div className="bg-surface/40 rounded-xl p-4">
@@ -246,7 +246,7 @@ export default function ChildDetailPage() {
               <div className="w-10 h-10 rounded-xl bg-neon-yellow/10 flex items-center justify-center"><Gift className="w-5 h-5 text-neon-yellow" /></div>
               <div>
                 <h3 className="font-display font-bold">{t.parent.giftCoinsTitle}</h3>
-                <p className="text-xs text-muted-foreground">{child.full_name} uchun</p>
+                <p className="text-xs text-muted-foreground">{child.full_name} uçun</p>
               </div>
             </div>
             <div className="mb-3 flex items-center justify-between text-sm px-3 py-2 rounded-lg bg-surface/50">

@@ -40,7 +40,7 @@ export function createAdminClient() {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error(
       'SUPABASE_SERVICE_ROLE_KEY sozlanmagan. Vercel loyihasining ' +
-      'Environment Variables bo\'limiga qo\'shing va qayta deploy qiling.',
+      'Environment Variables bo\'limiga qo\'şing va qayta deploy qiling.',
     );
   }
 

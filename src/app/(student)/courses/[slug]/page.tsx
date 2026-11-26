@@ -241,7 +241,7 @@ export default function CourseDetailPage() {
                     </div>
                     <Link href={`/courses/${slug}/topics/${topics[0]?.slug}`}
                       className="w-full text-center py-3 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                      <Play className="w-4 h-4" /> Davom ettirish
+                      <Play className="w-4 h-4" /> Davom ettiriş
                     </Link>
                   </>
                 )
@@ -249,7 +249,7 @@ export default function CourseDetailPage() {
                 <button onClick={handleEnroll} disabled={enrolling}
                   className="w-full py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                   {enrolling ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                  {course.is_free ? "Bepul boshlash" : `${course.price_coins} coin bilan ochish`}
+                  {course.is_free ? "Bepul boşlaş" : `${course.price_coins} coin bilan oçiş`}
                 </button>
               ) : (
                 <>
@@ -258,7 +258,7 @@ export default function CourseDetailPage() {
                     className="w-full py-3.5 rounded-xl bg-foreground text-background font-display font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" />
-                    Bepul ro'yxatdan o'tish
+                    Bepul röyxatdan ötiş
                   </Link>
                   <Link
                     href={`/login?redirect=/courses/${slug}`}

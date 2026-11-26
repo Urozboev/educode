@@ -110,7 +110,7 @@ export function BooksView() {
         <div className="py-20 text-center">
           <Library className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {books.length === 0 ? "Kitoblar tez orada qo'shiladi" : t.misc.noResults}
+            {books.length === 0 ? "Kitoblar tez orada qöşiladi" : t.misc.noResults}
           </p>
         </div>
       ) : (
@@ -162,7 +162,7 @@ export function BooksView() {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neon-purple/[0.08] text-neon-purple border border-neon-purple/25 hover:bg-neon-purple/[0.14] transition-colors"
                   >
                     {b.file_type === "link" ? <FileText className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
-                    {b.file_type === "link" ? "Ochish" : "Yuklab olish"}
+                    {b.file_type === "link" ? "Ochish" : "Yuklab oliş"}
                   </a>
                 </div>
               </div>

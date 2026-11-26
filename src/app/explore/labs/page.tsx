@@ -50,7 +50,7 @@ export default function LabsPage() {
                   <Clock className="w-3 h-3" /> ~<span className="numeric">{lab.minutes}</span> daqiqa
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neon-purple">
-                  Ochish <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                  Oçiş <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </div>
             </Link>

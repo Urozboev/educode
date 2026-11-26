@@ -61,10 +61,10 @@ export default function AdminDashboardPage() {
   }, []);
 
   const mainCards = [
-    { label: "Foydalanuvchilar", value: stats.users, sub: `${stats.students} talaba · ${stats.teachers} o'qituvchi · ${stats.admins} admin`, icon: Users, color: "#6C5CE7", href: "/a-users" },
-    { label: t.nav.courses, value: stats.courses, sub: `${stats.publishedCourses} nashr · ${stats.enrollments} ro'yxat`, icon: BookOpen, color: "#00D2FF", href: "/a-courses" },
-    { label: t.nav.challenges, value: stats.challenges, sub: `${stats.submissions} yuborish · ${stats.accepted} qabul`, icon: Swords, color: "#00E676", href: "/a-challenges" },
-    { label: t.admin.dash.quizzes, value: stats.quizResults, sub: `${stats.quizResults} ta o'tkazildi`, icon: Brain, color: "#FFD600", href: "#" },
+    { label: "Foydalanuvchilar", value: stats.users, sub: `${stats.students} talaba · ${stats.teachers} öqituvçi · ${stats.admins} admin`, icon: Users, color: "#6C5CE7", href: "/a-users" },
+    { label: t.nav.courses, value: stats.courses, sub: `${stats.publishedCourses} naşr · ${stats.enrollments} röyxat`, icon: BookOpen, color: "#00D2FF", href: "/a-courses" },
+    { label: t.nav.challenges, value: stats.challenges, sub: `${stats.submissions} yuboriş · ${stats.accepted} qabul`, icon: Swords, color: "#00E676", href: "/a-challenges" },
+    { label: t.admin.dash.quizzes, value: stats.quizResults, sub: `${stats.quizResults} ta ötkazildi`, icon: Brain, color: "#FFD600", href: "#" },
   ];
 
   const quickLinks = [

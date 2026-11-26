@@ -40,52 +40,52 @@ const links: SceneLink[] = [{ a: "pc", b: "r" }, { a: "r", b: "srv" }];
 
 const steps: Step[] = [
   {
-    say: "7–5 pog'onalar (amaliy, taqdimot, seans): brauzer so'rov tuzdi — «GET /index.html». Hozircha bu oddiy matn, xat qog'ozi kabi.",
+    say: "7–5 poğonalar (amaliy, taqdimot, seans): brauzer sörov tuzdi — «GET /index.html». Hozirça bu oddiy matn, xat qoğozi kabi.",
     focus: ["pc"],
-    panel: <Pack parts={["Data"]} layer="Amaliy pog'ona" note="ma'lumot" />,
+    panel: <Pack parts={["Data"]} layer="Amaliy poğona" note="ma'lumot" />,
   },
   {
-    say: "4-pog'ona (transport) xabarni konvertga soldi: TCP sarlavhasi. Unda port raqamlari bor — serverda qaysi dasturga (80 — veb-server) va javob kompyuterning qaysi dasturiga qaytishi kerak.",
+    say: "4-poğona (transport) xabarni konvertga soldi: TCP sarlavhasi. Unda port raqamlari bor — serverda qaysi dasturga (80 — veb-server) va javob kompyuterning qaysi dasturiga qaytişi kerak.",
     focus: ["pc"],
     panel: <Pack parts={["TCP", "Data"]} layer="Transport" note="segment" />,
-    ask: { q: "Qaysi pog'ona port raqamini (80) qo'shadi?", options: ["Tarmoq (IP)", "Transport (TCP)", "Kanal (Ethernet)"], answer: 1, explain: "Transport pog'onasi — TCP/UDP. Port xabar qaysi DASTURGA ekanini bildiradi." },
+    ask: { q: "Qaysi poğona port raqamini (80) qöşadi?", options: ["Tarmoq (IP)", "Transport (TCP)", "Kanal (Ethernet)"], answer: 1, explain: "Transport poğonasi — TCP/UDP. Port xabar qaysi DASTURGA ekanini bildiradi." },
   },
   {
-    say: "3-pog'ona (tarmoq) yana bir konvert qo'shdi: IP sarlavha — kimdan kimga (IP manzillar). Endi bu paket.",
+    say: "3-poğona (tarmoq) yana bir konvert qöşdi: IP sarlavha — kimdan kimga (IP manzillar). Endi bu paket.",
     focus: ["pc"],
     panel: <Pack parts={["IP", "TCP", "Data"]} layer="Tarmoq" note="paket" />,
-    ask: { q: "Endi qaysi manzil qo'shiladi?", options: ["MAC manzil", "IP manzil", "Port"], answer: 1, explain: "Tarmoq pog'onasi IP manzillarni qo'shadi — paket shu bo'yicha boshqa tarmoqlarga yo'naltiriladi." },
+    ask: { q: "Endi qaysi manzil qöşiladi?", options: ["MAC manzil", "IP manzil", "Port"], answer: 1, explain: "Tarmoq poğonasi IP manzillarni qöşadi — paket şu böyiça boşqa tarmoqlarga yönaltiriladi." },
   },
   {
-    say: "2-pog'ona (kanal) eng tashqi konvertni qo'shdi: Ethernet sarlavha (MAC manzillar — keyingi qurilmagacha) va oxiriga FCS — buzilishni tekshirish uchun. Endi bu kadr.",
+    say: "2-poğona (kanal) eng taşqi konvertni qöşdi: Ethernet sarlavha (MAC manzillar — keyingi qurilmagaça) va oxiriga FCS — buzilişni tekşiriş uçun. Endi bu kadr.",
     focus: ["pc"],
     panel: <Pack parts={["Eth", "IP", "TCP", "Data", "FCS"]} layer="Kanal" note="kadr" />,
   },
   {
-    say: "1-pog'ona (fizik) kadrni bitlarga — kabeldagi elektr signaliga aylantirdi. Kadr routerga ketdi.",
+    say: "1-poğona (fizik) kadrni bitlarga — kabeldagi elektr signaliga aylantirdi. Kadr routerga ketdi.",
     flights: [{ from: "pc", to: "r", label: "0110 1001…" }],
     panel: <div className="font-mono text-[13px] text-neon-purple break-all">0100 0111 0100 0101 0101 0100 0010 0000 0010 1111 …</div>,
   },
   {
-    say: "Router konvertlarni ochadi: Ethernet (2) — «kadr menga keldi», IP (3) — «manzil 93.184.216.34, o'ng tomonga uzataman». TCP va ichidagi ma'lumotni u OCHMAYDI — bu uning ishi emas.",
-    marks: { r: { text: "IP gacha ochdim", at: 0.1 } },
+    say: "Router konvertlarni oçadi: Ethernet (2) — «kadr menga keldi», IP (3) — «manzil 93.184.216.34, öng tomonga uzataman». TCP va içidagi maʼlumotni u OÇMAYDI — bu uning işi emas.",
+    marks: { r: { text: "IP gaça oçdim", at: 0.1 } },
     focus: ["r"],
-    panel: <Pack parts={["IP", "TCP", "Data"]} layer="Router" note="yangi Ethernet konvert bilan qayta o'raydi" />,
-    ask: { q: "Router paketni qaysi pog'onagacha ochib o'qiydi?", options: ["2 — kanal", "3 — tarmoq", "4 — transport", "7 — amaliy"], answer: 1, explain: "3-pog'onagacha: IP manzilga qarab yo'l tanlaydi. Shuning uchun router — 3-pog'ona qurilmasi." },
+    panel: <Pack parts={["IP", "TCP", "Data"]} layer="Router" note="yangi Ethernet konvert bilan qayta öraydi" />,
+    ask: { q: "Router paketni qaysi poğonagaça oçib öqiydi?", options: ["2 — kanal", "3 — tarmoq", "4 — transport", "7 — amaliy"], answer: 1, explain: "3-poğonagaça: IP manzilga qarab yöl tanlaydi. Şuning uçun router — 3-poğona qurilmasi." },
   },
   {
-    say: "Router yangi Ethernet konvert bilan o'rab, serverga uzatdi.",
+    say: "Router yangi Ethernet konvert bilan örab, serverga uzatdi.",
     flights: [{ from: "r", to: "srv", label: "0110 1001…" }],
   },
   {
-    say: "Server konvertlarni teskari tartibda ochadi: Ethernet → IP → TCP (port 80 — veb-server dasturiga) → «GET /index.html». Bu dekapsulyatsiya. Javob xuddi shu yo'l bilan qaytadi.",
+    say: "Server konvertlarni teskari tartibda oçadi: Ethernet → IP → TCP (port 80 — veb-server dasturiga) → «GET /index.html». Bu dekapsulyatsiya. Javob xuddi şu yöl bilan qaytadi.",
     focus: ["srv"],
     marks: { srv: { text: "Port 80 — menga!", tone: "ok", at: 0.1 } },
-    panel: <Pack parts={["Data"]} layer="Server, amaliy pog'ona" note="xat o'qildi" />,
+    panel: <Pack parts={["Data"]} layer="Server, amaliy poğona" note="xat öqildi" />,
   },
-  { say: "Xulosa: yuborishda har pog'ona konvert qo'shadi (inkapsulyatsiya), qabul qilishda ochadi (dekapsulyatsiya). Switch 2-pog'onagacha, router 3-pog'onagacha, server esa hammasini ochadi." },
+  { say: "Xulosa: yuborişda har poğona konvert qöşadi (inkapsulyatsiya), qabul qilişda oçadi (dekapsulyatsiya). Switch 2-poğonagaça, router 3-poğonagaça, server esa hammasini oçadi." },
 ];
 
 export default function OsiStory() {
-  return <Story nodes={nodes} links={links} steps={steps} height={300} title="OSI: xabar qanday konvertlarga o'raladi" />;
+  return <Story nodes={nodes} links={links} steps={steps} height={300} title="OSI: xabar qanday konvertlarga öraladi" />;
 }

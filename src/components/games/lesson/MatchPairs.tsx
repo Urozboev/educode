@@ -100,7 +100,7 @@ export function MatchPairs({
         </span>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
-            Urinish: <span className="numeric">{attempts}</span>
+            Uriniş: <span className="numeric">{attempts}</span>
           </span>
           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-neon-yellow">
             <Zap className="w-4 h-4" /> <span className="numeric">{score}</span>
@@ -147,7 +147,7 @@ export function MatchPairs({
 
         {/* O'ng — ta'riflar (aralash) */}
         <div className="space-y-2.5">
-          <p className="eyebrow mb-3">Ta&apos;rif</p>
+          <p className="eyebrow mb-3">Taʼrif</p>
           {rightOrder.map(pairIndex => {
             const p = pairs[pairIndex];
             if (!p) return null;
@@ -181,7 +181,7 @@ export function MatchPairs({
         <p className="text-center text-sm text-muted-foreground mt-6">
           {selectedLeft === null
             ? t.lg.pickTermLeft
-            : `"${pairs[selectedLeft]?.left}" uchun o'ngdan mos ta'rifni bosing`}
+            : `"${pairs[selectedLeft]?.left}" uçun öngdan mos taʼrifni bosing`}
         </p>
       )}
 
@@ -204,7 +204,7 @@ export function MatchPairs({
                 onClick={() => onFinish({ score, maxScore, correct: matched.size, total })}
                 className="btn-primary py-2.5 px-6 text-sm"
               >
-                Yakunlash
+                Yakunlaş
               </button>
             </div>
           </motion.div>
@@ -222,7 +222,7 @@ export function MatchPairs({
             onClick={() => onFinish({ score, maxScore, correct: matched.size, total })}
             className="text-xs text-muted-foreground hover:text-foreground transition"
           >
-            Tugatmasdan chiqish ({matched.size}/{total})
+            Tugatmasdan çiqiş ({matched.size}/{total})
           </button>
         </div>
       )}
