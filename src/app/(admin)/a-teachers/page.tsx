@@ -56,7 +56,7 @@ export default function AdminTeachersPage() {
   const pendingCount = useMemo(() => apps.filter(a => a.status === "pending").length, [apps]);
 
   async function approve(a: TeacherApplication) {
-    if (!confirm(`${a.full_name} — o'qituvchi huquqi berilsinmi?`)) return;
+    if (!confirm(`${a.full_name} — öqituvçi huquqi berilsinmi?`)) return;
     setBusyId(a.id);
     const { error } = await supabase.rpc("approve_teacher_application", { p_application_id: a.id });
     setBusyId(null);
@@ -66,7 +66,7 @@ export default function AdminTeachersPage() {
   }
 
   async function reject(a: TeacherApplication) {
-    const reason = prompt("Rad etish sababi (arizachi ko'radi):", "");
+    const reason = prompt("Rad etiş sababi (arizaçi köradi):", "");
     if (reason === null) return;
     setBusyId(a.id);
     const { error } = await supabase.rpc("reject_teacher_application", {
@@ -102,7 +102,7 @@ export default function AdminTeachersPage() {
           </h1>
           <p className="text-sm text-muted-foreground">
             {pendingCount > 0
-              ? `${pendingCount} ta ariza ko'rib chiqilishi kutilmoqda`
+              ? `${pendingCount} ta ariza körib çiqilişi kutilmoqda`
               : t.admin.tch.emptyPending}
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function AdminTeachersPage() {
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-neon-green/30 text-neon-green bg-neon-green/[0.06] hover:bg-neon-green/[0.12] disabled:opacity-50 transition-colors"
                           >
                             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                            Tasdiqlash
+                            Tasdiqlaş
                           </button>
                         )}
                         {a.status === "pending" && (
@@ -212,7 +212,7 @@ export default function AdminTeachersPage() {
                             disabled={busy}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-neon-red/30 text-neon-red bg-neon-red/[0.06] hover:bg-neon-red/[0.12] disabled:opacity-50 transition-colors"
                           >
-                            <X className="w-4 h-4" /> Rad etish
+                            <X className="w-4 h-4" /> Rad etiş
                           </button>
                         )}
                         {a.status === "approved" && (
@@ -222,7 +222,7 @@ export default function AdminTeachersPage() {
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-border text-muted-foreground hover:text-foreground hover:bg-surface disabled:opacity-50 transition-colors"
                           >
                             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
-                            Huquqni bekor qilish
+                            Huquqni bekor qiliş
                           </button>
                         )}
                       </div>

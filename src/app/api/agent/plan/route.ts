@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
   const targetLevel = LEVELS.includes(body.targetLevel) && body.targetLevel !== 'zero'
     ? body.targetLevel : 'advanced';
 
-  if (!direction) return Response.json({ error: "Yo'nalish tanlanmagan" }, { status: 400 });
+  if (!direction) return Response.json({ error: "Yönaliş tanlanmagan" }, { status: 400 });
 
   // Daraja: kirish testi natijasi ustuvor, aks holda foydalanuvchi
   // o'zi aytgani. Test bo'lmasa ham reja tuzilaveradi — testni
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
   // Agent suhbatda rejani bilib tursin
   await saveMemoryItems(supabase, user.id, [
     { kind: 'goal', content: `Maqsad: ${goal}`, weight: 3 },
-    { kind: 'fact', content: `Boshlang'ich daraja: ${startLevel}`, weight: 2 },
+    { kind: 'fact', content: `Boşlanğiç daraja: ${startLevel}`, weight: 2 },
   ]);
 
   const { data: modules } = await supabase
@@ -142,7 +142,7 @@ export async function PATCH(req: NextRequest) {
   const { moduleId, status } = await req.json().catch(() => ({} as any));
   const allowed = ['active', 'done', 'skipped'];
   if (!moduleId || !allowed.includes(status)) {
-    return Response.json({ error: "Noto'g'ri parametr" }, { status: 400 });
+    return Response.json({ error: "Notöğri parametr" }, { status: 400 });
   }
 
   // RLS modulni track egasi bo'yicha tekshiradi, lekin keyingi modulni

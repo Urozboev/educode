@@ -25,14 +25,14 @@ export type LabMeta = {
 export const LABS: LabMeta[] = [
   {
     slug: "loops",
-    title: "Sikl va shartlar",
+    title: "Sikl va şartlar",
     summary:
-      "Dastur qatorma-qator qanday bajarilishini kuzating: qaysi qator ishlayapti, o'zgaruvchilar qanday o'zgaryapti va nima uchun sikl to'xtaydi.",
+      "Dastur qatorma-qator qanday bajarilişini kuzating: qaysi qator işlayapti, özgaruvçilar qanday özgaryapti va nima uçun sikl töxtaydi.",
     goals: [
-      "for va while sikllari orasidagi farqni ko'rish",
-      "Shart tekshirilganda dastur qaysi tarmoqqa ketishini kuzatish",
-      "O'zgaruvchi qiymati har qadamda qanday o'zgarishini tushunish",
-      "Ichma-ich sikl necha marta ishlashini sanash",
+      "for va while sikllari orasidagi farqni köriş",
+      "Şart tekşirilganda dastur qaysi tarmoqqa ketişini kuzatiş",
+      "Özgaruvçi qiymati har qadamda qanday özgarişini tuşuniş",
+      "Içma-iç sikl neça marta işlaşini sanaş",
     ],
     category: "programming",
     difficulty: "beginner",
@@ -40,13 +40,13 @@ export const LABS: LabMeta[] = [
   },
   {
     slug: "sorting",
-    title: "Saralash algoritmlari",
+    title: "Saralaş algoritmlari",
     summary:
-      "Bubble, Selection va Insertion saralash qanday ishlashini qadamma-qadam kuzating. O'z massivingizni kiriting va solishtirishlar sonini taqqoslang.",
+      "Bubble, Selection va Insertion saralaş qanday işlaşini qadamma-qadam kuzating. Öz massivingizni kiriting va soliştirişlar sonini taqqoslang.",
     goals: [
-      "Har bir algoritm massivni qanday tartibga solishini ko'rish",
-      "Solishtirish va almashtirish sonini taqqoslash",
-      "Nima uchun bir algoritm boshqasidan tez ekanini tushunish",
+      "Har bir algoritm massivni qanday tartibga solişini köriş",
+      "Soliştiriş va almaştiriş sonini taqqoslaş",
+      "Nima uçun bir algoritm boşqasidan tez ekanini tuşuniş",
     ],
     category: "algorithms",
     difficulty: "beginner",
@@ -56,12 +56,12 @@ export const LABS: LabMeta[] = [
     slug: "binary",
     title: "Ikkilik sanoq sistemasi",
     summary:
-      "Bitlarni yoqib-o'chirib, o'nlik son qanday hosil bo'lishini ko'ring. Mashq rejimida berilgan sonni ikkilikda yig'ing.",
+      "Bitlarni yoqib-öçirib, önlik son qanday hosil bölişini köring. Maşq rejimida berilgan sonni ikkilikda yiğing.",
     goals: [
-      "Har bitning o'rin qiymati (1, 2, 4, 8…) nimani anglatishini bilish",
-      "Ikkilik sonni o'nlikka aylantirish",
-      "O'nlik sonni ikkilikda yig'ish",
-      "Nima uchun bitta bayt 0 dan 255 gacha son saqlashini tushunish",
+      "Har bitning örin qiymati (1, 2, 4, 8…) nimani anglatişini biliş",
+      "Ikkilik sonni önlikka aylantiriş",
+      "Önlik sonni ikkilikda yiğiş",
+      "Nima uçun bitta bayt 0 dan 255 gaça son saqlaşini tuşuniş",
     ],
     category: "computer_literacy",
     difficulty: "beginner",
@@ -69,13 +69,13 @@ export const LABS: LabMeta[] = [
   },
   {
     slug: "hardware",
-    title: "Kompyuter qurilmalarini ulash",
+    title: "Kompyuter qurilmalarini ulaş",
     summary:
-      "Monitor, klaviatura, quloqchin va tarmoq kabelini tizim blokidagi to'g'ri portga ulang. Xato qilsangiz, port nima uchun ekani tushuntiriladi.",
+      "Monitor, klaviatura, quloqçin va tarmoq kabelini tizim blokidagi töğri portga ulang. Xato qilsangiz, port nima uçun ekani tuşuntiriladi.",
     goals: [
-      "HDMI, USB, audio, LAN va quvvat portlarini farqlash",
-      "Qaysi qurilma qaysi portga ulanishini bilish",
-      "Portlar universalligi va cheklovlarini tushunish",
+      "HDMI, USB, audio, LAN va quvvat portlarini farqlaş",
+      "Qaysi qurilma qaysi portga ulanişini biliş",
+      "Portlar universalligi va çeklovlarini tuşuniş",
     ],
     category: "computer_literacy",
     difficulty: "beginner",

@@ -66,7 +66,7 @@ export default function TeacherExportPage() {
     <div className="space-y-8 max-w-3xl">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-display font-bold text-3xl mb-1">{t.teacher.export}</h1>
-        <p className="text-muted-foreground">{studentIds.length} ta talabaning ma'lumotlarini yuklab oling</p>
+        <p className="text-muted-foreground">{studentIds.length} ta talabaning maʼlumotlarini yuklab oling</p>
       </motion.div>
 
       <div className="space-y-4">

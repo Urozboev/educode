@@ -50,7 +50,7 @@ const games = (t: Dictionary) => [
   {
     id: "binary",
     title: "Binary Bridge",
-    desc: "Ikkilik sanoq sistemasida bitlarni yoqib berilgan sonlarni hosil qiling va ko'prik quring.",
+    desc: "Ikkilik sanoq sistemasida bitlarni yoqib berilgan sonlarni hosil qiling va köprik quring.",
     icon: Binary,
     color: "#00E676",
     difficulty: "O'rta",
@@ -185,7 +185,7 @@ export default function ExploreGames() {
 
                 <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-foreground/70 group-hover:text-neon-purple transition-colors">
                   {!isLoggedIn && <Lock className="w-3.5 h-3.5" />}
-                  {isLoggedIn ? "O'ynash" : "Kirish va o'ynash"}
+                  {isLoggedIn ? "O'ynash" : "Kiriş va öynaş"}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </div>
               </div>

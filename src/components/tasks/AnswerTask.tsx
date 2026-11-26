@@ -83,7 +83,7 @@ export default function AnswerTask({
   }
 
   if (fields.length === 0) {
-    return <div className="glass-card p-6 text-sm text-muted-foreground">Topshiriq sozlanmagan.</div>;
+    return <div className="glass-card p-6 text-sm text-muted-foreground">Topşiriq sozlanmagan.</div>;
   }
 
   return (
@@ -91,7 +91,7 @@ export default function AnswerTask({
       {solved && !result && (
         <div className="flex items-center gap-2 rounded-xl border border-neon-green/30 bg-neon-green/[0.07] px-3.5 py-2.5 text-sm">
           <CheckCircle2 className="w-4 h-4 text-neon-green shrink-0" />
-          Bu topshiriqni avval to'g'ri bajargansiz. Xohlasangiz qayta yechib ko'ring.
+          Bu topşiriqni avval töğri bajargansiz. Xohlasangiz qayta yeçib köring.
         </div>
       )}
 
@@ -111,8 +111,8 @@ export default function AnswerTask({
                   {i + 1}
                 </span>
                 {f.label}
-                {state === "ok" && <CheckCircle2 className="w-4 h-4 text-neon-green" aria-label="to'g'ri" />}
-                {state === "bad" && <XCircle className="w-4 h-4 text-neon-red" aria-label="noto'g'ri" />}
+                {state === "ok" && <CheckCircle2 className="w-4 h-4 text-neon-green" aria-label="töğri" />}
+                {state === "bad" && <XCircle className="w-4 h-4 text-neon-red" aria-label="notöğri" />}
               </label>
 
               {f.type === "choice" && f.options ? (
@@ -176,26 +176,26 @@ export default function AnswerTask({
             className="btn-primary py-2.5 px-5 text-sm flex items-center gap-2 disabled:opacity-50"
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            Tekshirish
+            Tekşiriş
           </button>
           {result && !allCorrect && (
             <button type="button" onClick={reset} className="btn-ghost py-2.5 px-4 text-sm flex items-center gap-2">
-              <RotateCcw className="w-4 h-4" /> Tozalash
+              <RotateCcw className="w-4 h-4" /> Tozalaş
             </button>
           )}
-          {attempts > 0 && <span className="text-xs text-muted-foreground font-mono ml-auto">urinish: {attempts}</span>}
+          {attempts > 0 && <span className="text-xs text-muted-foreground font-mono ml-auto">uriniş: {attempts}</span>}
         </div>
       </form>
 
       {allCorrect && (
         <div className="flex items-center gap-2 rounded-xl border border-neon-green/30 bg-neon-green/[0.07] px-3.5 py-3 text-sm font-medium">
           <CheckCircle2 className="w-5 h-5 text-neon-green shrink-0" />
-          Barcha javoblar to'g'ri!
+          Barça javoblar töğri!
         </div>
       )}
       {result && !allCorrect && attempts >= 3 && (
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Bir necha marta urindingiz — chapdagi yordamchi maslahatlarni oching yoki mavzu simulyatsiyasida hisobni qadamma-qadam tekshiring.
+          Bir neça marta urindingiz — çapdagi yordamçi maslahatlarni oçing yoki mavzu simulyatsiyasida hisobni qadamma-qadam tekşiring.
         </p>
       )}
     </div>

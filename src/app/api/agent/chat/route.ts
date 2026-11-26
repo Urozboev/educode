@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   let conversationId: string | null = body.conversationId || null;
 
   if (!message) {
-    return Response.json({ error: 'Xabar bo\'sh' }, { status: 400 });
+    return Response.json({ error: 'Xabar bo\'ş' }, { status: 400 });
   }
 
   // --- Paywall ---
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
   if (await isOverDailyCap(supabase, user.id, access.plan)) {
     return Response.json(
-      { error: 'Bugungi xabarlar chegarasiga yetdingiz. Ertaga davom etamiz.', code: 'daily_cap' },
+      { error: 'Bugungi xabarlar çegarasiga yetdingiz. Ertaga davom etamiz.', code: 'daily_cap' },
       { status: 429 },
     );
   }
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
 
   const contents: any[] = [
     { role: 'user', parts: [{ text: systemPrompt }] },
-    { role: 'model', parts: [{ text: 'Tayyorman. O\'qituvchi sifatida ishlayman.' }] },
+    { role: 'model', parts: [{ text: 'Tayyorman. O\'qituvçi sifatida işlayman.' }] },
   ];
 
   for (const m of (history || []).reverse()) {
@@ -238,7 +238,7 @@ export async function POST(req: NextRequest) {
           .eq('conversation_id', convId);
 
         if (count && count % MEMORY_EXTRACT_EVERY === 0) {
-          const transcript = `Foydalanuvchi: ${message}\nUstoz: ${full}`;
+          const transcript = `Foydalanuvçi: ${message}\nUstoz: ${full}`;
           const items = await extractMemory(transcript);
           if (items.length) await saveMemoryItems(supabase, user.id, items);
         }

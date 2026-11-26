@@ -86,7 +86,7 @@ export function GlossaryView() {
               mode === "list" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <List className="w-4 h-4" /> Ro&apos;yxat
+            <List className="w-4 h-4" /> Röyxat
           </button>
           <button
             onClick={() => setMode("cards")}
@@ -95,7 +95,7 @@ export function GlossaryView() {
               mode === "cards" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <Layers className="w-4 h-4" /> Kartochkalar
+            <Layers className="w-4 h-4" /> Kartoçkalar
           </button>
         </div>
         <span className="text-sm text-muted-foreground">{filtered.length} ta termin</span>
@@ -140,7 +140,7 @@ export function GlossaryView() {
         <div className="py-20 text-center">
           <BookMarked className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-base text-muted-foreground">
-            {terms.length === 0 ? "Terminlar tez orada qo'shiladi" : t.misc.noResults}
+            {terms.length === 0 ? "Terminlar tez orada qöşiladi" : t.misc.noResults}
           </p>
         </div>
       ) : mode === "cards" ? (
@@ -353,16 +353,16 @@ function FlashcardDeck({ terms }: { terms: GlossaryTerm[] }) {
         </div>
         <div className="flex gap-2">
           <button onClick={shuffle} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-surface transition-colors">
-            <Shuffle className="w-4 h-4" /> Aralashtirish
+            <Shuffle className="w-4 h-4" /> Aralaştiriş
           </button>
           <button onClick={reset} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-surface transition-colors">
-            <RotateCcw className="w-4 h-4" /> Boshidan
+            <RotateCcw className="w-4 h-4" /> Boşidan
           </button>
         </div>
       </div>
 
       <p className="text-xs text-muted-foreground/70 text-center mt-4">
-        Klaviatura: <kbd>Bo&apos;shliq</kbd> — ag&apos;darish, <kbd>←</kbd> <kbd>→</kbd> — o&apos;tish
+        Klaviatura: <kbd>Bo&apos;shliq</kbd> — ağdariş, <kbd>←</kbd> <kbd>→</kbd> — ötiş
       </p>
     </div>
   );

@@ -116,8 +116,8 @@ export default function AdminStudentsPage() {
   };
 
   function exportCsv() {
-    const head = ["Talaba", "Username", ...(course ? ["Joriy mavzu"] : ["Kurslar"]), "Progress %", "Test o'rtacha %",
-      "Yechilgan topshiriqlar", "Reyting bali", "Baho", "XP", "Coin", "Bugun (hodisa)", "7 kun (hodisa)", "Oxirgi faollik"];
+    const head = ["Talaba", "Username", ...(course ? ["Joriy mavzu"] : ["Kurslar"]), "Progress %", "Test örtaça %",
+      "Yeçilgan topşiriqlar", "Reyting bali", "Baho", "XP", "Coin", "Bugun (hodisa)", "7 kun (hodisa)", "Oxirgi faollik"];
     downloadCsv(
       `talabalar-${selectedCourse?.slug ?? "barcha"}-${new Date().toISOString().slice(0, 10)}.csv`,
       head,
@@ -136,7 +136,7 @@ export default function AdminStudentsPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display font-bold text-3xl">Talabalar statistikasi</h1>
-          <p className="text-muted-foreground text-sm">Kim qaysi kursda, qayergacha yetdi, bugun va shu hafta nima bajardi, baholari</p>
+          <p className="text-muted-foreground text-sm">Kim qaysi kursda, qayergaça yetdi, bugun va şu hafta nima bajardi, baholari</p>
         </div>
         <button onClick={exportCsv} disabled={!filtered.length}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card text-sm font-medium hover:bg-accent disabled:opacity-50">
@@ -148,9 +148,9 @@ export default function AdminStudentsPage() {
         <div className="glass-card p-4 border-l-4 border-l-neon-red text-sm flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-neon-red shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold">Statistikani yuklab bo&apos;lmadi</p>
+            <p className="font-semibold">Statistikani yuklab bölmadi</p>
             <p className="text-muted-foreground">{error}</p>
-            <p className="text-muted-foreground mt-1">Agar xato funksiya topilmagani haqida bo&apos;lsa — <code>88_talabalar_statistikasi.sql</code> migratsiyasini Supabase SQL Editor da ishga tushiring.</p>
+            <p className="text-muted-foreground mt-1">Agar xato funksiya topilmagani haqida bölsa — <code>88_talabalar_statistikasi.sql</code> migratsiyasini Supabase SQL Editor da işga tuşiring.</p>
           </div>
         </div>
       )}
@@ -161,8 +161,8 @@ export default function AdminStudentsPage() {
           { label: selectedCourse ? "Kursdagi talabalar" : "Talabalar", value: summary.total, icon: Users, color: "#6C5CE7" },
           { label: "Bugun faol", value: summary.today, icon: Activity, color: "#00E676" },
           { label: "7 kunda faol", value: summary.week, icon: CalendarDays, color: "#00D2FF" },
-          { label: "O'rtacha progress", value: `${summary.progress}%`, icon: TrendingUp, color: "#FFD600" },
-          { label: "O'rtacha reyting", value: summary.score == null ? "—" : summary.score, icon: Award, color: "#FF6B9D" },
+          { label: "Örtaça progress", value: `${summary.progress}%`, icon: TrendingUp, color: "#FFD600" },
+          { label: "Örtaça reyting", value: summary.score == null ? "—" : summary.score, icon: Award, color: "#FF6B9D" },
         ].map((c) => (
           <div key={c.label} className="glass-card p-4">
             <c.icon className="w-5 h-5 mb-2" style={{ color: c.color }} />
@@ -176,8 +176,8 @@ export default function AdminStudentsPage() {
       <div className="glass-card overflow-hidden">
         <div className="px-5 py-4 border-b border-border/50 flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-neon-purple" />
-          <h2 className="font-display font-semibold text-lg">Kurslar bo&apos;yicha</h2>
-          <span className="text-xs text-muted-foreground">— qatorni bossangiz, pastdagi ro&apos;yxat shu kurs bilan filtrlanadi</span>
+          <h2 className="font-display font-semibold text-lg">Kurslar böyiça</h2>
+          <span className="text-xs text-muted-foreground">— qatorni bossangiz, pastdagi röyxat şu kurs bilan filtrlanadi</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -188,8 +188,8 @@ export default function AdminStudentsPage() {
                 <th className="px-3 py-2.5 font-semibold">Bugun faol</th>
                 <th className="px-3 py-2.5 font-semibold">7 kunda faol</th>
                 <th className="px-3 py-2.5 font-semibold">Tugatgan</th>
-                <th className="px-3 py-2.5 font-semibold min-w-[140px]">O&apos;rtacha progress</th>
-                <th className="px-3 py-2.5 font-semibold">Test o&apos;rtacha</th>
+                <th className="px-3 py-2.5 font-semibold min-w-[140px]">Örtaça progress</th>
+                <th className="px-3 py-2.5 font-semibold">Test örtaça</th>
                 <th className="px-3 py-2.5 font-semibold">Reyting</th>
               </tr>
             </thead>
@@ -199,7 +199,7 @@ export default function AdminStudentsPage() {
                   className={cn("border-b border-border/30 cursor-pointer hover:bg-surface/40", course === c.id && "bg-neon-purple/10")}>
                   <td className="px-5 py-2.5">
                     <p className="font-medium">{c.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{c.total_topics} mavzu{!c.is_published && " · nashr qilinmagan"}</p>
+                    <p className="text-[11px] text-muted-foreground">{c.total_topics} mavzu{!c.is_published && " · naşr qilinmagan"}</p>
                   </td>
                   <td className="px-3 py-2.5 text-center font-semibold">{c.enrolled}</td>
                   <td className="px-3 py-2.5 text-center">{c.active_today}</td>
@@ -227,14 +227,14 @@ export default function AdminStudentsPage() {
       <div className="flex flex-col lg:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ism yoki username bo'yicha qidirish" className="input-field pl-11" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Ism yoki username böyiça qidiriş" className="input-field pl-11" />
         </div>
         <select value={course} onChange={(e) => setCourse(e.target.value)} className="input-field lg:w-72">
-          <option value="">Barcha kurslar</option>
+          <option value="">Barça kurslar</option>
           {courses.filter((c) => c.enrolled > 0).map((c) => <option key={c.id} value={c.id}>{c.title} ({c.enrolled})</option>)}
         </select>
         <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="input-field lg:w-52">
-          {SORTS.map((s) => <option key={s.k} value={s.k}>Saralash: {s.label}</option>)}
+          {SORTS.map((s) => <option key={s.k} value={s.k}>Saralaş: {s.label}</option>)}
         </select>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -262,11 +262,11 @@ export default function AdminStudentsPage() {
                 <th className="text-left px-3 py-3 font-semibold">{course ? "Joriy mavzu" : "Kurslar"}</th>
                 <th className="px-3 py-3 font-semibold min-w-[130px]">Progress</th>
                 <th className="px-3 py-3 font-semibold">Test</th>
-                <th className="px-3 py-3 font-semibold">Topshiriq</th>
+                <th className="px-3 py-3 font-semibold">Topşiriq</th>
                 <th className="px-3 py-3 font-semibold">Baho</th>
                 <th className="px-3 py-3 font-semibold">XP</th>
                 <th className="px-3 py-3 font-semibold">Coin</th>
-                <th className="px-3 py-3 font-semibold" title="Tugatilgan mavzular / jami hodisalar (test, topshiriq, mavzu)">Bugun</th>
+                <th className="px-3 py-3 font-semibold" title="Tugatilgan mavzular / jami hodisalar (test, topşiriq, mavzu)">Bugun</th>
                 <th className="px-3 py-3 font-semibold" title="Oxirgi 7 kun: tugatilgan mavzular / jami hodisalar">7 kun</th>
                 <th className="text-left px-3 py-3 font-semibold">Faollik</th>
                 <th />
@@ -335,9 +335,9 @@ export default function AdminStudentsPage() {
       </div>
 
       <div className="glass-card p-5 text-xs text-muted-foreground space-y-1.5">
-        <p><b className="text-foreground">Reyting bali (0–100)</b> = mavzular progressi 40% + testlar o&apos;rtachasi 30% + yechilgan topshiriqlar 30% (topshiriq bo&apos;lmagan kursda: progress 55% + testlar 45%). Test bali — har mavzudagi eng yaxshi urinish.</p>
-        <p><b className="text-foreground">Baho</b> (OTM shkalasi): 86–100 → 5, 71–85 → 4, 56–70 → 3, 55 va kam → 2. Bu joriy (oraliq) baho, kurs davomida o&apos;zgarib boradi.</p>
-        <p><b className="text-foreground">Bugun / 7 kun</b>: tugatilgan mavzular / jami hodisalar (test topshirish, topshiriq yuborish, mavzu tugatish). Vaqt — Toshkent bo&apos;yicha.</p>
+        <p><b className="text-foreground">Reyting bali (0–100)</b> = mavzular progressi 40% + testlar örtaçasi 30% + yeçilgan topşiriqlar 30% (topşiriq bölmagan kursda: progress 55% + testlar 45%). Test bali — har mavzudagi eng yaxşi uriniş.</p>
+        <p><b className="text-foreground">Baho</b> (OTM şkalasi): 86–100 → 5, 71–85 → 4, 56–70 → 3, 55 va kam → 2. Bu joriy (oraliq) baho, kurs davomida özgarib boradi.</p>
+        <p><b className="text-foreground">Bugun / 7 kun</b>: tugatilgan mavzular / jami hodisalar (test topşiriş, topşiriq yuboriş, mavzu tugatiş). Vaqt — Toşkent böyiça.</p>
       </div>
     </div>
   );

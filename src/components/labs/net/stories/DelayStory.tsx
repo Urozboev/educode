@@ -32,28 +32,28 @@ const links: SceneLink[] = [{ a: "pc", b: "r1" }, { a: "r1", b: "sea" }, { a: "s
 
 const steps: Step[] = [
   {
-    say: "Talaba Nyu-Yorkdagi serverga 10 MB fayl yuboradi, kanal 100 Mbit/s. Vaqt ikki qismdan iborat: bitlarni kabelga «itarish» (uzatish) va signalning yo'lni bosib o'tishi (tarqalish).",
+    say: "Talaba Nyu-Yorkdagi serverga 10 MB fayl yuboradi, kanal 100 Mbit/s. Vaqt ikki qismdan iborat: bitlarni kabelga «itariş» (uzatiş) va signalning yölni bosib ötişi (tarqaliş).",
     flights: [{ from: "pc", to: "srv", label: "10 MB" }],
   },
   {
-    say: "Uzatish vaqti = hajm ÷ tezlik. 10 MB = 80 Mbit; 80 ÷ 100 = 0,8 s. Shuncha vaqt kompyuter bitlarni birin-ketin chiqarib turadi.",
-    ask: { q: "10 MB faylni 100 Mbit/s kanalga uzatish qancha vaqt oladi?", options: ["0,1 s", "0,8 s", "8 s", "80 s"], answer: 1, hint: "Avval MB ni Mbit ga o'tkazing: × 8.", explain: "10 × 8 = 80 Mbit; 80 ÷ 100 = 0,8 s." },
-    panel: <Bars tx={0.8} prop={0.05} note="Katta fayl: asosiy vaqt uzatishga ketadi." />,
+    say: "Uzatiş vaqti = hajm ÷ tezlik. 10 MB = 80 Mbit; 80 ÷ 100 = 0,8 s. Şunça vaqt kompyuter bitlarni birin-ketin çiqarib turadi.",
+    ask: { q: "10 MB faylni 100 Mbit/s kanalga uzatiş qança vaqt oladi?", options: ["0,1 s", "0,8 s", "8 s", "80 s"], answer: 1, hint: "Avval MB ni Mbit ga ötkazing: × 8.", explain: "10 × 8 = 80 Mbit; 80 ÷ 100 = 0,8 s." },
+    panel: <Bars tx={0.8} prop={0.05} note="Katta fayl: asosiy vaqt uzatişga ketadi." />,
   },
   {
-    say: "Tarqalish vaqti = masofa ÷ signal tezligi. Optik tolada yorug'lik ~200 000 km/s yuradi: 10 000 km ÷ 200 000 km/s = 0,05 s = 50 ms. Bu vaqtni hech qanday tezroq kanal qisqartira olmaydi.",
-    ask: { q: "10 000 km optik kabelda signal qancha vaqt yuradi?", options: ["5 ms", "50 ms", "500 ms"], answer: 1, explain: "10 000 ÷ 200 000 = 0,05 s = 50 ms." },
+    say: "Tarqaliş vaqti = masofa ÷ signal tezligi. Optik tolada yoruğlik ~200 000 km/s yuradi: 10 000 km ÷ 200 000 km/s = 0,05 s = 50 ms. Bu vaqtni heç qanday tezroq kanal qisqartira olmaydi.",
+    ask: { q: "10 000 km optik kabelda signal qança vaqt yuradi?", options: ["5 ms", "50 ms", "500 ms"], answer: 1, explain: "10 000 ÷ 200 000 = 0,05 s = 50 ms." },
     panel: <Bars tx={0.8} prop={0.05} note="Jami ≈ 0,85 s." />,
   },
   {
-    say: "Endi kichik xabar — 100 baytli chat xabari. Uni 1 Gbit/s kanalga itarish atigi 0,8 mikrosekund, lekin yo'l baribir 50 ms. Bu yerda vaqtning deyarli hammasi tarqalishga ketadi.",
+    say: "Endi kiçik xabar — 100 baytli çat xabari. Uni 1 Gbit/s kanalga itariş atigi 0,8 mikrosekund, lekin yöl baribir 50 ms. Bu yerda vaqtning deyarli hammasi tarqalişga ketadi.",
     flights: [{ from: "pc", to: "srv", label: "salom!", tone: "green" }],
-    panel: <Bars tx={0.0000008} prop={0.05} note="Kichik xabar: asosiy vaqt yo'lda." />,
-    ask: { q: "Kanal tezligini 10 baravar oshirsak, qaysi holatda vaqt sezilarli qisqaradi?", options: ["10 MB fayl", "100 baytli chat xabari", "Ikkalasida bir xil"], answer: 0, explain: "Katta faylda asosiy qism — uzatish, u tezlikka bog'liq. Kichik xabarda esa vaqt yo'lda ketadi, tezroq kanal yordam bermaydi." },
+    panel: <Bars tx={0.0000008} prop={0.05} note="Kiçik xabar: asosiy vaqt yölda." />,
+    ask: { q: "Kanal tezligini 10 baravar oşirsak, qaysi holatda vaqt sezilarli qisqaradi?", options: ["10 MB fayl", "100 baytli çat xabari", "Ikkalasida bir xil"], answer: 0, explain: "Katta faylda asosiy qism — uzatiş, u tezlikka boğliq. Kiçik xabarda esa vaqt yölda ketadi, tezroq kanal yordam bermaydi." },
   },
-  { say: "Xulosa: jami kechikish ≈ uzatish (hajm ÷ tezlik) + tarqalish (masofa ÷ signal tezligi). Katta fayllar uchun tezroq kanal, uzoq masofali o'yin va qo'ng'iroqlar uchun esa yaqinroq server muhim." },
+  { say: "Xulosa: jami keçikiş ≈ uzatiş (hajm ÷ tezlik) + tarqaliş (masofa ÷ signal tezligi). Katta fayllar uçun tezroq kanal, uzoq masofali öyin va qönğiroqlar uçun esa yaqinroq server muhim." },
 ];
 
 export default function DelayStory() {
-  return <Story nodes={nodes} links={links} steps={steps} height={290} title="Paket Nyu-Yorkka qancha vaqtda yetadi?" />;
+  return <Story nodes={nodes} links={links} steps={steps} height={290} title="Paket Nyu-Yorkka qança vaqtda yetadi?" />;
 }

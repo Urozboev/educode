@@ -24,6 +24,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 type CourseFormType = {
   title: string;
@@ -200,7 +201,7 @@ export default function AdminCoursesPage() {
   }
 
   async function handleDelete(c: Course) {
-    if (!confirm(`"${c.title}" kursini o'chirishni tasdiqlaysizmi?`)) return;
+    if (!confirm(`"${c.title}" kursini öçirişni tasdiqlaysizmi?`)) return;
     await supabase.from("courses").delete().eq("id", c.id);
     toast.success(t.admin.crs.deleted);
     loadCourses();
@@ -208,7 +209,7 @@ export default function AdminCoursesPage() {
   }
 
   const filtered = courses.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase()),
+    uzIncludes(c.title, search),
   );
 
   return (
@@ -271,7 +272,7 @@ export default function AdminCoursesPage() {
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 className="input-field"
-                placeholder="Python dasturlash asoslari"
+                placeholder="Python dasturlaş asoslari"
               />
             </div>
             <div>
@@ -396,7 +397,7 @@ export default function AdminCoursesPage() {
                 value={form.tags}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
                 className="input-field"
-                placeholder="python, boshlang'ich"
+                placeholder="python, boşlanğiç"
               />
             </div>
 
@@ -415,7 +416,7 @@ export default function AdminCoursesPage() {
                       <button
                         onClick={() => setForm({ ...form, thumbnail_url: "" })}
                         className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white hover:bg-neon-red/80 transition-colors"
-                        title="Rasmni olib tashlash"
+                        title="Rasmni olib taşlaş"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>

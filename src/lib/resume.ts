@@ -24,9 +24,9 @@ export interface ResumePoint {
 }
 
 const PENDING_LABEL: Record<"content" | "quiz" | "tasks", string> = {
-  content: "darsni o'qish",
-  quiz: "testni topshirish",
-  tasks: "topshiriqlarni bajarish",
+  content: "darsni öqiş",
+  quiz: "testni topşiriş",
+  tasks: "topşiriqlarni bajariş",
 };
 
 /** "darsni o'qish va testni topshirish" ko'rinishidagi matn */

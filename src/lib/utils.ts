@@ -129,10 +129,10 @@ export function getLevelLabel(level: string, t?: Dictionary): string {
 export function getDifficultyConfig(difficulty: string) {
   switch (difficulty) {
     case 'easy': return { label: 'Oson', class: 'badge-easy', color: '#00E676', level: 1 };
-    case 'medium': return { label: "O'rta", class: 'badge-medium', color: '#FFD600', level: 2 };
+    case 'medium': return { label: "Örta", class: 'badge-medium', color: '#FFD600', level: 2 };
     case 'hard': return { label: 'Qiyin', class: 'badge-hard', color: '#FF5252', level: 3 };
-    case 'beginner': return { label: "Boshlang'ich", class: 'badge-easy', color: '#00E676', level: 1 };
-    case 'intermediate': return { label: "O'rta", class: 'badge-medium', color: '#FFD600', level: 2 };
+    case 'beginner': return { label: "Boşlanğiç", class: 'badge-easy', color: '#00E676', level: 1 };
+    case 'intermediate': return { label: "Örta", class: 'badge-medium', color: '#FFD600', level: 2 };
     case 'advanced': return { label: 'Yuqori', class: 'badge-hard', color: '#FF5252', level: 3 };
     default: return { label: difficulty, class: '', color: '#94A3B8', level: 1 };
   }
@@ -147,7 +147,7 @@ export function getCategoryLabel(category: string): string {
     python: 'Python',
     basics: 'Asoslar',
     algorithms: 'Algoritmlar',
-    data_structures: "Ma'lumotlar tuzilmasi",
+    data_structures: "Maʼlumotlar tuzilmasi",
     arrays: 'Massivlar',
     strings: 'Satrlar',
     math: 'Matematika',

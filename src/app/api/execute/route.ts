@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     await supabase.from('coin_transactions').insert({
       user_id, amount: coinReward, type: 'challenge_complete',
       reference_id: task_id,
-      description: `"${challenge.title}" topshirig'i bajarildi`,
+      description: `"${challenge.title}" topşiriği bajarildi`,
       balance_after: newCoins,
     });
 

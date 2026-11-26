@@ -10,6 +10,7 @@ import { cn, getDifficultyConfig, getCategoryLabel } from "@/lib/utils";
 import type { Challenge } from "@/types";
 import { motion } from "framer-motion";
 import { Search, Swords, Users, Coins, Lock, ArrowRight } from "lucide-react";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 const categories = [
   { value: "all", label: "Barchasi" },
@@ -17,6 +18,7 @@ const categories = [
   { value: "math", label: "Matematika" },
   { value: "strings", label: "Satrlar" },
   { value: "arrays", label: "Massivlar" },
+  { value: "functions", label: "Funksiyalar" },
   { value: "algorithms", label: "Algoritmlar" },
 ];
 
@@ -53,7 +55,7 @@ export default function ExploreChallenges() {
 
   const filtered = challenges.filter(
     (c) =>
-      c.title.toLowerCase().includes(search.toLowerCase()) &&
+      uzIncludes(c.title, search) &&
       (category === "all" || c.category === category)
   );
 

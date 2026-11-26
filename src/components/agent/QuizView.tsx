@@ -83,7 +83,7 @@ export default function QuizView({
         body: JSON.stringify({ action: "start", moduleId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Test ochilmadi");
+      if (!res.ok) throw new Error(data.error || "Test oçilmadi");
 
       setAssessmentId(data.assessmentId);
       setQuestions(data.questions);
@@ -159,13 +159,13 @@ export default function QuizView({
 
           <div className="text-3xl font-bold">{result.score}%</div>
           <p className="mt-1 text-sm text-muted-foreground">
-            {result.correctCount} / {result.total} to'g'ri javob
+            {result.correctCount} / {result.total} töğri javob
           </p>
 
           <p className="mx-auto mt-4 max-w-md text-sm">{decision.message}</p>
 
           <div className="mt-3 text-xs text-muted-foreground">
-            Mavzu bo'yicha o'zlashtirish: {decision.masteryScore}%
+            Mavzu böyiça özlaştiriş: {decision.masteryScore}%
           </div>
         </div>
 
@@ -196,7 +196,7 @@ export default function QuizView({
                       </span>
                     </p>
                     <p className="text-muted-foreground">
-                      To'g'ri javob:{" "}
+                      Töğri javob:{" "}
                       <span className="font-medium text-foreground">
                         {q.options.find((o) => o.id === fb.correct)?.text}
                       </span>
@@ -237,7 +237,7 @@ export default function QuizView({
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
             >
               <ListChecks className="h-4 w-4" />
-              {decision.trackCompleted ? t.agent.viewPlan : "Rejaga o'tish"}
+              {decision.trackCompleted ? t.agent.viewPlan : "Rejaga ötiş"}
               <ArrowRight className="h-4 w-4" />
             </Link>
           )}
@@ -252,10 +252,10 @@ export default function QuizView({
   return (
     <div className="space-y-5 py-6">
       <div>
-        <h2 className="text-xl font-bold">Mavzuni tekshiramiz</h2>
+        <h2 className="text-xl font-bold">Mavzuni tekşiramiz</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {questions.length} ta savol. Bilmasangiz &quot;Bilmayman&quot; ni tanlang — tavakkal
-          qilingan javob mavzuni o'zlashtirilgan deb belgilab, sizni oldinga o'tkazib yuboradi.
+          qilingan javob mavzuni özlaştirilgan deb belgilab, sizni oldinga ötkazib yuboradi.
         </p>
       </div>
 
@@ -313,7 +313,7 @@ export default function QuizView({
           className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-40"
         >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-          Yakunlash
+          Yakunlaş
         </button>
       </div>
     </div>

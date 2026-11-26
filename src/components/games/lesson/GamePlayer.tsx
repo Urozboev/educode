@@ -110,7 +110,7 @@ export function GamePlayer({ slug }: { slug: string }) {
         <Gamepad2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
         <p className="text-muted-foreground mb-6">{t.lg.gameNotFound}</p>
         <Link href="/explore/lesson-games" className="btn-primary py-2.5 px-5 text-sm">
-          O&apos;yinlar ro&apos;yxati
+          Öyinlar röyxati
         </Link>
       </div>
     );
@@ -132,13 +132,13 @@ export function GamePlayer({ slug }: { slug: string }) {
         </div>
 
         <h1 className="font-display font-extrabold text-3xl tracking-tight mb-2">
-          {pct >= 80 ? t.lg.greatResult : pct >= 50 ? "Yaxshi!" : "Yana urinib ko'ring"}
+          {pct >= 80 ? t.lg.greatResult : pct >= 50 ? "Yaxshi!" : "Yana urinib köring"}
         </h1>
         <p className="text-muted-foreground mb-8">{game.title}</p>
 
         <div className="grid grid-cols-3 gap-3 mb-8">
           <Stat label="Ball" value={result.score} />
-          <Stat label="To'g'ri" value={`${result.correct}/${result.total}`} />
+          <Stat label="Töğri" value={`${result.correct}/${result.total}`} />
           <Stat label="Foiz" value={`${pct}%`} />
         </div>
 
@@ -182,10 +182,10 @@ export function GamePlayer({ slug }: { slug: string }) {
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button onClick={replay} className="btn-ghost py-2.5 px-5 text-sm inline-flex items-center gap-2">
-            <RotateCcw className="w-4 h-4" /> Qaytadan o&apos;ynash
+            <RotateCcw className="w-4 h-4" /> Qaytadan öynaş
           </button>
           <Link href="/explore/lesson-games" className="btn-primary py-2.5 px-5 text-sm">
-            Boshqa o&apos;yinlar
+            Boşqa öyinlar
           </Link>
         </div>
       </motion.div>
@@ -200,7 +200,7 @@ export function GamePlayer({ slug }: { slug: string }) {
           href="/explore/lesson-games"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
-          <ArrowLeft className="w-4 h-4" /> O&apos;yinlar
+          <ArrowLeft className="w-4 h-4" /> Öyinlar
         </Link>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>

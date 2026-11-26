@@ -21,27 +21,27 @@ const links: SceneLink[] = ["A", "B", "C", "D"].map((p) => ({ a: p, b: "X" }));
 const table = (rows: string[][], hi?: number) => <MiniTable title="Kommutator xotirasi (MAC jadvali)" head={["Kim", "Port"]} rows={rows} highlight={hi} />;
 
 const SWITCH: Step[] = [
-  { say: "Ali Valiga xabar yubormoqchi. Hamma kompyuter kommutatorga kabel bilan ulangan. Kommutatorning xotirasi hozircha bo'sh — u hech kimni tanimaydi.", focus: ["A", "C", "X"], panel: table([]) },
+  { say: "Ali Valiga xabar yubormoqçi. Hamma kompyuter kommutatorga kabel bilan ulangan. Kommutatorning xotirasi hozirça böş — u heç kimni tanimaydi.", focus: ["A", "C", "X"], panel: table([]) },
   {
-    say: "Xabar kommutatorga keldi. Kommutator birinchi navbatda jo'natuvchini eslab qoladi: «Ali — 1-portda».",
+    say: "Xabar kommutatorga keldi. Kommutator birinçi navbatda jönatuvçini eslab qoladi: «Ali — 1-portda».",
     flights: [{ from: "A", to: "X", label: "Ali → Vali" }],
     marks: { X: { text: "Ali 1-portda — eslab qoldim" } },
     panel: table([["Ali", "1"]], 0),
   },
   {
-    say: "Vali qaysi portda ekanini kommutator hali bilmaydi. Shuning uchun xabarni hamma portga yuboradi. Faqat Vali qabul qiladi, Bobur va Dilnoza tashlab yuboradi.",
+    say: "Vali qaysi portda ekanini kommutator hali bilmaydi. Şuning uçun xabarni hamma portga yuboradi. Faqat Vali qabul qiladi, Bobur va Dilnoza taşlab yuboradi.",
     flights: [{ from: "X", to: "B", label: "Ali → Vali" }, { from: "X", to: "C", label: "Ali → Vali" }, { from: "X", to: "D", label: "Ali → Vali" }],
     marks: { B: { text: "Menga emas", tone: "drop" }, C: { text: "Menga!", tone: "ok" }, D: { text: "Menga emas", tone: "drop" } },
     panel: table([["Ali", "1"]]),
     ask: {
       q: "Kommutator Vali qaysi portda ekanini hali bilmaydi. Xabar qaysi kompyuterlarga yuboriladi?",
       pick: ["B", "C", "D"],
-      hint: "Kommutator manzilni bilmasa, xabarni kelgan portdan tashqari BARCHA portlarga yuboradi.",
-      explain: "Jadvalda Vali yo'q — kommutator xabarni Alidan boshqa hammaga yuboradi (flooding). Faqat Vali uni qabul qiladi.",
+      hint: "Kommutator manzilni bilmasa, xabarni kelgan portdan taşqari BARÇA portlarga yuboradi.",
+      explain: "Jadvalda Vali yöq — kommutator xabarni Alidan boşqa hammaga yuboradi (flooding). Faqat Vali uni qabul qiladi.",
     },
   },
   {
-    say: "Vali javob yozdi. Kommutator yana jo'natuvchini eslab qoladi: «Vali — 3-portda».",
+    say: "Vali javob yozdi. Kommutator yana jönatuvçini eslab qoladi: «Vali — 3-portda».",
     flights: [{ from: "C", to: "X", label: "Vali → Ali", tone: "green" }],
     marks: { X: { text: "Vali 3-portda — eslab qoldim" } },
     panel: table([["Ali", "1"], ["Vali", "3"]], 1),
@@ -55,12 +55,12 @@ const SWITCH: Step[] = [
       q: "Vali javob yozdi. Endi kommutator javobni qaysi kompyuterga yuboradi?",
       pick: "A",
       hint: "Jadvalga qarang: Ali qaysi portda yozilgan?",
-      explain: "Ali jadvalda bor (1-port) — javob faqat Aliga boradi, boshqalar bezovta qilinmaydi.",
+      explain: "Ali jadvalda bor (1-port) — javob faqat Aliga boradi, boşqalar bezovta qilinmaydi.",
     },
     panel: table([["Ali", "1"], ["Vali", "3"]], 0),
   },
   {
-    say: "Bundan keyin Ali va Vali orasidagi barcha xabarlar to'g'ridan-to'g'ri boradi. Kommutator bir marta o'rganadi — keyin faqat kerakli eshikni ochadi. Bobur va Dilnoza ham shu paytda bemalol gaplasha oladi.",
+    say: "Bundan keyin Ali va Vali orasidagi barça xabarlar töğridan-töğri boradi. Kommutator bir marta örganadi — keyin faqat kerakli eşikni oçadi. Bobur va Dilnoza ham şu paytda bemalol gaplaşa oladi.",
     flights: [{ from: "A", to: "C", label: "Ali → Vali" }, { from: "B", to: "D", label: "Bobur → Dilnoza", tone: "purple" }],
     marks: { C: { text: "Menga!", tone: "ok" }, D: { text: "Menga!", tone: "ok" } },
     panel: table([["Ali", "1"], ["Bobur", "2"], ["Vali", "3"], ["Dilnoza", "4"]]),
@@ -68,30 +68,30 @@ const SWITCH: Step[] = [
 ];
 
 const HUB: Step[] = [
-  { say: "Endi markazda hub (konsentrator). U hech narsani eslab qolmaydi — kelgan signalni shunchaki barcha portlarga takrorlaydi.", focus: ["A", "C", "X"] },
+  { say: "Endi markazda hub (konsentrator). U heç narsani eslab qolmaydi — kelgan signalni şunçaki barça portlarga takrorlaydi.", focus: ["A", "C", "X"] },
   { say: "Ali Valiga xabar yubordi.", flights: [{ from: "A", to: "X", label: "Ali → Vali" }] },
   {
     say: "Hub xabarni oldi. U nima qiladi?",
     ask: {
       q: "Hub xabarni qaysi kompyuterlarga yuboradi?",
       pick: ["B", "C", "D"],
-      hint: "Hub manzilni o'qimaydi ham — signalni shunchaki takrorlaydi.",
-      explain: "Hub xabarni hamma portga takrorladi. Faqat Vali oladi, lekin kabel butun tarmoqda band bo'ldi.",
+      hint: "Hub manzilni öqimaydi ham — signalni şunçaki takrorlaydi.",
+      explain: "Hub xabarni hamma portga takrorladi. Faqat Vali oladi, lekin kabel butun tarmoqda band böldi.",
     },
     flights: [{ from: "X", to: "B", label: "Ali → Vali" }, { from: "X", to: "C", label: "Ali → Vali" }, { from: "X", to: "D", label: "Ali → Vali" }],
     marks: { B: { text: "Menga emas", tone: "drop" }, C: { text: "Menga!", tone: "ok" }, D: { text: "Menga emas", tone: "drop" } },
   },
   {
-    say: "Vali javob yozdi — u ham hammaga ketdi. Hub o'rganmaydi: har bir xabar bilan hamma bezovta qilinadi.",
+    say: "Vali javob yozdi — u ham hammaga ketdi. Hub örganmaydi: har bir xabar bilan hamma bezovta qilinadi.",
     flights: [{ from: "C", to: "A", label: "Vali → Ali", tone: "green" }, { from: "C", to: "B", label: "Vali → Ali", tone: "green" }, { from: "C", to: "D", label: "Vali → Ali", tone: "green" }],
     marks: { A: { text: "Menga!", tone: "ok" }, B: { text: "Menga emas", tone: "drop" }, D: { text: "Menga emas", tone: "drop" } },
   },
   {
-    say: "Ali va Dilnoza bir vaqtda yuborishdi. Hub ichida signallar ustma-ust tushdi — to'qnashuv! Ikkalasi ham kutib, qayta yuborishga majbur.",
+    say: "Ali va Dilnoza bir vaqtda yuborişdi. Hub içida signallar ustma-ust tuşdi — töqnaşuv! Ikkalasi ham kutib, qayta yuborişga majbur.",
     flights: [{ from: "A", to: "X", label: "Ali → Vali" }, { from: "D", to: "X", label: "Dilnoza → Bobur", tone: "purple" }],
-    marks: { X: { text: "To'qnashuv!", tone: "warn" } },
+    marks: { X: { text: "Töqnaşuv!", tone: "warn" } },
   },
-  { say: "Xulosa: hub — bitta umumiy «yo'lak», unda bir vaqtda faqat bitta odam gapira oladi. Kompyuterlar ko'paygan sari tarmoq sekinlashadi. Shuning uchun bugun hamma joyda kommutator ishlatiladi." },
+  { say: "Xulosa: hub — bitta umumiy «yölak», unda bir vaqtda faqat bitta odam gapira oladi. Kompyuterlar köpaygan sari tarmoq sekinlaşadi. Şuning uçun bugun hamma joyda kommutator işlatiladi." },
 ];
 
 export default function SwitchStory({ initial = "switch" }: { initial?: "hub" | "switch" }) {

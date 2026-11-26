@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
   if (!hasServiceRole()) {
     return Response.json({
-      error: "Server sozlamasi to'liq emas: SUPABASE_SERVICE_ROLE_KEY qo'shilmagan.",
+      error: "Server sozlamasi töliq emas: SUPABASE_SERVICE_ROLE_KEY qöşilmagan.",
     }, { status: 500 });
   }
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     const direction = String(body.direction || '').trim();
     const lang = body.lang || 'uz';
 
-    if (!direction) return Response.json({ error: "Yo'nalish tanlanmagan" }, { status: 400 });
+    if (!direction) return Response.json({ error: "Yönaliş tanlanmagan" }, { status: 400 });
 
     const { questions, error, tokensIn, tokensOut } = await generatePlacement(direction, lang);
     if (error || !questions.length) {
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 
     if (!row) return Response.json({ error: 'Test topilmadi' }, { status: 404 });
     if (row.score !== null) {
-      return Response.json({ error: 'Bu test allaqachon topshirilgan' }, { status: 409 });
+      return Response.json({ error: 'Bu test allaqaçon topşirilgan' }, { status: 409 });
     }
 
     const admin = createAdminClient();
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
       .update({
         answer: answers,
         score: result.score,
-        feedback: `Daraja: ${result.level}. To'g'ri javoblar: ${result.correctCount}/${result.total}.`,
+        feedback: `Daraja: ${result.level}. Töğri javoblar: ${result.correctCount}/${result.total}.`,
         graded_by: 'auto',
         graded_at: new Date().toISOString(),
       })
@@ -159,5 +159,5 @@ export async function POST(req: NextRequest) {
     return Response.json({ result, direction: row.payload?.direction ?? null });
   }
 
-  return Response.json({ error: "Noma'lum amal" }, { status: 400 });
+  return Response.json({ error: "Nomaʼlum amal" }, { status: 400 });
 }

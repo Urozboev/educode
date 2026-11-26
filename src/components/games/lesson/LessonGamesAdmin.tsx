@@ -37,8 +37,8 @@ const CATEGORIES = [
 ];
 
 const DIFFICULTIES: { value: CourseDifficulty; label: string }[] = [
-  { value: "beginner", label: "Boshlang'ich" },
-  { value: "intermediate", label: "O'rta" },
+  { value: "beginner", label: "Boşlanğiç" },
+  { value: "intermediate", label: "Örta" },
   { value: "advanced", label: "Yuqori" },
 ];
 
@@ -160,7 +160,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
   async function del(g: LessonGame) {
     if (!confirm(t.lg.confirmDeleteGame.replace("{name}", g.title))) return;
     await supabase.from("lesson_games").delete().eq("id", g.id);
-    toast.success("O'chirildi");
+    toast.success("Öçirildi");
     fetch("/api/revalidate", { method: "POST" }).catch(() => {});
     load();
   }
@@ -189,11 +189,11 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
             <Gamepad2 className="w-6 h-6 text-neon-purple" /> {t.lg.title}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {`${games.length} ta o'yin`}{scope === "teacher" && " · hamkasblarnikini ham ko'rishingiz mumkin"}
+            {`${games.length} ta öyin`}{scope === "teacher" && " · hamkasblarnikini ham körişingiz mumkin"}
           </p>
         </div>
         <button onClick={openNew} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
-          <Plus className="w-4 h-4" /> Yangi o&apos;yin
+          <Plus className="w-4 h-4" /> Yangi öyin
         </button>
       </div>
 
@@ -207,13 +207,13 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
             exit={{ opacity: 0, height: 0 }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-display font-semibold">{editId ? "Tahrirlash" : "Yangi o'yin"}</h2>
+              <h2 className="font-display font-semibold">{editId ? "Tahrirlash" : "Yangi öyin"}</h2>
               <button onClick={() => setShowForm(false)} className="p-1.5 hover:bg-accent rounded-lg"><X className="w-5 h-5" /></button>
             </div>
 
             {/* Tur tanlash */}
             <div>
-              <label className="text-sm font-medium mb-2 block">O&apos;yin turi</label>
+              <label className="text-sm font-medium mb-2 block">Öyin turi</label>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {GAME_TYPES.map(t => {
                   const Icon = TYPE_ICON[t.value];
@@ -239,7 +239,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
 
             <div>
               <label className="text-sm font-medium mb-1 block">Nom *</label>
-              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Sikllar bo'yicha viktorina" />
+              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="input-field" placeholder="Sikllar böyiça viktorina" />
             </div>
 
             <div>
@@ -300,7 +300,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Qoralama
               </button>
               <button onClick={() => save(true)} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Nashr qilish
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Naşr qiliş
               </button>
             </div>
           </motion.div>
@@ -358,7 +358,7 @@ export function LessonGamesAdmin({ scope }: { scope: "admin" | "teacher" }) {
                   <button onClick={() => del(g)} className="p-2 hover:bg-neon-red/10 rounded-lg text-muted-foreground hover:text-neon-red"><Trash2 className="w-4 h-4" /></button>
                 </>
               ) : (
-                <span className="text-[11px] text-muted-foreground px-2 whitespace-nowrap">boshqa muallif</span>
+                <span className="text-[11px] text-muted-foreground px-2 whitespace-nowrap">boşqa muallif</span>
               )}
             </div>
           );
@@ -553,7 +553,7 @@ function JeopardyEditor({ content, onChange }: { content: JeopardyContent; onCha
             onClick={() => setCat(ci, { cells: [...cat.cells, { value: (cat.cells.length + 1) * 100, question: "", answer: "" }] })}
             className="text-xs font-semibold text-neon-purple hover:underline inline-flex items-center gap-1"
           >
-            <Plus className="w-3.5 h-3.5" /> Katak qo&apos;shish
+            <Plus className="w-3.5 h-3.5" /> Katak qöşiş
           </button>
         </div>
       ))}
@@ -595,7 +595,7 @@ function PairsEditor({ content, onChange }: { content: MatchPairsContent; onChan
             value={p.right}
             onChange={e => onChange({ pairs: pairs.map((x, xi) => xi === i ? { ...x, right: e.target.value } : x) })}
             className="input-field text-sm"
-            placeholder="Ta'rif"
+            placeholder="Taʼrif"
           />
           {pairs.length > 2 && (
             <button

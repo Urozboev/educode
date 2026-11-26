@@ -15,7 +15,7 @@ import {
 import { useI18n } from "@/lib/i18n";
 
 const REGIONS = [
-  "Toshkent shahri", "Toshkent viloyati", "Andijon", "Buxoro", "Farg'ona",
+  "Toşkent şahri", "Toşkent viloyati", "Andijon", "Buxoro", "Farg'ona",
   "Jizzax", "Xorazm", "Namangan", "Navoiy", "Qashqadaryo", "Qoraqalpog'iston",
   "Samarqand", "Sirdaryo", "Surxondaryo",
 ];
@@ -24,7 +24,7 @@ const SUBJECTS = [
   { value: "informatika", label: "Informatika" },
   { value: "matematika", label: "Matematika" },
   { value: "fizika", label: "Fizika" },
-  { value: "boshlangich", label: "Boshlang'ich sinf" },
+  { value: "boshlangich", label: "Boşlanğiç sinf" },
   { value: "boshqa", label: "Boshqa" },
 ];
 
@@ -173,8 +173,8 @@ export default function TeacherApplyPage() {
             <div className="leading-relaxed">
               <p className="font-semibold text-neon-red mb-0.5">Ariza rad etilgan</p>
               <p className="text-muted-foreground">
-                {application.reject_reason || "Sabab ko'rsatilmagan."} Ma&apos;lumotlarni
-                to&apos;g&apos;rilab qayta yuborishingiz mumkin.
+                {application.reject_reason || "Sabab körsatilmagan."} Maʼlumotlarni
+                töğrilab qayta yuborişingiz mumkin.
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function TeacherApplyPage() {
 
         <p className="text-center text-sm text-muted-foreground mt-5">
           <Link href="/dashboard" className="hover:text-foreground transition-colors">
-            Keyinroq to&apos;ldiraman
+            Keyinroq töldiraman
           </Link>
         </p>
       </div>

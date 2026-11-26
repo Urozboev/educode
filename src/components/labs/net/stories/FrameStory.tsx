@@ -6,8 +6,8 @@ import { Story, type SceneNode, type SceneLink, type Step } from "../scene/Story
 
 const FIELDS = [
   { k: "pre", t: "Preambula", n: "8 B", c: "bg-slate-500/15" },
-  { k: "dst", t: "Qabul qiluvchi MAC", n: "6 B", c: "bg-sky-500/20" },
-  { k: "src", t: "Yuboruvchi MAC", n: "6 B", c: "bg-indigo-500/20" },
+  { k: "dst", t: "Qabul qiluvçi MAC", n: "6 B", c: "bg-sky-500/20" },
+  { k: "src", t: "Yuboruvçi MAC", n: "6 B", c: "bg-indigo-500/20" },
   { k: "type", t: "Turi", n: "2 B", c: "bg-amber-500/20" },
   { k: "data", t: "Ma'lumot", n: "46–1500 B", c: "bg-emerald-500/20" },
   { k: "fcs", t: "FCS (CRC)", n: "4 B", c: "bg-rose-500/20" },
@@ -37,33 +37,33 @@ const nodes: SceneNode[] = [
 const links: SceneLink[] = [{ a: "A", b: "sw" }, { a: "sw", b: "B" }, { a: "sw", b: "C" }];
 
 const steps: Step[] = [
-  { say: "Ethernet da ma'lumot «kadr» deb ataladigan konvertda yuboriladi. Konvertning har bo'lagi o'z vazifasini bajaradi.", panel: <Frame values={V} /> },
-  { say: "Preambula — 10101010… ketma-ketligi: qabul qiluvchiga «kadr boshlanyapti, soatingni moslab ol» deydi.", panel: <Frame on="pre" values={{ ...V, pre: "1010…1011" }} /> },
+  { say: "Ethernet da maʼlumot «kadr» deb ataladigan konvertda yuboriladi. Konvertning har bölagi öz vazifasini bajaradi.", panel: <Frame values={V} /> },
+  { say: "Preambula — 10101010… ketma-ketligi: qabul qiluvçiga «kadr boşlanyapti, soatingni moslab ol» deydi.", panel: <Frame on="pre" values={{ ...V, pre: "1010…1011" }} /> },
   {
-    say: "Birinchi navbatda qabul qiluvchi MAC turadi. Kommutator kadrning boshini o'qishi bilanoq qaysi portga yuborishni biladi.",
+    say: "Birinçi navbatda qabul qiluvçi MAC turadi. Kommutator kadrning boşini öqişi bilanoq qaysi portga yuborişni biladi.",
     flights: [{ from: "A", to: "B", label: "→ BB:22" }],
     panel: <Frame on="dst" values={V} />,
-    ask: { q: "Kommutator kadrni qaysi portga yuborishni qaysi maydonga qarab hal qiladi?", options: ["Yuboruvchi MAC", "Qabul qiluvchi MAC", "Turi", "FCS"], answer: 1, explain: "Qabul qiluvchi MAC — u kadr boshida turadi, shuning uchun kommutator tez qaror qiladi." },
+    ask: { q: "Kommutator kadrni qaysi portga yuborişni qaysi maydonga qarab hal qiladi?", options: ["Yuboruvçi MAC", "Qabul qiluvçi MAC", "Turi", "FCS"], answer: 1, explain: "Qabul qiluvçi MAC — u kadr boşida turadi, şuning uçun kommutator tez qaror qiladi." },
   },
   {
-    say: "Yuboruvchi MAC — kommutator undan «A shu portda» deb o'rganadi. «Turi» 0x0800 — ichida IPv4 paket bor (0x0806 bo'lsa — ARP).",
+    say: "Yuboruvçi MAC — kommutator undan «A şu portda» deb örganadi. «Turi» 0x0800 — içida IPv4 paket bor (0x0806 bölsa — ARP).",
     panel: <Frame on="type" values={V} />,
-    ask: { q: "Kadrda 0x0806 turi bor. Ichida nima?", options: ["IPv4", "ARP", "IPv6"], answer: 1, explain: "0x0800 — IPv4, 0x0806 — ARP, 0x86DD — IPv6." },
+    ask: { q: "Kadrda 0x0806 turi bor. Içida nima?", options: ["IPv4", "ARP", "IPv6"], answer: 1, explain: "0x0800 — IPv4, 0x0806 — ARP, 0x86DD — IPv6." },
   },
   {
-    say: "Ma'lumot maydoni kamida 46 bayt bo'ladi (kam bo'lsa to'ldiriladi) va ko'pi bilan 1500 bayt (MTU). Undan katta paket bo'laklarga bo'linadi.",
+    say: "Maʼlumot maydoni kamida 46 bayt böladi (kam bölsa töldiriladi) va köpi bilan 1500 bayt (MTU). Undan katta paket bölaklarga bölinadi.",
     panel: <Frame on="data" values={V} />,
     ask: { q: "Ethernet kadrining minimal umumiy uzunligi (preambulasiz)?", options: ["46 B", "64 B", "1500 B", "1518 B"], answer: 1, explain: "6 + 6 + 2 + 46 + 4 = 64 bayt. Maksimal — 1518 bayt." },
   },
   {
-    say: "FCS — oxirgi 4 bayt, kadrdan hisoblangan CRC. Yo'lda shovqin bitta bitni o'zgartirdi: B o'zi hisoblagan CRC bilan FCS mos kelmadi va kadrni tashladi.",
+    say: "FCS — oxirgi 4 bayt, kadrdan hisoblangan CRC. Yölda şovqin bitta bitni özgartirdi: B özi hisoblagan CRC bilan FCS mos kelmadi va kadrni taşladi.",
     flights: [{ from: "A", to: "B", label: "kadr ⚡", tone: "red" }],
-    marks: { B: { text: "CRC mos emas → tashlandi", tone: "drop", at: 2.2 } },
+    marks: { B: { text: "CRC mos emas → taşlandi", tone: "drop", at: 2.2 } },
     panel: <Frame on="fcs" values={{ ...V, fcs: "3F A1 9C 07 ≠ 81 0D 22 E4" }} />,
   },
-  { say: "Xulosa: Qabul qiluvchi MAC (6) + Yuboruvchi MAC (6) + Turi (2) + Ma'lumot (46–1500) + FCS (4) = 64–1518 bayt. Kommutator MAC larni o'qiydi, qabul qiluvchi FCS bilan butunligini tekshiradi.", panel: <Frame values={V} /> },
+  { say: "Xulosa: Qabul qiluvçi MAC (6) + Yuboruvçi MAC (6) + Turi (2) + Maʼlumot (46–1500) + FCS (4) = 64–1518 bayt. Kommutator MAC larni öqiydi, qabul qiluvçi FCS bilan butunligini tekşiradi.", panel: <Frame values={V} /> },
 ];
 
 export default function FrameStory() {
-  return <Story nodes={nodes} links={links} steps={steps} height={310} title="Ethernet kadri ichida nima bor?" />;
+  return <Story nodes={nodes} links={links} steps={steps} height={310} title="Ethernet kadri içida nima bor?" />;
 }

@@ -51,7 +51,7 @@ export default function AdminGuidePage() {
     const toza = Object.fromEntries(Object.entries(videos).filter(([, v]) => v && v.trim()).map(([k, v]) => [k, v!.trim()]));
     const { data, error } = await supabase
       .from("platform_settings")
-      .upsert({ key: GUIDE_SETTINGS_KEY, value: toza, description: "Yo'riqnoma videolari", updated_at: new Date().toISOString() })
+      .upsert({ key: GUIDE_SETTINGS_KEY, value: toza, description: "Yöriqnoma videolari", updated_at: new Date().toISOString() })
       .select("key");
     setSaving(false);
     if (error || !data?.length) {

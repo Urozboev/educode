@@ -168,12 +168,12 @@ export async function isOverDailyCap(
 export function paywallMessage(access: AgentAccess): string {
   switch (access.reason) {
     case 'no_user':
-      return 'Agent bilan ishlash uchun tizimga kiring.';
+      return 'Agent bilan işlaş uçun tizimga kiring.';
     case 'expired':
-      return 'Obunangiz muddati tugadi. Davom etish uchun obunani yangilang.';
+      return 'Obunangiz muddati tugadi. Davom etiş uçun obunani yangilang.';
     case 'free_limit_reached':
-      return `Bepul sinov tugadi (${FREE_TRIAL_MESSAGES} xabar). Agent bilan cheksiz ishlash uchun Pro obunani rasmiylashtiring.`;
+      return `Bepul sinov tugadi (${FREE_TRIAL_MESSAGES} xabar). Agent bilan çeksiz işlaş uçun Pro obunani rasmiylaştiring.`;
     default:
-      return 'Agent hozircha mavjud emas.';
+      return 'Agent hozirça mavjud emas.';
   }
 }

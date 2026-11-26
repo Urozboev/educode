@@ -129,7 +129,7 @@ export default function QuizPage() {
       if (prog && prog.content_read && prog.tasks_completed) {
         await completeTopic(supabase, userId, topicId, courseId);
       }
-      toast.success(`Test o'tdi — ${correct}/${quizzes.length}`);
+      toast.success(`Test ötdi — ${correct}/${quizzes.length}`);
     } else {
       toast.error(`Test o'tmadi. ${correct}/${quizzes.length} (60% kerak)`);
     }
@@ -181,7 +181,7 @@ export default function QuizPage() {
           href={`/courses/${slug}/topics/${topicSlug}`}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-surface/60 hover:bg-surface font-semibold text-sm transition"
         >
-          <ArrowLeft className="w-4 h-4" /> Mavzuga qaytish
+          <ArrowLeft className="w-4 h-4" /> Mavzuga qaytiş
         </Link>
       </div>
     );
@@ -201,7 +201,7 @@ export default function QuizPage() {
           href={`/courses/${slug}/topics/${topicSlug}`}
           className="inline-flex items-center gap-2 text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Mavzuga qaytish
+          <ArrowLeft className="w-4 h-4" /> Mavzuga qaytiş
         </Link>
 
         <div className="rounded-3xl border border-border/60 bg-card/40 p-8 md:p-10 text-center">
@@ -324,7 +324,7 @@ export default function QuizPage() {
         href={`/courses/${slug}/topics/${topicSlug}`}
         className="inline-flex items-center gap-2 text-[15px] font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> Mavzuga qaytish
+        <ArrowLeft className="w-4 h-4" /> Mavzuga qaytiş
       </Link>
 
       <div className="flex items-center gap-3">
@@ -422,7 +422,7 @@ export default function QuizPage() {
             disabled={Object.keys(selected).length < quizzes.length}
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition disabled:opacity-50"
           >
-            Tugatish <CheckCircle2 className="w-4 h-4" />
+            Tugatiş <CheckCircle2 className="w-4 h-4" />
           </button>
         )}
       </div>

@@ -28,15 +28,15 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     const systemPrompt = fillPlaceholders(PLAN_REVIEW_PROMPT, { STEP: step });
-    const userPrompt = `Topshiriq: ${task_description || ''}
+    const userPrompt = `Topşiriq: ${task_description || ''}
 
-Bosqich: ${step}
+Bosqiç: ${step}
 Talaba javobi:
 """
 ${content}
 """
 
-Yuqoridagi qoidalar asosida bahoni JSON shaklida qaytar.`;
+Yuqoridagi qoidalar asosida bahoni JSON şaklida qaytar.`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

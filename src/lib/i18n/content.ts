@@ -96,12 +96,12 @@ export const RESOURCE_LABEL: Record<TranslatableResource, string> = {
   courses: "Kurslar",
   topics: "Mavzular",
   quizzes: "Testlar",
-  topic_tasks: "Mavzu topshiriqlari",
+  topic_tasks: "Mavzu topşiriqlari",
   challenges: "Masalalar",
   glossary_terms: "Terminlar",
   teaching_methods: "Metodlar",
   books: "Kitoblar",
-  lesson_games: "Dars o'yinlari",
+  lesson_games: "Dars öyinlari",
   contests: "Olimpiadalar",
 };
 

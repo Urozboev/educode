@@ -24,12 +24,12 @@ export default function AdminTestimonialsPage() {
 
   async function toggleApprove(id: string, current: boolean) {
     await supabase.from("testimonials").update({ is_approved: !current }).eq("id", id);
-    toast.success(current ? "Bosh sahifadan olib tashlandi" : "Bosh sahifada ko'rinadi");
+    toast.success(current ? "Boş sahifadan olib taşlandi" : "Boş sahifada körinadi");
     load();
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Izohni o'chirish?")) return;
+    if (!confirm("Izohni öçiriş?")) return;
     await supabase.from("testimonials").delete().eq("id", id);
     toast.success(t.admin.common.deleted); load();
   }
@@ -41,7 +41,7 @@ export default function AdminTestimonialsPage() {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-display font-bold text-3xl">{t.admin.tst.title}</h1>
-        <p className="text-muted-foreground text-sm">{pending.length} ta tasdiqlanmagan · {approved.length} ta bosh sahifada</p>
+        <p className="text-muted-foreground text-sm">{pending.length} ta tasdiqlanmagan · {approved.length} ta boş sahifada</p>
       </motion.div>
 
       {/* Pending */}
@@ -76,7 +76,7 @@ export default function AdminTestimonialsPage() {
 
       {/* Approved */}
       <div>
-        <h2 className="font-semibold text-sm text-neon-green mb-3 flex items-center gap-2">✅ Bosh sahifada ko'rinadi ({approved.length})</h2>
+        <h2 className="font-semibold text-sm text-neon-green mb-3 flex items-center gap-2">✅ Boş sahifada körinadi ({approved.length})</h2>
         {approved.length === 0 ? <p className="text-sm text-muted-foreground py-4">{t.admin.tst.empty}</p> : (
           <div className="grid md:grid-cols-2 gap-3">
             {approved.map(t => (

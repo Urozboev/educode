@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "@/components/i18n/Link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -9,7 +9,8 @@ import { LayoutDashboard, Menu, X, Moon, Sun, LogOut, ChevronDown } from "lucide
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
-import { primaryLinks, resourceLinks, tailLinks, allGuestLinks } from "@/lib/nav";
+import { primaryLinks, resourceLinks, tailLinks } from "@/lib/nav";
+import MobileNavSheet from "@/components/nav/MobileNavSheet";
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { BrandMark } from "@/components/brand/BrandMark";
@@ -22,9 +23,9 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
   const primary = primaryLinks(t);
   const resources = resourceLinks(t);
   const tail = tailLinks(t);
-  const allLinks = allGuestLinks(t);
   const [user, setUser] = useState<{ name: string; avatar: string | null; role: string } | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
   const [mounted, setMounted] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -130,37 +131,16 @@ export default function ExploreLayout({ children }: { children: React.ReactNode 
             )}
 
             {/* Mobile menu toggle */}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="xl:hidden p-2 hover:bg-accent rounded-lg">
+            <button onClick={() => setMobileOpen(!mobileOpen)} aria-expanded={mobileOpen} aria-controls="mobile-nav" aria-label="Menu" className="xl:hidden p-2 hover:bg-accent rounded-lg">
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile dropdown. Past ekranda ro'yxat sig'masdi va oxirgi
-            havolalarga umuman yetib bo'lmasdi — ichidan aylantiriladi. */}
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div className="xl:hidden bg-card border-b border-border overflow-hidden"
-              initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-              {/* Balandlik animatsiyasi TASHQI qavatda, aylantirish ICHKIDA.
-                  Ikkalasi bitta elementda bo'lsa framer-motion "auto" ni
-                  o'lchay olmay qoladi va panel ochilmaydi. */}
-              <div className="px-4 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
-                {allLinks.map(l => (
-                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
-                    className={`block py-2.5 px-3 rounded-lg text-sm ${pathname === l.href ? "bg-neon-purple/10 text-neon-purple" : "hover:bg-accent"}`}>{l.label}</Link>
-                ))}
-                {!user && (
-                  <div className="flex gap-2 pt-2 border-t border-border mt-2">
-                    <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-ghost text-sm py-2 px-4 flex-1 text-center">{t.nav.login}</Link>
-                    <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary text-sm py-2 px-4 flex-1 text-center">{t.nav.getStarted}</Link>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
+
+      {/* Mobil menyu — navbar'dan TASHQARIDA (sabab komponent izohida) */}
+      <MobileNavSheet open={mobileOpen} onClose={closeMobile} dashboardHref={user ? dashboardUrl : null} pathname={pathname} />
       <main className="pt-24 md:pt-28 pb-20 px-4 md:px-6"><div className="max-w-6xl mx-auto overflow-x-hidden supports-[overflow:clip]:overflow-x-clip">{children}</div></main>
     </div>
   );

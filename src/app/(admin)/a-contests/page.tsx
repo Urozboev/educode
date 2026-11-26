@@ -15,6 +15,7 @@ import {
   Search, GripVertical, ExternalLink, Users,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 /** `datetime-local` input uchun: ISO → "YYYY-MM-DDTHH:mm" (mahalliy vaqtda) */
 function toLocalInput(iso: string): string {
@@ -76,7 +77,7 @@ export default function AdminContestsPage() {
   }
 
   const filteredChallenges = useMemo(
-    () => challenges.filter(c => c.title.toLowerCase().includes(search.toLowerCase())),
+    () => challenges.filter(c => uzIncludes(c.title, search)),
     [challenges, search]
   );
 
@@ -167,7 +168,7 @@ export default function AdminContestsPage() {
   }
 
   async function del(c: Contest) {
-    if (!confirm(`"${c.title}" o'chirilsinmi? Ishtirokchilar ro'yxati ham o'chadi.`)) return;
+    if (!confirm(`"${c.title}" öçirilsinmi? Iştirokçilar röyxati ham öçadi.`)) return;
     await supabase.from("contests").delete().eq("id", c.id);
     toast.success(t.admin.common.deleted);
     load();
@@ -248,7 +249,7 @@ export default function AdminContestsPage() {
                 </label>
                 {picked.length > 0 && (
                   <button onClick={() => setPicked([])} className="text-xs text-muted-foreground hover:text-neon-red">
-                    Tozalash
+                    Tozalaş
                   </button>
                 )}
               </div>
@@ -322,7 +323,7 @@ export default function AdminContestsPage() {
               </button>
               <button onClick={() => save(true)} disabled={saving}
                 className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} E&apos;lon qilish
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />} Eʼlon qiliş
               </button>
             </div>
           </motion.div>

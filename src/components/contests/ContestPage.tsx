@@ -274,7 +274,7 @@ export function ContestPage({
 
                   {p.my_status === "solved" && (
                     <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-neon-green flex-shrink-0">
-                      <Check className="w-3.5 h-3.5" /> Yechildi
+                      <Check className="w-3.5 h-3.5" /> Yeçildi
                     </span>
                   )}
                   {p.my_status === "tried" && (
@@ -435,7 +435,7 @@ function Standings({ rows, problems, me }: { rows: ContestStanding[]; problems: 
                       ) : (
                         <span className="inline-flex flex-col items-center leading-tight rounded-md bg-neon-red/[0.10] border border-neon-red/30 px-1.5 py-1 min-w-[42px]">
                           <span className="numeric text-[11px] font-semibold text-neon-red">−{cell.wrong}</span>
-                          <span className="text-[9px] text-muted-foreground">urinish</span>
+                          <span className="text-[9px] text-muted-foreground">uriniş</span>
                         </span>
                       )}
                     </td>

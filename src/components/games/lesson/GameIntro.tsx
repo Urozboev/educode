@@ -34,7 +34,7 @@ export const GAME_RULES = (t: Dictionary): Record<LessonGameType, GameRules> => 
       t.lg.quizRule3,
     ],
     keys: [
-      { key: "1 – 4", action: "variant tanlash" },
+      { key: "1 – 4", action: "variant tanlaş" },
       { key: "Enter", action: "keyingi savol" },
     ],
   },
@@ -42,8 +42,8 @@ export const GAME_RULES = (t: Dictionary): Record<LessonGameType, GameRules> => 
     summary: t.lg.matchDesc,
     steps: [
       t.lg.matchRule1,
-      "Har to'g'ri juftlik 100 ball",
-      "Xato urinish 20 ball ayiradi — shoshilmang",
+      "Har töğri juftlik 100 ball",
+      "Xato uriniş 20 ball ayiradi — şoşilmang",
     ],
   },
   jeopardy: {
@@ -59,11 +59,11 @@ export const GAME_RULES = (t: Dictionary): Record<LessonGameType, GameRules> => 
     steps: [
       t.lg.crosswordRule1,
       t.lg.crosswordRule2,
-      "Har to'liq so'z 100 ball; yordam ishlatilgan so'z 50 ball",
+      "Har töliq söz 100 ball; yordam işlatilgan söz 50 ball",
     ],
     keys: [
-      { key: "← ↑ → ↓", action: "kataklar bo'ylab yurish" },
-      { key: "Backspace", action: "o'chirib orqaga qaytish" },
+      { key: "← ↑ → ↓", action: "kataklar böylab yuriş" },
+      { key: "Backspace", action: "öçirib orqaga qaytiş" },
     ],
   },
 });
@@ -121,10 +121,10 @@ export function GameIntro({
         className="btn-primary py-3 px-8 text-sm inline-flex items-center gap-2"
         autoFocus
       >
-        <Play className="w-4 h-4" /> Boshlash
+        <Play className="w-4 h-4" /> Boşlaş
       </button>
 
-      <p className="sr-only">{title} o&apos;yini</p>
+      <p className="sr-only">{title} öyini</p>
     </motion.div>
   );
 }

@@ -55,20 +55,20 @@ export function CrosswordEditor({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-display font-semibold text-sm">
-          So&apos;zlar <span className="numeric text-muted-foreground">({usableCount})</span>
+          Sözlar <span className="numeric text-muted-foreground">({usableCount})</span>
         </h3>
         <button
           type="button"
           onClick={() => setEntries(e => [...e, { answer: "", clue: "" }])}
           className="text-xs font-semibold text-neon-purple hover:underline inline-flex items-center gap-1"
         >
-          <Plus className="w-3.5 h-3.5" /> So&apos;z qo&apos;shish
+          <Plus className="w-3.5 h-3.5" /> Söz qöşiş
         </button>
       </div>
 
       <p className="text-xs text-muted-foreground">
         {t.lg.apostropheNote}
-        <span className="font-mono"> o&apos;zgaruvchi → OZGARUVCHI</span>
+        <span className="font-mono"> özgaruvçi → OZGARUVÇI</span>
       </p>
 
       {entries.map((e, i) => (
@@ -104,14 +104,14 @@ export function CrosswordEditor({
         disabled={usableCount < 2}
         className="btn-ghost py-2.5 px-5 text-sm inline-flex items-center gap-2 disabled:opacity-40"
       >
-        <Wand2 className="w-4 h-4" /> To&apos;rni yaratish
+        <Wand2 className="w-4 h-4" /> Törni yaratiş
       </button>
 
       {skipped.length > 0 && (
         <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-neon-yellow/[0.07] border border-neon-yellow/25 text-sm">
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5 text-neon-yellow" />
           <div className="leading-relaxed">
-            <p className="font-semibold mb-0.5">To&apos;rga sig&apos;madi: {skipped.join(", ")}</p>
+            <p className="font-semibold mb-0.5">Törga siğmadi: {skipped.join(", ")}</p>
             <p className="text-muted-foreground text-xs">
               {t.lg.noCommonLetter}
             </p>
@@ -123,7 +123,7 @@ export function CrosswordEditor({
       {grid && content.rows > 0 && (
         <div>
           <p className="eyebrow mb-2">
-            {t.lg.result} <span className="numeric">{content.words.length}</span> so&apos;z,{" "}
+            {t.lg.result} <span className="numeric">{content.words.length}</span> söz,{" "}
             <span className="numeric">{content.rows}</span>×<span className="numeric">{content.cols}</span>
           </p>
           <div className="overflow-x-auto p-3 rounded-xl bg-surface/40 border border-border">

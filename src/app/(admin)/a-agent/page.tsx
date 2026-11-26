@@ -85,7 +85,7 @@ export default function AdminAgentCostsPage() {
       <div className="py-16 text-center">
         <p className="mb-4 text-sm text-destructive">{error}</p>
         <button onClick={() => void load()} className="text-sm text-primary hover:underline">
-          Qayta urinish
+          Qayta uriniş
         </button>
       </div>
     );
@@ -122,7 +122,7 @@ export default function AdminAgentCostsPage() {
           <button
             onClick={() => void load()}
             className="rounded-lg border border-border p-2 hover:bg-muted"
-            title="Yangilash"
+            title="Yangilaş"
           >
             <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
           </button>
@@ -152,10 +152,10 @@ export default function AdminAgentCostsPage() {
           </div>
 
           <div className="text-right">
-            <div className="text-sm text-muted-foreground">Bitta faol foydalanuvchi</div>
+            <div className="text-sm text-muted-foreground">Bitta faol foydalanuvçi</div>
             <div className="font-display text-2xl font-bold">{usd(t.costPerActiveUserUsd)}</div>
             <div className="text-xs text-muted-foreground">
-              {t.activeUserCount} ta faol · obuna narxidan past bo'lishi kerak
+              {t.activeUserCount} ta faol · obuna narxidan past bölişi kerak
             </div>
           </div>
         </div>
@@ -193,9 +193,9 @@ export default function AdminAgentCostsPage() {
       <div className="rounded-2xl border border-border p-6">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="font-semibold">Kesh tejami</h2>
+            <h2 className="font-semibold">Keş tejami</h2>
             <p className="text-sm text-muted-foreground">
-              Keshsiz xarajat taxminan {usd(t.costUsd + report.cache.savingsUsd)} bo'lardi
+              Keşsiz xarajat taxminan {usd(t.costUsd + report.cache.savingsUsd)} bölardi
             </p>
           </div>
           <div className="text-right">
@@ -209,7 +209,7 @@ export default function AdminAgentCostsPage() {
         <div className="grid gap-3 sm:grid-cols-4">
           <CacheStat label="Darslar" hits={report.cache.lesson} entries={report.cache.cachedEntries.lesson} />
           <CacheStat label="Testlar" hits={report.cache.quiz} entries={report.cache.cachedEntries.quiz} />
-          <CacheStat label="Topshiriqlar" hits={report.cache.task} entries={report.cache.cachedEntries.task} />
+          <CacheStat label="Topşiriqlar" hits={report.cache.task} entries={report.cache.cachedEntries.task} />
           <CacheStat label="Ovoz" hits={report.cache.voiceHits} entries={report.cache.cachedEntries.voice} />
         </div>
       </div>
@@ -263,16 +263,16 @@ export default function AdminAgentCostsPage() {
       {/* Eng qimmat foydalanuvchilar */}
       {report.topUsers.length > 0 && (
         <div className="rounded-2xl border border-border p-6">
-          <h2 className="mb-1 font-semibold">Eng ko'p xarajat qilganlar</h2>
+          <h2 className="mb-1 font-semibold">Eng köp xarajat qilganlar</h2>
           <p className="mb-4 text-sm text-muted-foreground">
-            Zarar shu ro'yxatning yuqorisidan boshlanadi — kunlik chegarani shularga qarab sozlang
+            Zarar şu röyxatning yuqorisidan boşlanadi — kunlik çegarani şularga qarab sozlang
           </p>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                  <th className="pb-2 font-medium">Foydalanuvchi</th>
+                  <th className="pb-2 font-medium">Foydalanuvçi</th>
                   <th className="pb-2 text-right font-medium">Xabar</th>
                   <th className="pb-2 text-right font-medium">Token</th>
                   <th className="pb-2 text-right font-medium">TTS belgi</th>
@@ -305,14 +305,14 @@ export default function AdminAgentCostsPage() {
         <div>
           <p className="mb-2 text-muted-foreground">
             Hisob quyidagi narxlarga asoslangan. Ular <code>.env.local</code> orqali
-            sozlanadi — provayder tarifi o'zgarganda yangilang, aks holda marja
-            noto'g'ri ko'rinadi.
+            sozlanadi — provayder tarifi özgarganda yangilang, aks holda marja
+            notöğri körinadi.
           </p>
           <ul className="space-y-0.5 text-xs text-muted-foreground">
             <li><code>AGENT_COST_INPUT_PER_M</code> = ${report.pricing.inputPerM} / 1M token</li>
             <li><code>AGENT_COST_OUTPUT_PER_M</code> = ${report.pricing.outputPerM} / 1M token</li>
             <li><code>AGENT_COST_TTS_PER_1K</code> = ${report.pricing.ttsPer1k} / 1000 belgi</li>
-            <li><code>USD_UZS_RATE</code> = {formatNumber(report.pricing.usdUzs)} so'm</li>
+            <li><code>USD_UZS_RATE</code> = {formatNumber(report.pricing.usdUzs)} söm</li>
           </ul>
         </div>
       </div>
@@ -346,7 +346,7 @@ function CacheStat({ label, hits, entries }: { label: string; hits: number; entr
       </div>
       <div className="mt-1 text-lg font-bold">{formatNumber(hits)}</div>
       <div className="text-xs text-muted-foreground">
-        {formatNumber(entries)} ta yozuv · keshdan berilgan
+        {formatNumber(entries)} ta yozuv · keşdan berilgan
       </div>
     </div>
   );

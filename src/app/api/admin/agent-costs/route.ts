@@ -27,12 +27,12 @@ export async function GET(req: NextRequest) {
     .from('profiles').select('role').eq('id', user.id).maybeSingle();
 
   if (profile?.role !== 'admin') {
-    return Response.json({ error: 'Faqat admin uchun' }, { status: 403 });
+    return Response.json({ error: 'Faqat admin uçun' }, { status: 403 });
   }
 
   if (!hasServiceRole()) {
     return Response.json({
-      error: "SUPABASE_SERVICE_ROLE_KEY sozlanmagan — hisobot yig'ib bo'lmaydi.",
+      error: "SUPABASE_SERVICE_ROLE_KEY sozlanmagan — hisobot yiğib bölmaydi.",
     }, { status: 500 });
   }
 

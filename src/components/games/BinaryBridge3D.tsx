@@ -176,7 +176,7 @@ export default function BinaryBridge3D() {
       const bonus = 10;
       setScore((s) => s + 100);
       setCoinsEarned((c) => c + bonus);
-      toast.success(`Ko'prik qurildi! +100 ball (+${bonus} coin) 🎉`);
+      toast.success(`Köprik qurildi! +100 ball (+${bonus} coin) 🎉`);
 
       // Award coins in DB
       try {
@@ -215,11 +215,11 @@ export default function BinaryBridge3D() {
               3D BINARY BRIDGE
             </span>
             <h3 className="font-display font-bold text-base text-foreground">
-              Kosmik Bitlar Ko&apos;prigi
+              Kosmik Bitlar Köprigi
             </h3>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            3D kubiklarni bosib <code className="text-neon-cyan font-bold">1</code> (Yoqilgan) holatiga o&apos;tkazing va berilgan songa tenglang.
+            3D kubiklarni bosib <code className="text-neon-cyan font-bold">1</code> (Yoqilgan) holatiga ötkazing va berilgan songa tenglang.
           </p>
         </div>
 
@@ -241,12 +241,12 @@ export default function BinaryBridge3D() {
           </div>
           <div>
             <div className="text-[11px] font-mono text-muted-foreground uppercase">
-              Hosil qilinishi kerak bo&apos;lgan son (Target):
+              Hosil qilinişi kerak bölgan son (Target):
             </div>
             <div className="font-display font-bold text-lg text-foreground flex items-center gap-2">
               <span>{target.targetNumber}</span>
               <span className="text-xs text-neon-cyan font-mono">
-                (O&apos;nlik son)
+                (Önlik son)
               </span>
             </div>
           </div>
@@ -255,7 +255,7 @@ export default function BinaryBridge3D() {
         <div className="flex items-center gap-6">
           <div className="text-right">
             <div className="text-[11px] font-mono text-muted-foreground uppercase">
-              Siz to&apos;plagan summa:
+              Siz töplagan summa:
             </div>
             <div
               className={cn(
@@ -274,7 +274,7 @@ export default function BinaryBridge3D() {
           <button
             onClick={resetBits}
             className="p-2.5 rounded-xl bg-surface border border-border text-xs font-semibold hover:bg-card text-muted-foreground hover:text-foreground transition"
-            title="Qayta boshlash"
+            title="Qayta boşlaş"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -311,7 +311,7 @@ export default function BinaryBridge3D() {
               ⚡
             </div>
             <h3 className="font-display font-bold text-2xl text-foreground mb-1">
-              Ko&apos;prik Muvaffaqiyatli Qurildi!
+              Köprik Muvaffaqiyatli Qurildi!
             </h3>
             <p className="text-xs text-muted-foreground">
               Keyingi son yuklanmoqda...

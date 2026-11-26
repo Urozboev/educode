@@ -23,15 +23,15 @@ export function pasteLevel(ratio: number, count: number): PasteLevel {
 const STYLE: Record<Exclude<PasteLevel, "none">, { cls: string; label: string }> = {
   low: {
     cls: "text-muted-foreground bg-surface border-border",
-    label: "qisman ko'chirilgan",
+    label: "qisman köçirilgan",
   },
   medium: {
     cls: "text-neon-yellow bg-neon-yellow/10 border-neon-yellow/30",
-    label: "ko'p qismi ko'chirilgan",
+    label: "köp qismi köçirilgan",
   },
   high: {
     cls: "text-neon-red bg-neon-red/10 border-neon-red/30",
-    label: "deyarli to'liq ko'chirilgan",
+    label: "deyarli töliq köçirilgan",
   },
 };
 
@@ -53,7 +53,7 @@ export function PasteBadge({
 
   return (
     <span
-      title={`${count} marta nusxa qo'yilgan${chars != null ? `, jami ${chars} belgi` : ""} — kodning ~${ratio}% i`}
+      title={`${count} marta nusxa qöyilgan${chars != null ? `, jami ${chars} belgi` : ""} — kodning ~${ratio}% i`}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-md border font-medium flex-shrink-0",
         compact ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-1 text-[11px]",

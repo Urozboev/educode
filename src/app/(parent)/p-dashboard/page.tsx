@@ -113,7 +113,7 @@ export default function ParentDashboard() {
   // Kutilayotgan so'rovni bekor qilish / bog'langan farzandni uzish.
   // parent_links da yozish policy'si yo'q — faqat RPC orqali.
   async function removeLink(linkId: string, isPending: boolean, name: string) {
-    if (!isPending && !confirm(`${name} ro'yxatdan olib tashlansinmi? Uning ma'lumotlarini ko'ra olmay qolasiz.`)) return;
+    if (!isPending && !confirm(`${name} röyxatdan olib taşlansinmi? Uning maʼlumotlarini köra olmay qolasiz.`)) return;
     setRemoving(linkId);
     const { data, error } = await supabase.rpc("cancel_parent_link", { p_link_id: linkId });
     setRemoving(null);
@@ -136,7 +136,7 @@ export default function ParentDashboard() {
       {/* Farzand qo'shish */}
       <motion.div className="glass-card p-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
-          <UserPlus className="w-5 h-5 text-neon-blue" /> Farzand qo'shish
+          <UserPlus className="w-5 h-5 text-neon-blue" /> Farzand qöşiş
         </h2>
 
         <div className="flex gap-2 mb-4">
@@ -175,7 +175,7 @@ export default function ParentDashboard() {
               <input value={emailInput} onChange={e => setEmailInput(e.target.value)} type="email"
                 placeholder={t.parent.emailPh} className="input-field flex-1" />
               <button onClick={addByEmail} disabled={submitting} className="btn-primary py-3 px-6 text-sm flex items-center gap-2 disabled:opacity-50">
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />} So'rov yuborish
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />} Sörov yuboriş
               </button>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function ParentDashboard() {
       {pending.length > 0 && (
         <div>
           <h3 className="font-semibold text-sm text-muted-foreground mb-3 flex items-center gap-2">
-            <Clock className="w-4 h-4" /> Tasdiqlanishi kutilmoqda
+            <Clock className="w-4 h-4" /> Tasdiqlanişi kutilmoqda
           </h3>
           <div className="space-y-2">
             {pending.map(c => (
@@ -196,7 +196,7 @@ export default function ParentDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-sm">{c.full_name}</p>
-                  <p className="text-xs text-neon-yellow">Farzand tasdiqlashini kutmoqda...</p>
+                  <p className="text-xs text-neon-yellow">Farzand tasdiqlaşini kutmoqda...</p>
                 </div>
                 <Clock className="w-4 h-4 text-neon-yellow" />
                 <button onClick={() => removeLink(c.link_id, true, c.full_name)}

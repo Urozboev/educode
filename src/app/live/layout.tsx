@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "O'yinga kirish",
-  description: "O'qituvchi bergan PIN kod bilan dars o'yiniga qo'shiling.",
+  title: "Öyinga kiriş",
+  description: "Öqituvçi bergan PIN kod bilan dars öyiniga qöşiling.",
   robots: { index: false, follow: false },
 };
 

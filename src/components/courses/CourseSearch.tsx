@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Loader2, FileText, Type } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { searchVariants } from "@/lib/uz-alphabet";
 
 /**
  * Kurs ichida qidiruv.
@@ -44,13 +45,24 @@ export function CourseSearch({ courseId, courseSlug }: { courseId: string; cours
       return;
     }
     setBusy(true);
-    const { data, error } = await supabase.rpc("search_course_topics", {
-      p_course_id: courseId,
-      p_query: query.trim(),
-    });
+    // Kontent yangi alifboda, foydalanuvchi esa ko'pincha eski yozuvda
+    // ("o'zgaruvchi") yozadi — so'rov ikkala shaklda parallel yuboriladi
+    const results = await Promise.all(
+      searchVariants(query).map((v) =>
+        supabase.rpc("search_course_topics", { p_course_id: courseId, p_query: v }),
+      ),
+    );
+    const seen = new Map<string, Hit>();
+    for (const { data } of results) {
+      for (const h of (data ?? []) as Hit[]) {
+        const prev = seen.get(h.topic_id);
+        // Sarlavhadagi moslik kontentdagidan ustun
+        if (!prev || (prev.match_in === "content" && h.match_in === "title")) seen.set(h.topic_id, h);
+      }
+    }
     setBusy(false);
     setSearched(true);
-    setHits(error ? [] : ((data ?? []) as Hit[]));
+    setHits([...seen.values()].sort((a, b) => a.order_index - b.order_index));
   }, [supabase, courseId]);
 
   useEffect(() => {
@@ -61,10 +73,11 @@ export function CourseSearch({ courseId, courseSlug }: { courseId: string; cours
 
   /** Topilgan so'zni parcha ichida ajratib ko'rsatish */
   function highlight(text: string) {
-    const needle = q.trim();
+    const lower = text.toLowerCase();
+    // Qaysi shakl topilgan bo'lsa, o'shani ajratamiz
+    const needle = searchVariants(q).find((v) => lower.includes(v.toLowerCase())) ?? "";
     if (!needle) return text;
-    const i = text.toLowerCase().indexOf(needle.toLowerCase());
-    if (i === -1) return text;
+    const i = lower.indexOf(needle.toLowerCase());
     return (
       <>
         {text.slice(0, i)}
@@ -108,7 +121,7 @@ export function CourseSearch({ courseId, courseSlug }: { courseId: string; cours
           >
             {hits.length === 0 ? (
               <p className="text-sm text-muted-foreground px-1 py-3">
-                &quot;{q.trim()}&quot; bo&apos;yicha hech nima topilmadi
+                &quot;{q.trim()}&quot; böyiça heç nima topilmadi
               </p>
             ) : (
               <>

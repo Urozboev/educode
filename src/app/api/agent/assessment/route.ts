@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   // yozib ham bo'lmaydi
   if (!hasServiceRole()) {
     return Response.json({
-      error: "Server sozlamasi to'liq emas: SUPABASE_SERVICE_ROLE_KEY qo'shilmagan.",
+      error: "Server sozlamasi töliq emas: SUPABASE_SERVICE_ROLE_KEY qöşilmagan.",
     }, { status: 500 });
   }
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     if (!mod) return Response.json({ error: 'Modul topilmadi' }, { status: 404 });
     if (mod.status === 'locked') {
-      return Response.json({ error: 'Bu modul hali ochilmagan' }, { status: 403 });
+      return Response.json({ error: 'Bu modul hali oçilmagan' }, { status: 403 });
     }
 
     const { data: track } = await supabase
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
 
     if (!row) return Response.json({ error: 'Test topilmadi' }, { status: 404 });
     if (row.score !== null) {
-      return Response.json({ error: 'Bu test allaqachon topshirilgan' }, { status: 409 });
+      return Response.json({ error: 'Bu test allaqaçon topşirilgan' }, { status: 409 });
     }
 
     const { data: quiz } = await admin
@@ -178,5 +178,5 @@ export async function POST(req: NextRequest) {
     return Response.json({ result, decision });
   }
 
-  return Response.json({ error: "Noma'lum amal" }, { status: 400 });
+  return Response.json({ error: "Nomaʼlum amal" }, { status: 400 });
 }

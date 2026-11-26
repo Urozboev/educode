@@ -52,7 +52,7 @@ export default function AdminAchievementsPage() {
   }
 
   async function handleDelete(a: Achievement) {
-    if (!confirm(`"${a.title}" ni o'chirish?`)) return;
+    if (!confirm(`"${a.title}" ni öçiriş?`)) return;
     await supabase.from("achievements").delete().eq("id", a.id);
     toast.success(t.admin.common.deleted); load();
   }
@@ -105,7 +105,7 @@ export default function AdminAchievementsPage() {
           <div className="flex justify-end gap-3 mt-6">
             <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
             <button onClick={handleSave} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlash</button>
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Saqlaş</button>
           </div>
         </motion.div>
       )}

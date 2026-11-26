@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: `${SITE_NAME} — ${SITE_TAGLINE}`,
     short_name: SITE_NAME,
     description:
-      "Interaktiv dasturlash kurslari, AI Sokratik mentor va gamifikatsiya — bitta platformada.",
+      "Interaktiv dasturlaş kurslari, AI Sokratik mentor va gamifikatsiya — bitta platformada.",
     start_url: "/",
     display: "standalone",
     background_color: "#f9f9fc",

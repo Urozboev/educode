@@ -220,7 +220,7 @@ export function Story({
       setScore((s) => ({ ok: s.ok + (ok ? 1 : 0), total: s.total + 1 }));
     }
     if (ok) { setAnswered((a) => ({ ...a, [i]: "ok" })); setWrong(null); }
-    else setWrong(wrongText ?? ask?.hint ?? "Yana bir bor o'ylab ko'ring.");
+    else setWrong(wrongText ?? ask?.hint ?? "Yana bir bor öylab köring.");
   }
 
   function clickNode(id: string) {
@@ -229,7 +229,7 @@ export function Story({
       setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
       setWrong(null);
     } else {
-      grade(id === ask.pick, id !== ask.pick ? `${byId.get(id)?.label ?? id} — to'g'ri emas. ${ask.hint ?? ""}`.trim() : undefined);
+      grade(id === ask.pick, id !== ask.pick ? `${byId.get(id)?.label ?? id} — töğri emas. ${ask.hint ?? ""}`.trim() : undefined);
     }
   }
   function checkMulti() {
@@ -249,7 +249,7 @@ export function Story({
           <span className="font-display font-bold text-base">{title}</span>
           {totalAsks > 0 && (
             <span className="ml-auto text-xs rounded-full bg-neon-purple/10 text-neon-purple px-2.5 py-1 font-semibold">
-              {totalAsks} ta savol · {score.ok}/{score.total} to&apos;g&apos;ri
+              {totalAsks} ta savol · {score.ok}/{score.total} töğri
             </span>
           )}
         </div>
@@ -345,7 +345,7 @@ export function Story({
           <button type="button" onClick={start} className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[1px] group">
             <span className="flex items-center gap-3 rounded-full bg-hero-gradient text-white pl-5 pr-6 py-3 font-semibold shadow-xl shadow-neon-purple/30 group-hover:scale-105 transition-transform">
               <span className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"><Play className="w-5 h-5 fill-white" /></span>
-              Ko&apos;rsatish
+              Körsatiş
             </span>
           </button>
         )}
@@ -353,7 +353,7 @@ export function Story({
 
       <div className="border-t border-border/60 bg-surface/40 px-5 py-4 space-y-3">
         <div className={cn("text-[15px] md:text-base leading-relaxed", !waiting && "min-h-[52px]")} aria-live="polite">
-          {step ? (waiting ? null : step.say) : <span className="text-muted-foreground">&quot;Ko&apos;rsatish&quot; tugmasini bosing — voqea qadamma-qadam ko&apos;rsatiladi, orada sizga savollar beriladi.</span>}
+          {step ? (waiting ? null : step.say) : <span className="text-muted-foreground">&quot;Körsatiş&quot; tugmasini bosing — voqea qadamma-qadam körsatiladi, orada sizga savollar beriladi.</span>}
         </div>
 
         {ask && (
@@ -365,13 +365,13 @@ export function Story({
             {waiting && ask.pick && (
               <p className="text-sm text-muted-foreground flex items-center gap-1.5">
                 <MousePointerClick className="w-4 h-4" />
-                {Array.isArray(ask.pick) ? "Sahnadagi kerakli qurilmalarni bosib belgilang, keyin «Tekshirish»." : "Javob uchun sahnadagi qurilmani bosing."}
+                {Array.isArray(ask.pick) ? "Sahnadagi kerakli qurilmalarni bosib belgilang, keyin «Tekşiriş»." : "Javob uçun sahnadagi qurilmani bosing."}
               </p>
             )}
             {waiting && ask.options && (
               <div className="flex flex-wrap gap-2">
                 {ask.options.map((o, k) => (
-                  <button key={o} type="button" onClick={() => grade(k === ask.answer, `«${o}» — to'g'ri emas. ${ask.hint ?? ""}`.trim())}
+                  <button key={o} type="button" onClick={() => grade(k === ask.answer, `«${o}» — töğri emas. ${ask.hint ?? ""}`.trim())}
                     className="px-4 py-2 rounded-xl border border-border bg-card hover:border-neon-purple hover:bg-neon-purple/5 text-sm font-medium transition-colors">
                     {o}
                   </button>
@@ -380,18 +380,18 @@ export function Story({
             )}
             {waiting && Array.isArray(ask.pick) && (
               <button type="button" onClick={checkMulti} disabled={sel.length === 0}
-                className="btn-primary py-2 px-4 text-sm disabled:opacity-50">Tekshirish ({sel.length})</button>
+                className="btn-primary py-2 px-4 text-sm disabled:opacity-50">Tekşiriş ({sel.length})</button>
             )}
             {waiting && wrong && (
               <p className="text-sm text-rose-600 dark:text-rose-400 flex items-start gap-1.5"><XCircle className="w-4 h-4 shrink-0 mt-0.5" />{wrong}</p>
             )}
             {waiting && (
               <button type="button" onClick={() => { grade(false, ""); setAnswered((a) => ({ ...a, [i]: "shown" })); }}
-                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> Javobni ko&apos;rsatish</button>
+                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> Javobni körsatiş</button>
             )}
             {!waiting && (
               <p className="text-sm leading-relaxed">
-                {answered[i] === "ok" ? <b className="text-emerald-600 dark:text-emerald-400">To&apos;g&apos;ri! </b> : <b>Javob: </b>}
+                {answered[i] === "ok" ? <b className="text-emerald-600 dark:text-emerald-400">Töğri! </b> : <b>Javob: </b>}
                 {ask.explain}
               </p>
             )}
@@ -401,11 +401,11 @@ export function Story({
         {step?.panel && (!waiting || step.panelDuringAsk) && <div>{step.panel}</div>}
 
         <div className="flex flex-wrap items-center gap-2">
-          <button type="button" aria-label="Boshidan" onClick={() => { setI(-1); setPlaying(false); }}
+          <button type="button" aria-label="Boşidan" onClick={() => { setI(-1); setPlaying(false); }}
             className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center hover:bg-surface"><RotateCcw className="w-4 h-4" /></button>
           <button type="button" aria-label="Oldingi qadam" disabled={i <= 0} onClick={() => { setPlaying(false); setI((x) => Math.max(0, x - 1)); }}
             className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center hover:bg-surface disabled:opacity-40"><ChevronLeft className="w-4 h-4" /></button>
-          <button type="button" aria-label={playing ? "To'xtatish" : "Davom etish"}
+          <button type="button" aria-label={playing ? "To'xtatish" : "Davom etiş"}
             onClick={() => { if (i < 0) start(); else if (i >= steps.length - 1) { setI(0); setPlaying(true); } else setPlaying((p) => !p); }}
             className="w-11 h-11 rounded-full bg-hero-gradient text-white flex items-center justify-center shadow-lg shadow-neon-purple/20">
             {playing && !waiting ? <Pause className="w-5 h-5 fill-white" /> : <Play className="w-5 h-5 fill-white ml-0.5" />}
@@ -432,7 +432,7 @@ export function Story({
 
         {i === steps.length - 1 && totalAsks > 0 && (
           <p className="text-sm text-muted-foreground">
-            Natija: {score.ok} / {totalAsks} savolga birinchi urinishda to&apos;g&apos;ri javob berdingiz.{score.ok < totalAsks && " Qayta ko'rish uchun ⟲ ni bosing."}
+            Natija: {score.ok} / {totalAsks} savolga birinçi urinişda töğri javob berdingiz.{score.ok < totalAsks && " Qayta köriş uçun ⟲ ni bosing."}
           </p>
         )}
       </div>
@@ -449,7 +449,7 @@ export function MiniTable({ title, head, rows, highlight }: { title: string; hea
       <table className="w-full">
         <thead><tr className="text-[11px] text-muted-foreground">{head.map((h) => <th key={h} className="text-left px-3 py-1 font-medium">{h}</th>)}</tr></thead>
         <tbody>
-          {rows.length === 0 && <tr><td colSpan={head.length} className="px-3 py-2 text-muted-foreground text-xs">bo&apos;sh</td></tr>}
+          {rows.length === 0 && <tr><td colSpan={head.length} className="px-3 py-2 text-muted-foreground text-xs">böş</td></tr>}
           {rows.map((r, k) => (
             <tr key={k} className={cn("border-t border-border/50 font-mono", k === highlight && "bg-emerald-500/15")}>
               {r.map((c, j) => <td key={j} className="px-3 py-1">{c}</td>)}

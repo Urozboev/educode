@@ -10,6 +10,7 @@
 # next.js
 /.next/
 /.next-check/
+/.next-preview/
 /out/
 
 # production

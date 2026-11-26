@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { CategoryIcon } from "@/components/icons/CategoryIcon";
 import { LevelBadge } from "@/components/ui/LevelBadge";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 const categories = [
   { value: "all", label: "Barchasi" },
@@ -90,8 +91,8 @@ export default function CoursesPage() {
   }
 
   const filteredCourses = courses.filter((course) => {
-    const matchSearch = course.title.toLowerCase().includes(search.toLowerCase()) ||
-      course.description?.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = uzIncludes(course.title, search) ||
+      uzIncludes(course.description, search);
     const matchCategory = category === "all" || course.category === category;
     return matchSearch && matchCategory;
   });
@@ -132,7 +133,7 @@ export default function CoursesPage() {
       {continuing.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
           <h2 className="font-display font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Play className="w-4 h-4 text-neon-green" /> Davom ettirish
+            <Play className="w-4 h-4 text-neon-green" /> Davom ettiriş
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {continuing.map(({ enrollment, course }) => (

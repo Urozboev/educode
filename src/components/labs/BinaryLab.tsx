@@ -93,14 +93,14 @@ export function BinaryLab() {
         <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-neon-purple/[0.06] border border-neon-purple/20">
           <p className="inline-flex items-center gap-2 text-sm">
             <Target className="w-4 h-4 text-neon-purple flex-shrink-0" />
-            Ushbu sonni ikkilik ko&apos;rinishda yig&apos;ing:
+            Uşbu sonni ikkilik körinişda yiğing:
             <span className="numeric text-2xl text-neon-purple">{target}</span>
           </p>
           <button
             onClick={() => setShowHint(h => !h)}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
           >
-            <Lightbulb className="w-3.5 h-3.5" /> {showHint ? "Maslahatni yashirish" : "Maslahat"}
+            <Lightbulb className="w-3.5 h-3.5" /> {showHint ? "Maslahatni yaşiriş" : "Maslahat"}
           </button>
         </div>
       )}
@@ -111,7 +111,7 @@ export function BinaryLab() {
           animate={{ opacity: 1, y: 0 }}
           className="text-sm text-muted-foreground -mt-3"
         >
-          Eng katta o&apos;rin qiymatidan boshlang: {target} dan kichik yoki teng eng katta
+          Eng katta örin qiymatidan boşlang: {target} dan kiçik yoki teng eng katta
           darajani tanlang, qolganini ayiring va davom eting.
         </motion.p>
       )}
@@ -125,7 +125,7 @@ export function BinaryLab() {
               <button
                 onClick={() => toggle(i)}
                 aria-pressed={on}
-                aria-label={`${WEIGHTS[i]} o'rin qiymati`}
+                aria-label={`${WEIGHTS[i]} örin qiymati`}
                 className={cn(
                   "w-9 h-12 sm:w-12 sm:h-16 rounded-lg border-2 font-display font-extrabold text-lg sm:text-2xl transition-all",
                   on
@@ -182,14 +182,14 @@ export function BinaryLab() {
 
       <div className="flex flex-wrap items-center justify-center gap-3">
         <button onClick={reset} className="btn-ghost py-2.5 px-5 text-sm inline-flex items-center gap-2">
-          <RotateCcw className="w-4 h-4" /> Tozalash
+          <RotateCcw className="w-4 h-4" /> Tozalaş
         </button>
         {mode === "practice" && (
           <button
             onClick={() => { setTarget(randomTarget()); reset(); }}
             className="btn-ghost py-2.5 px-5 text-sm inline-flex items-center gap-2"
           >
-            <Shuffle className="w-4 h-4" /> Boshqa son
+            <Shuffle className="w-4 h-4" /> Boşqa son
           </button>
         )}
       </div>

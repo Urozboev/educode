@@ -72,7 +72,7 @@ export default function StudentDetailPage() {
           <h1 className="font-display font-bold text-2xl">{student.full_name}</h1>
           <div className="flex items-center gap-4 mt-1">
             <span className={cn("text-sm font-medium", getLevelColor(student.level))}>{getLevelLabel(student.level)}</span>
-            <span className="text-sm text-muted-foreground">A'zo: {formatDate(student.created_at)}</span>
+            <span className="text-sm text-muted-foreground">Aʼzo: {formatDate(student.created_at)}</span>
           </div>
         </div>
         <div className="flex items-center gap-4">

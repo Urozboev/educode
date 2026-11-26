@@ -103,7 +103,7 @@ export default function ParentCoinsPage() {
       if (data.url) {
         window.location.href = data.url; // provayder to'lov sahifasiga o'tish
       } else {
-        toast.error(data.error || "To'lov tizimi sozlanmagan");
+        toast.error(data.error || "Tölov tizimi sozlanmagan");
         setPayingProvider(null);
       }
     } catch (e: any) {
@@ -154,7 +154,7 @@ export default function ParentCoinsPage() {
               <div className="flex items-center justify-center gap-1 text-neon-yellow font-display font-bold text-xl mb-1">
                 <Coins className="w-5 h-5" />{formatNumber(pkg.coins)}
               </div>
-              <p className="text-sm font-medium">{formatNumber(pkg.uzs)} so'm</p>
+              <p className="text-sm font-medium">{formatNumber(pkg.uzs)} söm</p>
             </button>
           ))}
         </div>
@@ -189,7 +189,7 @@ export default function ParentCoinsPage() {
             <div className="flex items-start gap-3 p-3 rounded-xl bg-neon-blue/5 border border-neon-blue/20">
               <CreditCard className="w-5 h-5 text-neon-blue flex-shrink-0 mt-0.5" />
               <div className="flex-1 text-sm">
-                <p className="text-muted-foreground mb-1">{t.parent.transferToA} <strong className="text-foreground">{formatNumber(selectedPkg.uzs)} so'm</strong> {t.parent.transferToB}</p>
+                <p className="text-muted-foreground mb-1">{t.parent.transferToA} <strong className="text-foreground">{formatNumber(selectedPkg.uzs)} söm</strong> {t.parent.transferToB}</p>
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold text-base">{settings?.card_number}</span>
                   <button onClick={copyCard} className="p-1 hover:bg-accent rounded">
@@ -211,7 +211,7 @@ export default function ParentCoinsPage() {
                 {t.parent.afterTransfer}
               </p>
               <button onClick={submitRequest} disabled={submitting} className="btn-primary py-2.5 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} So'rov yuborish
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Sörov yuboriş
               </button>
             </div>
           </motion.div>
@@ -228,7 +228,7 @@ export default function ParentCoinsPage() {
                 <div className="flex items-center gap-2">
                   <Coins className="w-4 h-4 text-neon-yellow" />
                   <span className="font-medium">{formatNumber(r.amount_coins)} coin</span>
-                  <span className="text-muted-foreground">· {formatNumber(r.amount_uzs)} so'm</span>
+                  <span className="text-muted-foreground">· {formatNumber(r.amount_uzs)} söm</span>
                 </div>
                 {statusBadge(r.status)}
               </div>
@@ -244,7 +244,7 @@ export default function ParentCoinsPage() {
           <div className="space-y-2">
             {gifts.map(g => (
               <div key={g.id} className="flex items-center justify-between p-3 rounded-xl bg-surface/50 text-sm">
-                <span>{g.child?.full_name || "Farzand"} ga sovg'a qilindi</span>
+                <span>{g.child?.full_name || "Farzand"} ga sovğa qilindi</span>
                 <span className="font-bold text-neon-yellow flex items-center gap-1"><Coins className="w-3.5 h-3.5" />{g.amount}</span>
               </div>
             ))}

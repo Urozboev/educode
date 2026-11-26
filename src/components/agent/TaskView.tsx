@@ -82,9 +82,9 @@ export default function TaskView({
         body: JSON.stringify({ action: "run", taskId: task.id, code, stdin }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Ishga tushmadi");
+      if (!res.ok) throw new Error(data.error || "Işga tuşmadi");
 
-      setOutput(data.result.stderr || data.result.stdout || "(chiqish bo'sh)");
+      setOutput(data.result.stderr || data.result.stdout || "(çiqiş böş)");
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -141,11 +141,11 @@ export default function TaskView({
           {task.examples.map((ex, i) => (
             <div key={i} className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl border border-border">
-                <div className="border-b border-border px-3 py-1.5 text-xs text-muted-foreground">Kirish</div>
+                <div className="border-b border-border px-3 py-1.5 text-xs text-muted-foreground">Kiriş</div>
                 <pre className="overflow-x-auto p-3 text-[13px]">{ex.input || "(bo'sh)"}</pre>
               </div>
               <div className="rounded-xl border border-border">
-                <div className="border-b border-border px-3 py-1.5 text-xs text-muted-foreground">Chiqish</div>
+                <div className="border-b border-border px-3 py-1.5 text-xs text-muted-foreground">Çiqiş</div>
                 <pre className="overflow-x-auto p-3 text-[13px]">{ex.expected_output}</pre>
               </div>
             </div>
@@ -153,7 +153,7 @@ export default function TaskView({
           {task.hiddenCount > 0 && (
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Lock className="h-3 w-3" />
-              Yana {task.hiddenCount} ta yashirin test — ular chegara holatlarni tekshiradi
+              Yana {task.hiddenCount} ta yaşirin test — ular çegara holatlarni tekşiradi
             </p>
           )}
         </div>
@@ -181,7 +181,7 @@ export default function TaskView({
       {/* Sinash */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-xs text-muted-foreground">Kirish (stdin)</label>
+          <label className="mb-1.5 block text-xs text-muted-foreground">Kiriş (stdin)</label>
           <textarea
             value={stdin}
             onChange={(e) => setStdin(e.target.value)}
@@ -190,7 +190,7 @@ export default function TaskView({
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs text-muted-foreground">Chiqish</label>
+          <label className="mb-1.5 block text-xs text-muted-foreground">Çiqiş</label>
           <pre className="h-[86px] overflow-auto rounded-xl border border-border bg-muted/50 p-3 font-mono text-[13px]">
             {output ?? "—"}
           </pre>
@@ -210,7 +210,7 @@ export default function TaskView({
           className="flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-medium hover:bg-muted disabled:opacity-40"
         >
           {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-          Sinab ko'rish
+          Sinab köriş
         </button>
 
         <button
@@ -219,7 +219,7 @@ export default function TaskView({
           className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-40"
         >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          Topshirish
+          Topşiriş
         </button>
 
         {task.hints.length > hintsShown && (
@@ -254,7 +254,7 @@ export default function TaskView({
           <div className="mb-4 flex items-center justify-between">
             <div>
               <div className="text-lg font-bold">
-                {result.passedCount} / {result.total} test o'tdi
+                {result.passedCount} / {result.total} test ötdi
               </div>
               <div className="text-sm text-muted-foreground">Natija: {result.score}%</div>
             </div>
@@ -277,15 +277,15 @@ export default function TaskView({
                   </span>
                   <span className="font-medium">
                     Test {o.index}
-                    {o.isHidden && <span className="ml-2 text-xs text-muted-foreground">(yashirin)</span>}
+                    {o.isHidden && <span className="ml-2 text-xs text-muted-foreground">(yaşirin)</span>}
                   </span>
                 </div>
 
                 {!o.passed && !o.isHidden && (
                   <div className="ml-7 mt-2 space-y-1 font-mono text-xs">
-                    <div className="text-muted-foreground">Kirish: {o.input || "(bo'sh)"}</div>
+                    <div className="text-muted-foreground">Kiriş: {o.input || "(bo'sh)"}</div>
                     <div className="text-muted-foreground">Kutilgan: {o.expected}</div>
-                    <div className="text-destructive">Chiqdi: {o.actual || "(bo'sh)"}</div>
+                    <div className="text-destructive">Çiqdi: {o.actual || "(bo'sh)"}</div>
                   </div>
                 )}
 
@@ -305,7 +305,7 @@ export default function TaskView({
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
               >
                 <ListChecks className="h-4 w-4" />
-                Rejaga qaytish
+                Rejaga qaytiş
               </Link>
             ) : (
               <button
@@ -313,7 +313,7 @@ export default function TaskView({
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-medium hover:bg-muted"
               >
                 <RotateCcw className="h-4 w-4" />
-                Yana urinish
+                Yana uriniş
               </button>
             )}
           </div>

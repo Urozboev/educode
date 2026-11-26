@@ -42,7 +42,7 @@ export default function PortfoliosPage() {
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
           {t.explore.portfoliosSubtitle}{" "}
-          <Link href="/portfolio" className="text-neon-purple hover:underline">{t.explore.portfoliosLink}</Link> oching.
+          <Link href="/portfolio" className="text-neon-purple hover:underline">{t.explore.portfoliosLink}</Link> oçing.
         </p>
       </motion.div>
 

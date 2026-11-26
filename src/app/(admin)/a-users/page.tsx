@@ -12,6 +12,7 @@ import {
   UserMinus, Link2, X, Loader2, GraduationCap
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 export default function AdminUsersPage() {
   const { t } = useI18n();
@@ -59,7 +60,7 @@ export default function AdminUsersPage() {
 
   async function changeRole(userId: string, newRole: string) {
     if (!(await updateProfile(userId, { role: newRole }))) return;
-    toast.success(`Rol "${newRole}" ga o'zgartirildi`);
+    toast.success(`Rol "${newRole}" ga özgartirildi`);
     load();
   }
 
@@ -74,8 +75,8 @@ export default function AdminUsersPage() {
     if (!user) return;
     const amt = prompt(
       `${user.full_name} — Hozirgi balans: ${user.coins} coin\n\n` +
-      `Qo'shish uchun musbat son kiriting (masalan: 50)\n` +
-      `Ayirish uchun manfiy son kiriting (masalan: -30)`
+      `Qöşiş uçun musbat son kiriting (masalan: 50)\n` +
+      `Ayiriş uçun manfiy son kiriting (masalan: -30)`
     );
     if (!amt) return;
     const amount = parseInt(amt);
@@ -143,7 +144,7 @@ export default function AdminUsersPage() {
   const selectedTeacherProfile = users.find(u => u.id === selectedTeacher);
 
   const filtered = users.filter(u => {
-    const matchSearch = u.full_name.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = uzIncludes(u.full_name, search);
     const matchRole = roleFilter === "all" || u.role === roleFilter;
     return matchSearch && matchRole;
   });
@@ -158,7 +159,7 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-bold text-3xl">{t.admin.users}</h1>
-          <p className="text-muted-foreground text-sm">{users.length} ta foydalanuvchi</p>
+          <p className="text-muted-foreground text-sm">{users.length} ta foydalanuvçi</p>
         </motion.div>
         {teachers.length > 0 && (
           <div className="flex gap-2">
@@ -183,12 +184,12 @@ export default function AdminUsersPage() {
                 </div>
                 <div>
                   <h2 className="font-semibold">{selectedTeacherProfile.full_name}</h2>
-                  <p className="text-xs text-neon-blue">O'qituvchi · {teacherStudents.length} ta talaba biriktirilgan</p>
+                  <p className="text-xs text-neon-blue">Öqituvçi · {teacherStudents.length} ta talaba biriktirilgan</p>
                 </div>
               </div>
               <div className="flex gap-2">
                 <button onClick={assignAllStudents} className="text-xs px-3 py-1.5 rounded-lg bg-neon-green/10 text-neon-green hover:bg-neon-green/20 transition-all">
-                  Hammasini biriktirish
+                  Hammasini biriktiriş
                 </button>
                 <button onClick={() => setShowAssignPanel(false)} className="p-1.5 hover:bg-accent rounded-lg">
                   <X className="w-5 h-5" />

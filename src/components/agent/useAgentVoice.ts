@@ -10,6 +10,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { stripForSpeech } from "@/lib/agent/speech-text";
+import { toOldUz } from "@/lib/uz-alphabet";
 
 export function useAgentVoice(lang = "uz") {
   const [speaking, setSpeaking] = useState(false);
@@ -46,7 +47,8 @@ export function useAgentVoice(lang = "uz") {
   /** Provayder yo'q bo'lganda — brauzer sintezi. Sifat pastroq, lekin jim qolmaydi */
   const speakInBrowser = useCallback((text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance(text);
+    // Brauzer ovozlari yangi alifbo harflarini (ş, ç, ğ, ö) tanimasligi mumkin
+    const u = new SpeechSynthesisUtterance(lang === "uz" ? toOldUz(text) : text);
     u.lang = lang === "uz" ? "uz-UZ" : lang === "ru" ? "ru-RU" : "en-US";
     u.onstart = () => setSpeaking(true);
     u.onend = () => setSpeaking(false);

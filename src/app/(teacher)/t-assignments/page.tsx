@@ -107,7 +107,7 @@ export default function TeacherAssignmentsPage() {
   }
 
   async function deleteGroup(id: string) {
-    if (!confirm("Guruhni o'chirish?")) return;
+    if (!confirm("Guruhni öçiriş?")) return;
     await supabase.from("teacher_groups").delete().eq("id", id);
     toast.success(t.teacher.asg.deleted); load();
   }
@@ -143,14 +143,14 @@ export default function TeacherAssignmentsPage() {
       <div className="flex items-center justify-between">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display font-bold text-3xl mb-1">{t.teacher.asg.assignTitle}</h1>
-          <p className="text-muted-foreground text-sm">{assignments.length} ta topshiriq · {groups.length} ta guruh</p>
+          <p className="text-muted-foreground text-sm">{assignments.length} ta topşiriq · {groups.length} ta guruh</p>
         </motion.div>
         <div className="flex gap-2">
           <button onClick={() => setShowGroupForm(!showGroupForm)} className="btn-ghost py-2.5 px-4 text-sm flex items-center gap-2">
             <Users className="w-4 h-4" /> {t.teacher.asg.createGroup}
           </button>
           <button onClick={() => setShowForm(true)} className="btn-primary py-2.5 px-5 flex items-center gap-2 text-sm">
-            <Plus className="w-4 h-4" /> Biriktirish
+            <Plus className="w-4 h-4" /> Biriktiriş
           </button>
         </div>
       </div>
@@ -214,7 +214,7 @@ export default function TeacherAssignmentsPage() {
             <div className="flex justify-end gap-3 mt-4">
               <button onClick={() => setShowForm(false)} className="btn-ghost py-2 px-5 text-sm">{t.common.cancel}</button>
               <button onClick={handleSave} disabled={saving} className="btn-primary py-2 px-5 text-sm flex items-center gap-2 disabled:opacity-50">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Biriktirish</button>
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Biriktiriş</button>
             </div>
           </motion.div>
         )}

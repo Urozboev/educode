@@ -114,7 +114,7 @@ export default function TeacherDashboardPage() {
         kind: "game" as const,
         name: nameMap[g.user_id] || t.teacher.unknown,
         ok: g.total_count > 0 && g.correct_count * 2 >= g.total_count,
-        detail: `O'yin · ${g.correct_count}/${g.total_count} to'g'ri`,
+        detail: `Öyin · ${g.correct_count}/${g.total_count} töğri`,
         at: g.created_at,
       })),
     ].sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 10);
@@ -176,8 +176,8 @@ export default function TeacherDashboardPage() {
           <ol className="space-y-3 mb-7">
             {[
               { n: "01", t: "Guruh yarating", d: "Masalan “9-A sinf”" },
-              { n: "02", t: "Kodni talabalarga ayting", d: "Doskaga yozing yoki guruhga tashlang" },
-              { n: "03", t: "Dars o'yinini boshlang", d: "Tayyor o'yinlardan foydalaning yoki o'zingiz tuzing" },
+              { n: "02", t: "Kodni talabalarga ayting", d: "Doskaga yozing yoki guruhga taşlang" },
+              { n: "03", t: "Dars öyinini boşlang", d: "Tayyor öyinlardan foydalaning yoki özingiz tuzing" },
             ].map(s => (
               <li key={s.n} className="flex gap-3">
                 <span className="numeric text-sm text-muted-foreground/50 mt-0.5">{s.n}</span>
@@ -222,7 +222,7 @@ export default function TeacherDashboardPage() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="eyebrow">{t.teacher.dash.groupCodes}</h2>
             <Link href="/t-groups" className="text-sm text-neon-purple hover:underline inline-flex items-center gap-1">
-              Boshqarish <ChevronRight className="w-4 h-4" />
+              Boşqariş <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -286,7 +286,7 @@ export default function TeacherDashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display font-semibold text-lg">{t.teacher.students}</h2>
               <Link href="/t-students" className="text-sm text-neon-purple hover:underline flex items-center gap-1">
-                Barchasi <ChevronRight className="w-4 h-4" />
+                Barçasi <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
 

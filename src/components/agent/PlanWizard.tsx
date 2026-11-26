@@ -40,9 +40,9 @@ interface PlacementResult {
  * u tarjima QILINMAYDI. Ekranga `label` chiqadi.
  */
 const DIRECTIONS = (t: Dictionary) => [
-  { key: "Frontend dasturchi", label: t.agent.dirFrontend, desc: t.agent.dirFrontendDesc },
-  { key: "Backend dasturchi", label: t.agent.dirBackend, desc: t.agent.dirBackendDesc },
-  { key: "Mobil dasturchi", label: t.agent.dirMobile, desc: t.agent.dirMobileDesc },
+  { key: "Frontend dasturçi", label: t.agent.dirFrontend, desc: t.agent.dirFrontendDesc },
+  { key: "Backend dasturçi", label: t.agent.dirBackend, desc: t.agent.dirBackendDesc },
+  { key: "Mobil dasturçi", label: t.agent.dirMobile, desc: t.agent.dirMobileDesc },
   { key: "Data Analitik", label: t.agent.dirData, desc: t.agent.dirDataDesc },
   { key: "DevOps muhandis", label: t.agent.dirDevops, desc: t.agent.dirDevopsDesc },
   { key: "Kompyuter savodxonligi", label: t.agent.dirLiteracy, desc: t.agent.dirLiteracyDesc },
@@ -164,8 +164,8 @@ export default function PlanWizard() {
         <h2 className="mb-2 text-lg font-semibold">Reja tuzilmoqda...</h2>
         <p className="text-sm text-muted-foreground">
           {result
-            ? `Darajangiz: ${LEVEL_LABELS[result.level] || result.level}. Shunga mos yo'l tuzyapman.`
-            : "Bir necha soniya kuting."}
+            ? `Darajangiz: ${LEVEL_LABELS[result.level] || result.level}. Şunga mos yöl tuzyapman.`
+            : "Bir neça soniya kuting."}
         </p>
       </div>
     );
@@ -180,7 +180,7 @@ export default function PlanWizard() {
           <h2 className="text-xl font-bold">Darajangizni aniqlaymiz</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {questions.length} ta savol. Bilmasangiz &quot;Bilmayman&quot; ni tanlang —
-            bu xato javobdan yaxshiroq, chunki reja aniqroq chiqadi.
+            bu xato javobdan yaxşiroq, çunki reja aniqroq çiqadi.
           </p>
         </div>
 
@@ -233,7 +233,7 @@ export default function PlanWizard() {
             className="ml-auto flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-40"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-            Yakunlash
+            Yakunlaş
           </button>
         </div>
       </div>
@@ -247,7 +247,7 @@ export default function PlanWizard() {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <Target className="h-7 w-7" />
         </div>
-        <h1 className="text-2xl font-bold">Qaysi yo'nalishni o'rganmoqchisiz?</h1>
+        <h1 className="text-2xl font-bold">Qaysi yönalişni örganmoqçisiz?</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t.agent.wizardHint}
         </p>
@@ -284,7 +284,7 @@ export default function PlanWizard() {
       <div>
         <label className="mb-2 flex items-center gap-2 text-sm font-medium">
           <Clock className="h-4 w-4" />
-          Haftasiga necha soat ajrata olasiz? — {weeklyHours} soat
+          Haftasiga neça soat ajrata olasiz? — {weeklyHours} soat
         </label>
         <input
           type="range"
@@ -305,14 +305,14 @@ export default function PlanWizard() {
           className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground disabled:opacity-40"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-          Darajani aniqlab, reja tuzish
+          Darajani aniqlab, reja tuziş
         </button>
         <button
           onClick={() => buildPlan("zero")}
           disabled={!chosen || loading}
           className="flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-medium hover:bg-muted disabled:opacity-40"
         >
-          Testsiz, noldan boshlash
+          Testsiz, noldan boşlaş
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>

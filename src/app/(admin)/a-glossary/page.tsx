@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/uz";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 const CATEGORIES = (t: Dictionary) => [
   { value: "programming", label: t.admin.set.catProgramming },
@@ -59,9 +60,9 @@ export default function AdminGlossaryPage() {
 
   const filtered = useMemo(() => terms.filter(t =>
     (filterCat === "all" || t.category === filterCat) &&
-    (t.term.toLowerCase().includes(search.toLowerCase()) ||
-      t.term_en?.toLowerCase().includes(search.toLowerCase()) ||
-      t.definition.toLowerCase().includes(search.toLowerCase()))
+    (uzIncludes(t.term, search) ||
+      uzIncludes(t.term_en, search) ||
+      uzIncludes(t.definition, search))
   ), [terms, search, filterCat]);
 
   function openNew() { setForm(empty); setEditId(null); setShowForm(true); }
@@ -118,7 +119,7 @@ export default function AdminGlossaryPage() {
   }
 
   async function del(g: GlossaryTerm) {
-    if (!confirm(`"${g.term}" o'chirilsinmi?`)) return;
+    if (!confirm(`"${g.term}" öçirilsinmi?`)) return;
     await supabase.from("glossary_terms").delete().eq("id", g.id);
     toast.success(t.admin.common.deleted);
     load();
@@ -129,7 +130,7 @@ export default function AdminGlossaryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display font-bold text-2xl flex items-center gap-2">
-            <BookMarked className="w-6 h-6 text-neon-purple" /> Terminlar lug'ati
+            <BookMarked className="w-6 h-6 text-neon-purple" /> Terminlar luğati
           </h1>
           <p className="text-sm text-muted-foreground">{terms.length} ta termin</p>
         </div>
@@ -215,7 +216,7 @@ export default function AdminGlossaryPage() {
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input value={search} onChange={e => setSearch(e.target.value)} className="input-field pl-10" placeholder="Termin bo'yicha qidirish..." />
+          <input value={search} onChange={e => setSearch(e.target.value)} className="input-field pl-10" placeholder="Termin böyiça qidiriş..." />
         </div>
         <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="input-field w-auto">
           <option value="all">{t.admin.gls.allFields}</option>

@@ -21,6 +21,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { uzIncludes } from "@/lib/uz-alphabet";
 
 type FormType = {
   title: string;
@@ -223,7 +224,7 @@ export default function AdminChallengesPage() {
   }
 
   async function handleDelete(c: Challenge) {
-    if (!confirm(`"${c.title}" ni o'chirish?`)) return;
+    if (!confirm(`"${c.title}" ni öçiriş?`)) return;
     await supabase.from("challenges").delete().eq("id", c.id);
     toast.success(t.admin.common.deleted);
     // Ommaviy sahifalar keshini tozalash (lib/cache.ts)
@@ -232,7 +233,7 @@ export default function AdminChallengesPage() {
   }
 
   const filtered = challenges.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase()),
+    uzIncludes(c.title, search),
   );
 
   return (
@@ -243,7 +244,7 @@ export default function AdminChallengesPage() {
             {t.admin.chl.pageTitle}
           </h1>
           <p className="text-muted-foreground text-sm">
-            {challenges.length} ta topshiriq
+            {challenges.length} ta topşiriq
           </p>
         </div>
         <button
@@ -286,7 +287,7 @@ export default function AdminChallengesPage() {
                 ) : (
                   <Sparkles className="w-3.5 h-3.5" />
                 )}
-                AI bilan to'ldirish
+                AI bilan töldiriş
               </button>
               <button
                 onClick={() => setShowForm(false)}
@@ -409,7 +410,7 @@ export default function AdminChallengesPage() {
             </div>
             <div className="md:col-span-2">
               <label className="text-sm font-medium mb-1 block">
-                Test case'lar (JSON)
+                Test caseʼlar (JSON)
               </label>
               <textarea
                 value={form.test_cases}
@@ -422,7 +423,7 @@ export default function AdminChallengesPage() {
             </div>
             <div className="md:col-span-2">
               <label className="text-sm font-medium mb-1 block">
-                Yashirin test case'lar (JSON)
+                Yaşirin test caseʼlar (JSON)
               </label>
               <textarea
                 value={form.hidden_test_cases}
@@ -450,7 +451,7 @@ export default function AdminChallengesPage() {
               ) : (
                 <Save className="w-4 h-4" />
               )}{" "}
-              Saqlash
+              Saqlaş
             </button>
           </div>
         </motion.div>

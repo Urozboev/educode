@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const title = ch.title;
   const description =
     ch.description?.slice(0, 200) ||
-    `${ch.title} — ${SITE_NAME} platformasidagi dasturlash topshirig'i.`;
+    `${ch.title} — ${SITE_NAME} platformasidagi dasturlaş topşiriği.`;
   const url = absUrl(`/challenges/${ch.slug}`);
   const langs = (ch.languages || []).join(", ");
   const og = ogImageUrl({

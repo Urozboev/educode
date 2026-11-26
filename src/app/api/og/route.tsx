@@ -10,7 +10,7 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const title = (searchParams.get("title") || "MirAcademy").slice(0, 80);
-  const subtitle = (searchParams.get("subtitle") || "Dasturlashni o'ynab o'rgan").slice(0, 120);
+  const subtitle = (searchParams.get("subtitle") || "Dasturlaşni öynab örgan").slice(0, 120);
   const type = searchParams.get("type") || "default";
 
   // Type → rang/emoji
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     course: { label: "KURS", color: "#8A7BF7", emoji: "📚" },
     challenge: { label: "TOPSHIRIQ", color: "#4FC3F7", emoji: "⚡" },
     topic: { label: "MAVZU", color: "#3DD9AC", emoji: "🎯" },
-    default: { label: "TA'LIM PLATFORMASI", color: "#8A7BF7", emoji: "🚀" },
+    default: { label: "TAʼLIM PLATFORMASI", color: "#8A7BF7", emoji: "🚀" },
   };
   const badge = typeBadge[type] || typeBadge.default;
 
@@ -154,7 +154,7 @@ export async function GET(req: NextRequest) {
         >
           <span style={{ display: "flex" }}>miracademy.uz · interaktiv kurslar</span>
           <span style={{ display: "flex", color: "#a0a0b0" }}>
-            o'zbek tilida · bepul
+            özbek tilida · bepul
           </span>
         </div>
       </div>

@@ -63,7 +63,7 @@ export default function AdminPaymentsPage() {
   async function review(id: string, approve: boolean) {
     let note: string | null = null;
     if (!approve) {
-      note = prompt("Rad etish sababi (ixtiyoriy):") || null;
+      note = prompt("Rad etiş sababi (ixtiyoriy):") || null;
     }
     setActing(id);
     const { data, error } = await supabase.rpc("approve_coin_purchase", {
@@ -119,7 +119,7 @@ export default function AdminPaymentsPage() {
                     <p className="font-semibold">{r.parent_name}</p>
                     <div className="flex flex-wrap items-center gap-3 mt-1 text-sm">
                       <span className="flex items-center gap-1 text-neon-yellow font-bold"><Coins className="w-4 h-4" />{formatNumber(r.amount_coins)} coin</span>
-                      <span className="flex items-center gap-1 text-muted-foreground"><CreditCard className="w-4 h-4" />{formatNumber(r.amount_uzs)} so'm</span>
+                      <span className="flex items-center gap-1 text-muted-foreground"><CreditCard className="w-4 h-4" />{formatNumber(r.amount_uzs)} söm</span>
                       <span className="text-xs text-muted-foreground">{formatRelativeDate(r.created_at)}</span>
                     </div>
                     {r.payment_note && (
@@ -135,7 +135,7 @@ export default function AdminPaymentsPage() {
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={() => review(r.id, true)} disabled={acting === r.id}
                       className="px-4 py-2 rounded-xl bg-neon-green/10 text-neon-green border border-neon-green/30 hover:bg-neon-green/20 text-sm font-medium flex items-center gap-1.5 disabled:opacity-50">
-                      {acting === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Tasdiqlash
+                      {acting === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Tasdiqlaş
                     </button>
                     <button onClick={() => review(r.id, false)} disabled={acting === r.id}
                       className="px-4 py-2 rounded-xl bg-neon-red/10 text-neon-red border border-neon-red/30 hover:bg-neon-red/20 text-sm font-medium flex items-center gap-1.5 disabled:opacity-50">

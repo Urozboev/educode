@@ -355,7 +355,7 @@ function ActivityStrip({ weeks }: { weeks: { week: string; count: number }[] }) 
           return (
             <div
               key={w.week}
-              title={`${w.week} — ${w.count} ta yechim`}
+              title={`${w.week} — ${w.count} ta yeçim`}
               className={cn(
                 "flex-1 h-9 rounded-md border transition-colors",
                 level === 0 && "bg-surface border-border/50",

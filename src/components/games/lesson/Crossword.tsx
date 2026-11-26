@@ -271,7 +271,7 @@ export function Crossword({
           onClick={() => onFinish({ score, maxScore, correct: solvedCount, total })}
           className="btn-primary py-2.5 px-6 text-sm"
         >
-          Yakunlash
+          Yakunlaş
         </button>
       </div>
 
@@ -282,7 +282,7 @@ export function Crossword({
             animate={{ opacity: 1, y: 0 }}
             className="mt-4 text-center font-semibold text-neon-green"
           >
-            Krossvord to&apos;liq yechildi
+            Krossvord töliq yeçildi
           </motion.p>
         )}
       </AnimatePresence>

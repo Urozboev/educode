@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
   if (!hasServiceRole()) {
     return Response.json({
-      error: "Server sozlamasi to'liq emas: SUPABASE_SERVICE_ROLE_KEY qo'shilmagan.",
+      error: "Server sozlamasi töliq emas: SUPABASE_SERVICE_ROLE_KEY qöşilmagan.",
     }, { status: 500 });
   }
 
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     if (!mod) return Response.json({ error: 'Modul topilmadi' }, { status: 404 });
     if (mod.status === 'locked') {
-      return Response.json({ error: 'Bu modul hali ochilmagan' }, { status: 403 });
+      return Response.json({ error: 'Bu modul hali oçilmagan' }, { status: 403 });
     }
 
     const { data: track } = await supabase
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!taskId || !task) {
-      return Response.json({ error: error || 'Topshiriq tayyorlanmadi' }, { status: 502 });
+      return Response.json({ error: error || 'Topşiriq tayyorlanmadi' }, { status: 502 });
     }
 
     const { data: row, error: insErr } = await supabase
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     const { data: task } = await admin
       .from('agent_tasks').select('language').eq('id', taskId).maybeSingle();
 
-    if (!task) return Response.json({ error: 'Topshiriq topilmadi' }, { status: 404 });
+    if (!task) return Response.json({ error: 'Topşiriq topilmadi' }, { status: 404 });
 
     const result = await runCode(task.language, code, typeof stdin === 'string' ? stdin : '');
     return Response.json({ result });
@@ -136,12 +136,12 @@ export async function POST(req: NextRequest) {
       .eq('kind', 'task')
       .maybeSingle();
 
-    if (!row) return Response.json({ error: 'Topshiriq topilmadi' }, { status: 404 });
+    if (!row) return Response.json({ error: 'Topşiriq topilmadi' }, { status: 404 });
 
     const { data: taskRow } = await admin
       .from('agent_tasks').select('payload').eq('id', row.payload?.task_id).maybeSingle();
 
-    if (!taskRow) return Response.json({ error: 'Topshiriq matni topilmadi' }, { status: 500 });
+    if (!taskRow) return Response.json({ error: 'Topşiriq matni topilmadi' }, { status: 500 });
 
     const result = await gradeSubmission(taskRow.payload as TaskPayload, code);
 
@@ -177,5 +177,5 @@ export async function POST(req: NextRequest) {
     return Response.json({ result, masteryScore });
   }
 
-  return Response.json({ error: "Noma'lum amal" }, { status: 400 });
+  return Response.json({ error: "Nomaʼlum amal" }, { status: 400 });
 }

@@ -26,7 +26,7 @@ export default function Error({
       code="500"
       token="INTERNAL_ERROR"
       command={`miracademy render "${pathname || "/"}"`}
-      steps={["sahifa tayyorlanmoqda", "bajarilish to'xtadi"]}
+      steps={["sahifa tayyorlanmoqda", "bajariliş töxtadi"]}
       detail={error.digest ? `digest: ${error.digest}` : undefined}
       tone="coral"
       title={t.errors.serverTitle}

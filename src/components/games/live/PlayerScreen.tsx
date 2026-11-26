@@ -172,7 +172,7 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
     return (
       <Center>
         <Trophy className="w-14 h-14 text-neon-yellow mb-4" />
-        <h1 className="font-display font-extrabold text-3xl mb-1">O&apos;yin tugadi</h1>
+        <h1 className="font-display font-extrabold text-3xl mb-1">Öyin tugadi</h1>
         {myRank > 0 && (
           <p className="text-lg text-muted-foreground mb-6">
             {t.lg.yourPlace} <b className="numeric text-foreground">{myRank}</b>
@@ -181,7 +181,7 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
 
         <div className="grid grid-cols-2 gap-3 w-full max-w-xs mb-8">
           <Box label="Ball" value={me?.score ?? 0} />
-          <Box label="To'g'ri" value={me?.correct_count ?? 0} />
+          <Box label="Töğri" value={me?.correct_count ?? 0} />
         </div>
 
         {standings.length > 0 && (
@@ -205,7 +205,7 @@ export function PlayerScreen({ sessionId }: { sessionId: string }) {
         )}
 
         <Link href="/live" onClick={clearPlayer} className="btn-ghost py-2.5 px-6 text-sm">
-          Chiqish
+          Çiqiş
         </Link>
       </Center>
     );

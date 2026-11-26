@@ -164,7 +164,7 @@ export default function TeacherAnalyticsPage() {
           <div className="p-4 rounded-xl bg-surface/50 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1"><ShieldAlert className="w-4 h-4 text-neon-red" /></div>
             <div className="font-display font-bold text-2xl text-neon-red">{aiAgg.pasteTotal}</div>
-            <div className="text-[11px] text-muted-foreground">paste ogohlantirishi</div>
+            <div className="text-[11px] text-muted-foreground">paste ogohlantirişi</div>
           </div>
         </div>
 
