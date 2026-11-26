@@ -22,7 +22,7 @@ export async function GET() {
     .gte('date', sevenDaysAgo.toISOString().slice(0, 10))
     .order('date', { ascending: true });
 
-  // Bugungi mustaqil topshiriqlar (AI feedback ishlatilmagan submissions)
+  // Bugungi qabul qilingan yechimlar
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   const { count: submissionsToday } = await supabase
@@ -32,19 +32,29 @@ export async function GET() {
     .eq('status', 'accepted')
     .gte('created_at', todayStart.toISOString());
 
-  // AI bog'liqlik indeksi (oddiy hisob): used / (used + autonomous_solved)
-  // 0 = 100% mustaqil, 100 = har topshiriqda AI
+  // Haftalik bog'liqlik ko'rsatkichi — dissertatsiyadagi (2.1) formula,
+  // ko'mak darajasi, kalibrlash va muloqot ko'rsatkichlari (89-migratsiya).
+  // Migratsiya hali ishga tushirilmagan bo'lsa — null, karta eski hisobga qaytadi.
+  const [support, calibration, engagement] = await Promise.all([
+    supabase.rpc('ai_support_state', { p_user: user.id }),
+    supabase.rpc('calibration_summary', { p_user: user.id }),
+    supabase.rpc('engagement_summary', { p_user: user.id }),
+  ]);
+
+  // Eski soddalashtirilgan kunlik hisob (zaxira)
   const autonomous = Math.max(0, (submissionsToday ?? 0) - stats.used);
   const totalActions = stats.used + autonomous;
-  const dependencyScore = totalActions === 0
-    ? 0
-    : Math.round((stats.used / totalActions) * 100);
+  const dailyScore = totalActions === 0 ? 0 : Math.round((stats.used / totalActions) * 100);
+  const weekly = support.data as { index?: number | null; interpretable?: boolean } | null;
 
   return NextResponse.json({
     daily: stats,
     submissionsToday: submissionsToday ?? 0,
     autonomousToday: autonomous,
-    dependencyScore,
+    dependencyScore: weekly?.interpretable && weekly.index != null ? weekly.index : dailyScore,
+    support: support.error ? null : support.data,
+    calibration: calibration.error ? null : calibration.data,
+    engagement: engagement.error ? null : engagement.data,
     trend: trend ?? [],
   });
 }

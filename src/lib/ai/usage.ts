@@ -4,6 +4,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupportState } from './engagement';
 
 export const DEFAULT_DAILY_LIMIT = 10;
 export const COOLDOWN_MINUTES = 30;
@@ -111,10 +112,21 @@ export async function logAIInteraction(
     topic_id?: string;
     task_id?: string;
     task_type?: 'topic_task' | 'challenge' | 'free_chat' | 'plan_first' | 'hint';
+    /** Muloqot kodi va ko'mak darajasi (89-migratsiya) */
+    engagement_code?: string;
+    engagement_kind?: string;
+    classifier_version?: string;
+    support_level?: number;
   },
 ): Promise<{ ok: boolean; cooldownTriggered: boolean }> {
-  // Insert ai_interactions
-  await supabase.from('ai_interactions').insert(payload);
+  // Insert ai_interactions. 89-migratsiya hali ishga tushirilmagan bazada
+  // yangi ustunlar yo'q — u holda log ularsiz yoziladi, yo'qolmaydi.
+  const { error } = await supabase.from('ai_interactions').insert(payload);
+  if (error && /engagement_|classifier_version|support_level/.test(error.message)) {
+    const { engagement_code, engagement_kind, classifier_version, support_level, ...rest } = payload;
+    void engagement_code; void engagement_kind; void classifier_version; void support_level;
+    await supabase.from('ai_interactions').insert(rest);
+  }
 
   // Counter oshirish (RPC)
   await supabase.rpc('increment_ai_usage', { p_user_id: payload.user_id });
@@ -140,6 +152,20 @@ export async function logAIInteraction(
   }
 
   return { ok: true, cooldownTriggered };
+}
+
+/**
+ * Talabaning joriy SI ko'mak darajasi (0–3) — 89-migratsiyadagi
+ * ai_support_state. Migratsiya yo'q bo'lsa yoki xato bo'lsa — 0 (cheklovsiz),
+ * ya'ni platforma eski xulqiga qaytadi.
+ */
+export async function getSupportState(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<SupportState> {
+  const { data, error } = await supabase.rpc('ai_support_state', { p_user: userId });
+  if (error || !data) return { level: 0 };
+  return data as SupportState;
 }
 
 /**

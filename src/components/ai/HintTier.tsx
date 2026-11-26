@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/supabase/user";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
+import { SUPPORT_LEVELS } from "@/lib/ai/engagement";
 
 export interface HintTierItem {
   level: number;             // 1..4
@@ -19,6 +20,8 @@ interface Props {
   taskId: string;
   taskType: "topic_task" | "challenge";
   hints: HintTierItem[] | any[];   // backward compat: ['text'] yoki [{text}]
+  /** SI ko'magi darajasi (0–3) — yuqori darajada chuqur maslahatlar yopiladi */
+  supportLevel?: number;
 }
 
 const LEVEL_LABELS = ["Umumiy yo'nalish", "Aniqroq yo'nalish", "Konkret qism", "Kod parchasi"];
@@ -28,7 +31,8 @@ const DEFAULT_COSTS = [0, 2, 5, 10];
  * Bosqichma-bosqich ochiladigan maslahat tizimi.
  * Har bir daraja uchun talaba REASONING yozadi, keyin coin sarflab ochadi.
  */
-export default function HintTier({ taskId, taskType, hints }: Props) {
+export default function HintTier({ taskId, taskType, hints, supportLevel = 0 }: Props) {
+  const maxHint = SUPPORT_LEVELS[supportLevel as 0 | 1 | 2 | 3]?.maxHint ?? 4;
   const { t } = useI18n();
   const supabase = createClient();
   const [unlocked, setUnlocked] = useState<Record<number, boolean>>({});
@@ -102,7 +106,8 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
           // duplicate — allaqachon ochilgan
           setUnlocked(p => ({ ...p, [level]: true }));
         } else {
-          toast.error(error.message);
+          // Ko'mak darajasi cheklovi bazadagi triggerdan keladi (89-migratsiya)
+          toast.error(/AI_SUPPORT_LEVEL/.test(error.message) ? (error.hint || "Hozir bu maslahat yopiq") : error.message);
           setLoading(null);
           return;
         }
@@ -154,7 +159,8 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
         const level = h.level;
         const isUnlocked = !!unlocked[level];
         const cost = h.unlock_cost ?? 0;
-        const isLocked = level > 1 && !unlocked[level - 1];
+        const supportLocked = !isUnlocked && level > maxHint;
+        const isLocked = (level > 1 && !unlocked[level - 1]) || supportLocked;
         return (
           <motion.div
             key={level}
@@ -184,7 +190,9 @@ export default function HintTier({ taskId, taskType, hints }: Props) {
                   {!isUnlocked && (
                     <p className="text-[10px] text-muted-foreground">
                       {cost === 0 ? "Tekin" : `${cost} coin`}
-                      {isLocked && " · oldingi darajani oching"}
+                      {supportLocked
+                        ? ` · ${SUPPORT_LEVELS[supportLevel as 0 | 1 | 2 | 3].name}: mustaqil yechim bilan ochiladi`
+                        : isLocked && " · oldingi darajani oching"}
                     </p>
                   )}
                 </div>

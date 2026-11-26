@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { cn, getInitials, formatDate, formatDateTime, getLevelLabel, getLevelColor } from "@/lib/utils";
 import type { Profile } from "@/types";
 import { type StudentCourseStat, gradeInfo, pctColor, activityState, dayKey } from "@/lib/student-stats";
+import { SUPPORT_LEVELS } from "@/lib/ai/engagement";
 import {
   ArrowLeft, Zap, Coins, Flame, BookOpen, CheckCircle2, XCircle, Clock, ChevronDown,
   FileText, Code2, ListChecks, GraduationCap, Activity, Loader2, Circle, PlayCircle, Swords,
@@ -22,6 +23,11 @@ interface SubRow {
   passed_tests: number; total_tests: number; created_at: string; review_note: string | null; reviewed_at: string | null;
 }
 interface TaskRow { id: string; topic_id: string; title: string; task_kind: string | null }
+interface CogRow {
+  dep_index: number | null; dep_events: number; support_level: number; level_changes: number;
+  turns: number; co_share: number | null; recovery: number | null;
+  cal_resolved: number; cal_brier: number | null; cal_bias: number | null;
+}
 interface CoinRow { id: string; amount: number; type: string; description: string | null; balance_after: number | null; created_at: string }
 
 type Ev = { ts: string; kind: "topic" | "quiz" | "sub" | "start"; title: string; sub?: string; ok?: boolean | null; course?: string };
@@ -50,6 +56,8 @@ export default function AdminStudentDetailPage() {
   const [tasks, setTasks] = useState<TaskRow[]>([]);
   const [challenges, setChallenges] = useState<Record<string, string>>({});
   const [coins, setCoins] = useState<CoinRow[]>([]);
+  /** 89-migratsiya: bog'liqlik, ko'mak darajasi, muloqot va kalibrlash */
+  const [cog, setCog] = useState<CogRow | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   const [feedRange, setFeedRange] = useState<"today" | "week" | "month">("week");
   const [error, setError] = useState<string | null>(null);
@@ -75,6 +83,7 @@ export default function AdminStudentDetailPage() {
       const subRows = (s.data ?? []) as SubRow[];
       setSubs(subRows);
       setCoins((c.data ?? []) as CoinRow[]);
+      supabase.rpc("cognitive_overview", { p_user: id }).then(({ data }) => setCog(((data ?? []) as CogRow[])[0] ?? null));
 
       const courseIds = statRows.map((r) => r.course_id);
       const challengeIds = [...new Set(subRows.filter((x) => x.task_type === "challenge").map((x) => x.task_id))];
@@ -230,6 +239,23 @@ export default function AdminStudentDetailPage() {
           </div>
         </div>
       </div>
+
+      {cog && (
+        <div className="glass-card p-5">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <p className="text-sm font-semibold">Kognitiv avtonomiya</p>
+            <Link href="/a-cognitive" className="text-xs text-neon-purple hover:underline">Barcha talabalar →</Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
+            <Mini label="SIga bog'liqlik (7 kun)" value={cog.dep_index == null ? "—" : String(cog.dep_index)} hint={`${cog.dep_events} ta hodisa; 3 tadan kam bo'lsa talqin qilinmaydi`} />
+            <Mini label="Ko'mak darajasi" value={`${cog.support_level} · ${SUPPORT_LEVELS[cog.support_level].name}`} hint={`${cog.level_changes} marta o'zgargan`} />
+            <Mini label="Tayyor yechim so'rash" value={cog.co_share == null ? "—" : `${cog.co_share}%`} hint={`${cog.turns} ta mentor savoli (30 kun)`} />
+            <Mini label="O'z fikriga qaytish" value={cog.recovery == null ? "—" : `${cog.recovery}%`} />
+            <Mini label="O'zini baholash aniqligi" value={cog.cal_brier == null ? "—" : `${Math.round((1 - Number(cog.cal_brier)) * 100)}%`}
+              hint={cog.cal_bias == null ? undefined : `${cog.cal_resolved} ta bashorat, siljish ${Number(cog.cal_bias).toFixed(2)} (> 0 — ortiqcha baholash)`} />
+          </div>
+        </div>
+      )}
 
       {/* Kurslar */}
       <div className="space-y-3">

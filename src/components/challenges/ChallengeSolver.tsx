@@ -69,6 +69,7 @@ export function ChallengeSolver({
         body: JSON.stringify({
           feedback_type: "code_review", code, language: lang,
           task_description: challenge.description, test_results: results,
+          task_id: challenge.id, task_type: "challenge",
         }),
       });
       const data = await res.json();

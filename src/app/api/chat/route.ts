@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SOCRATIC_CHAT_PROMPT, PROMPT_VERSIONS } from '@/lib/ai-prompts';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { checkAIQuota, logAIInteraction } from '@/lib/ai/usage';
+import { checkAIQuota, logAIInteraction, getSupportState } from '@/lib/ai/usage';
+import { classifyMessage, CLASSIFIER_VERSION, SUPPORT_LEVELS, OFFLOAD_NUDGE } from '@/lib/ai/engagement';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,8 +38,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Xabar kodi (CO — fikrlashni topshirish, AL — faol o'rganish) va
+    // ko'mak darajasi: mentor javobining chuqurligi shularga moslanadi
+    const engagement = classifyMessage(message);
+    const support = user ? await getSupportState(supabase, user.id) : { level: 0 as const };
+    const extra: string[] = [];
+    if (support.level > 0) extra.push(SUPPORT_LEVELS[support.level].rule);
+    if (engagement.kind === 'CO' && engagement.code !== 'CO4') extra.push(OFFLOAD_NUDGE);
+
     const contents: any[] = [];
-    contents.push({ role: 'user', parts: [{ text: SOCRATIC_CHAT_PROMPT }] });
+    contents.push({
+      role: 'user',
+      parts: [{ text: SOCRATIC_CHAT_PROMPT + (extra.length ? `\n\nQO'SHIMCHA KO'RSATMA:\n- ${extra.join('\n- ')}` : '') }],
+    });
     contents.push({ role: 'model', parts: [{ text: "Tushundim. Sokratik usulda yo'l-yo'riq beraman." }] });
 
     const recentHistory = (history || []).slice(-6);
@@ -88,6 +100,10 @@ export async function POST(request: NextRequest) {
         prompt_template: PROMPT_VERSIONS.socraticChat,
         user_query: message,
         ai_response: reply,
+        engagement_code: engagement.code,
+        engagement_kind: engagement.kind,
+        classifier_version: CLASSIFIER_VERSION,
+        support_level: support.level,
       });
       cooldownTriggered = r.cooldownTriggered;
     }
@@ -101,6 +117,8 @@ export async function POST(request: NextRequest) {
       },
       quota: quota ? { ...quota, used: quota.used + 1, remaining: Math.max(0, quota.remaining - 1) } : null,
       cooldownTriggered,
+      engagement,
+      supportLevel: support.level,
     });
   } catch (error: any) {
     console.error('Chat error:', error);

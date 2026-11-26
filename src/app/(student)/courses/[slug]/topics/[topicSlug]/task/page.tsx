@@ -19,6 +19,8 @@ import HintTier from "@/components/ai/HintTier";
 import PlanFirstFlow from "@/components/ai/PlanFirstFlow";
 import AnswerTask from "@/components/tasks/AnswerTask";
 import ReportTask from "@/components/tasks/ReportTask";
+import SupportLevelBanner, { useSupportState } from "@/components/ai/SupportLevelBanner";
+import CalibrationPrompt from "@/components/ai/CalibrationPrompt";
 
 const CodeEditor = dynamic(() => import("@/components/editor/CodeEditor"), { ssr: false });
 
@@ -47,6 +49,8 @@ export default function TaskPage() {
   /** Yuborilgan, lekin o'qituvchi hali tekshirmagan hisobotlar. */
   const [pending, setPending] = useState<Set<string>>(new Set());
   const { locale, t } = useI18n();
+  // SI ko'magi darajasi — topshiriq yechilganda qayta so'raladi (tiklanish darhol ko'rinsin)
+  const support = useSupportState(solved.size);
 
   useEffect(() => {
     (async () => {
@@ -111,7 +115,10 @@ export default function TaskPage() {
     try {
       const res = await fetch("/api/ai/feedback", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ feedback_type: "code_review", code, language: currentTask.language, task_description: currentTask.description, test_results: results }),
+        body: JSON.stringify({
+          feedback_type: "code_review", code, language: currentTask.language, task_description: currentTask.description, test_results: results,
+          task_id: currentTask.id, task_type: "topic_task", topic_id: topicId,
+        }),
       });
       const data = await res.json();
       setAiFeedback(data.feedback);
@@ -160,6 +167,12 @@ export default function TaskPage() {
         )}
       </div>
 
+      <SupportLevelBanner state={support} />
+
+      {kindOf(currentTask) !== "report" && (
+        <CalibrationPrompt key={`cal-${currentTask.id}`} taskId={currentTask.id} taskType="topic_task" solved={solved.has(currentTask.id)} />
+      )}
+
       {/* Plan-First flow (medium/hard uchun majburiy, easy va yechilganlar uchun yashirin) */}
       {kindOf(currentTask) === "code" && currentTask.difficulty !== 'easy' && !solved.has(currentTask.id) && (
         <PlanFirstFlow
@@ -205,6 +218,7 @@ export default function TaskPage() {
                 taskId={currentTask.id}
                 taskType="topic_task"
                 hints={currentTask.hints as any}
+                supportLevel={support.level}
               />
             </div>
           )}
