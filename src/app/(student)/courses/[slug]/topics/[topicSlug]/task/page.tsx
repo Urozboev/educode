@@ -146,7 +146,7 @@ export default function TaskPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <Link href={`/courses/${slug}/topics/${topicSlug}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" /> Mavzuga qaytish
+          <ArrowLeft className="w-4 h-4" /> Mavzuga qaytiş
         </Link>
         {tasks.length > 1 && (
           <div className="flex gap-2">
@@ -204,7 +204,7 @@ export default function TaskPage() {
               <p className="text-xs font-semibold text-muted-foreground mb-2">Misol testlar:</p>
               {currentTask.test_cases.filter(tc => !tc.is_hidden).slice(0, 3).map((tc, i) => (
                 <div key={i} className="flex gap-4 text-xs font-mono bg-surface rounded-lg px-3 py-2 mb-1.5">
-                  <span className="text-muted-foreground">Kirish: <span className="text-foreground">{tc.input}</span></span>
+                  <span className="text-muted-foreground">Kiriş: <span className="text-foreground">{tc.input}</span></span>
                   <span className="text-muted-foreground">Kutilgan: <span className="text-neon-green">{tc.expected_output}</span></span>
                 </div>
               ))}

@@ -49,14 +49,21 @@ export default function ChallengesPage() {
 
   useEffect(() => {
     (async () => {
+      // Ro'yxatga faqat kartochka maydonlari kerak. Ilgari select("*") har
+      // masalaning kod shabloni, ko'rsatma HTML'i va testlarini ham olib
+      // kelardi. Masalalar va yechilganlar ro'yxati bir vaqtda so'raladi.
       const user = await getCurrentUser(supabase);
-      const { data } = await supabase.from("challenges").select("*").eq("is_published", true).order("difficulty");
-      if (data) setChallenges(await withTranslations(supabase, "challenges", data as Challenge[], locale));
-      if (user) {
-        const { data: subs } = await supabase.from("submissions").select("task_id")
-          .eq("user_id", user.id).eq("task_type", "challenge").eq("status", "accepted");
-        if (subs) setSolvedIds(new Set(subs.map(s => s.task_id)));
-      }
+      const [{ data }, subsRes] = await Promise.all([
+        supabase.from("challenges")
+          .select("id, slug, title, description, category, difficulty, coin_reward, solved_count")
+          .eq("is_published", true).order("difficulty"),
+        user
+          ? supabase.from("submissions").select("task_id")
+              .eq("user_id", user.id).eq("task_type", "challenge").eq("status", "accepted")
+          : Promise.resolve({ data: null }),
+      ]);
+      if (data) setChallenges(await withTranslations(supabase, "challenges", data as unknown as Challenge[], locale));
+      if (subsRes.data) setSolvedIds(new Set((subsRes.data as { task_id: string }[]).map(s => s.task_id)));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

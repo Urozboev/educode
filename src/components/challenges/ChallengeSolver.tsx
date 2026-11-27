@@ -92,7 +92,7 @@ export function ChallengeSolver({
           </div>
           <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4 flex-wrap">
             <span>{getCategoryLabel(challenge.category)}</span>
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{challenge.solved_count} yechgan</span>
+            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{challenge.solved_count} yeçgan</span>
             <span className="flex items-center gap-1 text-neon-yellow"><Coins className="w-3 h-3" />+{challenge.coin_reward}</span>
             <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{challenge.time_limit_ms}ms limit</span>
           </div>
@@ -105,7 +105,7 @@ export function ChallengeSolver({
             <p className="text-xs font-semibold text-muted-foreground mb-2">Namuna testlar:</p>
             {challenge.test_cases.filter(tc => !tc.is_hidden).map((tc, i) => (
               <div key={i} className="flex gap-4 text-xs font-mono bg-surface rounded-lg px-3 py-2 mb-1.5">
-                <span>Kirish: <span className="text-foreground whitespace-pre-wrap">{tc.input}</span></span>
+                <span>Kiriş: <span className="text-foreground whitespace-pre-wrap">{tc.input}</span></span>
                 <span>Kutilgan: <span className="text-neon-green whitespace-pre-wrap">{tc.expected_output}</span></span>
               </div>
             ))}
@@ -181,10 +181,10 @@ export function ChallengeSolver({
             </p>
             <div className="flex flex-col sm:flex-row gap-2 w-full max-w-xs">
               <Link href={`/register?redirect=${encodeURIComponent(loginRedirect)}`} className="btn-primary flex-1 py-2.5 text-sm">
-                Ro&apos;yxatdan o&apos;tish
+                Röyxatdan ötiş
               </Link>
               <Link href={`/login?redirect=${encodeURIComponent(loginRedirect)}`} className="btn-ghost flex-1 py-2.5 text-sm">
-                Kirish
+                Kiriş
               </Link>
             </div>
           </div>

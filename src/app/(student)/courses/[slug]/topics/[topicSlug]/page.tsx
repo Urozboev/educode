@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import LessonToc, { withHeadingIds, useActiveHeading } from "@/components/courses/LessonToc";
 import { useScrollableTables, wrapTables } from "@/components/courses/useScrollableTables";
+import BrandLoader from "@/components/brand/BrandLoader";
 import { cn, formatDuration } from "@/lib/utils";
 import ReflectionJournalModal from "@/components/ai/ReflectionJournalModal";
 import ProtectedVideoPlayer from "@/components/video/ProtectedVideoPlayer";
@@ -74,28 +75,31 @@ export default function TopicPage() {
 
   async function loadTopic() {
     setLoading(true);
-    const user = await getCurrentUser(supabase);
-    if (user) setUserId(user.id);
 
-    const { data: courseData } = await supabase
-      .from("courses")
-      .select("*")
-      .eq("slug", slug)
-      .single();
+    // 1-bosqich — bir vaqtda: foydalanuvchi (lokal sessiya), kurs va
+    // mavzular. Mavzular kurs id'sini kutmasdan kurs slug'i bo'yicha
+    // so'raladi (courses!inner). Ilgari bu uch so'rov ketma-ket edi —
+    // Supabase uzoq hududda bo'lgani uchun har biri ~0,7 s qo'shardi.
+    //
+    // topics RLS: free preview / bepul kurs / enrollment bo'lsagina qator keladi.
+    // Guest foydalanuvchi faqat is_free_preview darslarni oladi.
+    const [user, { data: courseData }, { data: topicsRaw }] = await Promise.all([
+      getCurrentUser(supabase),
+      supabase.from("courses").select("*").eq("slug", slug).single(),
+      supabase.from("topics").select("*, courses!inner(slug)").eq("courses.slug", slug).order("order_index"),
+    ]);
+    if (user) setUserId(user.id);
     if (!courseData) {
       router.push(user ? "/courses" : "/explore/courses");
       return;
     }
-    setCourse(await withTranslation(supabase, "courses", courseData as Course, locale));
-
-    // topics RLS: free preview / bepul kurs / enrollment bo'lsagina qator keladi.
-    // Guest foydalanuvchi faqat is_free_preview darslarni oladi.
-    const { data: topicsData } = await supabase
-      .from("topics")
-      .select("*")
-      .eq("course_id", courseData.id)
-      .order("order_index");
-    const translated = topicsData ? await withTranslations(supabase, "topics", topicsData as Topic[], locale) : [];
+    // Birlashtirish uchun qo'shilgan `courses` maydoni mavzu obyektida qolmasin
+    const topicsData = (topicsRaw ?? []).map(({ courses: _c, ...t }: Record<string, unknown>) => t) as unknown as Topic[];
+    const [courseTr, translated] = await Promise.all([
+      withTranslation(supabase, "courses", courseData as Course, locale),
+      topicsData.length ? withTranslations(supabase, "topics", topicsData, locale) : Promise.resolve([] as Topic[]),
+    ]);
+    setCourse(courseTr);
     setAllTopics(translated);
 
     const currentTopic = translated.find((t) => t.slug === topicSlug);
@@ -107,13 +111,14 @@ export default function TopicPage() {
     setTopic(currentTopic as Topic);
 
     // Progress faqat login qilgan foydalanuvchi uchun
+    // 2-bosqich — progress va refleksiya bir vaqtda
     if (user) {
-      let { data: prog } = await supabase
-        .from("topic_progress")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("topic_id", currentTopic.id)
-        .single();
+      const [progRes, { count: reflCount }] = await Promise.all([
+        supabase.from("topic_progress").select("*").eq("user_id", user.id).eq("topic_id", currentTopic.id).maybeSingle(),
+        supabase.from("reflection_journals").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("topic_id", currentTopic.id),
+      ]);
+      if ((reflCount ?? 0) > 0) setReflectionDone(true);
+      let prog = progRes.data;
       if (!prog) {
         const { data: newProg } = await supabase
           .from("topic_progress")
@@ -127,14 +132,6 @@ export default function TopicPage() {
         prog = newProg;
       }
       if (prog) setProgress(prog as TopicProgress);
-
-      // Refleksiya yozilganmi?
-      const { count: reflCount } = await supabase
-        .from("reflection_journals")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("topic_id", currentTopic.id);
-      if ((reflCount ?? 0) > 0) setReflectionDone(true);
     }
 
     setLoading(false);
@@ -213,11 +210,12 @@ export default function TopicPage() {
   const prevTopic = currentIndex > 0 ? allTopics[currentIndex - 1] : null;
   const nextTopic = currentIndex < allTopics.length - 1 ? allTopics[currentIndex + 1] : null;
 
+  // Route loading.tsx bilan bir xil logo — sahifa almashishdan ma'lumot
+  // kelguncha bitta uzluksiz animatsiya ko'rinadi
   if (loading || !topic)
     return (
-      <div className="space-y-4 animate-pulse">
-        <div className="h-8 w-64 bg-surface rounded-lg" />
-        <div className="h-96 rounded-3xl border border-border/50 bg-card/40" />
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <BrandLoader />
       </div>
     );
 

@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
   if (!apiKey) {
     return NextResponse.json({
-      feedback: '⚠️ CLAUDE_API_KEY .env.local faylida sozlanmagan. Qo\'shib, serverni qayta ishga tushiring.',
+      feedback: '⚠️ CLAUDE_API_KEY .env.local faylida sozlanmagan. Qo\'şib, serverni qayta işga tuşiring.',
     });
   }
 
@@ -53,21 +53,21 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           feedback: support.level === 3
             ? `🧭 ${SUPPORT_LEVELS[3].name}: ${SUPPORT_LEVELS[3].short}`
-            : `🧭 ${SUPPORT_LEVELS[2].name}: avval o'z yechimingizni bir marta yuboring — keyin SI izoh beradi.`,
+            : `🧭 ${SUPPORT_LEVELS[2].name}: avval öz yeçimingizni bir marta yuboring — keyin SI izoh beradi.`,
           blocked: true,
           supportLevel: support.level,
         }, { status: 403 });
       }
     }
 
-    let systemPrompt = "Sen dasturlash o'qituvchisisan. O'zbek tilida javob ber. Qisqa va aniq bo'l.";
+    let systemPrompt = "Sen dasturlaş öqituvçisisan. Özbek tilida javob ber. Qisqa va aniq böl.";
     let userPrompt = '';
     let promptTemplate: string = PROMPT_VERSIONS.socraticFeedback;
 
     if (feedback_type === 'code_review') {
       systemPrompt = SOCRATIC_FEEDBACK_PROMPT + `\n\nTalaba darajasi: ${user_level || 'beginner'}.`
-        + (support.level > 0 && !allPassed ? `\n\nQO'SHIMCHA KO'RSATMA: ${SUPPORT_LEVELS[support.level].rule}` : '');
-      userPrompt = `Topshiriq: ${task_description || 'Dasturlash topshiriqni bajarish'}
+        + (support.level > 0 && !allPassed ? `\n\nQO'SHIMCHA KÖRSATMA: ${SUPPORT_LEVELS[support.level].rule}` : '');
+      userPrompt = `Topşiriq: ${task_description || 'Dasturlaş topşiriqni bajariş'}
 Til: ${language || 'python'}
 Talabaning kodi:
 \`\`\`
@@ -75,17 +75,17 @@ ${code || ''}
 \`\`\`
 Test natijalari: ${JSON.stringify(test_results || [])}
 
-Yuqoridagi qoidalar asosida talabaga Sokratik usulda yo'l-yo'riq ber. To'liq yechim yozma.`;
+Yuqoridagi qoidalar asosida talabaga Sokratik usulda yöl-yöriq ber. Töliq yeçim yozma.`;
 
     } else if (feedback_type === 'quiz_review') {
       promptTemplate = PROMPT_VERSIONS.quizReview;
       userPrompt = `Test natijasi: ${test_results?.score || 0}/${test_results?.total || 0}.
 Xato javoblar: ${JSON.stringify(test_results?.wrong_answers || [])}
-Qaysi mavzularni qayta o'rganish kerak? Qisqa, motivatsiyali javob ber.`;
+Qaysi mavzularni qayta örganiş kerak? Qisqa, motivatsiyali javob ber.`;
 
     } else if (feedback_type === 'placement_analysis') {
       promptTemplate = PROMPT_VERSIONS.placementAnalysis;
-      systemPrompt = `Sen ta'lim ekspertisan. O'zbek tilida. 150 so'zda: umumiy baho, kuchli/zaif tomonlar, tavsiya, motivatsiya.`;
+      systemPrompt = `Sen taʼlim ekspertisan. Özbek tilida. 150 sözda: umumiy baho, kuçli/zaif tomonlar, tavsiya, motivatsiya.`;
       const cats = test_results?.categories || [];
       userPrompt = `Daraja testi: ${test_results?.score}/${test_results?.total}, daraja: ${test_results?.level}.
 Sohalar:
@@ -118,7 +118,7 @@ ${cats.map((c: any) => `${c.name}: ${c.correct}/${c.total} (${c.percentage}%)`).
       const errText = await response.text();
       console.error('Claude API xatolik:', response.status, errText);
       return NextResponse.json({
-        feedback: `⚠️ AI javob bermadi (${response.status}). .env.local da CLAUDE_API_KEY to'g'riligini tekshiring.`,
+        feedback: `⚠️ AI javob bermadi (${response.status}). .env.local da CLAUDE_API_KEY töğriligini tekşiring.`,
       });
     }
 

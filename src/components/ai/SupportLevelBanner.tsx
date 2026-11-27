@@ -38,12 +38,12 @@ export default function SupportLevelBanner({ state, className }: { state: Suppor
     <div className={cn("rounded-2xl border px-4 py-3 flex items-start gap-3", TONE[state.level], className)}>
       <Compass className="w-5 h-5 shrink-0 mt-0.5 text-foreground/70" />
       <div className="text-sm space-y-1">
-        <p className="font-semibold">SI ko&apos;magi: {l.name} <span className="text-xs font-normal text-muted-foreground">({state.level}/3)</span></p>
+        <p className="font-semibold">SI kömagi: {l.name} <span className="text-xs font-normal text-muted-foreground">({state.level}/3)</span></p>
         <p className="text-muted-foreground">{l.short}</p>
         <p className="text-xs text-muted-foreground">
-          Sababi: oxirgi 7 kunda SIga bog&apos;liqlik ko&apos;rsatkichingiz {state.index ?? "—"}/100
-          {state.autonomous != null && <> (mustaqil yechimlar: {state.autonomous})</>}. Bu baho emas — mustaqil ishlash odatini tiklash uchun.
-          Topshiriqni maslahatsiz yechsangiz, ko&apos;mak darhol bir bosqich ortadi.
+          Sababi: oxirgi 7 kunda SIga boğliqlik körsatkiçingiz {state.index ?? "—"}/100
+          {state.autonomous != null && <> (mustaqil yeçimlar: {state.autonomous})</>}. Bu baho emas — mustaqil işlaş odatini tiklaş uçun.
+          Topşiriqni maslahatsiz yeçsangiz, kömak darhol bir bosqiç ortadi.
         </p>
       </div>
     </div>

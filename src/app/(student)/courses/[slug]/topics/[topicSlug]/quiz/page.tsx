@@ -1,5 +1,6 @@
 "use client";
 
+import BrandLoader from "@/components/brand/BrandLoader";
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "@/components/i18n/Link";
@@ -57,19 +58,25 @@ export default function QuizPage() {
 
   useEffect(() => {
     (async () => {
-      const user = await getCurrentUser(supabase);
+      // Bitta so'rov: mavzu (kurs slug'i bilan — boshqa kursdagi bir xil
+      // slug'li mavzu bilan adashmaydi), kurs id va testlar birga keladi.
+      // Ilgari kurs → mavzu → testlar ketma-ket 3 ta so'rov edi.
+      const [user, { data: topic }] = await Promise.all([
+        getCurrentUser(supabase),
+        supabase
+          .from("topics")
+          .select("id, course_id, courses!inner(slug), quizzes(*)")
+          .eq("slug", topicSlug)
+          .eq("courses.slug", slug)
+          .order("order_index", { referencedTable: "quizzes" })
+          .maybeSingle(),
+      ]);
       if (user) setUserId(user.id);
-      const { data: course } = await supabase.from("courses").select("id").eq("slug", slug).single();
-      if (course) setCourseId(course.id);
-      const { data: topic } = await supabase.from("topics").select("id").eq("slug", topicSlug).single();
       if (!topic) return;
+      setCourseId(topic.course_id);
       setTopicId(topic.id);
-      const { data } = await supabase
-        .from("quizzes")
-        .select("*")
-        .eq("topic_id", topic.id)
-        .order("order_index");
-      if (data) setRawQuizzes(await withTranslations(supabase, "quizzes", data as Quiz[], locale));
+      const data = (topic as unknown as { quizzes: Quiz[] }).quizzes;
+      if (data) setRawQuizzes(await withTranslations(supabase, "quizzes", data, locale));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,7 +179,7 @@ export default function QuizPage() {
   }
 
   if (loading)
-    return <div className="h-64 rounded-3xl border border-border/50 bg-card/40 animate-pulse" />;
+    return <div className="min-h-[60vh] flex items-center justify-center"><BrandLoader /></div>;
   if (quizzes.length === 0)
     return (
       <div className="text-center py-20">

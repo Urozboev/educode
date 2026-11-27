@@ -15,10 +15,10 @@ import { toast } from "sonner";
  */
 
 const OPTIONS = [
-  { v: 1, label: "Yecha olmayman", hint: "~10%" },
-  { v: 2, label: "Ehtimol yo'q", hint: "~35%" },
+  { v: 1, label: "Yeça olmayman", hint: "~10%" },
+  { v: 2, label: "Ehtimol yöq", hint: "~35%" },
   { v: 3, label: "Ehtimol ha", hint: "~65%" },
-  { v: 4, label: "Albatta yechaman", hint: "~90%" },
+  { v: 4, label: "Albatta yeçaman", hint: "~90%" },
 ];
 
 interface Item { confidence: number; outcome: number | null }
@@ -64,8 +64,8 @@ export default function CalibrationPrompt({ taskId, taskType, solved }: { taskId
   if (!item) {
     return (
       <div className="rounded-2xl border border-neon-purple/30 bg-neon-purple/[0.05] px-4 py-3">
-        <p className="text-sm font-semibold flex items-center gap-2"><Gauge className="w-4 h-4 text-neon-purple" /> Boshlashdan oldin: bu topshiriqni SI va maslahatlarsiz yecha olasizmi?</p>
-        <p className="text-xs text-muted-foreground mt-0.5 mb-2.5">Halol baholang — bu baho emas. O&apos;z imkoniyatini to&apos;g&apos;ri baholash ham o&apos;rganiladigan ko&apos;nikma.</p>
+        <p className="text-sm font-semibold flex items-center gap-2"><Gauge className="w-4 h-4 text-neon-purple" /> Boşlaşdan oldin: bu topşiriqni SI va maslahatlarsiz yeça olasizmi?</p>
+        <p className="text-xs text-muted-foreground mt-0.5 mb-2.5">Halol baholang — bu baho emas. Öz imkoniyatini töğri baholaş ham örganiladigan könikma.</p>
         <div className="flex flex-wrap gap-2">
           {OPTIONS.map((o) => (
             <button key={o.v} type="button" onClick={() => pick(o.v)} disabled={saving !== null}
@@ -82,7 +82,7 @@ export default function CalibrationPrompt({ taskId, taskType, solved }: { taskId
   if (item.outcome === null) {
     return (
       <p className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
-        <Gauge className="w-3.5 h-3.5" /> Bashoratingiz: <b className="text-foreground">{label}</b>. Natija topshiriq yechilgach solishtiriladi.
+        <Gauge className="w-3.5 h-3.5" /> Başoratingiz: <b className="text-foreground">{label}</b>. Natija topşiriq yeçilgaç soliştiriladi.
       </p>
     );
   }
@@ -91,15 +91,15 @@ export default function CalibrationPrompt({ taskId, taskType, solved }: { taskId
   const expectedYes = item.confidence >= 3;
   const match = expectedYes === (item.outcome === 1);
   const msg = match
-    ? "Bashoratingiz to'g'ri chiqdi — o'z imkoniyatingizni aniq baholadingiz."
+    ? "Başoratingiz töğri çiqdi — öz imkoniyatingizni aniq baholadingiz."
     : expectedYes
-      ? "O'zingizni biroz ortiqcha baholadingiz: topshiriq maslahat yoki tayyor kod yordamida yechildi. Keyingi safar boshlashdan oldin qaysi qismi qiyin ekanini o'ylab ko'ring."
-      : "O'zingizni kam baholadingiz — siz o'ylaganingizdan kuchliroqsiz! Topshiriq mustaqil yechildi.";
+      ? "Özingizni biroz ortiqça baholadingiz: topşiriq maslahat yoki tayyor kod yordamida yeçildi. Keyingi safar boşlaşdan oldin qaysi qismi qiyin ekanini öylab köring."
+      : "Özingizni kam baholadingiz — siz öylaganingizdan kuçliroqsiz! Topşiriq mustaqil yeçildi.";
   return (
     <div className={cn("rounded-2xl border px-4 py-2.5 text-sm flex items-start gap-2",
       match ? "border-emerald-500/30 bg-emerald-500/[0.06]" : "border-amber-500/30 bg-amber-500/[0.07]")}>
       {match ? <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> : <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />}
-      <p><b>Bashorat: {label}</b> → natija: {item.outcome === 1 ? "mustaqil yechildi" : "yordam bilan yechildi yoki yechilmadi"}. {msg}</p>
+      <p><b>Başorat: {label}</b> → natija: {item.outcome === 1 ? "mustaqil yeçildi" : "yordam bilan yeçildi yoki yeçilmadi"}. {msg}</p>
     </div>
   );
 }

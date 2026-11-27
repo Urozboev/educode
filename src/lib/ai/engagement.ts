@@ -16,15 +16,15 @@ export type EngagementCode = "CO1" | "CO2" | "CO3" | "CO4" | "AL1" | "AL2" | "AL
 export type EngagementKind = "CO" | "AL" | "N";
 
 export const ENGAGEMENT_CODES: { code: EngagementCode; kind: EngagementKind; label: string; example: string }[] = [
-  { code: "CO1", kind: "CO", label: "Tayyor yechim so'rash", example: "Shu masalaning kodini yozib bering" },
-  { code: "CO2", kind: "CO", label: "Topshiriqni ko'chirib berish", example: "(topshiriq sharti o'z fikrisiz joylashtiriladi)" },
-  { code: "CO3", kind: "CO", label: "Xatoni tuzatib berishni so'rash", example: "Ishlamayapti, to'g'irlab bering" },
-  { code: "CO4", kind: "CO", label: "Passiv davom ettirish", example: "Keyin-chi? / davom et / tushunmadim" },
-  { code: "AL1", kind: "AL", label: "Tushuncha savoli", example: "Nega bu yerda while emas for ishlatiladi?" },
-  { code: "AL2", kind: "AL", label: "O'z gipotezasini aytish", example: "Menimcha, sikl bir marta ortiqcha aylanyapti" },
-  { code: "AL3", kind: "AL", label: "O'z yechimini tushuntirish", example: "Men avval ro'yxatni saraladim, keyin…" },
-  { code: "AL4", kind: "AL", label: "Tekshirish va umumlashtirish", example: "To'g'ri tushundimmi? Boshqa usul bormi?" },
-  { code: "N", kind: "N", label: "Boshqa / neytral", example: "Salom, rahmat" },
+  { code: "CO1", kind: "CO", label: "Tayyor yeçim söraş", example: "Şu masalaning kodini yozib bering" },
+  { code: "CO2", kind: "CO", label: "Topşiriqni köçirib beriş", example: "(topşiriq şarti öz fikrisiz joylaştiriladi)" },
+  { code: "CO3", kind: "CO", label: "Xatoni tuzatib berişni söraş", example: "Işlamayapti, töğirlab bering" },
+  { code: "CO4", kind: "CO", label: "Passiv davom ettiriş", example: "Keyin-çi? / davom et / tuşunmadim" },
+  { code: "AL1", kind: "AL", label: "Tuşunça savoli", example: "Nega bu yerda while emas for işlatiladi?" },
+  { code: "AL2", kind: "AL", label: "Öz gipotezasini aytiş", example: "Menimça, sikl bir marta ortiqça aylanyapti" },
+  { code: "AL3", kind: "AL", label: "Öz yeçimini tuşuntiriş", example: "Men avval röyxatni saraladim, keyin…" },
+  { code: "AL4", kind: "AL", label: "Tekşiriş va umumlaştiriş", example: "Töğri tuşundimmi? Boşqa usul bormi?" },
+  { code: "N", kind: "N", label: "Boşqa / neytral", example: "Salom, rahmat" },
 ];
 
 export const kindOf = (code: EngagementCode): EngagementKind =>
@@ -139,31 +139,31 @@ export interface SupportState {
 
 export const SUPPORT_LEVELS = [
   {
-    name: "To'liq ko'mak",
-    short: "Barcha maslahatlar va SI izohi ochiq.",
+    name: "Töliq kömak",
+    short: "Barça maslahatlar va SI izohi oçiq.",
     rule: "",
     maxHint: 4,
   },
   {
-    name: "Yo'naltiruvchi ko'mak",
-    short: "SI faqat yo'naltiruvchi savollar beradi. Kod parchasi (4-maslahat) o'z yechimingizni bir marta yuborgandan keyin ochiladi.",
-    rule: "Talabaning SIga bog'liqligi o'rtacha. Faqat yo'naltiruvchi savol ber, kod yozma, javobni talabaning o'zi topsin.",
+    name: "Yönaltiruvçi kömak",
+    short: "SI faqat yönaltiruvçi savollar beradi. Kod parçasi (4-maslahat) öz yeçimingizni bir marta yuborgandan keyin oçiladi.",
+    rule: "Talabaning SIga boğliqligi örtaça. Faqat yönaltiruvçi savol ber, kod yozma, javobni talabaning özi topsin.",
     maxHint: 4,
   },
   {
-    name: "Ishora bosqichi",
-    short: "Faqat 1–2-darajali maslahatlar ochiq. SI izohi o'z urinishingizdan keyin beriladi.",
-    rule: "Talabaning SIga bog'liqligi yuqori. Javobing 2–3 jumladan oshmasin: faqat qisqa ishora va bitta savol. Kod ham, aniq qadamlar ham berma.",
+    name: "Işora bosqiçi",
+    short: "Faqat 1–2-darajali maslahatlar oçiq. SI izohi öz urinişingizdan keyin beriladi.",
+    rule: "Talabaning SIga boğliqligi yuqori. Javobing 2–3 jumladan oşmasin: faqat qisqa işora va bitta savol. Kod ham, aniq qadamlar ham berma.",
     maxHint: 2,
   },
   {
     name: "Mustaqil sinov",
-    short: "Topshiriqlar bo'yicha SI izohi vaqtincha yopiq, faqat 1-maslahat ochiq. Bitta topshiriqni maslahatsiz yeching — ko'mak darhol qaytadi.",
-    rule: "Talaba hozir mustaqil sinov bosqichida. Topshiriqqa oid kod, yechim yo'li yoki xato joyini aytma. Faqat umumiy tushunchani (sintaksis, atama ma'nosi) qisqa tushuntirishing mumkin va talabani o'zi urinib ko'rishga undash kerak.",
+    short: "Topşiriqlar böyiça SI izohi vaqtinça yopiq, faqat 1-maslahat oçiq. Bitta topşiriqni maslahatsiz yeçing — kömak darhol qaytadi.",
+    rule: "Talaba hozir mustaqil sinov bosqiçida. Topşiriqqa oid kod, yeçim yöli yoki xato joyini aytma. Faqat umumiy tuşunçani (sintaksis, atama maʼnosi) qisqa tuşuntirişing mumkin va talabani özi urinib körişga undaş kerak.",
     maxHint: 1,
   },
 ] as const;
 
 /** Mentorga qo'shimcha ko'rsatma: talaba tayyor yechim so'raganda */
 export const OFFLOAD_NUDGE =
-  "Talaba hozir tayyor yechim yoki tuzatishni so'radi. Yechim berma. Avval undan o'z fikrini so'ra: nimani sinab ko'rdi, qayerda to'xtadi, xato qayerda deb o'ylaydi. Bitta aniq savol bilan yakunla.";
+  "Talaba hozir tayyor yeçim yoki tuzatişni söradi. Yeçim berma. Avval undan öz fikrini söra: nimani sinab kördi, qayerda töxtadi, xato qayerda deb öylaydi. Bitta aniq savol bilan yakunla.";

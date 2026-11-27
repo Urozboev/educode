@@ -22,13 +22,13 @@ interface AIStats {
 
 function getZone(score: number, t: Dictionary): { label: string; emoji: string; cls: string; tip: string } {
   if (score <= 30) return {
-    label: "Sog'lom",
+    label: "Soğlom",
     emoji: "🟢",
     cls: "bg-neon-green/10 border-neon-green/30 text-neon-green",
     tip: t.misc.balanceHealthy,
   };
   if (score <= 60) return {
-    label: "O'rtacha",
+    label: "Örtaça",
     emoji: "🟡",
     cls: "bg-neon-yellow/10 border-neon-yellow/30 text-neon-yellow",
     tip: t.misc.balanceModerate,
@@ -95,7 +95,7 @@ export default function CognitiveHealthCard({ className }: { className?: string 
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-[11px] text-muted-foreground">
-            AI bog'liqlik indeksi{stats.support?.interpretable ? " (7 kun)" : ""}
+            AI boğliqlik indeksi{stats.support?.interpretable ? " (7 kun)" : ""}
           </span>
           <span className="text-xs font-mono font-semibold">{stats.dependencyScore}%</span>
         </div>
@@ -129,13 +129,13 @@ export default function CognitiveHealthCard({ className }: { className?: string 
         </div>
         <div className="bg-surface/40 rounded-lg p-2.5">
           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1">
-            <TrendingUp className="w-3 h-3" /> Mustaqil yechilgan
+            <TrendingUp className="w-3 h-3" /> Mustaqil yeçilgan
           </div>
           <div className="text-sm font-semibold font-mono text-neon-green">
             {stats.autonomousToday}
           </div>
           <div className="text-[9px] text-muted-foreground mt-0.5">
-            jami {stats.submissionsToday} ta topshiriq
+            jami {stats.submissionsToday} ta topşiriq
           </div>
         </div>
       </div>
@@ -144,26 +144,26 @@ export default function CognitiveHealthCard({ className }: { className?: string 
       {stats.support && !stats.support.staff && (
         <div className="space-y-2 mb-3">
           <div className="flex items-center justify-between text-[11px]">
-            <span className="text-muted-foreground flex items-center gap-1"><Compass className="w-3 h-3" /> SI ko&apos;magi</span>
+            <span className="text-muted-foreground flex items-center gap-1"><Compass className="w-3 h-3" /> SI kömagi</span>
             <span className="font-semibold">{SUPPORT_LEVELS[stats.support.level].name}</span>
           </div>
           {!stats.support.interpretable && (
-            <p className="text-[10px] text-muted-foreground">Haftalik ko&apos;rsatkich uchun hali ma&apos;lumot yetarli emas (kamida 3 ta hodisa kerak).</p>
+            <p className="text-[10px] text-muted-foreground">Haftalik körsatkiç uçun hali maʼlumot yetarli emas (kamida 3 ta hodisa kerak).</p>
           )}
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-surface/40 rounded-lg p-2.5" title="Topshiriqdan oldingi bashoratingiz natija bilan qanchalik mos keldi (Brier bali asosida)">
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1"><Gauge className="w-3 h-3" /> O&apos;zini baholash aniqligi</div>
+            <div className="bg-surface/40 rounded-lg p-2.5" title="Topşiriqdan oldingi başoratingiz natija bilan qançalik mos keldi (Brier bali asosida)">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1"><Gauge className="w-3 h-3" /> Özini baholaş aniqligi</div>
               <div className="text-sm font-semibold font-mono">
                 {stats.calibration?.brier != null ? `${Math.round((1 - Number(stats.calibration.brier)) * 100)}%` : "—"}
               </div>
               <div className="text-[9px] text-muted-foreground mt-0.5">
-                {stats.calibration?.bias == null ? `${stats.calibration?.resolved ?? 0} ta bashorat`
-                  : Number(stats.calibration.bias) > 0.15 ? "o'zingizni ortiqcha baholaysiz"
-                  : Number(stats.calibration.bias) < -0.15 ? "o'zingizni kam baholaysiz" : "muvozanatli"}
+                {stats.calibration?.bias == null ? `${stats.calibration?.resolved ?? 0} ta başorat`
+                  : Number(stats.calibration.bias) > 0.15 ? "özingizni ortiqça baholaysiz"
+                  : Number(stats.calibration.bias) < -0.15 ? "özingizni kam baholaysiz" : "muvozanatli"}
               </div>
             </div>
-            <div className="bg-surface/40 rounded-lg p-2.5" title="SI bilan muloqotingizda o'z fikringizni bildirgan savollar ulushi (30 kun)">
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1"><MessageCircleQuestion className="w-3 h-3" /> Fikrlab so&apos;rash</div>
+            <div className="bg-surface/40 rounded-lg p-2.5" title="SI bilan muloqotingizda öz fikringizni bildirgan savollar uluşi (30 kun)">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1"><MessageCircleQuestion className="w-3 h-3" /> Fikrlab söraş</div>
               <div className="text-sm font-semibold font-mono">
                 {stats.engagement?.co_share != null ? `${100 - stats.engagement.co_share}%` : "—"}
               </div>
@@ -178,7 +178,7 @@ export default function CognitiveHealthCard({ className }: { className?: string 
         <div className="mb-3 px-2.5 py-2 rounded-lg bg-neon-red/5 border border-neon-red/20 flex items-center gap-2 text-[11px] text-neon-red">
           <Clock className="w-3 h-3 flex-shrink-0" />
           <span>
-            Cooldown: {new Date(stats.daily.cooldownUntil).toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" })} gacha
+            Cooldown: {new Date(stats.daily.cooldownUntil).toLocaleTimeString("uz-UZ", { hour: "2-digit", minute: "2-digit" })} gaça
           </span>
         </div>
       )}

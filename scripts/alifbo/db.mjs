@@ -47,19 +47,31 @@ const KEY = env.SUPABASE_SERVICE_ROLE_KEY;
 if (!URL_ || !KEY) { console.error(".env.local da NEXT_PUBLIC_SUPABASE_URL yoki SUPABASE_SERVICE_ROLE_KEY yo'q"); process.exit(1); }
 const H = { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
 
+/** Tarmoq uzilishi ("fetch failed") vaqtinchalik bo'ladi — 4 martagacha qayta urinadi */
+async function fetchRetry(url, opts, tries = 4) {
+  for (let i = 1; ; i++) {
+    try { return await fetch(url, opts); }
+    catch (e) {
+      if (i >= tries) throw e;
+      await new Promise((r) => setTimeout(r, 800 * i));
+    }
+  }
+}
+
 async function fetchAll(table, select) {
   const rows = [];
-  for (let from = 0; ; from += 1000) {
-    const r = await fetch(`${URL_}/rest/v1/${table}?select=${select}&order=id`, { headers: { ...H, Range: `${from}-${from + 999}` } });
+  for (let from = 0; ; from += 500) {
+    const r = await fetchRetry(`${URL_}/rest/v1/${table}?select=${select}&order=id`, { headers: { ...H, Range: `${from}-${from + 499}` } });
     if (!r.ok) throw new Error(`${table}: ${r.status} ${await r.text()}`);
     const page = await r.json();
     rows.push(...page);
-    if (page.length < 1000) break;
+    if (page.length < 500) break;
   }
   return rows;
 }
-async function patch(table, id, values) {
-  const r = await fetch(`${URL_}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
+/** `key` — qator qaysi ustun bo'yicha topiladi (about_page'da "key", qolganlarida "id") */
+async function patch(table, key, id, values) {
+  const r = await fetchRetry(`${URL_}/rest/v1/${table}?${key}=eq.${encodeURIComponent(id)}`, {
     method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify(values),
   });
   if (!r.ok) throw new Error(`${table} ${id}: ${r.status} ${await r.text()}`);
@@ -144,7 +156,7 @@ if (RESTORE) {
   const backup = JSON.parse(fs.readFileSync(RESTORE, "utf8"));
   let n = 0;
   for (const { table, key, id, old } of backup.rows) {
-    const r = await fetch(`${URL_}/rest/v1/${table}?${key}=eq.${encodeURIComponent(id)}`, { method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify(old) });
+    const r = await fetchRetry(`${URL_}/rest/v1/${table}?${key}=eq.${encodeURIComponent(id)}`, { method: "PATCH", headers: { ...H, Prefer: "return=minimal" }, body: JSON.stringify(old) });
     if (!r.ok) console.error(table, id, r.status, await r.text()); else n++;
   }
   console.log(`${n} ta qator qaytarildi`);
@@ -185,7 +197,7 @@ for (const plan of PLAN) {
     if (!Object.keys(upd).length) continue;
     changed++;
     backup.rows.push({ table: plan.table, key, id: row[key], old });
-    if (APPLY) await patch(plan.table, row[key], upd).catch((e) => report.push(`  XATO ${plan.table} ${row[key]}: ${e.message.slice(0, 160)}`));
+    if (APPLY) await patch(plan.table, key, row[key], upd).catch((e) => report.push(`  XATO ${plan.table} ${row[key]}: ${e.message.slice(0, 160)}`));
   }
   total += changed;
   report.push(`${plan.table.padEnd(18)} ${String(rows.length).padStart(5)} qator, o'zgaradi: ${changed}`);

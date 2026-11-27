@@ -57,6 +57,10 @@ export const PROTECTED = new Set([
   "challenge", "challenges", "character", "characters", "hashable", "unhashable",
   "manchester", "no-cache", "shifts", "ssh", "tech", "exchanger", "sheet",
   "drop-shadow", "prefers-color-scheme",
+  // bazadagi kontentni ko'rib chiqishda topilganlar (2026-11-27): buyruqlar,
+  // HTTP sarlavhalari, TCP holatlari, dastur nomlari
+  "apache", "established", "hierarchy", "attached", "echo", "flushdns", "netsh",
+  "change", "psh", "tashkent", "control", "none",
 ]);
 
 /** So'z tokeni: harflar, raqamlar, apostroflar, chiziqcha, pastki chiziq */
@@ -78,6 +82,9 @@ function isProtectedWord(w) {
 /** Bitta so'zni o'giradi (himoyalanmagan bo'lsa) */
 function convertWord(w) {
   if (isProtectedWord(w)) return w;
+  // Chiziqchali so'z — har bir qism alohida: "Cache-Control", "pre-shared"
+  // inglizcha qoladi, "Veb-dasturlash" esa o'giriladi
+  if (/[^-]-[^-]/.test(w)) return w.split("-").map((p) => (p ? convertWord(p) : p)).join("-");
   let s = w;
   // 1. o' / g'
   //    o' faqat ortidan harf kelsa: o'zbekchada so'z oxirida o' deyarli yo'q,

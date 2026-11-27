@@ -10,7 +10,7 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const title = (searchParams.get("title") || "MirAcademy").slice(0, 80);
-  const subtitle = (searchParams.get("subtitle") || "Dasturlaşni öynab örgan").slice(0, 120);
+  const subtitle = (searchParams.get("subtitle") || "Dasturlaşni oson örganing").slice(0, 120);
   const type = searchParams.get("type") || "default";
 
   // Type → rang/emoji

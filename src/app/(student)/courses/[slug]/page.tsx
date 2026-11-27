@@ -1,5 +1,6 @@
 "use client";
 
+import BrandLoader from "@/components/brand/BrandLoader";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "@/components/i18n/Link";
@@ -48,28 +49,41 @@ export default function CourseDetailPage() {
   }, [slug, locale]);
 
   async function loadCourse() {
+    // Foydalanuvchi lokal sessiyadan olinadi — tarmoqqa chiqmaydi
     const user = await getCurrentUser(supabase);
-    if (user) {
-      setUserId(user.id);
-      const { data: profile } = await supabase.from("profiles").select("coins").eq("id", user.id).single();
-      if (profile) setUserCoins(profile.coins);
-    }
+    if (user) setUserId(user.id);
 
-    const { data: courseData } = await supabase
-      .from("courses").select("*").eq("slug", slug).eq("is_published", true).single();
+    // 1-bosqich — bir vaqtda: kurs, coinlar, yozilish va progress.
+    // Yozilish/progress kurs id'sini kutmasdan kurs slug'i bo'yicha
+    // so'raladi (courses!inner). Ilgari 6 ta ketma-ket so'rov edi —
+    // uzoq hududdagi Supabase'da har biri ~0,7 s.
+    const none = Promise.resolve({ data: null });
+    const strip = <T,>(row: Record<string, unknown>) => { const { courses: _c, ...r } = row; return r as T; };
+    const [{ data: courseData }, profileRes, enrollRes, progressRes] = await Promise.all([
+      supabase.from("courses").select("*").eq("slug", slug).eq("is_published", true).single(),
+      user ? supabase.from("profiles").select("coins").eq("id", user.id).single() : none,
+      user ? supabase.from("enrollments").select("*, courses!inner(slug)").eq("user_id", user.id).eq("courses.slug", slug).maybeSingle() : none,
+      user ? supabase.from("topic_progress").select("*, courses!inner(slug)").eq("user_id", user.id).eq("courses.slug", slug) : none,
+    ]);
     if (!courseData) {
       // Login qilmagan foydalanuvchi uchun /explore'ga, login qilganga /courses'ga qaytaramiz
       router.push(user ? "/courses" : "/explore/courses");
       return;
     }
-    setCourse(await withTranslation(supabase, "courses", courseData as Course, locale));
+    if (profileRes.data) setUserCoins((profileRes.data as { coins: number }).coins);
+    const enrollData = enrollRes.data ? strip<Enrollment>(enrollRes.data as Record<string, unknown>) : null;
+    if (enrollData) setEnrollment(enrollData);
+    if (progressRes.data) setTopicProgress((progressRes.data as Record<string, unknown>[]).map((r) => strip<TopicProgress>(r)));
 
-    // Mundarija public view'dan (kontent ustunlari yo'q — RLS'siz o'qiladi)
-    // va bo'limlar parallel yuklanadi
-    const [{ data: topicsData }, { data: sectionsData }] = await Promise.all([
+    // 2-bosqich — bir vaqtda: mundarija (public view, kontent ustunlarisiz),
+    // bo'limlar va "davom ettirish" nuqtasi (faqat kursga yozilganlarga)
+    const [courseTr, { data: topicsData }, { data: sectionsData }, resumePoint] = await Promise.all([
+      withTranslation(supabase, "courses", courseData as Course, locale),
       supabase.from("topics_toc").select("*").eq("course_id", courseData.id).order("order_index"),
       supabase.from("course_sections").select("*").eq("course_id", courseData.id).eq("is_published", true).order("order_index"),
+      user && enrollData ? getResumePoint(supabase, user.id, courseData.id) : Promise.resolve(null),
     ]);
+    setCourse(courseTr);
     if (topicsData) {
       setTopics(await withTranslations(supabase, "topics", topicsData as TopicTocEntry[], locale));
     }
@@ -80,21 +94,7 @@ export default function CourseDetailPage() {
         setOpenSections({ [sectionsData[0].id]: true });
       }
     }
-
-    if (user) {
-      const { data: enrollData } = await supabase
-        .from("enrollments").select("*").eq("user_id", user.id).eq("course_id", courseData.id).single();
-      if (enrollData) setEnrollment(enrollData as Enrollment);
-
-      const { data: progressData } = await supabase
-        .from("topic_progress").select("*").eq("user_id", user.id).eq("course_id", courseData.id);
-      if (progressData) setTopicProgress(progressData as TopicProgress[]);
-
-      // Faqat kursga yozilganlarga — yozilmaganda "davom ettirish" ma'nosiz
-      if (enrollData) {
-        setResume(await getResumePoint(supabase, user.id, courseData.id));
-      }
-    }
+    if (resumePoint) setResume(resumePoint);
     setLoading(false);
   }
 
@@ -139,10 +139,8 @@ export default function CourseDetailPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 w-48 bg-surface rounded-lg" />
-        <div className="glass-card p-8 h-48" />
-        <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="glass-card p-4 h-20" />)}</div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <BrandLoader />
       </div>
     );
   }

@@ -6,6 +6,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { I18nProvider } from "@/components/i18n/I18nProvider";
 import { DEFAULT_LOCALE, LOCALE_META, isLocale, type Locale } from "@/lib/i18n/config";
 import { Toaster } from "sonner";
+import BrandLoader from "@/components/brand/BrandLoader";
 import {
   SITE_URL,
   SITE_NAME,
@@ -121,6 +122,15 @@ export const metadata: Metadata = {
   },
 };
 
+const SPLASH_SCRIPT = `(function(){try{
+if(!matchMedia('(display-mode: standalone)').matches)return;
+var d=document.documentElement,t=Date.now();
+function hide(){d.setAttribute('data-splash','done');}
+function done(){setTimeout(hide,Math.max(0,1500-(Date.now()-t)));}
+if(document.readyState==='complete')done();else addEventListener('load',done);
+setTimeout(hide,5000);
+}catch(e){}})();`;
+
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f9f9fc" },
@@ -148,6 +158,17 @@ export default async function RootLayout({
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}
     >
       <body className="min-h-screen font-body antialiased noise-overlay">
+        {/*
+          PWA splash: o'rnatilgan ilova ochilganda oq ekran o'rniga logo
+          animatsiyasi. CSS uni faqat display-mode: standalone da ko'rsatadi.
+          Skript sahifa yuklangach (kamida 1,5 s, ko'pi bilan 5 s) <html> ga
+          data-splash="done" qo'yadi — element o'chirilmaydi, React
+          gidratatsiyasi buzilmasin. Skript HTML bilan birga darhol ishlaydi.
+        */}
+        <div className="app-splash" aria-hidden="true">
+          <BrandLoader />
+        </div>
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
