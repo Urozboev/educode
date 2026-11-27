@@ -11,6 +11,11 @@ const plain = [
   ["Shahar va choy", "Şahar va çoy"],
   ["SHAXS CHO'L", "ŞAXS ÇÖL"],
   ["G'alaba", "Ğalaba"],
+  // Chiziqchali inglizcha atamalar va buyruqlar o'zgarmaydi
+  ["Cache-Control va If-None-Match sarlavhalari", "Cache-Control va If-None-Match sarlavhalari"],
+  ["pre-shared kalit, echo-server, ESTABLISHED holati", "pre-shared kalit, echo-server, ESTABLISHED holati"],
+  ["netsh va ipconfig /flushdns buyruqlari, Apache", "netsh va ipconfig /flushdns buyruqlari, Apache"],
+  ["Veb-dasturlash bosqichma-bosqich", "Veb-dasturlaş bosqiçma-bosqiç"],
   // apostrof shakllari
   ["o‘rganish oʻqish o’rin o`yin", "örganiş öqiş örin öyin"],
   // tutuq

@@ -14,7 +14,7 @@ export const SITE_URL = (
 
 export const SITE_NAME = "MirAcademy";
 export const SITE_BRAND_FULL = "MirAcademy (miracademy.uz)";
-export const SITE_TAGLINE = "Dasturlaşni öynab örgan";
+export const SITE_TAGLINE = "Dasturlaşni oson örganing";
 
 /**
  * Brend nomining boshqa yozilish shakllari.

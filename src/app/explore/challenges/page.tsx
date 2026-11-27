@@ -40,10 +40,11 @@ export default function ExploreChallenges() {
       setIsLoggedIn(!!session);
       const { data } = await supabase
         .from("challenges")
-        .select("*")
+        // Faqat kartochka maydonlari — kod shabloni va testlar ro'yxatga kerak emas
+        .select("id, slug, title, description, category, difficulty, coin_reward, solved_count")
         .eq("is_published", true)
         .order("difficulty");
-      if (data) setChallenges(await withTranslations(supabase, "challenges", data as Challenge[], locale));
+      if (data) setChallenges(await withTranslations(supabase, "challenges", data as unknown as Challenge[], locale));
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

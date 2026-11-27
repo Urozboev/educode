@@ -7,7 +7,10 @@ const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'tydufbtkbkefqcxxajdk.supabase.co', pathname: '/storage/v1/object/public/**' },
+      // Har qanday Supabase loyihasining faqat OCHIQ fayl omborlari. Ilgari bu
+      // yerda allaqachon ishlatilmaydigan eski loyiha manzili turardi;
+      // 2026-11 da baza Frankfurtdagi yangi loyihaga ko'chirildi.
+      { protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],

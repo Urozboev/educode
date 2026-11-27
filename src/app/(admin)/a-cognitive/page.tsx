@@ -28,8 +28,8 @@ interface Sample { id: string; user_query: string; engagement_code: string; crea
 interface Pair { interaction_id: string; auto_code: string; human_code: string; coder_id: string }
 
 const ZONE: Record<string, { label: string; cls: string }> = {
-  healthy: { label: "Sog'lom", cls: "text-emerald-600 dark:text-emerald-400" },
-  moderate: { label: "O'rtacha", cls: "text-amber-600 dark:text-amber-400" },
+  healthy: { label: "Soğlom", cls: "text-emerald-600 dark:text-emerald-400" },
+  moderate: { label: "Örtaça", cls: "text-amber-600 dark:text-amber-400" },
   high: { label: "Yuqori", cls: "text-orange-600 dark:text-orange-400" },
   very_high: { label: "Juda yuqori", cls: "text-rose-600 dark:text-rose-400" },
 };
@@ -106,7 +106,7 @@ export default function AdminCognitivePage() {
 
   function exportCsv() {
     downloadCsv(`kognitiv-avtonomiya-${new Date().toISOString().slice(0, 10)}.csv`,
-      ["Talaba", "Bog'liqlik (7 kun)", "Zona", "Hodisalar", "Ko'mak darajasi", "Daraja o'zgarishlari", "Savollar (30 kun)", "Topshirish ulushi %", "Tiklanish %", "Bashoratlar", "Brier", "Siljish"],
+      ["Talaba", "Boğliqlik (7 kun)", "Zona", "Hodisalar", "Kömak darajasi", "Daraja özgarişlari", "Savollar (30 kun)", "Topşiriş uluşi %", "Tiklaniş %", "Bashoratlar", "Brier", "Siljish"],
       rows.map((r) => [r.full_name, r.dep_index, r.dep_zone ? ZONE[r.dep_zone]?.label : "", r.dep_events, r.support_level, r.level_changes, r.turns, r.co_share, r.recovery, r.cal_resolved, r.cal_brier, r.cal_bias]));
   }
 
@@ -115,7 +115,7 @@ export default function AdminCognitivePage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display font-bold text-3xl">Kognitiv avtonomiya</h1>
-          <p className="text-muted-foreground text-sm">SIga bog&apos;liqlik, moslashuvchan ko&apos;mak, muloqot sifati va o&apos;zini baholash aniqligi</p>
+          <p className="text-muted-foreground text-sm">SIga boğliqlik, moslaşuvçan kömak, muloqot sifati va özini baholaş aniqligi</p>
         </div>
         <button onClick={exportCsv} disabled={!rows.length} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-card text-sm font-medium hover:bg-accent disabled:opacity-50">
           <Download className="w-4 h-4" /> Excel (CSV)
@@ -125,8 +125,8 @@ export default function AdminCognitivePage() {
       {error && (
         <div className="glass-card p-4 border-l-4 border-l-neon-red text-sm flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-neon-red shrink-0 mt-0.5" />
-          <div><p className="font-semibold">Ma&apos;lumot yuklanmadi</p><p className="text-muted-foreground">{error}</p>
-            <p className="text-muted-foreground mt-1"><code>89_kognitiv_avtonomiya.sql</code> migratsiyasi Supabase SQL Editor da ishga tushirilganini tekshiring.</p></div>
+          <div><p className="font-semibold">Maʼlumot yuklanmadi</p><p className="text-muted-foreground">{error}</p>
+            <p className="text-muted-foreground mt-1"><code>89_kognitiv_avtonomiya.sql</code> migratsiyasi Supabase SQL Editor da işga tuşirilganini tekşiring.</p></div>
         </div>
       )}
 
@@ -134,24 +134,24 @@ export default function AdminCognitivePage() {
         <div className="glass-card p-4">
           <Brain className="w-5 h-5 mb-2 text-neon-purple" />
           <div className="font-display font-bold text-2xl">{stats.interpretable}<span className="text-sm text-muted-foreground font-normal">/{stats.students}</span></div>
-          <div className="text-xs text-muted-foreground">Ko&apos;rsatkichi talqin qilinadigan talabalar (≥ 3 hodisa)</div>
+          <div className="text-xs text-muted-foreground">Körsatkiçi talqin qilinadigan talabalar (≥ 3 hodisa)</div>
         </div>
         <div className="glass-card p-4">
           <Compass className="w-5 h-5 mb-2 text-sky-500" />
           <div className="flex gap-1.5 flex-wrap">
             {stats.levels.map((n, l) => <span key={l} className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", LEVEL_CLS[l])} title={SUPPORT_LEVELS[l].name}>{l}: {n}</span>)}
           </div>
-          <div className="text-xs text-muted-foreground mt-2">Ko&apos;mak darajalari bo&apos;yicha</div>
+          <div className="text-xs text-muted-foreground mt-2">Kömak darajalari böyiça</div>
         </div>
         <div className="glass-card p-4">
           <MessageCircleQuestion className="w-5 h-5 mb-2 text-amber-500" />
           <div className="font-display font-bold text-2xl">{stats.coShare ?? "—"}{stats.coShare != null && "%"}</div>
-          <div className="text-xs text-muted-foreground">Fikrlashni topshirish ulushi · tiklanish {stats.recovery ?? "—"}{stats.recovery != null && "%"}</div>
+          <div className="text-xs text-muted-foreground">Fikrlaşni topşiriş uluşi · tiklaniş {stats.recovery ?? "—"}{stats.recovery != null && "%"}</div>
         </div>
         <div className="glass-card p-4">
           <Gauge className="w-5 h-5 mb-2 text-emerald-500" />
           <div className="font-display font-bold text-2xl">{stats.calAcc ?? "—"}{stats.calAcc != null && "%"}</div>
-          <div className="text-xs text-muted-foreground">O&apos;rtacha kalibrlash aniqligi (1 − Brier)</div>
+          <div className="text-xs text-muted-foreground">Örtaça kalibrlaş aniqligi (1 − Brier)</div>
         </div>
       </div>
 
@@ -161,20 +161,20 @@ export default function AdminCognitivePage() {
             <thead>
               <tr className="border-b border-border/50 text-xs text-muted-foreground">
                 <th className="text-left px-5 py-3 font-semibold">Talaba</th>
-                <th className="px-3 py-3 font-semibold" title="(2.1) formula, oxirgi 7 kun">Bog&apos;liqlik</th>
-                <th className="px-3 py-3 font-semibold">Ko&apos;mak darajasi</th>
-                <th className="px-3 py-3 font-semibold" title="ai_support_log yozuvlari">O&apos;zgarishlar</th>
+                <th className="px-3 py-3 font-semibold" title="(2.1) formula, oxirgi 7 kun">Boğliqlik</th>
+                <th className="px-3 py-3 font-semibold">Kömak darajasi</th>
+                <th className="px-3 py-3 font-semibold" title="ai_support_log yozuvlari">Özgarişlar</th>
                 <th className="px-3 py-3 font-semibold" title="30 kundagi mentor savollari">Savollar</th>
-                <th className="px-3 py-3 font-semibold" title="CO / (CO + AL)">Topshirish</th>
-                <th className="px-3 py-3 font-semibold" title="CO navbatidan keyin 3 navbat ichida AL ga qaytish">Tiklanish</th>
-                <th className="px-3 py-3 font-semibold" title="Natijasi ma'lum bashoratlar · 1 − Brier · siljish">Kalibrlash</th>
+                <th className="px-3 py-3 font-semibold" title="CO / (CO + AL)">Topşiriş</th>
+                <th className="px-3 py-3 font-semibold" title="CO navbatidan keyin 3 navbat içida AL ga qaytiş">Tiklaniş</th>
+                <th className="px-3 py-3 font-semibold" title="Natijasi maʼlum başoratlar · 1 − Brier · siljiş">Kalibrlaş</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr><td colSpan={8} className="text-center py-10 text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Yuklanmoqda…</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={8} className="text-center py-10 text-muted-foreground">Ma&apos;lumot yo&apos;q</td></tr>
+                <tr><td colSpan={8} className="text-center py-10 text-muted-foreground">Maʼlumot yöq</td></tr>
               ) : rows.map((r) => (
                 <tr key={r.user_id} className="border-b border-border/30 hover:bg-surface/30">
                   <td className="px-5 py-2.5">
@@ -217,9 +217,9 @@ export default function AdminCognitivePage() {
       <div className="glass-card p-5 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="font-display font-semibold text-lg">Tasnifchini ekspert kodlashi bilan tekshirish</h2>
+            <h2 className="font-display font-semibold text-lg">Tasnifçini ekspert kodlaşi bilan tekşiriş</h2>
             <p className="text-xs text-muted-foreground max-w-2xl">
-              Talabalarning haqiqiy savollaridan tasodifiy namuna olinadi. Avtomatik kod ko&apos;rsatilmaydi (ko&apos;r kodlash). Siz tanlagan kod tasnifchi kodi bilan solishtirilib, kelishuv va Koen kappasi hisoblanadi. Ikki ekspert alohida kodlasa, har birining natijasi saqlanadi.
+              Talabalarning haqiqiy savollaridan tasodifiy namuna olinadi. Avtomatik kod körsatilmaydi (kör kodlaş). Siz tanlagan kod tasnifçi kodi bilan soliştirilib, kelişuv va Koen kappasi hisoblanadi. Ikki ekspert alohida kodlasa, har birining natijasi saqlanadi.
             </p>
           </div>
           <button onClick={loadSample} disabled={sampleLoading} className="btn-primary py-2 px-4 text-sm inline-flex items-center gap-2">
@@ -233,18 +233,18 @@ export default function AdminCognitivePage() {
             <p className="font-display font-bold text-2xl">{kCodes.n}</p>
           </div>
           <div className="rounded-xl bg-surface/50 px-4 py-3">
-            <p className="text-xs text-muted-foreground">8 kod bo&apos;yicha: kelishuv · κ</p>
+            <p className="text-xs text-muted-foreground">8 kod böyiça: kelişuv · κ</p>
             <p className="font-display font-bold text-2xl">{kCodes.agree == null ? "—" : `${Math.round(kCodes.agree * 100)}% · ${kCodes.kappa!.toFixed(2)}`}</p>
           </div>
           <div className="rounded-xl bg-surface/50 px-4 py-3">
-            <p className="text-xs text-muted-foreground">CO / AL / N bo&apos;yicha: kelishuv · κ</p>
+            <p className="text-xs text-muted-foreground">CO / AL / N böyiça: kelişuv · κ</p>
             <p className="font-display font-bold text-2xl">{kKinds.agree == null ? "—" : `${Math.round(kKinds.agree * 100)}% · ${kKinds.kappa!.toFixed(2)}`}</p>
           </div>
         </div>
-        {kCodes.n > 0 && kCodes.n < 50 && <p className="text-xs text-muted-foreground">Ishonchli kappa uchun kamida 100–200 ta juftlik tavsiya etiladi.</p>}
+        {kCodes.n > 0 && kCodes.n < 50 && <p className="text-xs text-muted-foreground">Işonçli kappa uçun kamida 100–200 ta juftlik tavsiya etiladi.</p>}
 
         <details className="text-xs">
-          <summary className="cursor-pointer text-muted-foreground">Kodlar ta&apos;rifi</summary>
+          <summary className="cursor-pointer text-muted-foreground">Kodlar taʼrifi</summary>
           <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 mt-2">
             {ENGAGEMENT_CODES.map((c) => <p key={c.code}><b className="font-mono">{c.code}</b> {c.label} — <span className="text-muted-foreground">{c.example}</span></p>)}
           </div>
@@ -266,7 +266,7 @@ export default function AdminCognitivePage() {
                 {coded[s.id] && (
                   <span className="text-xs ml-2 inline-flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                    tasnifchi: <b className="font-mono">{s.engagement_code}</b>{coded[s.id] === s.engagement_code ? " — mos" : " — farq"}
+                    tasnifçi: <b className="font-mono">{s.engagement_code}</b>{coded[s.id] === s.engagement_code ? " — mos" : " — farq"}
                   </span>
                 )}
               </div>
@@ -276,9 +276,9 @@ export default function AdminCognitivePage() {
       </div>
 
       <div className="glass-card p-5 text-xs text-muted-foreground space-y-1.5">
-        <p><b className="text-foreground">Bog&apos;liqlik ko&apos;rsatkichi</b> — I = Σwₖnₖ / (Σwₖnₖ + Yₘ) · 100, oxirgi 7 kun. Vaznlar: mentor savoli va o&apos;tmagan kodga izoh 0,25, maslahatlar 0,25 / 0,50 / 0,75 / 1,00, reja va o&apos;tgan kodga izoh 0. Yₘ — 3/4-maslahatsiz va ko&apos;chirilmagan qabul qilingan yechimlar.</p>
-        <p><b className="text-foreground">Ko&apos;mak darajasi</b>: 0 (≤ 30) to&apos;liq · 1 (31–60) yo&apos;naltiruvchi · 2 (61–80) ishora · 3 (81+) mustaqil sinov. Daraja belgilangandan keyin mustaqil yechim bo&apos;lsa, darhol bittaga pasayadi.</p>
-        <p><b className="text-foreground">Kalibrlash</b>: talaba topshiriqdan oldin 1–4 ishonch beradi (0,10 / 0,35 / 0,65 / 0,90). Brier = o&apos;rtacha (p − natija)², siljish &gt; 0 — o&apos;zini ortiqcha baholash.</p>
+        <p><b className="text-foreground">Boğliqlik körsatkiçi</b> — I = Σwₖnₖ / (Σwₖnₖ + Yₘ) · 100, oxirgi 7 kun. Vaznlar: mentor savoli va ötmagan kodga izoh 0,25, maslahatlar 0,25 / 0,50 / 0,75 / 1,00, reja va ötgan kodga izoh 0. Yₘ — 3/4-maslahatsiz va köçirilmagan qabul qilingan yeçimlar.</p>
+        <p><b className="text-foreground">Kömak darajasi</b>: 0 (≤ 30) töliq · 1 (31–60) yönaltiruvçi · 2 (61–80) işora · 3 (81+) mustaqil sinov. Daraja belgilangandan keyin mustaqil yeçim bölsa, darhol bittaga pasayadi.</p>
+        <p><b className="text-foreground">Kalibrlaş</b>: talaba topşiriqdan oldin 1–4 işonç beradi (0,10 / 0,35 / 0,65 / 0,90). Brier = örtaça (p − natija)², siljiş &gt; 0 — özini ortiqça baholaş.</p>
       </div>
     </div>
   );

@@ -73,7 +73,7 @@ export default function ChatPage() {
       if (res.status === 429 || data.blocked) {
         setMessages(prev => [
           ...prev,
-          { role: "assistant", content: data.reply || data.message || "AI yordami chegarasiga yetdingiz." },
+          { role: "assistant", content: data.reply || data.message || "AI yordami çegarasiga yetdingiz." },
         ]);
         if (data.quota) {
           setQuota({
@@ -230,12 +230,12 @@ export default function ChatPage() {
               </div>
               {msg.nudge === "offload" && (
                 <p className="text-xs rounded-xl px-3 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300">
-                  🧭 Siz tayyor yechim so&apos;radingiz. Ko&apos;proq o&apos;rganasiz, agar o&apos;z fikringizni yozsangiz: nimani sinab ko&apos;rdingiz va xato qayerda deb o&apos;ylaysiz?
+                  🧭 Siz tayyor yeçim söradingiz. Köproq örganasiz, agar öz fikringizni yozsangiz: nimani sinab kördingiz va xato qayerda deb öylaysiz?
                 </p>
               )}
               {msg.nudge === "recovery" && (
                 <p className="text-xs rounded-xl px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300">
-                  ✨ Zo&apos;r — o&apos;z fikringiz bilan qaytdingiz. Aynan shu odat natijani eng ko&apos;p oshiradi.
+                  ✨ Zör — öz fikringiz bilan qaytdingiz. Aynan şu odat natijani eng köp oşiradi.
                 </p>
               )}
               {msg.role === "assistant" && (

@@ -24,7 +24,7 @@ interface Props {
   supportLevel?: number;
 }
 
-const LEVEL_LABELS = ["Umumiy yo'nalish", "Aniqroq yo'nalish", "Konkret qism", "Kod parchasi"];
+const LEVEL_LABELS = ["Umumiy yönaliş", "Aniqroq yönaliş", "Konkret qism", "Kod parçasi"];
 const DEFAULT_COSTS = [0, 2, 5, 10];
 
 /**
@@ -87,7 +87,7 @@ export default function HintTier({ taskId, taskType, hints, supportLevel = 0 }: 
 
     // Oldingi daraja ochilganmi?
     if (level > 1 && !unlocked[level - 1]) {
-      toast.warning("Avvalgi darajani oching!");
+      toast.warning("Avvalgi darajani oçing!");
       return;
     }
 
@@ -123,13 +123,13 @@ export default function HintTier({ taskId, taskType, hints, supportLevel = 0 }: 
           amount: -cost,
           type: 'hint_unlock',
           reference_id: taskId,
-          description: `Hint daraja ${level} ochildi`,
+          description: `Hint daraja ${level} oçildi`,
           balance_after: newCoins,
         });
       }
       setUnlocked(p => ({ ...p, [level]: true }));
       setExpandedLevel(level);
-      toast.success(`Maslahat ${level} ochildi`);
+      toast.success(`Maslahat ${level} oçildi`);
     } catch (e: any) {
       toast.error(e.message);
     }
@@ -143,7 +143,7 @@ export default function HintTier({ taskId, taskType, hints, supportLevel = 0 }: 
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-sm font-semibold flex items-center gap-2">
           <Lightbulb className="w-4 h-4 text-neon-yellow" />
-          Bosqichma-bosqich maslahatlar
+          Bosqiçma-bosqiç maslahatlar
         </h3>
         {coins !== null && (
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
@@ -191,8 +191,8 @@ export default function HintTier({ taskId, taskType, hints, supportLevel = 0 }: 
                     <p className="text-[10px] text-muted-foreground">
                       {cost === 0 ? "Tekin" : `${cost} coin`}
                       {supportLocked
-                        ? ` · ${SUPPORT_LEVELS[supportLevel as 0 | 1 | 2 | 3].name}: mustaqil yechim bilan ochiladi`
-                        : isLocked && " · oldingi darajani oching"}
+                        ? ` · ${SUPPORT_LEVELS[supportLevel as 0 | 1 | 2 | 3].name}: mustaqil yeçim bilan oçiladi`
+                        : isLocked && " · oldingi darajani oçing"}
                     </p>
                   )}
                 </div>

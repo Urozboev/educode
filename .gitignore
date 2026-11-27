@@ -11,6 +11,9 @@
 /.next/
 /.next-check/
 /.next-preview/
+/.next-newdb/
+# Alifbo skripti hisobotlari va baza zaxira nusxalari (kontent bor)
+/scripts/alifbo/out/
 /out/
 
 # production

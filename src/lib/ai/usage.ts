@@ -62,7 +62,7 @@ export async function checkAIQuota(
       return {
         allowed: false,
         reason: 'cooldown',
-        message: `Bir oz dam oling. AI yordami ${until.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })} dan keyin yana ochiladi. Shu vaqt ichida mustaqil urinib ko'ring.`,
+        message: `Bir oz dam oling. AI yordami ${until.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })} dan keyin yana oçiladi. Şu vaqt içida mustaqil urinib köring.`,
         remaining,
         limit,
         used,
@@ -76,7 +76,7 @@ export async function checkAIQuota(
     return {
       allowed: false,
       reason: 'limit_reached',
-      message: `Bugun AI yordami chegarasiga yetdingiz (${used}/${limit}). Ertaga davom etamiz. Ayni paytda mustaqil urinib ko'ring!`,
+      message: `Bugun AI yordami çegarasiga yetdingiz (${used}/${limit}). Ertaga davom etamiz. Ayni paytda mustaqil urinib köring!`,
       remaining: 0,
       limit,
       used,
@@ -86,7 +86,7 @@ export async function checkAIQuota(
   // 5. limit yaqin
   let warning: string | undefined;
   if (remaining > 0 && remaining <= 2) {
-    warning = `Yana ${remaining} ta savol qoldi. Mustaqil ishlashga harakat qilmoqchimisiz?`;
+    warning = `Yana ${remaining} ta savol qoldi. Mustaqil işlaşga harakat qilmoqçimisiz?`;
   }
 
   return { allowed: true, remaining, limit, used, warning };

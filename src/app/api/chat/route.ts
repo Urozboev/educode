@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   const model = process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-flash-latest';
 
   if (!apiKey) {
-    return NextResponse.json({ reply: '⚠️ GEMINI_API_KEY sozlanmagan. .env.local faylini tekshiring.' });
+    return NextResponse.json({ reply: '⚠️ GEMINI_API_KEY sozlanmagan. .env.local faylini tekşiring.' });
   }
 
   try {
@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
     const contents: any[] = [];
     contents.push({
       role: 'user',
-      parts: [{ text: SOCRATIC_CHAT_PROMPT + (extra.length ? `\n\nQO'SHIMCHA KO'RSATMA:\n- ${extra.join('\n- ')}` : '') }],
+      parts: [{ text: SOCRATIC_CHAT_PROMPT + (extra.length ? `\n\nQO'SHIMCHA KÖRSATMA:\n- ${extra.join('\n- ')}` : '') }],
     });
-    contents.push({ role: 'model', parts: [{ text: "Tushundim. Sokratik usulda yo'l-yo'riq beraman." }] });
+    contents.push({ role: 'model', parts: [{ text: "Tuşundim. Sokratik usulda yöl-yöriq beraman." }] });
 
     const recentHistory = (history || []).slice(-6);
     for (const msg of recentHistory) {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const err = await response.text();
       console.error('Gemini API:', response.status, err);
-      return NextResponse.json({ reply: `⚠️ AI xatolik (${response.status}). API kalitni tekshiring.` });
+      return NextResponse.json({ reply: `⚠️ AI xatolik (${response.status}). API kalitni tekşiring.` });
     }
 
     const data = await response.json();

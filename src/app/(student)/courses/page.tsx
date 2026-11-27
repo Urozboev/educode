@@ -70,22 +70,14 @@ export default function CoursesPage() {
   }, [locale]);
 
   async function loadData() {
+    // Kurslar va yozilishlar bir vaqtda (ilgari ketma-ket edi)
     const user = await getCurrentUser(supabase);
-
-    const { data: coursesData } = await supabase
-      .from("courses")
-      .select("*")
-      .eq("is_published", true)
-      .order("order_index");
+    const [{ data: coursesData }, enrollRes] = await Promise.all([
+      supabase.from("courses").select("*").eq("is_published", true).order("order_index"),
+      user ? supabase.from("enrollments").select("*").eq("user_id", user.id) : Promise.resolve({ data: null }),
+    ]);
     if (coursesData) setCourses(await withTranslations(supabase, "courses", coursesData as Course[], locale));
-
-    if (user) {
-      const { data: enrollData } = await supabase
-        .from("enrollments")
-        .select("*")
-        .eq("user_id", user.id);
-      if (enrollData) setEnrollments(enrollData as Enrollment[]);
-    }
+    if (enrollRes.data) setEnrollments(enrollRes.data as Enrollment[]);
 
     setLoading(false);
   }

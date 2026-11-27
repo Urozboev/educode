@@ -34,11 +34,11 @@ type Ev = { ts: string; kind: "topic" | "quiz" | "sub" | "start"; title: string;
 
 const STATUS: Record<string, { label: string; ok: boolean | null }> = {
   accepted: { label: "Qabul qilindi", ok: true },
-  wrong_answer: { label: "Noto'g'ri", ok: false },
+  wrong_answer: { label: "Notöğri", ok: false },
   pending: { label: "Tekshirilmoqda", ok: null },
   running: { label: "Tekshirilmoqda", ok: null },
   compilation_error: { label: "Kompilyatsiya xatosi", ok: false },
-  runtime_error: { label: "Bajarilish xatosi", ok: false },
+  runtime_error: { label: "Bajariliş xatosi", ok: false },
   time_limit: { label: "Vaqt limiti", ok: false },
   memory_limit: { label: "Xotira limiti", ok: false },
 };
@@ -116,7 +116,7 @@ export default function AdminStudentDetailPage() {
     for (const p of prog) {
       const t = topicById.get(p.topic_id);
       const course = t ? courseTitle.get(t.course_id) : undefined;
-      ev.push({ ts: p.started_at, kind: "start", title: t?.title ?? "Mavzu", sub: "Mavzuni ochdi", course });
+      ev.push({ ts: p.started_at, kind: "start", title: t?.title ?? "Mavzu", sub: "Mavzuni oçdi", course });
       if (p.is_completed && p.completed_at) ev.push({ ts: p.completed_at, kind: "topic", title: t?.title ?? "Mavzu", sub: "Mavzuni tugatdi", ok: true, course });
     }
     for (const q of quizzes) {
@@ -203,7 +203,7 @@ export default function AdminStudentDetailPage() {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm">
               {student.username && <span className="text-muted-foreground">@{student.username}</span>}
               <span className={cn("font-medium", getLevelColor(student.level))}>{getLevelLabel(student.level)}</span>
-              <span className="text-muted-foreground">A&apos;zo: {formatDate(student.created_at)}</span>
+              <span className="text-muted-foreground">Aʼzo: {formatDate(student.created_at)}</span>
               <span className={cn("text-[11px] font-medium px-2 py-0.5 rounded-full", act.cls)}>{act.label}</span>
               {student.is_blocked && <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-neon-red/10 text-neon-red">Bloklangan</span>}
             </div>
@@ -220,7 +220,7 @@ export default function AdminStudentDetailPage() {
         </div>
       </div>
 
-      {error && <div className="glass-card p-4 text-sm border-l-4 border-l-neon-red">Kurs statistikasi yuklanmadi: {error}. 88-migratsiya ishga tushirilganini tekshiring.</div>}
+      {error && <div className="glass-card p-4 text-sm border-l-4 border-l-neon-red">Kurs statistikasi yuklanmadi: {error}. 88-migratsiya işga tuşirilganini tekşiring.</div>}
 
       {/* Bugun / hafta + grafik */}
       <div className="grid lg:grid-cols-3 gap-4">
@@ -244,15 +244,15 @@ export default function AdminStudentDetailPage() {
         <div className="glass-card p-5">
           <div className="flex items-center justify-between gap-2 mb-3">
             <p className="text-sm font-semibold">Kognitiv avtonomiya</p>
-            <Link href="/a-cognitive" className="text-xs text-neon-purple hover:underline">Barcha talabalar →</Link>
+            <Link href="/a-cognitive" className="text-xs text-neon-purple hover:underline">Barça talabalar →</Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
-            <Mini label="SIga bog'liqlik (7 kun)" value={cog.dep_index == null ? "—" : String(cog.dep_index)} hint={`${cog.dep_events} ta hodisa; 3 tadan kam bo'lsa talqin qilinmaydi`} />
-            <Mini label="Ko'mak darajasi" value={`${cog.support_level} · ${SUPPORT_LEVELS[cog.support_level].name}`} hint={`${cog.level_changes} marta o'zgargan`} />
-            <Mini label="Tayyor yechim so'rash" value={cog.co_share == null ? "—" : `${cog.co_share}%`} hint={`${cog.turns} ta mentor savoli (30 kun)`} />
-            <Mini label="O'z fikriga qaytish" value={cog.recovery == null ? "—" : `${cog.recovery}%`} />
-            <Mini label="O'zini baholash aniqligi" value={cog.cal_brier == null ? "—" : `${Math.round((1 - Number(cog.cal_brier)) * 100)}%`}
-              hint={cog.cal_bias == null ? undefined : `${cog.cal_resolved} ta bashorat, siljish ${Number(cog.cal_bias).toFixed(2)} (> 0 — ortiqcha baholash)`} />
+            <Mini label="SIga boğliqlik (7 kun)" value={cog.dep_index == null ? "—" : String(cog.dep_index)} hint={`${cog.dep_events} ta hodisa; 3 tadan kam bölsa talqin qilinmaydi`} />
+            <Mini label="Kömak darajasi" value={`${cog.support_level} · ${SUPPORT_LEVELS[cog.support_level].name}`} hint={`${cog.level_changes} marta özgargan`} />
+            <Mini label="Tayyor yeçim söraş" value={cog.co_share == null ? "—" : `${cog.co_share}%`} hint={`${cog.turns} ta mentor savoli (30 kun)`} />
+            <Mini label="Öz fikriga qaytiş" value={cog.recovery == null ? "—" : `${cog.recovery}%`} />
+            <Mini label="Özini baholaş aniqligi" value={cog.cal_brier == null ? "—" : `${Math.round((1 - Number(cog.cal_brier)) * 100)}%`}
+              hint={cog.cal_bias == null ? undefined : `${cog.cal_resolved} ta başorat, siljiş ${Number(cog.cal_bias).toFixed(2)} (> 0 — ortiqça baholaş)`} />
           </div>
         </div>
       )}
@@ -260,7 +260,7 @@ export default function AdminStudentDetailPage() {
       {/* Kurslar */}
       <div className="space-y-3">
         <h2 className="font-display font-semibold text-xl flex items-center gap-2"><BookOpen className="w-5 h-5 text-neon-purple" /> Kurslar ({stats.length})</h2>
-        {stats.length === 0 && <div className="glass-card p-6 text-sm text-muted-foreground">Talaba hali hech qaysi kursga yozilmagan.</div>}
+        {stats.length === 0 && <div className="glass-card p-6 text-sm text-muted-foreground">Talaba hali heç qaysi kursga yozilmagan.</div>}
         {stats.map((s) => {
           const g = gradeInfo(s.grade);
           const isOpen = open === s.course_id;
@@ -277,7 +277,7 @@ export default function AdminStudentDetailPage() {
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {s.current_order
                         ? <>Hozir: <b className="text-foreground">{s.current_order}-mavzu</b> · {s.current_title}</>
-                        : "Barcha mavzular tugatilgan"}
+                        : "Barça mavzular tugatilgan"}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
                       <div className="flex-1 h-2.5 rounded-full bg-surface overflow-hidden max-w-md">
@@ -287,8 +287,8 @@ export default function AdminStudentDetailPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-4 gap-3 text-center shrink-0">
-                    <Mini label="Test o'rtacha" value={s.quiz_avg == null ? "—" : `${s.quiz_avg}%`} cls={pctColor(s.quiz_avg)} hint={`${s.quizzes_taken} ta test topshirgan`} />
-                    <Mini label="Topshiriqlar" value={`${s.tasks_solved}/${s.tasks_total}`} />
+                    <Mini label="Test örtaça" value={s.quiz_avg == null ? "—" : `${s.quiz_avg}%`} cls={pctColor(s.quiz_avg)} hint={`${s.quizzes_taken} ta test topşirgan`} />
+                    <Mini label="Topşiriqlar" value={`${s.tasks_solved}/${s.tasks_total}`} />
                     <Mini label="Reyting" value={String(s.score)} />
                     <div>
                       <span className={cn("inline-flex w-9 h-9 items-center justify-center rounded-xl font-bold", g.cls)} title={g.label}>{s.grade}</span>
@@ -311,8 +311,8 @@ export default function AdminStudentDetailPage() {
                         <th className="text-left px-3 py-2 font-semibold">Mavzu</th>
                         <th className="text-left px-3 py-2 font-semibold">Holat</th>
                         <th className="px-3 py-2 font-semibold">Matn</th>
-                        <th className="px-3 py-2 font-semibold">Test (eng yaxshi)</th>
-                        <th className="px-3 py-2 font-semibold">Topshiriqlar</th>
+                        <th className="px-3 py-2 font-semibold">Test (eng yaxşi)</th>
+                        <th className="px-3 py-2 font-semibold">Topşiriqlar</th>
                         <th className="text-left px-3 py-2 font-semibold">Tugatgan sana</th>
                       </tr>
                     </thead>
@@ -328,21 +328,21 @@ export default function AdminStudentDetailPage() {
                         return (
                           <tr key={t.id} className={cn("border-b border-border/30", isCur && "bg-neon-purple/[0.07]")}>
                             <td className="px-5 py-2 font-mono text-xs text-muted-foreground">{k + 1}</td>
-                            <td className="px-3 py-2">{t.title}{isCur && <span className="ml-2 text-[10px] font-semibold text-neon-purple">← hozir shu yerda</span>}</td>
+                            <td className="px-3 py-2">{t.title}{isCur && <span className="ml-2 text-[10px] font-semibold text-neon-purple">← hozir şu yerda</span>}</td>
                             <td className="px-3 py-2 whitespace-nowrap">
                               {p?.is_completed
                                 ? <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400"><CheckCircle2 className="w-3.5 h-3.5" /> Tugatgan</span>
                                 : p
-                                  ? <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400"><PlayCircle className="w-3.5 h-3.5" /> Boshlagan</span>
-                                  : <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Circle className="w-3.5 h-3.5" /> Ochilmagan</span>}
+                                  ? <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400"><PlayCircle className="w-3.5 h-3.5" /> Boşlagan</span>
+                                  : <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Circle className="w-3.5 h-3.5" /> Oçilmagan</span>}
                             </td>
                             <td className="px-3 py-2 text-center">{p?.content_read ? <CheckCircle2 className="w-4 h-4 text-emerald-500 inline" /> : <span className="text-muted-foreground">—</span>}</td>
                             <td className={cn("px-3 py-2 text-center font-mono text-xs", pctColor(best))}>
-                              {best == null ? "—" : `${Math.round(best)}%`}{tq.length > 1 && <span className="text-muted-foreground"> · {tq.length} urinish</span>}
+                              {best == null ? "—" : `${Math.round(best)}%`}{tq.length > 1 && <span className="text-muted-foreground"> · {tq.length} uriniş</span>}
                             </td>
                             <td className="px-3 py-2 text-center font-mono text-xs">
                               {tt.length ? <span className={solved === tt.length ? "text-emerald-600 dark:text-emerald-400" : ""}>{solved}/{tt.length}</span> : "—"}
-                              {pendingRep && <span className="ml-1 text-[10px] text-amber-600" title="Hisobot o'qituvchi tekshiruvini kutmoqda">⏳</span>}
+                              {pendingRep && <span className="ml-1 text-[10px] text-amber-600" title="Hisobot öqituvçi tekşiruvini kutmoqda">⏳</span>}
                             </td>
                             <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{p?.completed_at ? formatDateTime(p.completed_at) : ""}</td>
                           </tr>
@@ -370,7 +370,7 @@ export default function AdminStudentDetailPage() {
             </div>
           </div>
           <div className="space-y-1 max-h-[480px] overflow-y-auto pr-1">
-            {feed.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Bu davrda faollik yo&apos;q</p>}
+            {feed.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Bu davrda faollik yöq</p>}
             {feed.map((e, k) => {
               const Icon = e.kind === "topic" ? GraduationCap : e.kind === "quiz" ? ListChecks : e.kind === "start" ? BookOpen : e.sub?.startsWith("Masala") ? Swords : e.sub?.startsWith("Hisobot") ? FileText : Code2;
               return (
@@ -392,7 +392,7 @@ export default function AdminStudentDetailPage() {
 
         {/* Topshiriqlar */}
         <div className="glass-card p-5">
-          <h2 className="font-display font-semibold text-lg mb-3">Topshiriq va masalalar ({subs.length})</h2>
+          <h2 className="font-display font-semibold text-lg mb-3">Topşiriq va masalalar ({subs.length})</h2>
           <div className="space-y-1 max-h-[480px] overflow-y-auto pr-1">
             {subs.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Hali yuborilmagan</p>}
             {subs.map((s) => {
@@ -408,14 +408,14 @@ export default function AdminStudentDetailPage() {
                     <p className="text-xs text-muted-foreground truncate">
                       {s.task_type === "challenge" ? "Masala" : KIND[tk?.task_kind ?? "code"]}{t && <> · {t.title}</>}
                     </p>
-                    {s.review_note && <p className="text-xs mt-0.5 text-amber-700 dark:text-amber-400">O&apos;qituvchi izohi: {s.review_note}</p>}
+                    {s.review_note && <p className="text-xs mt-0.5 text-amber-700 dark:text-amber-400">Öqituvçi izohi: {s.review_note}</p>}
                   </div>
                   <div className="text-right shrink-0">
                     <p className={cn("text-xs font-semibold", st.ok === true ? "text-emerald-600 dark:text-emerald-400" : st.ok === false ? "text-rose-600 dark:text-rose-400" : "text-amber-600")}>
                       {st.label}{pct != null && s.language !== "report" && ` · ${pct}%`}
                     </p>
                     <p className="text-[10px] text-muted-foreground">{formatDateTime(s.created_at)}</p>
-                    {s.language === "report" && s.status === "pending" && <Link href="/a-reports" className="text-[10px] text-neon-purple hover:underline">Tekshirish →</Link>}
+                    {s.language === "report" && s.status === "pending" && <Link href="/a-reports" className="text-[10px] text-neon-purple hover:underline">Tekşiriş →</Link>}
                   </div>
                 </div>
               );
@@ -427,7 +427,7 @@ export default function AdminStudentDetailPage() {
         <div className="glass-card p-5">
           <h2 className="font-display font-semibold text-lg mb-3">Test natijalari ({quizzes.length})</h2>
           <div className="space-y-1 max-h-[420px] overflow-y-auto pr-1">
-            {quizzes.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Hali test topshirmagan</p>}
+            {quizzes.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Hali test topşirmagan</p>}
             {quizzes.map((q) => {
               const t = topicById.get(q.topic_id);
               const p = Math.round(Number(q.percentage));
@@ -436,7 +436,7 @@ export default function AdminStudentDetailPage() {
                   <div className={cn("w-12 h-9 rounded-lg flex items-center justify-center font-bold text-xs", p >= 86 ? "bg-emerald-500/10 text-emerald-600" : p >= 56 ? "bg-amber-500/10 text-amber-600" : "bg-rose-500/10 text-rose-600")}>{p}%</div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{t?.title ?? "Mavzu"}</p>
-                    <p className="text-xs text-muted-foreground truncate">{q.score}/{q.total} to&apos;g&apos;ri{q.attempt_number && q.attempt_number > 1 ? ` · ${q.attempt_number}-urinish` : ""}{t && <> · {courseTitle.get(t.course_id)}</>}</p>
+                    <p className="text-xs text-muted-foreground truncate">{q.score}/{q.total} töğri{q.attempt_number && q.attempt_number > 1 ? ` · ${q.attempt_number}-uriniş` : ""}{t && <> · {courseTitle.get(t.course_id)}</>}</p>
                   </div>
                   <span className="text-[10px] text-muted-foreground whitespace-nowrap">{formatDateTime(q.completed_at)}</span>
                 </div>
@@ -449,7 +449,7 @@ export default function AdminStudentDetailPage() {
         <div className="glass-card p-5">
           <h2 className="font-display font-semibold text-lg mb-3">Coin tarixi</h2>
           <div className="space-y-1 max-h-[420px] overflow-y-auto pr-1">
-            {coins.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Tranzaksiyalar yo&apos;q</p>}
+            {coins.length === 0 && <p className="text-sm text-muted-foreground py-6 text-center">Tranzaksiyalar yöq</p>}
             {coins.map((c) => (
               <div key={c.id} className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0">
                 <span className={cn("w-14 text-right font-mono text-sm font-semibold", c.amount >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400")}>{c.amount > 0 ? "+" : ""}{c.amount}</span>
@@ -491,9 +491,9 @@ function PeriodCard({ title, c }: { title: string; c: { topics: number; quizzes:
       <div className="grid grid-cols-2 gap-3">
         {[
           ["Tugatgan mavzu", c.topics, "text-neon-purple"],
-          ["Test topshirgan", c.quizzes, "text-neon-blue"],
-          ["Topshiriq yuborgan", c.subs, "text-foreground"],
-          ["Shundan qabul", c.solved, "text-neon-green"],
+          ["Test topşirgan", c.quizzes, "text-neon-blue"],
+          ["Topşiriq yuborgan", c.subs, "text-foreground"],
+          ["Şundan qabul", c.solved, "text-neon-green"],
         ].map(([l, v, cls]) => (
           <div key={l as string} className="rounded-xl bg-surface/50 px-3 py-2">
             <p className={cn("font-display font-bold text-xl", cls as string)}>{v as number}</p>
